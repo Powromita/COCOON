@@ -1,0 +1,81 @@
+{
+  "adobe": {
+    "display_name": "Adobe (Sun-dried Mud Brick)",
+    "category": "traditional_ladakh",
+    "thermal_conductivity": 0.13,
+    "density": 2210,
+    "specific_heat": 1000,
+    "data_status": "reference_based",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "rammed_earth": {
+    "display_name": "Rammed Earth",
+    "category": "traditional_ladakh",
+    "thermal_conductivity": 0.8,
+    "density": 1200,
+    "specific_heat": 1000,
+    "data_status": "reference_based",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "straw_clay": {
+    "display_name": "Straw-Clay",
+    "category": "passive_solar_ladakh",
+    "thermal_conductivity": 0.19,
+    "density": 660,
+    "specific_heat": 1500,
+    "data_status": "reference_based",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "stone_masonry": {
+    "display_name": "Stone Masonry (Generic Ladakh Construction Stone)",
+    "category": "traditional_ladakh",
+    "thermal_conductivity": 2.3,
+    "density": 2500,
+    "specific_heat": 1045,
+    "data_status": "reference_based_generalized",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "wood_timber": {
+    "display_name": "Wood / Structural Timber",
+    "category": "traditional_ladakh",
+    "thermal_conductivity": 0.13,
+    "density": 500,
+    "specific_heat": 1500,
+    "data_status": "reference_based_generalized",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "concrete": {
+    "display_name": "Concrete",
+    "category": "modern_engineered",
+    "thermal_conductivity": 1.13,
+    "density": 1800,
+    "specific_heat": 1008,
+    "data_status": "reference_based",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "reinforced_concrete": {
+    "display_name": "Reinforced Concrete",
+    "category": "modern_engineered",
+    "thermal_conductivity": 2.3,
+    "density": 2300,
+    "specific_heat": 1000,
+    "data_status": "reference_based",
+    "data_source": "Ladakh passive-solar building simulation dataset used in the project reference"
+  },
+
+  "puf": {
+    "display_name": "PUF Insulation (Modern Option)",
+    "category": "modern_insulation",
+    "thermal_conductivity": 0.025,
+    "density": 35,
+    "specific_heat": 1400,
+    "data_status": "provisional",
+    "data_source": "Existing project database value; replace with project-approved manufacturer or test data for final validation"
+  }
+}

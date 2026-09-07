@@ -1,0 +1,22 @@
+{
+    "single": {
+        "display_name": "Single Glazing",
+        "U_W_m2K": 5.8,
+        "SHGC": 0.86,
+        "source_status": "Starter engineering profile - replace with project-approved glazing database if available"
+    },
+
+    "double": {
+        "display_name": "Double Glazing",
+        "U_W_m2K": 2.8,
+        "SHGC": 0.70,
+        "source_status": "Starter engineering profile - replace with project-approved glazing database if available"
+    },
+
+    "triple": {
+        "display_name": "Triple Glazing",
+        "U_W_m2K": 1.8,
+        "SHGC": 0.55,
+        "source_status": "Starter engineering profile - replace with project-approved glazing database if available"
+    }
+}

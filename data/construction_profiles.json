@@ -1,0 +1,170 @@
+{
+  "wall": {
+    "adobe_600": {
+      "display_name": "Adobe Wall - 600 mm",
+      "source_status": "Reference-informed profile; 600 mm is an explicit selected profile thickness, not a calculated value",
+      "layers": [
+        {
+          "material": "adobe",
+          "thickness_mm": 600
+        }
+      ]
+    },
+
+    "stone_masonry_600": {
+      "display_name": "Stone Masonry Wall - 600 mm",
+      "source_status": "Reference-informed profile using generalized stone-masonry properties; local stone type should be supplied for site-specific validation",
+      "layers": [
+        {
+          "material": "stone_masonry",
+          "thickness_mm": 600
+        }
+      ]
+    },
+
+    "rammed_earth_500": {
+      "display_name": "Rammed Earth Wall - 500 mm",
+      "source_status": "Reference-informed profile; user can switch to Detailed Mode to enter exact site thickness",
+      "layers": [
+        {
+          "material": "rammed_earth",
+          "thickness_mm": 500
+        }
+      ]
+    },
+
+    "straw_clay_300": {
+      "display_name": "Straw-Clay Wall - 300 mm",
+      "source_status": "Reference-informed passive-solar construction profile; user can adjust exact thickness in Detailed Mode",
+      "layers": [
+        {
+          "material": "straw_clay",
+          "thickness_mm": 300
+        }
+      ]
+    },
+
+    "stone_puf_300_50": {
+      "display_name": "Stone Masonry 300 mm + PUF 50 mm",
+      "source_status": "Modern comparison profile; PUF properties are marked provisional in the material database",
+      "layers": [
+        {
+          "material": "stone_masonry",
+          "thickness_mm": 300
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 50
+        }
+      ]
+    },
+
+    "concrete_puf_200_50": {
+      "display_name": "Concrete 200 mm + PUF 50 mm",
+      "source_status": "Modern engineered comparison profile; PUF properties are marked provisional in the material database",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 200
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 50
+        }
+      ]
+    }
+  },
+
+  "roof": {
+    "wood_straw_clay": {
+      "display_name": "Timber + Straw-Clay Roof",
+      "source_status": "Reference-informed passive-solar layered profile; exact layer thicknesses are explicit profile values and can be changed in Detailed Mode",
+      "layers": [
+        {
+          "material": "wood_timber",
+          "thickness_mm": 100
+        },
+        {
+          "material": "straw_clay",
+          "thickness_mm": 250
+        }
+      ]
+    },
+
+    "straw_clay_300": {
+      "display_name": "Straw-Clay Roof - 300 mm",
+      "source_status": "Reference-informed passive-solar profile",
+      "layers": [
+        {
+          "material": "straw_clay",
+          "thickness_mm": 300
+        }
+      ]
+    },
+
+    "concrete_puf_150_50": {
+      "display_name": "Concrete 150 mm + PUF 50 mm",
+      "source_status": "Modern engineered comparison profile; PUF properties are provisional",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 150
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 50
+        }
+      ]
+    }
+  },
+
+  "floor": {
+    "stone_masonry_300": {
+      "display_name": "Stone Floor - 300 mm",
+      "source_status": "Reference-informed profile using generalized stone-masonry properties",
+      "layers": [
+        {
+          "material": "stone_masonry",
+          "thickness_mm": 300
+        }
+      ]
+    },
+
+    "concrete_150": {
+      "display_name": "Concrete Floor - 150 mm",
+      "source_status": "Modern engineered profile",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 150
+        }
+      ]
+    },
+
+    "reinforced_concrete_150": {
+      "display_name": "Reinforced Concrete Floor - 150 mm",
+      "source_status": "Modern engineered profile",
+      "layers": [
+        {
+          "material": "reinforced_concrete",
+          "thickness_mm": 150
+        }
+      ]
+    },
+
+    "concrete_puf_150_50": {
+      "display_name": "Concrete 150 mm + PUF 50 mm",
+      "source_status": "Modern engineered comparison profile; PUF properties are provisional",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 150
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 50
+        }
+      ]
+    }
+  }
+}
