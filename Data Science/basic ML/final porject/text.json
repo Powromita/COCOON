@@ -1,0 +1,42 @@
+{"text": " We have covered 1000 km in Tata Sierra. So whats good and whats bad? Lets find out!", "segments": [
+        {"id": 0, "seek": 0, "start": 0.0, "end": 3.0, "text": " We have covered 1000 km in Tata Sierra.", "tokens": [
+                50364,
+                492,    
+                362,
+                5343,
+                9714,
+                10698,
+                294,
+                314,
+                3274,
+                25182,
+                13,
+                50514
+            ], "temperature": 0.0, "avg_logprob": -0.6155686532297442, "compression_ratio": 1.036144578313253, "no_speech_prob": 0.22025828063488007
+        },
+        {"id": 1, "seek": 0, "start": 3.0, "end": 5.0, "text": " So what"s good and what"s bad?", "tokens": [
+                50514,
+                407,
+                437,
+                311,
+                665,
+                293,
+                437,
+                311,
+                1578,
+                30,
+                50614
+            ], "temperature": 0.0, "avg_logprob": -0.6155686532297442, "compression_ratio": 1.036144578313253, "no_speech_prob": 0.22025828063488007
+        },
+        {"id": 2, "seek": 0, "start": 5.0, "end": 6.0, "text": " Let"s find out!", "tokens": [
+                50614,
+                961,
+                311,
+                915,
+                484,
+                0,
+                50664
+            ], "temperature": 0.0, "avg_logprob": -0.6155686532297442, "compression_ratio": 1.036144578313253, "no_speech_prob": 0.22025828063488007
+        }
+    ], "language": "english"
+}

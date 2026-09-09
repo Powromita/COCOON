@@ -70,7 +70,11 @@ CONTOUR_FRACTIONS = (0.0, 0.25, 0.5, 0.75, 1.0)   # where in the window to snaps
 
 
 def run_case(config, weather_csv_path, case_name, max_hours=48,
-             element_size_m=0.15):
+             element_size_m=0.15, fast=False):
+    """``fast=True``: 4-core solve, 1-4 substeps per hour, and skip the
+    contour / mesh-temperature exports. Pair with a coarser
+    ``element_size_m`` (e.g. 0.30). For quick RC-vs-FEM checks where only
+    the indoor temperature series is needed."""
     out_dir = os.path.join(RESULTS_ROOT, case_name)
     run_loc = os.path.join(out_dir, "ansys_run")
     frames_dir = os.path.join(out_dir, "contour_frames")
@@ -98,9 +102,10 @@ def run_case(config, weather_csv_path, case_name, max_hours=48,
                             config["initial_temperature_C"])
 
     print(f"\n[{case_name}] launching ANSYS ({n_steps} hourly steps)...")
+    switches = "-m 3000 -db 1024" + (" -np 4" if fast else "")
     mapdl = launch_mapdl(exec_file=ANSYS_EXEC, run_location=run_loc,
                          override=True, cleanup_on_exit=True, start_timeout=180,
-                         additional_switches="-m 3000 -db 1024")
+                         additional_switches=switches)
     try:
         mapdl.clear()
         mapdl.prep7()
@@ -131,7 +136,7 @@ def run_case(config, weather_csv_path, case_name, max_hours=48,
         mapdl.timint("ON")
         mapdl.kbc(1)                 # stepped: hourly-constant loads, like the RC loop
         mapdl.autots("ON")
-        mapdl.nsubst(4, 20, 1)
+        mapdl.nsubst(1, 4, 1) if fast else mapdl.nsubst(4, 20, 1)
         mapdl.outres("ALL", "LAST")
         mapdl.tunif(T_init_K)        # whole model starts where the RC model started
 
@@ -216,14 +221,17 @@ def run_case(config, weather_csv_path, case_name, max_hours=48,
         series.to_csv(series_path, index=False)
         print(f"[{case_name}] saved {series_path}")
 
-        try:
-            _export_mesh_temperature(mapdl, weather, out_dir, case_name)
-        except Exception as exc:                       # noqa: BLE001
-            print(f"[{case_name}] mesh_temperature export skipped: {exc}")
-        try:
-            _export_contours(mapdl, weather, contour_steps, frames_dir, case_name)
-        except Exception as exc:                       # noqa: BLE001
-            print(f"[{case_name}] contour export skipped: {exc}")
+        if fast:
+            print(f"[{case_name}] fast mode: skipping mesh + contour exports")
+        else:
+            try:
+                _export_mesh_temperature(mapdl, weather, out_dir, case_name)
+            except Exception as exc:                   # noqa: BLE001
+                print(f"[{case_name}] mesh_temperature export skipped: {exc}")
+            try:
+                _export_contours(mapdl, weather, contour_steps, frames_dir, case_name)
+            except Exception as exc:                   # noqa: BLE001
+                print(f"[{case_name}] contour export skipped: {exc}")
 
     finally:
         mapdl.exit()

@@ -1,0 +1,10 @@
+{
+  "T_min_C": 0.64,
+  "T_max_C": 14.8,
+  "T_mean_C": 6.33,
+  "T_median_C": 5.74,
+  "T_final_C": 0.64,
+  "outdoor_min_C": -31.14,
+  "outdoor_max_C": -9.22,
+  "hours": 168
+}

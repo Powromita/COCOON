@@ -1,0 +1,26 @@
+{
+  "shortlist_ids": [
+    33,
+    15,
+    6
+  ],
+  "verdict": "STABLE: design 33 is rank 1 in >=80% of perturbed rankings -- a single winner is defensible.",
+  "pareto_ids": [
+    33
+  ],
+  "typical_top5": [
+    33,
+    15,
+    6,
+    2,
+    5
+  ],
+  "worstcase_top5": [
+    33,
+    15,
+    6,
+    5,
+    20
+  ],
+  "top3_stable_across_weather": true
+}

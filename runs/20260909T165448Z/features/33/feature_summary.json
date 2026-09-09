@@ -1,0 +1,34 @@
+{
+  "feature1_temperature": {
+    "T_min_C": 3.88,
+    "T_max_C": 14.81,
+    "T_mean_C": 8.33,
+    "T_median_C": 7.79,
+    "T_final_C": 3.88,
+    "outdoor_min_C": -31.14,
+    "outdoor_max_C": -9.22,
+    "hours": 168
+  },
+  "feature2_solar": {
+    "total_energy_Wh": 112267.063,
+    "total_energy_MJ": 404.161,
+    "peak_irradiance_W_m2": 692.05,
+    "peak_gain_W": 3197.271,
+    "avg_irradiance_W_m2": 144.644,
+    "capacity_factor_percent": 11.495,
+    "solar_temp_correlation": 0.973
+  },
+  "feature3_heatflow": {
+    "total_heat_loss_Wh": 237086.256,
+    "total_heat_loss_MJ": 853.511,
+    "peak_hourly_loss_W": 2270.239,
+    "avg_hourly_loss_W": 1411.228,
+    "wall_fraction_percent": 22.889,
+    "roof_fraction_percent": 8.939,
+    "floor_fraction_percent": 5.33,
+    "window_fraction_percent": 30.209,
+    "infiltration_fraction_percent": 32.633,
+    "peak_temp_difference_C": 45.323,
+    "avg_temp_difference_C": 28.129
+  }
+}

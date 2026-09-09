@@ -32,6 +32,27 @@ TIME_STEP_SECONDS = 3600
 
 
 # ==================================================
+# AIR INFILTRATION / VENTILATION
+# ==================================================
+# Uncontrolled air exchange through cracks, the door and vents is, in a
+# real shelter, one of the largest heat-loss paths -- often comparable to
+# the whole opaque envelope. The single-zone model adds it as a simple
+# air-change term:
+#
+#     Q_infiltration = rho_air * cp_air * (ACH * V / 3600) * (T_in - T_out)
+#
+# ACH ("air changes per hour") is taken from
+# configuration["air_changes_per_hour"]; DEFAULT_AIR_CHANGES_PER_HOUR is a
+# moderately-sealed small shelter. A rough tent/hut is ~1.5-3; a
+# well-detailed panel shelter ~0.3-0.5. Set it to 0 to reproduce the old
+# no-infiltration behaviour (and for like-for-like comparison with the
+# ANSYS model, which does not yet resolve infiltration).
+AIR_DENSITY_KG_M3 = 1.2
+AIR_SPECIFIC_HEAT_J_KGK = 1005.0
+DEFAULT_AIR_CHANGES_PER_HOUR = 0.7
+
+
+# ==================================================
 # POSITION-WEIGHTED THERMAL CAPACITANCE
 # ==================================================
 # The model collapses the whole shelter onto ONE indoor-air node. A
@@ -953,6 +974,54 @@ def run_simulation(
     )
 
 
+    # ==============================================
+    # AIR INFILTRATION
+    # ==============================================
+
+    air_changes_per_hour = (
+
+        configuration.get(
+
+            "air_changes_per_hour",
+
+            DEFAULT_AIR_CHANGES_PER_HOUR
+
+        )
+
+    )
+
+
+    internal_volume_m3 = (
+
+        configuration["geometry"]["length_m"]
+
+        * configuration["geometry"]["width_m"]
+
+        * configuration["geometry"]["height_m"]
+
+    )
+
+
+    # conductance of the infiltration path, W/K
+    infiltration_UA_W_K = (
+
+        AIR_DENSITY_KG_M3
+
+        * AIR_SPECIFIC_HEAT_J_KGK
+
+        * (
+
+            air_changes_per_hour
+
+            * internal_volume_m3
+
+            / 3600.0
+
+        )
+
+    )
+
+
     results = []
 
 
@@ -1187,6 +1256,27 @@ def run_simulation(
 
 
         # ------------------------------------------
+        # AIR INFILTRATION
+        # ------------------------------------------
+
+        Q_infiltration = (
+
+            infiltration_UA_W_K
+
+            * (
+
+                indoor_temperature
+
+                -
+
+                outdoor_temperature
+
+            )
+
+        )
+
+
+        # ------------------------------------------
         # TOTAL LOSS
         # ------------------------------------------
 
@@ -1205,6 +1295,10 @@ def run_simulation(
             +
 
             Q_floor
+
+            +
+
+            Q_infiltration
 
         )
 
@@ -1331,6 +1425,11 @@ def run_simulation(
                 Q_floor,
 
 
+            "Q_infiltration_W":
+
+                Q_infiltration,
+
+
             "Q_total_loss_W":
 
                 Q_loss,
@@ -1396,6 +1495,20 @@ def run_simulation(
                 "U_W_m2K":
 
                     window_U
+
+            },
+
+
+            "infiltration": {
+
+                "air_changes_per_hour":
+
+                    air_changes_per_hour,
+
+
+                "UA_W_K":
+
+                    infiltration_UA_W_K
 
             },
 

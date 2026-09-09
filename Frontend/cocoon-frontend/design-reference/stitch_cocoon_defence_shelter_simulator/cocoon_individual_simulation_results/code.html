@@ -1,0 +1,465 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary-fixed": "#2f1500",
+          "primary-container": "#1e3a8a",
+          "primary": "#00236f",
+          "secondary-container": "#fe932c",
+          "on-secondary": "#ffffff",
+          "tertiary-container": "#004a32",
+          "secondary": "#904d00",
+          "surface-variant": "#d3e4fe",
+          "surface-tint": "#4059aa",
+          "outline-variant": "#c5c5d3",
+          "secondary-fixed": "#ffdcc3",
+          "on-primary-fixed": "#00164e",
+          "on-tertiary-fixed-variant": "#005137",
+          "tertiary-fixed": "#85f8c4",
+          "primary-fixed-dim": "#b6c4ff",
+          "on-tertiary-fixed": "#002114",
+          "on-error-container": "#93000a",
+          "on-primary-fixed-variant": "#264191",
+          "on-surface": "#0b1c30",
+          "on-secondary-container": "#663500",
+          "error-container": "#ffdad6",
+          "on-surface-variant": "#444651",
+          "tertiary": "#003120",
+          "surface-container-low": "#eff4ff",
+          "outline": "#757682",
+          "on-error": "#ffffff",
+          "inverse-surface": "#213145",
+          "surface-container": "#e5eeff",
+          "surface-dim": "#cbdbf5",
+          "secondary-fixed-dim": "#ffb77d",
+          "on-secondary-fixed-variant": "#6e3900",
+          "inverse-on-surface": "#eaf1ff",
+          "on-tertiary-container": "#4ac08f",
+          "on-tertiary": "#ffffff",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-highest": "#d3e4fe",
+          "surface-container-high": "#dce9ff",
+          "on-primary": "#ffffff",
+          "primary-fixed": "#dce1ff",
+          "background": "#f8f9ff",
+          "surface": "#f8f9ff",
+          "inverse-primary": "#b6c4ff",
+          "tertiary-fixed-dim": "#68dba9",
+          "surface-bright": "#f8f9ff",
+          "on-background": "#0b1c30",
+          "on-primary-container": "#90a8ff",
+          "error": "#ba1a1a"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-md": "1rem",
+          "grid-unit": "0.5rem",
+          "panel-gutter": "1rem",
+          "space-2xs": "0.25rem",
+          "card-padding": "1.5rem",
+          "space-xs": "0.5rem",
+          "space-sm": "0.75rem",
+          "space-2xl": "3rem",
+          "space-lg": "1.5rem",
+          "space-xl": "2rem"
+        },
+        "fontFamily": {
+          "body-md": ["Inter"],
+          "display-xl": ["Inter"],
+          "headline-sm": ["Inter"],
+          "label-caps": ["Inter"],
+          "body-sm": ["Inter"],
+          "headline-md": ["Inter"],
+          "mono-metric-lg": ["JetBrains Mono"],
+          "mono-metric-sm": ["JetBrains Mono"],
+          "body-lg": ["Inter"],
+          "mono-metric-md": ["JetBrains Mono"],
+          "display-lg": ["Inter"]
+        },
+        "fontSize": {
+          "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "display-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+          "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+          "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "mono-metric-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.03em", "fontWeight": "500"}],
+          "mono-metric-sm": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "body-lg": ["15px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "mono-metric-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "display-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-lg"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="text-primary font-headline-md font-bold tracking-tight">COCOON</span><span class="h-4 w-px bg-outline-variant"></span><span class="text-on-surface-variant font-mono-metric-sm text-outline uppercase tracking-wider">PGML Suite</span></div><span class="text-on-surface-variant font-label-caps text-outline tracking-wider">Predict. Compare. Validate.</span></div><nav class="hidden md:flex items-center gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-headline-sm"><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm" data-path="home" href="{{DATA:SCREEN:SCREEN_2}}">Home</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm" data-path="configure" href="{{DATA:SCREEN:SCREEN_8}}">Configure</a><a aria-current="page" class="px-space-md py-space-xs rounded transition-colors bg-surface-container-high text-primary font-headline-sm" data-path="results" href="#">Results</a></nav></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-2xs rounded-full shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-mono-metric-sm text-on-surface font-medium">Individual Mode</span><span class="text-outline-variant">|</span><a class="text-primary font-mono-metric-sm hover:underline hover:text-primary-container transition-colors" href="{{DATA:SCREEN:SCREEN_2}}">Switch Mode</a></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-5rem)]"><div class="flex flex-col w-full">
+<div class="w-full px-space-lg py-space-md bg-surface-container-lowest shadow-sm">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-caps uppercase tracking-wider text-primary">Thermal Telemetry Evaluation</span>
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+<span class="font-mono-metric-sm text-outline">Simulation ID: LEH-IND-2026-08A</span>
+</div>
+<h1 class="font-display-xl text-on-surface tracking-tight">48-Hour Household Thermal Assessment</h1>
+<p class="font-body-md text-on-surface-variant">
+          Estimated room temperature for 6.0 × 4.0m Adobe Wall shelter in Leh winter conditions.
+        </p>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto">
+<div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-space-xs rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-headline-sm text-on-surface text-body-md">Individual Mode</span>
+<span class="text-outline-variant">|</span>
+<a class="font-mono-metric-sm text-primary hover:underline transition-colors font-medium" data-path="configure" href="{{DATA:SCREEN:SCREEN_2}}">Switch</a>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-space-md py-space-xs rounded font-headline-sm flex items-center gap-space-xs shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Export Summary</span>
+</button>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto w-full px-space-lg py-space-xl flex flex-col gap-space-xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="inline-flex bg-surface-container-high p-space-2xs rounded shadow-sm" role="tablist">
+<button class="px-space-lg py-space-xs rounded font-headline-sm bg-surface-container-lowest text-primary shadow-sm transition-all flex items-center gap-space-xs" id="tab-physics" type="button">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="">Physics Model</span>
+</button>
+<button class="px-space-lg py-space-xs rounded font-headline-sm text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-space-xs" id="tab-ml" type="button">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span class="">ML Rapid Estimate</span>
+</button>
+</div>
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-xs rounded shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+<span class="font-mono-metric-sm text-on-surface">Predicted Room Temp</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-xs rounded shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="font-mono-metric-sm text-on-surface">Outdoor Sub-Zero Temp</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-xs rounded shadow-sm">
+<span class="w-2.5 h-2.5 rounded bg-tertiary-fixed-dim"></span>
+<span class="font-mono-metric-sm text-on-surface">Comfort Zone (+16°C to +22°C)</span>
+</div>
+</div>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm relative overflow-hidden">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-on-surface">Transient Thermal Response (0h - 48h)</span>
+<span class="font-mono-metric-sm bg-surface-container-high text-primary px-space-xs py-space-2xs rounded">Timestep: 1.0 hr</span>
+</div>
+<div class="flex items-center gap-space-md bg-surface-container px-space-md py-space-xs rounded shadow-sm transition-opacity" id="cursor-readout">
+<div class="flex items-center gap-space-2xs">
+<span class="font-label-caps text-on-surface-variant">ELAPSED:</span>
+<span class="font-mono-metric-md text-on-surface font-semibold" id="metric-time">T+18h</span>
+</div>
+<span class="text-outline-variant">|</span>
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-label-caps text-on-surface-variant">INDOOR:</span>
+<span class="font-mono-metric-md text-secondary font-semibold" id="metric-indoor">+17.0°C</span>
+</div>
+<span class="text-outline-variant">|</span>
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-caps text-on-surface-variant">OUTDOOR:</span>
+<span class="font-mono-metric-md text-primary font-semibold" id="metric-outdoor">-22.0°C</span>
+</div>
+</div>
+</div>
+<div class="relative w-full h-80 pt-space-xs cursor-crosshair select-none" id="chart-container">
+<svg class="w-full h-full overflow-visible" id="thermal-chart" preserveAspectRatio="none" viewBox="0 0 1000 320">
+<defs>
+<linearGradient id="comfortGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#85f8c4" stop-opacity="0.32"></stop>
+<stop offset="100%" stop-color="#85f8c4" stop-opacity="0.12"></stop>
+</linearGradient>
+<linearGradient id="indoorGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#fe932c" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#fe932c" stop-opacity="0.0"></stop>
+</linearGradient>
+</defs>
+<rect fill="url(#comfortGrad)" height="42" width="910" x="50" y="70"></rect>
+<line opacity="0.45" stroke="#004a32" stroke-dasharray="3,3" stroke-width="1" x1="50" x2="960" y1="70" y2="70"></line>
+<line opacity="0.45" stroke="#004a32" stroke-dasharray="3,3" stroke-width="1" x1="50" x2="960" y1="112" y2="112"></line>
+<text fill="#004a32" font-family="JetBrains Mono" font-size="10" opacity="0.8" x="965" y="74">+22°C</text>
+<text fill="#004a32" font-family="JetBrains Mono" font-size="10" opacity="0.8" x="965" y="116">+16°C</text>
+<line stroke="#dce9ff" stroke-dasharray="2,4" stroke-width="1" x1="50" x2="960" y1="30" y2="30"></line>
+<line stroke="#dce9ff" stroke-dasharray="2,4" stroke-width="1" x1="50" x2="960" y1="154" y2="154"></line>
+<line stroke="#dce9ff" stroke-dasharray="2,4" stroke-width="1" x1="50" x2="960" y1="210" y2="210"></line>
+<line stroke="#dce9ff" stroke-dasharray="2,4" stroke-width="1" x1="50" x2="960" y1="266" y2="266"></line>
+<text fill="#757682" font-family="JetBrains Mono" font-size="10" x="20" y="34">+28°C</text>
+<text fill="#757682" font-family="JetBrains Mono" font-size="10" x="20" y="158">+10°C</text>
+<text fill="#757682" font-family="JetBrains Mono" font-size="10" x="20" y="214">0°C (Freeze)</text>
+<text fill="#757682" font-family="JetBrains Mono" font-size="10" x="20" y="270">-25°C</text>
+<line stroke="#cbd5e1" stroke-width="1" x1="50" x2="960" y1="290" y2="290"></line>
+<g fill="#757682" font-family="JetBrains Mono" font-size="10">
+<text x="50" y="306">Day 1 00:00</text>
+<text x="277" y="306">12:00 (Noon)</text>
+<text x="505" y="306">Day 2 00:00</text>
+<text x="732" y="306">12:00 (Noon)</text>
+<text x="935" y="306">48:00</text>
+</g>
+<path d="M 50,268 C 120,278 180,282 250,220 C 310,165 370,185 450,272 C 530,285 620,290 710,215 C 770,160 840,190 960,268" fill="none" id="outdoor-line" stroke="#1e3a8a" stroke-linecap="round" stroke-width="2.2"></path>
+<path d="M 50,118 C 120,116 180,110 270,92 C 340,78 410,88 490,116 C 560,120 630,112 720,90 C 790,76 860,92 960,118 L 960,290 L 50,290 Z" fill="url(#indoorGrad)" id="indoor-area"></path>
+<path d="M 50,118 C 120,116 180,110 270,92 C 340,78 410,88 490,116 C 560,120 630,112 720,90 C 790,76 860,92 960,118" fill="none" id="indoor-line" stroke="#fe932c" stroke-linecap="round" stroke-width="3"></path>
+<line id="interactive-marker-line" opacity="0.7" stroke="#0b1c30" stroke-dasharray="3,3" stroke-width="1.5" x1="391.25" x2="391.25" y1="20" y2="290"></line>
+<circle cx="391.25" cy="114.80000000000001" fill="#fe932c" id="indoor-point" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="391.25" cy="259.28" fill="#1e3a8a" id="outdoor-point" r="5" stroke="#ffffff" stroke-width="2"></circle>
+</svg>
+<div class="absolute bottom-1 right-2 bg-surface-container-lowest/90 px-space-xs py-space-2xs rounded text-outline font-label-caps tracking-wider">
+          Hover along graph to sample hours
+        </div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Minimum Room Temp</span>
+<span class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]">bedtime</span>
+</span>
+</div>
+<div class="py-space-xs">
+<div class="font-mono-metric-lg text-on-surface font-semibold tracking-tight">+15.2°C</div>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-body-sm text-on-surface-variant">Safe threshold at night</span>
+</div>
+</div>
+<div class="font-mono-metric-sm text-outline mt-space-xs pt-space-2xs bg-surface-container-low px-space-xs py-space-2xs rounded">
+          Occurs: 05:30 AM (Coldest Exterior)
+        </div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Maximum Room Temp</span>
+<span class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">wb_sunny</span>
+</span>
+</div>
+<div class="py-space-xs">
+<div class="font-mono-metric-lg text-secondary font-semibold tracking-tight">+18.8°C</div>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-body-sm text-on-surface-variant">Mid-afternoon solar gain</span>
+</div>
+</div>
+<div class="font-mono-metric-sm text-outline mt-space-xs pt-space-2xs bg-surface-container-low px-space-xs py-space-2xs rounded">
+          Occurs: 15:15 PM (South Glazing)
+        </div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Average Room Temp</span>
+<span class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[16px]">device_thermostat</span>
+</span>
+</div>
+<div class="py-space-xs">
+<div class="font-mono-metric-lg text-primary-container font-semibold tracking-tight">+17.1°C</div>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-body-sm text-on-surface-variant">Well above freezing</span>
+</div>
+</div>
+<div class="font-mono-metric-sm text-outline mt-space-xs pt-space-2xs bg-surface-container-low px-space-xs py-space-2xs rounded">
+          ΔT vs Outdoor: +36.2°C Delta
+        </div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Daily Fuel Equivalent</span>
+<span class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+</span>
+</div>
+<div class="py-space-xs">
+<div class="font-mono-metric-lg text-on-surface font-semibold tracking-tight">~12.4 L/day</div>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-body-sm text-on-surface-variant">Kerosene/diesel saved</span>
+</div>
+</div>
+<div class="font-mono-metric-sm text-outline mt-space-xs pt-space-2xs bg-surface-container-low px-space-xs py-space-2xs rounded">
+          Passive envelope insulation benefit
+        </div>
+</div>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-lg p-space-card-padding shadow-sm flex flex-col gap-space-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">info</span>
+<h2 class="font-headline-md text-on-surface tracking-tight">What This Means For Your Shelter</h2>
+</div>
+<div class="bg-tertiary-container/10 px-space-sm py-space-2xs rounded-full flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="font-mono-metric-sm text-tertiary-container font-medium">Safe Habitat Certified</span>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-space-xl items-start">
+<div class="flex-1 flex flex-col gap-space-md">
+<p class="font-body-lg text-on-surface leading-relaxed">
+            Your selected 600mm Adobe walls and double-glazed windows store warmth gathered during sunny daylight hours and release it gently through the sub-zero night. Even when the outside temperature drops to -24.8°C, the shelter stays comfortably above freezing without requiring dangerously heavy fuel stoves.
+          </p>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-low p-space-md rounded flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-tertiary-container text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">verified</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-on-surface text-[13px]">Frost Protected</span>
+<span class="font-body-sm text-on-surface-variant">100% Freezing Avoidance</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md rounded flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">solar_power</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-on-surface text-[13px]">Solar Retention</span>
+<span class="font-body-sm text-on-surface-variant">4.8 hrs passive heat storage</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md rounded flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">air</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-on-surface text-[13px]">Air Quality</span>
+<span class="font-body-sm text-on-surface-variant">Low indoor smoke dependency</span>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-80 bg-surface-container rounded p-space-md flex flex-col gap-space-sm self-stretch justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-caps uppercase tracking-wider text-outline">Shelter Parameters</span>
+<div class="flex justify-between items-center py-space-2xs">
+<span class="font-body-sm text-on-surface-variant">Footprint</span>
+<span class="font-mono-metric-sm text-on-surface font-medium">6.0 × 4.0 m (24.0 m²)</span>
+</div>
+<div class="flex justify-between items-center py-space-2xs">
+<span class="font-body-sm text-on-surface-variant">Wall Material</span>
+<span class="font-mono-metric-sm text-on-surface font-medium">Adobe Earth (600 mm)</span>
+</div>
+<div class="flex justify-between items-center py-space-2xs">
+<span class="font-body-sm text-on-surface-variant">South Glazing</span>
+<span class="font-mono-metric-sm text-on-surface font-medium">Double-Glazed Argon</span>
+</div>
+<div class="flex justify-between items-center py-space-2xs">
+<span class="font-body-sm text-on-surface-variant">Site Climate</span>
+<span class="font-mono-metric-sm text-on-surface font-medium">Leh Valley Winter (-25°C)</span>
+</div>
+</div>
+<div class="pt-space-xs">
+<a class="w-full inline-flex justify-center items-center gap-space-xs bg-surface-container-lowest hover:bg-surface-container-high text-primary px-space-md py-space-xs rounded font-headline-sm shadow-sm transition-colors text-body-md" data-path="configure" href="{{DATA:SCREEN:SCREEN_8}}">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span class="">Reconfigure Parameters</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const tabPhysics = document.getElementById('tab-physics');
+    const tabMl = document.getElementById('tab-ml');
+    const indoorLine = document.getElementById('indoor-line');
+    const indoorArea = document.getElementById('indoor-area');
+    const outdoorLine = document.getElementById('outdoor-line');
+    const chartContainer = document.getElementById('chart-container');
+    const markerLine = document.getElementById('interactive-marker-line');
+    const indoorPoint = document.getElementById('indoor-point');
+    const outdoorPoint = document.getElementById('outdoor-point');
+    const metricTime = document.getElementById('metric-time');
+    const metricIndoor = document.getElementById('metric-indoor');
+    const metricOutdoor = document.getElementById('metric-outdoor');
+
+    let currentMode = 'physics';
+
+    const physicsPaths = {
+      indoor: "M 50,118 C 120,116 180,110 270,92 C 340,78 410,88 490,116 C 560,120 630,112 720,90 C 790,76 860,92 960,118",
+      indoorArea: "M 50,118 C 120,116 180,110 270,92 C 340,78 410,88 490,116 C 560,120 630,112 720,90 C 790,76 860,92 960,118 L 960,290 L 50,290 Z",
+      outdoor: "M 50,268 C 120,278 180,282 250,220 C 310,165 370,185 450,272 C 530,285 620,290 710,215 C 770,160 840,190 960,268"
+    };
+
+    const mlPaths = {
+      indoor: "M 50,116 C 125,114 185,108 270,90 C 345,76 415,86 490,114 C 565,118 635,110 720,88 C 795,74 865,90 960,116",
+      indoorArea: "M 50,116 C 125,114 185,108 270,90 C 345,76 415,86 490,114 C 565,118 635,110 720,88 C 795,74 865,90 960,116 L 960,290 L 50,290 Z",
+      outdoor: "M 50,268 C 120,278 180,282 250,220 C 310,165 370,185 450,272 C 530,285 620,290 710,215 C 770,160 840,190 960,268"
+    };
+
+    function setTab(mode) {
+      currentMode = mode;
+      if (mode === 'physics') {
+        tabPhysics.className = 'px-space-lg py-space-xs rounded font-headline-sm bg-surface-container-lowest text-primary shadow-sm transition-all flex items-center gap-space-xs';
+        tabPhysics.querySelector('span').className = 'w-2 h-2 rounded-full bg-primary';
+        tabMl.className = 'px-space-lg py-space-xs rounded font-headline-sm text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-space-xs';
+        tabMl.querySelector('span').className = 'w-2 h-2 rounded-full bg-outline-variant';
+
+        indoorLine.setAttribute('d', physicsPaths.indoor);
+        indoorArea.setAttribute('d', physicsPaths.indoorArea);
+      } else {
+        tabMl.className = 'px-space-lg py-space-xs rounded font-headline-sm bg-surface-container-lowest text-primary shadow-sm transition-all flex items-center gap-space-xs';
+        tabMl.querySelector('span').className = 'w-2 h-2 rounded-full bg-primary';
+        tabPhysics.className = 'px-space-lg py-space-xs rounded font-headline-sm text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-space-xs';
+        tabPhysics.querySelector('span').className = 'w-2 h-2 rounded-full bg-outline-variant';
+
+        indoorLine.setAttribute('d', mlPaths.indoor);
+        indoorArea.setAttribute('d', mlPaths.indoorArea);
+      }
+    }
+
+    tabPhysics.addEventListener('click', function() { setTab('physics'); });
+    tabMl.addEventListener('click', function() { setTab('ml'); });
+
+    function updateCursor(xFrac) {
+      const clampedX = Math.max(0, Math.min(1, xFrac));
+      const svgX = 50 + clampedX * 910;
+      const hours = Math.round(clampedX * 48);
+
+      const hourCycle = (hours % 24) / 24;
+      const solarEffect = Math.sin((hourCycle - 0.25) * Math.PI * 2);
+      
+      const outdoorTemp = -22 + (solarEffect * 8);
+      const indoorTemp = currentMode === 'physics' ? (17.0 + solarEffect * 1.8) : (17.2 + solarEffect * 1.6);
+
+      const outdoorY = 210 - (outdoorTemp * 2.24);
+      const indoorY = 210 - (indoorTemp * 5.6);
+
+      markerLine.setAttribute('x1', svgX);
+      markerLine.setAttribute('x2', svgX);
+      indoorPoint.setAttribute('cx', svgX);
+      indoorPoint.setAttribute('cy', indoorY);
+      outdoorPoint.setAttribute('cx', svgX);
+      outdoorPoint.setAttribute('cy', outdoorY);
+
+      metricTime.textContent = 'T+' + hours + 'h';
+      metricIndoor.textContent = (indoorTemp > 0 ? '+' : '') + indoorTemp.toFixed(1) + '°C';
+      metricOutdoor.textContent = (outdoorTemp > 0 ? '+' : '') + outdoorTemp.toFixed(1) + '°C';
+    }
+
+    chartContainer.addEventListener('mousemove', function(e) {
+      const rect = chartContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const frac = (x - (50/1000 * rect.width)) / ((910/1000) * rect.width);
+      updateCursor(frac);
+    });
+
+    chartContainer.addEventListener('mouseleave', function() {
+      updateCursor(18 / 48);
+    });
+
+    updateCursor(18 / 48);
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full px-space-lg py-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Physics-Guided ML Platform</span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-mono-metric-sm text-on-surface">Extreme Sub-Zero Thermal Envelope Simulator</span></div><div class="flex items-center gap-space-md"><span class="font-body-sm text-on-surface-variant">Team <span class="font-medium text-on-surface">ByteFiesta</span></span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-mono-metric-sm text-primary font-medium bg-surface-container-low px-space-xs py-space-2xs rounded">SIH 2026 Defence Innovation</span></div></div></footer>
+
+</body></html>

@@ -1,0 +1,1917 @@
+[
+  {
+    "design_id": 0,
+    "geometry": {
+      "length_m": 5.69,
+      "width_m": 4.74,
+      "height_m": 2.84
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 71
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 301
+      }
+    ],
+    "roof": [
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 184
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 55
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 140
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.199,
+    "av_ratio": 1.125,
+    "floor_area_m2": 27.0,
+    "wwr_percent": 14.2,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 372,
+    "roof_thickness_mm": 184,
+    "floor_thickness_mm": 195
+  },
+  {
+    "design_id": 1,
+    "geometry": {
+      "length_m": 5.44,
+      "width_m": 4.99,
+      "height_m": 2.85
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 119
+      },
+      {
+        "material": "rammed_earth",
+        "thickness_mm": 332
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 83
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 170
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 65
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 140
+      }
+    ],
+    "windows": {
+      "type": "single",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.09,
+    "av_ratio": 1.119,
+    "floor_area_m2": 27.1,
+    "wwr_percent": 11.8,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 451,
+    "roof_thickness_mm": 253,
+    "floor_thickness_mm": 205
+  },
+  {
+    "design_id": 2,
+    "geometry": {
+      "length_m": 6.58,
+      "width_m": 3.77,
+      "height_m": 2.89
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 102
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 159
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 86
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 149
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 56
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 313
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 8,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 11.2
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.744,
+    "av_ratio": 1.179,
+    "floor_area_m2": 24.8,
+    "wwr_percent": 18.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 261,
+    "roof_thickness_mm": 235,
+    "floor_thickness_mm": 369
+  },
+  {
+    "design_id": 3,
+    "geometry": {
+      "length_m": 5.56,
+      "width_m": 4.01,
+      "height_m": 2.75
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 61
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 286
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 57
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 345
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 74
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 325
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.387,
+    "av_ratio": 1.222,
+    "floor_area_m2": 22.3,
+    "wwr_percent": 10.6,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 347,
+    "roof_thickness_mm": 402,
+    "floor_thickness_mm": 399
+  },
+  {
+    "design_id": 4,
+    "geometry": {
+      "length_m": 6.46,
+      "width_m": 4.86,
+      "height_m": 2.93
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 60
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 389
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 63
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 188
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 150
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.328,
+    "av_ratio": 1.062,
+    "floor_area_m2": 31.4,
+    "wwr_percent": 12.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 449,
+    "roof_thickness_mm": 251,
+    "floor_thickness_mm": 150
+  },
+  {
+    "design_id": 5,
+    "geometry": {
+      "length_m": 5.0,
+      "width_m": 3.81,
+      "height_m": 2.91
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 91
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 371
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 104
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 193
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 87
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 301
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.312,
+    "av_ratio": 1.269,
+    "floor_area_m2": 19.0,
+    "wwr_percent": 10.9,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 462,
+    "roof_thickness_mm": 297,
+    "floor_thickness_mm": 388
+  },
+  {
+    "design_id": 6,
+    "geometry": {
+      "length_m": 4.97,
+      "width_m": 4.54,
+      "height_m": 2.31
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 106
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 223
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 64
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 149
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 57
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 265
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.094,
+    "av_ratio": 1.276,
+    "floor_area_m2": 22.5,
+    "wwr_percent": 12.8,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 329,
+    "roof_thickness_mm": 213,
+    "floor_thickness_mm": 322
+  },
+  {
+    "design_id": 7,
+    "geometry": {
+      "length_m": 5.3,
+      "width_m": 3.8,
+      "height_m": 2.93
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 91
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 238
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 115
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 210
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 66
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 140
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.395,
+    "av_ratio": 1.245,
+    "floor_area_m2": 20.2,
+    "wwr_percent": 15.8,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 329,
+    "roof_thickness_mm": 325,
+    "floor_thickness_mm": 206
+  },
+  {
+    "design_id": 8,
+    "geometry": {
+      "length_m": 6.01,
+      "width_m": 4.07,
+      "height_m": 2.98
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 114
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 468
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 92
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 168
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 145
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.475,
+    "av_ratio": 1.159,
+    "floor_area_m2": 24.5,
+    "wwr_percent": 14.0,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 582,
+    "roof_thickness_mm": 260,
+    "floor_thickness_mm": 145
+  },
+  {
+    "design_id": 9,
+    "geometry": {
+      "length_m": 4.94,
+      "width_m": 4.41,
+      "height_m": 2.87
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 58
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 387
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 51
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 237
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 68
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 158
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.12,
+    "av_ratio": 1.207,
+    "floor_area_m2": 21.8,
+    "wwr_percent": 10.4,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 445,
+    "roof_thickness_mm": 288,
+    "floor_thickness_mm": 226
+  },
+  {
+    "design_id": 10,
+    "geometry": {
+      "length_m": 5.38,
+      "width_m": 4.53,
+      "height_m": 2.76
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 63
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 207
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 106
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 328
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 57
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 145
+      }
+    ],
+    "windows": {
+      "type": "single",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.189,
+    "av_ratio": 1.175,
+    "floor_area_m2": 24.4,
+    "wwr_percent": 15.3,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 270,
+    "roof_thickness_mm": 434,
+    "floor_thickness_mm": 202
+  },
+  {
+    "design_id": 11,
+    "geometry": {
+      "length_m": 5.71,
+      "width_m": 4.56,
+      "height_m": 2.86
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 101
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 237
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 65
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 156
+      }
+    ],
+    "floor": [
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 140
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 7,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 9.8
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.253,
+    "av_ratio": 1.138,
+    "floor_area_m2": 26.0,
+    "wwr_percent": 16.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 338,
+    "roof_thickness_mm": 221,
+    "floor_thickness_mm": 140
+  },
+  {
+    "design_id": 12,
+    "geometry": {
+      "length_m": 5.82,
+      "width_m": 4.58,
+      "height_m": 2.56
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 88
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 349
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 82
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 108
+      }
+    ],
+    "floor": [
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 144
+      }
+    ],
+    "windows": {
+      "type": "single",
+      "count": 7,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 9.8
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.271,
+    "av_ratio": 1.171,
+    "floor_area_m2": 26.6,
+    "wwr_percent": 18.4,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 437,
+    "roof_thickness_mm": 190,
+    "floor_thickness_mm": 144
+  },
+  {
+    "design_id": 13,
+    "geometry": {
+      "length_m": 6.05,
+      "width_m": 4.44,
+      "height_m": 2.88
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 76
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 202
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 88
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 190
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 49
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 184
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 7,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 9.8
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.361,
+    "av_ratio": 1.129,
+    "floor_area_m2": 26.8,
+    "wwr_percent": 16.2,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 278,
+    "roof_thickness_mm": 278,
+    "floor_thickness_mm": 233
+  },
+  {
+    "design_id": 14,
+    "geometry": {
+      "length_m": 6.79,
+      "width_m": 4.61,
+      "height_m": 2.84
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 95
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 168
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 76
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 154
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 82
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 151
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 8,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 11.2
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.473,
+    "av_ratio": 1.08,
+    "floor_area_m2": 31.3,
+    "wwr_percent": 17.3,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 263,
+    "roof_thickness_mm": 230,
+    "floor_thickness_mm": 233
+  },
+  {
+    "design_id": 15,
+    "geometry": {
+      "length_m": 4.84,
+      "width_m": 4.58,
+      "height_m": 2.94
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 60
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 548
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 100
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 186
+      }
+    ],
+    "floor": [
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 168
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.056,
+    "av_ratio": 1.19,
+    "floor_area_m2": 22.1,
+    "wwr_percent": 10.1,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 608,
+    "roof_thickness_mm": 286,
+    "floor_thickness_mm": 168
+  },
+  {
+    "design_id": 16,
+    "geometry": {
+      "length_m": 4.59,
+      "width_m": 4.3,
+      "height_m": 2.62
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 120
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 483
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 78
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 138
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 42
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 130
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.068,
+    "av_ratio": 1.283,
+    "floor_area_m2": 19.7,
+    "wwr_percent": 18.0,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 603,
+    "roof_thickness_mm": 216,
+    "floor_thickness_mm": 172
+  },
+  {
+    "design_id": 17,
+    "geometry": {
+      "length_m": 5.31,
+      "width_m": 4.07,
+      "height_m": 2.68
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 105
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 336
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 58
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 198
+      }
+    ],
+    "floor": [
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 344
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.303,
+    "av_ratio": 1.242,
+    "floor_area_m2": 21.6,
+    "wwr_percent": 14.0,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 441,
+    "roof_thickness_mm": 256,
+    "floor_thickness_mm": 344
+  },
+  {
+    "design_id": 18,
+    "geometry": {
+      "length_m": 5.24,
+      "width_m": 4.79,
+      "height_m": 2.33
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 92
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 174
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 112
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 176
+      }
+    ],
+    "floor": [
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 177
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.095,
+    "av_ratio": 1.229,
+    "floor_area_m2": 25.1,
+    "wwr_percent": 18.0,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 266,
+    "roof_thickness_mm": 288,
+    "floor_thickness_mm": 177
+  },
+  {
+    "design_id": 19,
+    "geometry": {
+      "length_m": 5.59,
+      "width_m": 3.32,
+      "height_m": 2.96
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 86
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 493
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 106
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 128
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 171
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.681,
+    "av_ratio": 1.298,
+    "floor_area_m2": 18.6,
+    "wwr_percent": 13.3,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 579,
+    "roof_thickness_mm": 234,
+    "floor_thickness_mm": 171
+  },
+  {
+    "design_id": 20,
+    "geometry": {
+      "length_m": 4.95,
+      "width_m": 4.23,
+      "height_m": 2.88
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 97
+      },
+      {
+        "material": "rammed_earth",
+        "thickness_mm": 410
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 51
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 157
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 76
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 162
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.171,
+    "av_ratio": 1.223,
+    "floor_area_m2": 21.0,
+    "wwr_percent": 10.6,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 507,
+    "roof_thickness_mm": 208,
+    "floor_thickness_mm": 238
+  },
+  {
+    "design_id": 21,
+    "geometry": {
+      "length_m": 5.45,
+      "width_m": 4.83,
+      "height_m": 2.33
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 94
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 333
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 92
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 229
+      }
+    ],
+    "floor": [
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 190
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.129,
+    "av_ratio": 1.21,
+    "floor_area_m2": 26.3,
+    "wwr_percent": 17.5,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 427,
+    "roof_thickness_mm": 321,
+    "floor_thickness_mm": 190
+  },
+  {
+    "design_id": 22,
+    "geometry": {
+      "length_m": 5.44,
+      "width_m": 4.52,
+      "height_m": 2.63
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 107
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 218
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 78
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 140
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 150
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 7,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 9.8
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.204,
+    "av_ratio": 1.191,
+    "floor_area_m2": 24.6,
+    "wwr_percent": 18.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 325,
+    "roof_thickness_mm": 218,
+    "floor_thickness_mm": 150
+  },
+  {
+    "design_id": 23,
+    "geometry": {
+      "length_m": 4.68,
+      "width_m": 4.57,
+      "height_m": 2.57
+    },
+    "walls": [
+      {
+        "material": "straw_clay",
+        "thickness_mm": 368
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 100
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 151
+      }
+    ],
+    "floor": [
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 266
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.025,
+    "av_ratio": 1.255,
+    "floor_area_m2": 21.4,
+    "wwr_percent": 17.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 368,
+    "roof_thickness_mm": 251,
+    "floor_thickness_mm": 266
+  },
+  {
+    "design_id": 24,
+    "geometry": {
+      "length_m": 4.8,
+      "width_m": 3.95,
+      "height_m": 2.96
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 112
+      },
+      {
+        "material": "adobe",
+        "thickness_mm": 437
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 111
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 247
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 50
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 186
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.214,
+    "av_ratio": 1.26,
+    "floor_area_m2": 19.0,
+    "wwr_percent": 13.5,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 549,
+    "roof_thickness_mm": 358,
+    "floor_thickness_mm": 236
+  },
+  {
+    "design_id": 25,
+    "geometry": {
+      "length_m": 6.19,
+      "width_m": 3.65,
+      "height_m": 2.56
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 64
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 356
+      }
+    ],
+    "roof": [
+      {
+        "material": "straw_clay",
+        "thickness_mm": 209
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 156
+      }
+    ],
+    "windows": {
+      "type": "single",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.698,
+    "av_ratio": 1.262,
+    "floor_area_m2": 22.6,
+    "wwr_percent": 16.7,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 420,
+    "roof_thickness_mm": 209,
+    "floor_thickness_mm": 156
+  },
+  {
+    "design_id": 26,
+    "geometry": {
+      "length_m": 5.34,
+      "width_m": 4.08,
+      "height_m": 2.44
+    },
+    "walls": [
+      {
+        "material": "rammed_earth",
+        "thickness_mm": 361
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 55
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 263
+      }
+    ],
+    "floor": [
+      {
+        "material": "concrete",
+        "thickness_mm": 136
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.309,
+    "av_ratio": 1.275,
+    "floor_area_m2": 21.8,
+    "wwr_percent": 12.2,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 361,
+    "roof_thickness_mm": 318,
+    "floor_thickness_mm": 136
+  },
+  {
+    "design_id": 27,
+    "geometry": {
+      "length_m": 6.19,
+      "width_m": 3.72,
+      "height_m": 2.95
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 93
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 225
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 68
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 155
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 47
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 171
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.664,
+    "av_ratio": 1.2,
+    "floor_area_m2": 23.0,
+    "wwr_percent": 12.0,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 318,
+    "roof_thickness_mm": 223,
+    "floor_thickness_mm": 218
+  },
+  {
+    "design_id": 28,
+    "geometry": {
+      "length_m": 4.96,
+      "width_m": 4.54,
+      "height_m": 2.41
+    },
+    "walls": [
+      {
+        "material": "adobe",
+        "thickness_mm": 434
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 96
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 168
+      }
+    ],
+    "floor": [
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 196
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.092,
+    "av_ratio": 1.258,
+    "floor_area_m2": 22.5,
+    "wwr_percent": 12.2,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 434,
+    "roof_thickness_mm": 264,
+    "floor_thickness_mm": 196
+  },
+  {
+    "design_id": 29,
+    "geometry": {
+      "length_m": 5.83,
+      "width_m": 4.2,
+      "height_m": 2.7
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 51
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 359
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 79
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 180
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 44
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 131
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.39,
+    "av_ratio": 1.19,
+    "floor_area_m2": 24.5,
+    "wwr_percent": 12.9,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 410,
+    "roof_thickness_mm": 259,
+    "floor_thickness_mm": 175
+  },
+  {
+    "design_id": 30,
+    "geometry": {
+      "length_m": 5.88,
+      "width_m": 4.63,
+      "height_m": 2.58
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 105
+      },
+      {
+        "material": "rammed_earth",
+        "thickness_mm": 349
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 106
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 121
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 87
+      },
+      {
+        "material": "reinforced_concrete",
+        "thickness_mm": 141
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 4,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 5.6
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.269,
+    "av_ratio": 1.159,
+    "floor_area_m2": 27.3,
+    "wwr_percent": 10.3,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 454,
+    "roof_thickness_mm": 227,
+    "floor_thickness_mm": 228
+  },
+  {
+    "design_id": 31,
+    "geometry": {
+      "length_m": 5.43,
+      "width_m": 4.62,
+      "height_m": 2.36
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 104
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 211
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 94
+      },
+      {
+        "material": "straw_clay",
+        "thickness_mm": 329
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 78
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 171
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.175,
+    "av_ratio": 1.226,
+    "floor_area_m2": 25.0,
+    "wwr_percent": 14.8,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 315,
+    "roof_thickness_mm": 423,
+    "floor_thickness_mm": 249
+  },
+  {
+    "design_id": 32,
+    "geometry": {
+      "length_m": 6.87,
+      "width_m": 4.28,
+      "height_m": 2.44
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 70
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 197
+      }
+    ],
+    "roof": [
+      {
+        "material": "straw_clay",
+        "thickness_mm": 243
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 44
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 138
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.604,
+    "av_ratio": 1.167,
+    "floor_area_m2": 29.4,
+    "wwr_percent": 12.8,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 267,
+    "roof_thickness_mm": 243,
+    "floor_thickness_mm": 182
+  },
+  {
+    "design_id": 33,
+    "geometry": {
+      "length_m": 6.6,
+      "width_m": 3.69,
+      "height_m": 2.86
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 92
+      },
+      {
+        "material": "stone_masonry",
+        "thickness_mm": 516
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 103
+      },
+      {
+        "material": "wood_timber",
+        "thickness_mm": 107
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 81
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 156
+      }
+    ],
+    "windows": {
+      "type": "triple",
+      "count": 6,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 8.4
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 1
+    },
+    "aspect_ratio": 1.79,
+    "av_ratio": 1.195,
+    "floor_area_m2": 24.3,
+    "wwr_percent": 14.3,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 608,
+    "roof_thickness_mm": 210,
+    "floor_thickness_mm": 237
+  },
+  {
+    "design_id": 34,
+    "geometry": {
+      "length_m": 5.53,
+      "width_m": 4.12,
+      "height_m": 2.53
+    },
+    "walls": [
+      {
+        "material": "puf",
+        "thickness_mm": 103
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 230
+      }
+    ],
+    "roof": [
+      {
+        "material": "puf",
+        "thickness_mm": 64
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 167
+      }
+    ],
+    "floor": [
+      {
+        "material": "puf",
+        "thickness_mm": 48
+      },
+      {
+        "material": "concrete",
+        "thickness_mm": 185
+      }
+    ],
+    "windows": {
+      "type": "double",
+      "count": 5,
+      "width_m": 1.0,
+      "height_m": 1.4,
+      "area_m2": 7.0
+    },
+    "doors": {
+      "type": "single_leaf",
+      "count": 2
+    },
+    "aspect_ratio": 1.342,
+    "av_ratio": 1.243,
+    "floor_area_m2": 22.8,
+    "wwr_percent": 14.4,
+    "wwr_within_band": true,
+    "wall_thickness_mm": 333,
+    "roof_thickness_mm": 231,
+    "floor_thickness_mm": 233
+  }
+]
