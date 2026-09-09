@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import DesignFlowNavigation from "@/components/navigation/DesignFlowNavigation";
+
 export default function OrganizationResultsPage() {
   return (
     <main className="min-h-screen bg-surface text-on-surface antialiased">
@@ -13,15 +15,7 @@ export default function OrganizationResultsPage() {
                 <span className="hidden text-body-sm text-outline sm:inline-block">Predict. Compare. Validate.</span>
               </div>
             </div>
-            <nav className="flex items-center gap-space-xs">
-              <Link href="/" className="rounded px-space-sm py-space-2xs text-on-surface-variant transition-colors hover:text-on-surface">
-                Home
-              </Link>
-              <Link href="/organization/configure" className="rounded px-space-sm py-space-2xs text-on-surface-variant transition-colors hover:text-on-surface">
-                Configure
-              </Link>
-              <span className="rounded bg-surface-container px-space-sm py-space-2xs text-primary">Results</span>
-            </nav>
+            <DesignFlowNavigation mode="organization" />
           </div>
 
           <div className="flex items-center gap-space-md">

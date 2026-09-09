@@ -3,38 +3,38 @@
 
 @theme {
   /* Colors — from DESIGN.md */
-  --color-surface: #f8f9ff;
-  --color-surface-dim: #cbdbf5;
-  --color-surface-bright: #f8f9ff;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container: #e5eeff;
-  --color-surface-container-high: #dce9ff;
-  --color-surface-container-highest: #d3e4fe;
-  --color-on-surface: #0b1c30;
-  --color-on-surface-variant: #444651;
-  --color-inverse-surface: #213145;
-  --color-inverse-on-surface: #eaf1ff;
-  --color-outline: #757682;
-  --color-outline-variant: #c5c5d3;
-  --color-surface-tint: #4059aa;
-  --color-primary: #00236f;
+  --color-surface: #070b14;
+  --color-surface-dim: #02040a;
+  --color-surface-bright: #111827;
+  --color-surface-container-lowest: #0b1020;
+  --color-surface-container-low: #10182a;
+  --color-surface-container: #172238;
+  --color-surface-container-high: #22304a;
+  --color-surface-container-highest: #2a3a58;
+  --color-on-surface: #eefaff;
+  --color-on-surface-variant: #9eb2c9;
+  --color-inverse-surface: #eefaff;
+  --color-inverse-on-surface: #070b14;
+  --color-outline: #7890aa;
+  --color-outline-variant: #30445e;
+  --color-surface-tint: #16d9f5;
+  --color-primary: #16d9f5;
   --color-on-primary: #ffffff;
-  --color-primary-container: #1e3a8a;
-  --color-on-primary-container: #90a8ff;
-  --color-inverse-primary: #b6c4ff;
-  --color-secondary: #904d00;
+  --color-primary-container: #087b9d;
+  --color-on-primary-container: #9ff3ff;
+  --color-inverse-primary: #006477;
+  --color-secondary: #ff9b4a;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #fe932c;
-  --color-on-secondary-container: #663500;
-  --color-tertiary: #003120;
+  --color-secondary-container: #b95116;
+  --color-on-secondary-container: #ffe3d1;
+  --color-tertiary: #35e6a2;
   --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #004a32;
-  --color-on-tertiary-container: #4ac08f;
-  --color-error: #ba1a1a;
+  --color-tertiary-container: #08734d;
+  --color-on-tertiary-container: #87f8c3;
+  --color-error: #ff6b6b;
   --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-error-container: #5a1b25;
+  --color-on-error-container: #ffd9dc;
   --color-primary-fixed: #dce1ff;
   --color-primary-fixed-dim: #b6c4ff;
   --color-on-primary-fixed: #00164e;
@@ -47,9 +47,9 @@
   --color-tertiary-fixed-dim: #68dba9;
   --color-on-tertiary-fixed: #002114;
   --color-on-tertiary-fixed-variant: #005137;
-  --color-background: #f8f9ff;
-  --color-on-background: #0b1c30;
-  --color-surface-variant: #d3e4fe;
+  --color-background: #070b14;
+  --color-on-background: #eefaff;
+  --color-surface-variant: #1b2941;
 
   /* Radius */
   --radius-sm: 0.125rem;
@@ -155,6 +155,9 @@ body {
   min-height: 100vh;
   background: var(--color-background);
   color: var(--color-on-background);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(22, 217, 245, 0.1), transparent 30rem),
+    radial-gradient(circle at 90% 20%, rgba(99, 102, 241, 0.1), transparent 28rem);
 }
 button,
 input,
@@ -165,4 +168,25 @@ img,
 svg {
   display: block;
   max-width: 100%;
+}
+
+[data-design-wizard] label {
+  color: #9eb2c9;
+}
+
+[data-design-wizard] select,
+[data-design-wizard] input[type="number"] {
+  border-color: #30445e;
+  background: #050914;
+  color: #eefaff;
+}
+
+[data-design-wizard] select:focus,
+[data-design-wizard] input[type="number"]:focus {
+  border-color: #16d9f5;
+  box-shadow: 0 0 0 3px rgba(22, 217, 245, 0.14);
+}
+
+[data-design-wizard] input[type="range"] {
+  accent-color: #16d9f5;
 }
