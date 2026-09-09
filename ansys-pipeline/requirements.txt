@@ -1,0 +1,7 @@
+# ANSYS validation pipeline (§7 of the PRD).
+# Needs a local licensed ANSYS install PyMAPDL can launch (Student edition
+# is fine for the prototype). Contour PNGs are rendered by MAPDL itself,
+# so pyvista is optional.
+ansys-mapdl-core>=0.68
+pandas>=2.0
+numpy>=1.24
