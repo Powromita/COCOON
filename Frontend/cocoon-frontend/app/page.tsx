@@ -45,7 +45,7 @@ export default function HomePage() {
 
             <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
               <Link
-                href="/individual/configure"
+                href="/auth/individual"
                 className="group flex min-h-[420px] flex-col justify-between rounded-xl bg-surface-container-lowest p-card-padding shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="space-y-6 flex flex-col">
@@ -92,7 +92,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/organization/configure"
+                href="/auth/organization"
                 className="group flex min-h-[420px] flex-col justify-between rounded-xl bg-surface-container-lowest p-card-padding shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="space-y-6 flex flex-col">
