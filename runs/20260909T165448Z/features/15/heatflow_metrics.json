@@ -1,0 +1,13 @@
+{
+  "total_heat_loss_Wh": 267811.414,
+  "total_heat_loss_MJ": 964.121,
+  "peak_hourly_loss_W": 2791.517,
+  "avg_hourly_loss_W": 1594.116,
+  "wall_fraction_percent": 26.088,
+  "roof_fraction_percent": 7.957,
+  "floor_fraction_percent": 24.251,
+  "window_fraction_percent": 16.575,
+  "infiltration_fraction_percent": 25.13,
+  "peak_temp_difference_C": 45.292,
+  "avg_temp_difference_C": 26.127
+}

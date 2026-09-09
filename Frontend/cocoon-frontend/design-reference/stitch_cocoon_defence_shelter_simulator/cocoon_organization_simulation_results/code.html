@@ -1,0 +1,378 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline-variant":"#c5c5d3","surface-variant":"#d3e4fe","secondary-container":"#fe932c","primary":"#00236f","on-primary-fixed-variant":"#264191","background":"#f8f9ff","surface-dim":"#cbdbf5","surface-container-highest":"#d3e4fe","surface-container-low":"#eff4ff","on-tertiary-container":"#4ac08f","on-background":"#0b1c30","secondary-fixed":"#ffdcc3","on-tertiary-fixed":"#002114","on-primary-fixed":"#00164e","surface-bright":"#f8f9ff","on-error-container":"#93000a","surface-container-high":"#dce9ff","error":"#ba1a1a","tertiary-fixed-dim":"#68dba9","on-tertiary-fixed-variant":"#005137","tertiary-fixed":"#85f8c4","surface-container":"#e5eeff","on-primary-container":"#90a8ff","on-secondary-container":"#663500","primary-fixed-dim":"#b6c4ff","secondary-fixed-dim":"#ffb77d","surface-container-lowest":"#ffffff","on-error":"#ffffff","inverse-surface":"#213145","on-primary":"#ffffff","primary-fixed":"#dce1ff","tertiary-container":"#004a32","on-surface":"#0b1c30","error-container":"#ffdad6","outline":"#757682","surface":"#f8f9ff","inverse-on-surface":"#eaf1ff","surface-tint":"#4059aa","on-secondary-fixed-variant":"#6e3900","on-secondary":"#ffffff","on-tertiary":"#ffffff","primary-container":"#1e3a8a","inverse-primary":"#b6c4ff","on-surface-variant":"#444651","on-secondary-fixed":"#2f1500","tertiary":"#003120","secondary":"#904d00"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"1rem","space-2xl":"3rem","grid-unit":"0.5rem","space-sm":"0.75rem","card-padding":"1.5rem","space-2xs":"0.25rem","space-lg":"1.5rem","space-xl":"2rem","space-xs":"0.5rem","panel-gutter":"1rem"},"fontFamily":{"mono-metric-lg":["JetBrains Mono"],"mono-metric-sm":["JetBrains Mono"],"display-lg":["Inter"],"headline-sm":["Inter"],"mono-metric-md":["JetBrains Mono"],"body-lg":["Inter"],"label-caps":["Inter"],"display-xl":["Inter"],"headline-md":["Inter"],"body-sm":["Inter"],"body-md":["Inter"]},"fontSize":{"mono-metric-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.03em","fontWeight":"500"}],"mono-metric-sm":["11px",{"lineHeight":"16px","fontWeight":"400"}],"display-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"mono-metric-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"body-lg":["15px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"600"}],"display-xl":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-variant selection:text-primary"><header class="sticky top-0 z-50 w-full bg-surface-container-lowest/90 backdrop-blur-sm border-b border-surface-container-high"><div class="h-16 max-w-7xl mx-auto px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-lg"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-heading text-[22px] tracking-tight font-bold text-on-surface">COCOON</span><span class="hidden sm:inline-block h-4 w-px bg-outline-variant"></span><span class="hidden sm:inline-block font-body-sm text-body-sm text-outline tracking-normal">Predict. Compare. Validate.</span></div></div><nav class="flex items-center gap-space-xs" data-active-classes="bg-surface-container text-primary font-semibold"><a class="px-space-sm py-space-2xs rounded text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="home" href="#/" onclick="window.location.hash='#/'; return true;">Home</a><a class="px-space-sm py-space-2xs rounded text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="configure" href="#/configure" onclick="window.location.hash='#/configure'; return true;">Configure</a><a aria-current="page" class="px-space-sm py-space-2xs rounded transition-colors bg-surface-container text-primary font-semibold" data-path="results" href="#/results">Results</a></nav></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-2xs rounded-full shadow-sm"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-mono-metric-sm text-on-surface font-medium">Organization Mode</span><span class="text-outline-variant">|</span><a class="text-primary font-mono-metric-sm hover:underline hover:text-primary-container transition-colors" href="#/" onclick="window.location.hash='#/'; return true;">Switch Mode</a></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">architecture</span></div></div></div></header><main class="w-full flex-1 bg-surface pt-0"><div class="flex flex-col w-full">
+<div class="mx-auto w-full py-8 space-y-8 px-6 max-w-7xl">
+<!-- Top Header & Model Mode Switcher -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg pb-space-xs">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded bg-surface-container text-primary font-mono-metric-sm text-mono-metric-sm uppercase font-semibold">
+<span class="material-symbols-outlined text-[14px]">science</span>
+            Transient Validation
+          </span>
+<span class="text-outline text-body-sm">•</span>
+<span class="font-mono-metric-sm text-mono-metric-sm text-outline">RUN_ID: SIM-2026-LDK-48H</span>
+</div>
+<h1 class="font-heading text-3xl sm:text-4xl text-on-surface font-bold tracking-tight">48-Hour Transient Thermal Analysis</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          Simulated response for 6.0 × 4.0 × 2.8m PUF Shelter • Location: Leh (-22°C Peak Solstice) • Internal Load: 850W
+        </p>
+</div>
+<!-- Controls: Tabs & Action Exports -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<!-- Pill Selector -->
+<div class="inline-flex p-1 rounded-lg bg-surface-container shadow-sm">
+<button class="mode-tab px-space-sm py-1.5 rounded font-body-sm text-body-sm font-medium text-on-surface-variant hover:text-on-surface transition-all" data-mode="rc" type="button">
+            Physics (RC Network)
+          </button>
+<button class="mode-tab px-space-sm py-1.5 rounded font-body-sm text-body-sm font-medium text-on-surface-variant hover:text-on-surface transition-all" data-mode="ml" type="button">
+            ML Surrogate
+          </button>
+<button class="mode-tab px-space-sm py-1.5 rounded font-body-sm text-body-sm font-semibold bg-primary text-on-primary shadow-sm transition-all" data-mode="ansys" type="button">
+            ANSYS Validated (Overlay FEM)
+          </button>
+</div>
+<!-- Quick Export Buttons -->
+<div class="flex items-center gap-space-xs">
+<button class="inline-flex items-center gap-1.5 px-space-sm py-2 rounded bg-surface-container-lowest text-on-surface font-body-sm text-body-sm font-medium shadow-sm hover:bg-surface-container transition-colors" id="export-csv-btn" type="button">
+<span class="material-symbols-outlined text-[16px] text-outline">table_view</span>
+            Export CSV Data
+          </button>
+<button class="inline-flex items-center gap-1.5 px-space-sm py-2 rounded bg-primary text-on-primary font-body-sm text-body-sm font-medium shadow-sm hover:bg-primary-container transition-colors" id="audit-pdf-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+            Generate Defence Audit PDF
+          </button>
+</div>
+</div>
+</div>
+<!-- Main Analytical Interactive Canvas Panel -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-6 flex flex-col gap-5 border border-surface-container-high/60">
+<!-- Chart Top Strip (Legend & Coordinates Display) -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-xs">
+<!-- Interactive Legend -->
+<div class="flex flex-wrap items-center gap-space-md font-body-sm text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-1 rounded-full bg-secondary-container"></span>
+<span class="font-medium text-on-surface">Predicted Indoor (°C)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-1 rounded-full bg-primary-container"></span>
+<span class="font-medium text-on-surface-variant">Ambient Outdoor (°C)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-0.5 border-t-2 border-dashed border-on-surface"></span>
+<span class="font-medium text-on-surface">ANSYS Fluent 3D FEM (°C)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3 rounded bg-tertiary-fixed-dim/30"></span>
+<span class="text-tertiary font-mono-metric-sm text-mono-metric-sm font-semibold">Comfort Zone (+16°C to +22°C)</span>
+</div>
+</div>
+<!-- Telemetry readout on hover -->
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded font-mono-metric-sm text-mono-metric-sm text-on-surface" id="live-telemetry">
+<span class="text-outline">CURSOR:</span>
+<span class="font-bold text-primary" id="tel-step">T+18h</span>
+<span class="text-outline-variant">|</span>
+<span class="">Amb: <strong class="text-primary-container" id="tel-amb">-24.8°C</strong></span>
+<span class="text-outline-variant">|</span>
+<span class="">Indoor: <strong class="text-secondary-container" id="tel-indoor">+18.2°C</strong></span>
+<span class="text-outline-variant">|</span>
+<span class="">FEM: <strong class="text-on-surface" id="tel-fem">+18.0°C</strong></span>
+<span class="text-outline-variant">|</span>
+<span class="px-1 rounded bg-surface-container font-semibold text-tertiary" id="tel-delta">Δ +0.2°C</span>
+</div>
+</div>
+<!-- High-Fidelity SVG Line Chart -->
+<div class="relative w-full overflow-hidden select-none" id="chart-container">
+<svg class="w-full h-[360px] overflow-visible" id="transient-chart" viewBox="0 0 1000 360">
+<!-- Background Grid Lines -->
+<g class="grid-lines text-outline-variant/40 stroke-current" stroke-dasharray="2,4" stroke-width="0.75">
+<!-- Y lines (-30°C to +25°C range, 55 total span: 360px => ~6.54 px/°C) -->
+<!-- +20°C: y=32.7 -->
+<line x1="45" x2="980" y1="33" y2="33"></line>
+<!-- +10°C: y=98.1 -->
+<line x1="45" x2="980" y1="98" y2="98"></line>
+<!-- 0°C (Freezing axis: solid accent) -->
+<line class="text-outline" stroke-dasharray="none" stroke-width="1.2" x1="45" x2="980" y1="163" y2="163"></line>
+<!-- -10°C: y=229 -->
+<line x1="45" x2="980" y1="229" y2="229"></line>
+<!-- -20°C: y=294 -->
+<line x1="45" x2="980" y1="294" y2="294"></line>
+<!-- Vertical Time Ticks (every 6h) -->
+<line x1="45" x2="45" y1="20" y2="320"></line>
+<line x1="162" x2="162" y1="20" y2="320"></line>
+<line x1="279" x2="279" y1="20" y2="320"></line>
+<line x1="395" x2="395" y1="20" y2="320"></line>
+<line x1="512" x2="512" y1="20" y2="320"></line>
+<line x1="629" x2="629" y1="20" y2="320"></line>
+<line x1="746" x2="746" y1="20" y2="320"></line>
+<line x1="863" x2="863" y1="20" y2="320"></line>
+<line x1="980" x2="980" y1="20" y2="320"></line>
+</g>
+<!-- Y-Axis Labels -->
+<g class="font-mono-metric-sm text-[10px] fill-current text-outline font-medium text-right">
+<text text-anchor="end" x="36" y="37">+20°C</text>
+<text class="fill-tertiary font-bold" text-anchor="end" x="36" y="60">+16°C</text>
+<text text-anchor="end" x="36" y="102">+10°C</text>
+<text class="fill-error font-bold" text-anchor="end" x="36" y="167">0°C (Freeze)</text>
+<text text-anchor="end" x="36" y="233">-10°C</text>
+<text text-anchor="end" x="36" y="298">-20°C</text>
+</g>
+<!-- Comfort Zone Shaded Band (+16°C to +22°C => y=59 to y=20) -->
+<rect class="fill-tertiary-fixed-dim/20" height="39" width="935" x="45" y="20"></rect>
+<line class="stroke-tertiary-fixed-dim" stroke-dasharray="4,4" stroke-width="1" x1="45" x2="980" y1="20" y2="20"></line>
+<line class="stroke-tertiary-fixed-dim" stroke-dasharray="4,4" stroke-width="1" x1="45" x2="980" y1="59" y2="59"></line>
+<text class="fill-tertiary font-mono-metric-sm text-[9px] font-semibold tracking-wider uppercase opacity-80" text-anchor="end" x="975" y="44">Habitable Standard (Def-Spec 89)</text>
+<!-- Solar Flux Daytime Shading Bands -->
+<!-- Day 1 Solstice Solar Window: T+8 to T+16 (x=201 to x=357) -->
+<rect class="fill-secondary-fixed/15 pointer-events-none" height="300" width="156" x="201" y="20"></rect>
+<text class="fill-secondary font-mono-metric-sm text-[9px] uppercase font-semibold" text-anchor="middle" x="279" y="315">Day 1 Solar Flux</text>
+<!-- Day 2 Solstice Solar Window: T+32 to T+40 (x=669 to x=825) -->
+<rect class="fill-secondary-fixed/15 pointer-events-none" height="300" width="156" x="669" y="20"></rect>
+<text class="fill-secondary font-mono-metric-sm text-[9px] uppercase font-semibold" text-anchor="middle" x="747" y="315">Day 2 Solar Flux</text>
+<!-- DATA PATH 1: Ambient Outdoor Temperature (-14 to -26 to -12) -->
+<!-- y = 163 - (temp * 6.54) -->
+<!-- -14°C: 254.5 | -26°C: 333 | -12°C: 241.5 -->
+<path class="stroke-primary-container" d="
+            M 45,254
+            C 100,268 140,300 201,310
+            C 240,318 260,265 318,241
+            C 360,225 390,260 435,290
+            C 470,315 500,332 550,333
+            C 610,335 650,285 708,245
+            C 750,222 790,250 835,285
+            C 880,312 920,328 980,330
+          " fill="none" id="path-ambient" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- DATA PATH 2: ANSYS Fluent 3D FEM Benchmark (Dashed overlay) -->
+<path class="stroke-on-surface" d="
+            M 45,45
+            C 100,47 140,50 201,48
+            C 240,46 280,36 330,35
+            C 380,35 430,48 480,52
+            C 530,55 570,54 629,51
+            C 680,47 720,37 780,34
+            C 830,32 870,42 920,47
+            C 950,50 970,51 980,51
+          " fill="none" id="path-fem" stroke-dasharray="5,4" stroke-linecap="round" stroke-width="2"></path>
+<!-- DATA PATH 3: Predicted Indoor ML Surrogate (Orange Line) -->
+<path class="stroke-secondary-container" d="
+            M 45,43
+            C 100,45 140,49 201,47
+            C 240,45 280,34 330,34
+            C 380,34 430,47 480,51
+            C 530,54 570,53 629,50
+            C 680,46 720,35 780,33
+            C 830,31 870,41 920,46
+            C 950,49 970,50 980,50
+          " fill="none" id="path-indoor" stroke-linecap="round" stroke-width="3"></path>
+<!-- Interactive Hover Crosshair Line & Nodes (Dynamic) -->
+<g class="transition-opacity duration-150" id="interactive-cursor">
+<line class="stroke-primary" id="cursor-line" stroke-dasharray="2,2" stroke-width="1.5" x1="395" x2="395" y1="20" y2="330"></line>
+<!-- Dots on paths -->
+<circle class="fill-secondary-container stroke-surface-container-lowest" cx="395" cy="40" id="dot-indoor" r="5" stroke-width="2"></circle>
+<circle class="fill-on-surface stroke-surface-container-lowest" cx="395" cy="42" id="dot-fem" r="4" stroke-width="1.5"></circle>
+<circle class="fill-primary-container stroke-surface-container-lowest" cx="395" cy="270" id="dot-amb" r="5" stroke-width="2"></circle>
+</g>
+<!-- X-Axis Labels (Timeline Steps T+0h to T+48h) -->
+<g class="font-mono-metric-sm text-[11px] fill-current text-on-surface-variant font-medium">
+<text text-anchor="middle" x="45" y="348">T+0h</text>
+<text text-anchor="middle" x="162" y="348">T+6h</text>
+<text text-anchor="middle" x="279" y="348">T+12h</text>
+<text text-anchor="middle" x="395" y="348">T+18h</text>
+<text text-anchor="middle" x="512" y="348">T+24h</text>
+<text text-anchor="middle" x="629" y="348">T+30h</text>
+<text text-anchor="middle" x="746" y="348">T+36h</text>
+<text text-anchor="middle" x="863" y="348">T+42h</text>
+<text text-anchor="middle" x="980" y="348">T+48h</text>
+</g>
+</svg>
+<!-- Dynamic Tooltip Badge Floating on Canvas -->
+<div class="absolute pointer-events-none top-8 left-1/3 bg-surface-container-lowest/95 backdrop-blur-sm p-space-sm rounded-lg shadow-xl border-l-4 border-primary transition-all duration-75 space-y-1" id="graph-floating-tooltip">
+<div class="flex items-center justify-between gap-4 font-mono-metric-sm text-mono-metric-sm text-outline">
+<span class="font-bold text-on-surface" id="flt-step">Time: T+18:00</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-primary text-[10px] font-semibold">STABLE</span>
+</div>
+<div class="grid grid-cols-2 gap-x-space-md gap-y-1 font-mono-metric-sm text-mono-metric-sm pt-1">
+<span class="text-on-surface-variant">ML Predicted:</span>
+<span class="font-bold text-secondary-container text-right" id="flt-ml">+18.2 °C</span>
+<span class="text-on-surface-variant">ANSYS 3D FEM:</span>
+<span class="font-bold text-on-surface text-right" id="flt-fem">+18.0 °C</span>
+<span class="text-on-surface-variant">Ambient Air:</span>
+<span class="font-bold text-primary-container text-right" id="flt-amb">-24.8 °C</span>
+<span class="text-on-surface-variant">Model Deviation:</span>
+<span class="font-bold text-tertiary text-right" id="flt-err">Δ +0.2 °C</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Stat Row (4 Technical Metric Cards) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md"><div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between hover:shadow-md transition-shadow"><div class="flex items-center justify-between text-outline mb-3"><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-medium">Min Indoor Habitat</span><span class="material-symbols-outlined text-[20px] text-tertiary">ac_unit</span></div><div class="space-y-1.5"><div class="font-mono-num text-[28px] leading-8 font-bold text-on-surface flex items-baseline gap-1.5">+16.8<span class="text-lg font-sans text-on-surface-variant font-medium">°C</span></div><div class="flex items-center gap-2 pt-1"><span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span><span class="font-mono-num text-xs text-tertiary font-semibold">Safe Threshold • T+22h</span></div></div><div class="mt-4 pt-2.5 bg-surface-container-low px-3 py-2 rounded text-xs font-mono-num text-outline flex items-center justify-between"><span class="">Delta vs Amb:</span><span class="font-semibold text-on-surface font-mono-num">+42.8°C</span></div></div><div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between hover:shadow-md transition-shadow"><div class="flex items-center justify-between text-outline mb-3"><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-medium">Max Indoor Habitat</span><span class="material-symbols-outlined text-[20px] text-secondary">wb_sunny</span></div><div class="space-y-1.5"><div class="font-mono-num text-[28px] leading-8 font-bold text-on-surface flex items-baseline gap-1.5">+19.8<span class="text-lg font-sans text-on-surface-variant font-medium">°C</span></div><div class="flex items-center gap-2 pt-1"><span class="w-2 h-2 rounded-full bg-secondary-container"></span><span class="font-mono-num text-xs text-secondary font-semibold">Controlled Solar Peak • T+38h</span></div></div><div class="mt-4 pt-2.5 bg-surface-container-low px-3 py-2 rounded text-xs font-mono-num text-outline flex items-center justify-between"><span class="">Solar Gain Buffer:</span><span class="font-semibold text-on-surface font-mono-num">+2.4°C rise</span></div></div><div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between hover:shadow-md transition-shadow"><div class="flex items-center justify-between text-outline mb-3"><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-medium">Average Regime</span><span class="material-symbols-outlined text-[20px] text-primary">thermostat</span></div><div class="space-y-1.5"><div class="font-mono-num text-[28px] leading-8 font-bold text-on-surface flex items-baseline gap-1.5">+18.4<span class="text-lg font-sans text-on-surface-variant font-medium">°C</span></div><div class="flex items-center gap-2 pt-1"><span class="w-2 h-2 rounded-full bg-primary-container"></span><span class="font-mono-num text-xs text-on-surface font-semibold">Target: 18.0°C ± 1.5°C</span></div></div><div class="mt-4 pt-2.5 bg-surface-container-low px-3 py-2 rounded text-xs font-mono-num text-outline flex items-center justify-between"><span class="">Variance:</span><span class="font-semibold text-on-surface font-mono-num">σ = 0.74°C</span></div></div><div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between hover:shadow-md transition-shadow"><div class="flex items-center justify-between text-outline mb-3"><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-medium">Total Envelope Loss</span><span class="material-symbols-outlined text-[20px] text-error">heat_pump</span></div><div class="space-y-1.5"><div class="font-mono-num text-[28px] leading-8 font-bold text-on-surface flex items-baseline gap-1.5">1,240<span class="text-lg font-sans text-on-surface-variant font-medium">W</span></div><div class="flex items-center gap-2 pt-1"><span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span><span class="font-mono-num text-xs text-tertiary font-semibold">Thermal Efficiency: 91.4%</span></div></div><div class="mt-4 pt-2.5 bg-surface-container-low px-3 py-2 rounded text-xs font-mono-num text-outline flex items-center justify-between"><span class="">Effective U-value:</span><span class="font-semibold text-on-surface font-mono-num">0.18 W/m²K</span></div></div></div>
+<!-- Analytical Details Grid: Benchmark Accuracy & "Why This Result" -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg"><div class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div><div class="space-y-4 pl-2"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-medium">Benchmark Rigor</span><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container font-mono-num text-xs text-primary font-semibold"><span class="material-symbols-outlined text-[14px]">check_circle</span>CONVERGED</span></div><div><h2 class="font-heading text-2xl text-on-surface font-bold tracking-tight">±0.8°C Precision vs 3D FEM</h2><p class="text-sm text-on-surface-variant mt-2 leading-normal">Physics-guided graph neural network evaluated against finite element computational fluid dynamics.</p></div><div class="grid grid-cols-3 gap-3 pt-2"><div class="bg-surface-container-low p-3.5 rounded-lg flex flex-col justify-between border border-surface-container-high/40"><span class="font-label-caps text-[10px] uppercase text-outline font-medium">MAE</span><span class="font-mono-num text-base font-bold text-on-surface mt-1.5">0.42°C</span><span class="text-[11px] text-on-surface-variant mt-0.5">Mean Abs.</span></div><div class="bg-surface-container-low p-3.5 rounded-lg flex flex-col justify-between border border-surface-container-high/40"><span class="font-label-caps text-[10px] uppercase text-outline font-medium">RMSE</span><span class="font-mono-num text-base font-bold text-on-surface mt-1.5">0.61°C</span><span class="text-[11px] text-on-surface-variant mt-0.5">Root Mean Sq.</span></div><div class="bg-surface-container-low p-3.5 rounded-lg flex flex-col justify-between border border-surface-container-high/40"><span class="font-label-caps text-[10px] uppercase text-outline font-medium">Correlation</span><span class="font-mono-num text-base font-bold text-primary mt-1.5">0.994</span><span class="text-[11px] text-on-surface-variant mt-0.5">R² Variance</span></div></div></div><div class="mt-6 bg-surface-container-low/70 px-4 py-3 rounded-lg border border-surface-container-high/30 ml-2"><div class="flex items-start gap-2.5"><span class="material-symbols-outlined text-primary text-[18px] mt-0.5">memory</span><div class="font-mono-num text-xs text-on-surface-variant leading-relaxed"><strong class="text-on-surface font-semibold">Mesh Baseline:</strong> ANSYS Fluent 2024 R2 Conjugate Heat Transfer (CHT) Mesh (1.8M polyhedral cells, Reynolds-averaged Navier-Stokes k-ω SST turbulence model).</div></div></div></div><div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col justify-between"><div class="space-y-4"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary-container text-[22px]">psychology</span><h2 class="font-heading text-xl text-on-surface font-bold tracking-tight">Why This Result: Physical Rationale &amp; Defense Logistics</h2></div><span class="font-mono-num text-xs text-outline tracking-wide">HIGH-ALTITUDE SPECS</span></div><p class="text-[15px] leading-7 text-on-surface-variant">The high-insulation 150mm PUF sandwich envelope combined with 2,400 kJ/K internal thermal capacitance acts as a thermal flywheel. Despite outdoor ambient plunging to -26.0°C at 04:00 hrs, the 850W internal equipment load and residual solar heat storage maintain the core habitat well above the critical freezing threshold without supplemental diesel space heating.</p><div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-3 border border-surface-container-high/40"><span class="material-symbols-outlined text-primary text-[22px]">local_shipping</span><p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Operational Impact: Eliminates kerosene soot contamination risks in enclosed shelters and minimizes vulnerable high-mountain fuel convoys along the Zojila pass.</p></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-2"><div class="bg-surface-container-high/40 p-4 rounded-lg flex flex-col justify-between border border-surface-container-high/60"><div class="flex items-center gap-1.5 text-on-secondary-container mb-2"><span class="material-symbols-outlined text-[18px]">water_drop</span><span class="font-label-caps text-label-caps uppercase text-outline font-medium">Fuel Savings</span></div><div class="font-mono-num text-lg font-bold text-on-surface">~18.5 L/day</div><div class="text-xs text-on-surface-variant mt-1">Diesel heating spared</div></div><div class="bg-surface-container-high/40 p-4 rounded-lg flex flex-col justify-between border border-surface-container-high/60"><div class="flex items-center gap-1.5 text-tertiary mb-2"><span class="material-symbols-outlined text-[18px]">co2</span><span class="font-label-caps text-label-caps uppercase text-outline font-medium">Carbon Mitigated</span></div><div class="font-mono-num text-lg font-bold text-on-surface">49.2 kg CO₂</div><div class="text-xs text-on-surface-variant mt-1">Daily carbon avoidance</div></div><div class="bg-surface-container-high/40 p-4 rounded-lg flex flex-col justify-between border border-surface-container-high/60"><div class="flex items-center gap-1.5 text-primary mb-2"><span class="material-symbols-outlined text-[18px]">route</span><span class="font-label-caps text-label-caps uppercase text-outline font-medium">Convoy Reduction</span></div><div class="font-mono-num text-lg font-bold text-primary">68% Drop</div><div class="text-xs text-on-surface-variant mt-1">Logistical kerosene risk</div></div></div></div></div>
+<!-- FEM Thermal Gradient Heatmap Slice View (Rich Technical Imagery) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container-high/50 flex flex-col gap-4"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2"><div class="space-y-1"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">view_in_ar</span><h3 class="font-heading text-lg sm:text-xl font-bold text-on-surface">ANSYS Conjugate CHT Spatial Gradient (Y-Z Midplane Slice)</h3></div><p class="text-xs sm:text-sm text-on-surface-variant">Finite volume spatial temperature distribution at Solstice Peak Night (T+18h, Exterior -24.8°C).</p></div><div class="flex items-center gap-2 font-mono-num text-xs text-outline"><span class="">Convergence Criterion:</span><span class="px-2.5 py-1 rounded bg-surface-container text-primary font-bold font-mono-num">10⁻⁶ Energy Residual</span></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch pt-2"><div class="lg:col-span-9 relative rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center min-h-[220px] shadow-inner"><img class="w-full h-64 object-cover object-center" data-alt="Technical engineering 3D thermal contour visualization slice of an insulated shelter in sub-zero Himalayan terrain. Deep blue cold boundary layers transitioning through cyan and yellow to a stable green-orange core at 18 degrees Celsius, scientific ANSYS Fluent CAE mesh overlay, sharp contrast, highly legible finite element heat flux contours." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDTonedz1UF0osmFeot8rKIfTb95VYXagrVEKJe7if0Oqk5I-fD31-1QPLFL8_7gDkf5T0b8YrVgOwsFa16XGgtkiDga1v1ZVdIMU0aCfMHvyrgnQOs_azQ_naoSaxX_ObeefHbJ9PuKiLcx43JdmV-nc1al8x7m8w-gN5UNZRGnlEhPt_N8RdbuhrlZUFGnw_VSwLyXN0E66aMKxkCNfW9v6ZBOAgvE3IzbvIn2_Zyu28BwYsC2vy"><div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/85 via-transparent to-transparent flex items-end p-4"><div class="font-mono-num text-xs text-inverse-on-surface flex flex-wrap items-center gap-4 bg-inverse-surface/60 backdrop-blur-sm px-3.5 py-1.5 rounded"><span class="">CORE INTERIOR: <strong class="text-tertiary-fixed font-bold">+18.2°C</strong></span><span class="">•</span><span class="">150mm PUF BOUNDARY: <strong class="text-primary-fixed font-bold">-4.1°C</strong></span><span class="">•</span><span class="">EXTERIOR SKIN: <strong class="text-error-container font-bold">-24.6°C</strong></span></div></div></div><div class="lg:col-span-3 flex flex-col justify-between p-5 bg-surface-container-low rounded-lg font-mono-num text-xs border border-surface-container-high/50"><div class="font-label-caps text-label-caps uppercase text-outline font-medium tracking-wider">Heat Gradient Legend</div><div class="flex items-center gap-3.5 my-auto py-2"><div class="w-4 h-44 rounded-sm bg-gradient-to-t from-primary-container via-surface-variant to-secondary-container shadow-inner"></div><div class="flex flex-col justify-between h-44 text-on-surface font-medium text-[11px] leading-tight"><span class="">+22.0°C <span class="text-[10px] text-outline-variant">(Max Comfort)</span></span><span class="text-tertiary font-bold">+18.0°C <span class="text-[10px] opacity-80">(Core Habit)</span></span><span class="">+10.0°C <span class="text-[10px] text-outline-variant">(Buffer)</span></span><span class="text-error font-bold">0.0°C <span class="text-[10px] opacity-80">(Freezing Point)</span></span><span class="">-15.0°C <span class="text-[10px] text-outline-variant">(Exterior Wall)</span></span><span class="text-primary-container font-bold">-26.0°C <span class="text-[10px] opacity-80">(Ambient Peak)</span></span></div></div><div class="text-[11px] text-outline font-mono-num text-right pt-2 border-t border-surface-container-high/40">Unit: Absolute Celsius</div></div></div></div>
+</div>
+</div>
+<script>
+  // Interactive Crosshair & Tooltip Scrubbing for SVG Line Chart
+  (function() {
+    const chart = document.getElementById('transient-chart');
+    const cursorLine = document.getElementById('cursor-line');
+    const dotIndoor = document.getElementById('dot-indoor');
+    const dotFem = document.getElementById('dot-fem');
+    const dotAmb = document.getElementById('dot-amb');
+    const floatingTooltip = document.getElementById('graph-floating-tooltip');
+    
+    // Telemetry display handles
+    const telStep = document.getElementById('tel-step');
+    const telAmb = document.getElementById('tel-amb');
+    const telIndoor = document.getElementById('tel-indoor');
+    const telFem = document.getElementById('tel-fem');
+    const telDelta = document.getElementById('tel-delta');
+
+    const fltStep = document.getElementById('flt-step');
+    const fltMl = document.getElementById('flt-ml');
+    const fltFem = document.getElementById('flt-fem');
+    const fltAmb = document.getElementById('flt-amb');
+    const fltErr = document.getElementById('flt-err');
+
+    const minX = 45;
+    const maxX = 980;
+    const widthSpan = maxX - minX;
+
+    // Computational mock data points across 48h (sampled every hour)
+    function getValuesAtRatio(ratio) {
+      const hour = Math.round(ratio * 48);
+      // Ambient outdoor curve: Drops to -26°C around h=20, rises to -12°C around h=36
+      const amb = -19 - 7 * Math.cos((hour - 14) * (2 * Math.PI / 24)) + (hour > 24 ? 1.5 : 0);
+      // Indoor temperature: stable around 17.5 to 19.5
+      const indoor = 18.2 + 1.1 * Math.sin((hour - 10) * (2 * Math.PI / 24));
+      // FEM tracks closely with noise
+      const fem = indoor + 0.3 * Math.sin(hour * 0.8) - 0.15;
+      const delta = (indoor - fem).toFixed(2);
+
+      return {
+        hour,
+        amb: amb.toFixed(1),
+        indoor: indoor.toFixed(1),
+        fem: fem.toFixed(1),
+        delta: (delta >= 0 ? '+' : '') + delta
+      };
+    }
+
+    // Y conversion: range -30°C to +25°C. 0°C is y=163. 1°C = 6.54px.
+    function tempToY(temp) {
+      return 163 - (temp * 6.54);
+    }
+
+    if (chart) {
+      chart.addEventListener('mousemove', (e) => {
+        const rect = chart.getBoundingClientRect();
+        const clientX = e.clientX - rect.left;
+        const svgX = (clientX / rect.width) * 1000;
+
+        if (svgX >= minX && svgX <= maxX) {
+          const ratio = (svgX - minX) / widthSpan;
+          const vals = getValuesAtRatio(ratio);
+
+          const yIndoor = tempToY(parseFloat(vals.indoor));
+          const yFem = tempToY(parseFloat(vals.fem));
+          const yAmb = tempToY(parseFloat(vals.amb));
+
+          cursorLine.setAttribute('x1', svgX);
+          cursorLine.setAttribute('x2', svgX);
+
+          dotIndoor.setAttribute('cx', svgX);
+          dotIndoor.setAttribute('cy', yIndoor);
+
+          dotFem.setAttribute('cx', svgX);
+          dotFem.setAttribute('cy', yFem);
+
+          dotAmb.setAttribute('cx', svgX);
+          dotAmb.setAttribute('cy', yAmb);
+
+          // Update Top Bar Telemetry
+          telStep.textContent = `T+${vals.hour}h`;
+          telAmb.textContent = `${vals.amb}°C`;
+          telIndoor.textContent = `+${vals.indoor}°C`;
+          telFem.textContent = `+${vals.fem}°C`;
+          telDelta.textContent = `Δ ${vals.delta}°C`;
+
+          // Update Floating Tooltip
+          fltStep.textContent = `Time: T+${vals.hour}:00`;
+          fltMl.textContent = `+${vals.indoor} °C`;
+          fltFem.textContent = `+${vals.fem} °C`;
+          fltAmb.textContent = `${vals.amb} °C`;
+          fltErr.textContent = `Δ ${vals.delta} °C`;
+
+          // Position floating tooltip
+          const pctX = (clientX / rect.width) * 100;
+          if (pctX > 65) {
+            floatingTooltip.style.left = 'auto';
+            floatingTooltip.style.right = (100 - pctX + 4) + '%';
+          } else {
+            floatingTooltip.style.right = 'auto';
+            floatingTooltip.style.left = (pctX + 3) + '%';
+          }
+        }
+      });
+    }
+
+    // Pill Tab Switching Feedback
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    const pathFem = document.getElementById('path-fem');
+    const pathIndoor = document.getElementById('path-indoor');
+
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        modeTabs.forEach(t => {
+          t.classList.remove('bg-primary', 'text-on-primary', 'font-semibold');
+          t.classList.add('text-on-surface-variant', 'font-medium');
+        });
+        tab.classList.remove('text-on-surface-variant', 'font-medium');
+        tab.classList.add('bg-primary', 'text-on-primary', 'font-semibold');
+
+        const mode = tab.getAttribute('data-mode');
+        if (mode === 'rc') {
+          pathFem.style.opacity = '0.2';
+          pathIndoor.style.strokeDasharray = '4,4';
+        } else if (mode === 'ml') {
+          pathFem.style.opacity = '0.2';
+          pathIndoor.style.strokeDasharray = 'none';
+        } else {
+          pathFem.style.opacity = '1';
+          pathIndoor.style.strokeDasharray = 'none';
+        }
+      });
+    });
+
+    // Button interactions
+    const csvBtn = document.getElementById('export-csv-btn');
+    if (csvBtn) {
+      csvBtn.addEventListener('click', () => {
+        csvBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-tertiary">check</span> Exported 48 Rows';
+        setTimeout(() => {
+          csvBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-outline">table_view</span> Export CSV Data';
+        }, 2200);
+      });
+    }
+
+    const pdfBtn = document.getElementById('audit-pdf-btn');
+    if (pdfBtn) {
+      pdfBtn.addEventListener('click', () => {
+        pdfBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">autorenew</span> Generating...';
+        setTimeout(() => {
+          pdfBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">verified</span> Audit PDF Ready';
+          setTimeout(() => {
+            pdfBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">verified</span> Generate Defence Audit PDF';
+          }, 2500);
+        }, 1200);
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-surface-container-high mt-space-2xl"><div class="max-w-7xl mx-auto px-space-lg py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md font-mono-metric-sm text-mono-metric-sm text-outline"><div class="flex flex-wrap items-center gap-space-md"><span class="">© 2026 Team <strong class="text-on-surface font-mono-metric-md text-mono-metric-md">ByteFiesta</strong></span><span class="inline-block h-3 w-px bg-outline-variant"></span><span class="inline-flex items-center gap-space-2xs px-space-xs py-0.5 rounded bg-surface-container text-primary text-[10px] uppercase font-semibold tracking-wider">SIH 2026 Defence Innovation</span><span class="inline-block h-3 w-px bg-outline-variant"></span><span class="">High-Altitude Sub-Zero Thermal Simulation Lab</span></div><div class="flex items-center gap-space-sm text-on-surface-variant"><span class="">BUILD: <code class="text-primary font-medium">v2.4.1-himalaya#bf8a29</code></span><span class="inline-block h-2 w-2 rounded-full bg-tertiary-fixed-dim"></span><span class="">CALIBRATED</span></div></div></footer>
+
+
+
+
+
+</body></html>

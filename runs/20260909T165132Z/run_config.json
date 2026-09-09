@@ -1,0 +1,12 @@
+{
+  "mode": "optimize",
+  "designs": 20,
+  "season": "winter",
+  "seed": 0,
+  "trials": 150,
+  "typical_hours": 168,
+  "worst_hours": 48,
+  "ansys": false,
+  "ansys_hours": 24,
+  "ansys_designs": 2
+}
