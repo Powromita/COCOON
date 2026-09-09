@@ -2,3 +2,7 @@ numpy
 pandas
 matplotlib
 requests
+scikit-learn
+joblib
+
+ansys-mapdl-core>=0.68

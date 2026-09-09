@@ -1,51 +1,66 @@
 """
+main.py
+
 Main controller for the
 DRDO Shelter Thermal Calculator.
+
+COCOON:
+Physics-Based Thermal Calculator
++
+Random Forest ML Prediction
++
+ANSYS Boundary Export
 """
+
 
 import os
 
 import matplotlib.pyplot as plt
-
 import pandas as pd
 
 
+# ==================================================
+# ML IMPORTS
+# ==================================================
+
+from ml.feature_builder import (
+    build_ml_features
+)
+
+
+from ml.predictor import (
+    predict_batch
+)
+
+
+# ==================================================
+# EXISTING PROJECT IMPORTS
+# ==================================================
+
 from ansys_export import (
-
     export_ansys_boundary_conditions
-
 )
 
 
 from materials import (
-
     get_material_display_name,
-
     load_materials
-
 )
 
 
 from thermal_model import (
-
     run_simulation
-
 )
 
 
 from user_input import (
-
     collect_user_configuration,
-
     load_json
-
 )
 
 
 from weather import (
-
     fetch_nasa_power_weather
-
 )
 
 
@@ -54,11 +69,8 @@ from weather import (
 # ==================================================
 
 os.makedirs(
-
     "results",
-
     exist_ok=True
-
 )
 
 
@@ -67,23 +79,17 @@ os.makedirs(
 # ==================================================
 
 MATERIAL_FILE = (
-
     "data/material_properties.json"
-
 )
 
 
 CONSTRUCTION_PROFILE_FILE = (
-
     "data/construction_profiles.json"
-
 )
 
 
 GLAZING_PROFILE_FILE = (
-
     "data/glazing_profiles.json"
-
 )
 
 
@@ -92,43 +98,29 @@ GLAZING_PROFILE_FILE = (
 # ==================================================
 
 def print_layers(
-
     title,
-
     layers,
-
     materials
-
 ):
 
     print(
-
         f"\n{title}:"
-
     )
 
 
     for layer in layers:
 
         material_id = (
-
             layer[
-
                 "material"
-
             ]
-
         )
 
 
         material = (
-
             materials[
-
                 material_id
-
             ]
-
         )
 
 
@@ -157,15 +149,11 @@ def print_layers(
 # ==================================================
 
 def print_profile_metadata(
-
     configuration
-
 ):
 
     profiles = configuration.get(
-
         "selected_profiles"
-
     )
 
 
@@ -175,9 +163,7 @@ def print_profile_metadata(
 
 
     print(
-
         "\nSelected construction profiles:"
-
     )
 
 
@@ -206,47 +192,51 @@ def print_profile_metadata(
 def main():
 
 
+    # ==============================================
+    # LOAD MATERIALS
+    # ==============================================
+
     print(
-
         "\nLoading material database..."
-
     )
 
 
     materials = load_materials(
-
         MATERIAL_FILE
-
     )
 
 
+    # ==============================================
+    # LOAD CONSTRUCTION PROFILES
+    # ==============================================
+
     print(
-
         "Loading construction profiles..."
-
     )
 
 
     construction_profiles = load_json(
-
         CONSTRUCTION_PROFILE_FILE
-
     )
 
 
+    # ==============================================
+    # LOAD GLAZING PROFILES
+    # ==============================================
+
     print(
-
         "Loading glazing profiles..."
-
     )
 
 
     glazing_profiles = load_json(
-
         GLAZING_PROFILE_FILE
-
     )
 
+
+    # ==============================================
+    # USER INPUT
+    # ==============================================
 
     configuration, location, start_date, end_date = (
 
@@ -264,27 +254,23 @@ def main():
 
 
     # ==============================================
-    # SHOW RESOLVED CONFIGURATION
+    # SHOW CONFIGURATION
     # ==============================================
 
     print()
 
     print(
-
         "=" * 60
-
     )
 
-    print(
 
+    print(
         "RESOLVED SIMULATION CONFIGURATION"
-
     )
 
+
     print(
-
         "=" * 60
-
     )
 
 
@@ -302,9 +288,7 @@ def main():
         "Wall layers",
 
         configuration[
-
             "walls"
-
         ],
 
         materials
@@ -317,9 +301,7 @@ def main():
         "Roof layers",
 
         configuration[
-
             "roof"
-
         ],
 
         materials
@@ -332,9 +314,7 @@ def main():
         "Floor layers",
 
         configuration[
-
             "floor"
-
         ],
 
         materials
@@ -343,11 +323,13 @@ def main():
 
 
     print_profile_metadata(
-
         configuration
-
     )
 
+
+    # ==============================================
+    # WINDOW INFORMATION
+    # ==============================================
 
     print(
 
@@ -367,10 +349,12 @@ def main():
     )
 
 
+    # ==============================================
+    # MODEL PARAMETERS
+    # ==============================================
+
     print(
-
         "\nModel parameters:"
-
     )
 
 
@@ -405,21 +389,19 @@ def main():
     )
 
 
+    # ==============================================
+    # CONTENTS
+    # ==============================================
+
     if (
 
         configuration[
-
             "contents"
-
         ][
-
             "mass_kg"
-
         ]
 
-        ==
-
-        0
+        == 0
 
     ):
 
@@ -435,9 +417,7 @@ def main():
     else:
 
         print(
-
             "\nContents thermal mass:"
-
         )
 
 
@@ -479,6 +459,10 @@ def main():
     )
 
 
+    # ==============================================
+    # CONFIRM
+    # ==============================================
+
     confirm = (
 
         input(
@@ -499,15 +483,12 @@ def main():
     if confirm not in {
 
         "yes",
-
         "y"
 
     }:
 
         print(
-
             "Simulation cancelled."
-
         )
 
         return
@@ -518,9 +499,7 @@ def main():
     # ==============================================
 
     print(
-
         "\nFetching real weather data from NASA POWER..."
-
     )
 
 
@@ -547,15 +526,11 @@ def main():
     weather = fetch_nasa_power_weather(
 
         latitude=location[
-
             "latitude"
-
         ],
 
         longitude=location[
-
             "longitude"
-
         ],
 
         start_date=start_date,
@@ -579,16 +554,12 @@ def main():
     # ==============================================
 
     print(
-
         "\nWEATHER DATA SUMMARY"
-
     )
 
 
     print(
-
         "-" * 60
-
     )
 
 
@@ -620,13 +591,11 @@ def main():
 
 
     # ==============================================
-    # SAVE WEATHER
+    # SAVE NASA WEATHER
     # ==============================================
 
     weather_file = (
-
         "results/nasa_weather_used.csv"
-
     )
 
 
@@ -640,13 +609,11 @@ def main():
 
 
     # ==============================================
-    # RUN SIMULATION
+    # RUN PHYSICS SIMULATION
     # ==============================================
 
     print(
-
         "\nRunning thermal simulation..."
-
     )
 
 
@@ -662,10 +629,96 @@ def main():
 
 
     results_df = pd.DataFrame(
-
         results
+    )
+
+
+    # ==============================================
+    # ML FEATURE GENERATION
+    # ==============================================
+
+    print(
+        "Generating ML features..."
+    )
+
+
+    ml_features_df = (
+
+        build_ml_features(
+
+            results_df,
+
+            weather,
+
+            configuration,
+
+            properties
+
+        )
 
     )
+
+
+    # ==============================================
+    # RANDOM FOREST PREDICTION
+    # ==============================================
+
+    print(
+        "Running Random Forest predictions..."
+    )
+
+
+    ml_predictions = (
+
+        predict_batch(
+
+            ml_features_df
+
+        )
+
+    )
+
+
+    # ==============================================
+    # ADD ML RESULTS
+    # ==============================================
+
+    results_df[
+
+        "ml_predicted_indoor_temperature_C"
+
+    ] = (
+
+        ml_predictions
+
+    )
+
+
+    # ==============================================
+    # PHYSICS VS ML DIFFERENCE
+    # ==============================================
+
+    results_df[
+
+        "physics_ml_difference_C"
+
+    ] = (
+
+        results_df[
+
+            "indoor_temperature_C"
+
+        ]
+
+        -
+
+        results_df[
+
+            "ml_predicted_indoor_temperature_C"
+
+        ]
+
+    ).abs()
 
 
     # ==============================================
@@ -673,9 +726,7 @@ def main():
     # ==============================================
 
     results_file = (
-
         "results/thermal_results.csv"
-
     )
 
 
@@ -693,9 +744,7 @@ def main():
     # ==============================================
 
     ansys_file = (
-
         "results/ansys_boundary_conditions.csv"
-
     )
 
 
@@ -715,35 +764,31 @@ def main():
     print()
 
     print(
-
         "=" * 60
-
     )
 
-    print(
 
+    print(
         "DRDO SHELTER THERMAL CALCULATOR RESULTS"
-
     )
 
-    print(
 
+    print(
         "=" * 60
-
     )
 
 
-    print(
+    # ==============================================
+    # THERMAL PROPERTIES
+    # ==============================================
 
+    print(
         "\nTHERMAL PROPERTIES"
-
     )
 
 
     print(
-
         "-" * 60
-
     )
 
 
@@ -774,17 +819,17 @@ def main():
     )
 
 
+    # ==============================================
+    # WINDOW PROPERTIES
+    # ==============================================
+
     print(
-
         "\nWINDOW PROPERTIES"
-
     )
 
 
     print(
-
         "-" * 60
-
     )
 
 
@@ -806,24 +851,22 @@ def main():
     )
 
 
+    # ==============================================
+    # CAPACITANCE
+    # ==============================================
+
     C = properties[
-
         "capacitance"
-
     ]
 
 
     print(
-
         "\nTHERMAL CAPACITANCE"
-
     )
 
 
     print(
-
         "-" * 60
-
     )
 
 
@@ -872,17 +915,17 @@ def main():
     )
 
 
+    # ==============================================
+    # PHYSICS RESULTS
+    # ==============================================
+
     print(
-
         "\nTEMPERATURE PREDICTION"
-
     )
 
 
     print(
-
         "-" * 60
-
     )
 
 
@@ -922,6 +965,87 @@ def main():
     )
 
 
+    # ==============================================
+    # ML RESULTS
+    # ==============================================
+
+    print()
+
+    print(
+        "ML TEMPERATURE PREDICTION"
+    )
+
+
+    print(
+        "-" * 60
+    )
+
+
+    print(
+
+        f"Minimum ML temperature: "
+
+        f"{results_df['ml_predicted_indoor_temperature_C'].min():.2f} °C"
+
+    )
+
+
+    print(
+
+        f"Maximum ML temperature: "
+
+        f"{results_df['ml_predicted_indoor_temperature_C'].max():.2f} °C"
+
+    )
+
+
+    print(
+
+        f"Average ML temperature: "
+
+        f"{results_df['ml_predicted_indoor_temperature_C'].mean():.2f} °C"
+
+    )
+
+
+    # ==============================================
+    # PHYSICS VS ML
+    # ==============================================
+
+    print()
+
+    print(
+        "PHYSICS vs ML COMPARISON"
+    )
+
+
+    print(
+        "-" * 60
+    )
+
+
+    print(
+
+        f"Average prediction difference: "
+
+        f"{results_df['physics_ml_difference_C'].mean():.4f} °C"
+
+    )
+
+
+    print(
+
+        f"Maximum prediction difference: "
+
+        f"{results_df['physics_ml_difference_C'].max():.4f} °C"
+
+    )
+
+
+    # ==============================================
+    # FILE OUTPUTS
+    # ==============================================
+
     print(
 
         f"\nNASA weather saved to: "
@@ -954,24 +1078,20 @@ def main():
     # ==============================================
 
     plt.figure(
-
         figsize=(12, 6)
-
     )
 
+
+    # Outdoor temperature
 
     plt.plot(
 
         results_df[
-
             "timestamp"
-
         ],
 
         results_df[
-
             "outdoor_temperature_C"
-
         ],
 
         label="Outdoor Temperature"
@@ -979,43 +1099,52 @@ def main():
     )
 
 
+    # Physics model prediction
+
     plt.plot(
 
         results_df[
-
             "timestamp"
-
         ],
 
         results_df[
-
             "indoor_temperature_C"
-
         ],
 
-        label="Predicted Indoor Temperature"
+        label="Physics Model Prediction"
+
+    )
+
+
+    # ML prediction
+
+    plt.plot(
+
+        results_df[
+            "timestamp"
+        ],
+
+        results_df[
+            "ml_predicted_indoor_temperature_C"
+        ],
+
+        label="Random Forest Prediction"
 
     )
 
 
     plt.xlabel(
-
         "Time"
-
     )
 
 
     plt.ylabel(
-
         "Temperature (°C)"
-
     )
 
 
     plt.title(
-
-        "Shelter Thermal Temperature Prediction"
-
+        "COCOON Shelter Thermal Temperature Prediction"
     )
 
 
@@ -1023,19 +1152,19 @@ def main():
 
 
     plt.xticks(
-
         rotation=45
-
     )
 
 
     plt.tight_layout()
 
 
+    # ==============================================
+    # SAVE GRAPH
+    # ==============================================
+
     graph_file = (
-
         "results/temperature_prediction.png"
-
     )
 
 
@@ -1059,6 +1188,10 @@ def main():
 
     plt.show()
 
+
+# ==================================================
+# RUN PROGRAM
+# ==================================================
 
 if __name__ == "__main__":
 
