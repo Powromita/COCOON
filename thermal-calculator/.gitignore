@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated results
+results/*.csv
+results/*.png
+results/*.jpg
+results/*.jpeg
+
+# ML models - add later if models become too large
+*.joblib
+
+# Environment variables
+.env

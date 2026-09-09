@@ -17,12 +17,49 @@ from heat_transfer import (
 
     calculate_layer_capacitance,
 
-    calculate_contents_capacitance
+    calculate_contents_capacitance,
+
+    resistance_to_interior,
+
+    position_weight,
+
+    resolve_solar_aperture
 
 )
 
 
 TIME_STEP_SECONDS = 3600
+
+
+# ==================================================
+# POSITION-WEIGHTED THERMAL CAPACITANCE
+# ==================================================
+# The model collapses the whole shelter onto ONE indoor-air node. A
+# construction layer's stored heat is only available to that fast node if
+# the conductive path between them is not much larger than the interior
+# surface film resistance that bounds the node (1/h_inside is ~0.4 m2K/W
+# for the Ladakh config). Layers sitting behind thick insulation have a
+# path resistance several times larger and barely exchange heat with the
+# room across a multi-day cold spell, so lumping their full mass onto the
+# indoor node makes the shelter look far more thermally stable than it is
+# -- see ansys-pipeline/VALIDATION_FINDINGS.md, where the position-blind
+# sum over-credited the interior by ~4x (MAE 3.75 C vs the ANSYS 3D
+# reference for the insulation-inside wall).
+#
+# Each layer's capacitance is scaled by
+#     weight = exp(-R_layer_to_interior / CAPACITANCE_COUPLING_RESISTANCE)
+# before it is added to the indoor node (see heat_transfer.position_weight
+# and resistance_to_interior). The constant is a single calibration knob,
+# tuned so the lumped-node model reproduces the effective thermal mass
+# ANSYS resolves for BOTH wall orderings at once (mass-inside and
+# insulation-inside); re-tune it as the validation set grows.
+#
+# Calibration (ansys-pipeline/validate_weighted_capacitance.py, 48 h Jan
+# cold spell): Rc = 0.8 m2K/W gives MAE 0.31 C for the mass-inside wall
+# and 0.53 C for the insulation-inside wall, both against the ANSYS 3D
+# reference and both inside the +/-0.8 C target. The unweighted sum scored
+# 0.66 C and 3.75 C on the same two cases.
+CAPACITANCE_COUPLING_RESISTANCE_M2K_W = 0.8
 
 
 # ==================================================
@@ -238,9 +275,20 @@ def calculate_construction_properties(
 
     h_inside,
 
-    h_outside
+    h_outside,
+
+    coupling_resistance_m2K_W=None
 
 ):
+
+    if coupling_resistance_m2K_W is None:
+
+        coupling_resistance_m2K_W = (
+
+            CAPACITANCE_COUPLING_RESISTANCE_M2K_W
+
+        )
+
 
     resistance = (
 
@@ -268,10 +316,12 @@ def calculate_construction_properties(
     )
 
 
-    capacitance = 0.0
+    lumped_capacitance = 0.0
+
+    weighted_capacitance = 0.0
 
 
-    for layer in layers:
+    for index, layer in enumerate(layers):
 
 
         layer_C = (
@@ -291,7 +341,37 @@ def calculate_construction_properties(
         )
 
 
-        capacitance += layer_C
+        R_to_interior = (
+
+            resistance_to_interior(
+
+                layers,
+
+                index,
+
+                h_inside
+
+            )
+
+        )
+
+
+        weight = (
+
+            position_weight(
+
+                R_to_interior,
+
+                coupling_resistance_m2K_W
+
+            )
+
+        )
+
+
+        lumped_capacitance += layer_C
+
+        weighted_capacitance += weight * layer_C
 
 
     return {
@@ -308,7 +388,12 @@ def calculate_construction_properties(
 
         "capacitance_J_K":
 
-            capacitance
+            weighted_capacitance,
+
+
+        "lumped_capacitance_J_K":
+
+            lumped_capacitance
 
     }
 
@@ -316,6 +401,81 @@ def calculate_construction_properties(
 # ==================================================
 # TOTAL THERMAL CAPACITANCE
 # ==================================================
+
+def lumped_mass_C_total(
+
+    wall_properties,
+
+    roof_properties,
+
+    floor_properties,
+
+    contents
+
+):
+
+    """Position-blind capacitance: the raw sum of every envelope layer's
+
+    rho * cp * V plus the contents mass, with no coupling weight applied.
+
+    This is the original pre-validation formula, kept available so
+
+    weighted and unweighted runs can be compared directly (see
+
+    ansys-pipeline/validate_weighted_capacitance.py)."""
+
+
+    contents_C = (
+
+        calculate_contents_capacitance(
+
+            contents[
+
+                "mass_kg"
+
+            ],
+
+            contents[
+
+                "specific_heat_J_kgK"
+
+            ]
+
+        )
+
+    )
+
+
+    return (
+
+        wall_properties[
+
+            "lumped_capacitance_J_K"
+
+        ]
+
+        +
+
+        roof_properties[
+
+            "lumped_capacitance_J_K"
+
+        ]
+
+        +
+
+        floor_properties[
+
+            "lumped_capacitance_J_K"
+
+        ]
+
+        +
+
+        contents_C
+
+    )
+
 
 def calculate_total_capacitance(
 
@@ -417,7 +577,22 @@ def calculate_total_capacitance(
 
         "total_J_K":
 
-            total_C
+            total_C,
+
+
+        "lumped_mass_total_J_K":
+
+            lumped_mass_C_total(
+
+                wall_properties,
+
+                roof_properties,
+
+                floor_properties,
+
+                contents
+
+            )
 
     }
 
@@ -458,6 +633,25 @@ def run_simulation(
     )
 
 
+    window_U = (
+
+        windows.get(
+
+            "U_W_m2K",
+
+            0.0
+
+        )
+
+    )
+
+
+    # Conductive glazing area. A glazing entry with U == 0 is a pure solar
+    # aperture (its gain still flows via resolve_solar_aperture) and does
+    # NOT displace opaque envelope, so the RC model's conduction stays
+    # identical to the windowless ANSYS reference. Only a glazing with a
+    # real U-value replaces wall here.
+
     window_area = (
 
         windows.get(
@@ -468,18 +662,9 @@ def run_simulation(
 
         )
 
-    )
+        if window_U > 0
 
-
-    window_U = (
-
-        windows.get(
-
-            "U_W_m2K",
-
-            0.0
-
-        )
+        else 0.0
 
     )
 
@@ -708,33 +893,17 @@ def run_simulation(
     # ==============================================
     # SOLAR
     # ==============================================
+    # Aperture area x glazing SHGC, resolved from configuration["windows"]
+    # via the shared helper so the ANSYS boundary builder computes Q_solar
+    # from exactly the same inputs and formula (see heat_transfer).
 
-    solar_area = (
+    solar_area, eta_solar = (
 
-        configuration[
+        resolve_solar_aperture(
 
-            "solar"
+            configuration
 
-        ][
-
-            "area_m2"
-
-        ]
-
-    )
-
-
-    eta_solar = (
-
-        configuration[
-
-            "solar"
-
-        ][
-
-            "eta_solar"
-
-        ]
+        )
 
     )
 
