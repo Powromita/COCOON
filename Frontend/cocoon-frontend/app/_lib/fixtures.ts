@@ -52,11 +52,11 @@ const hourlyLoss = (base: number) =>
   t.map((h) => base * (1.4 - 0.9 * dayShape(h)));
 
 const COMPARISON: RankedDesign[] = [
-  { rank: 1, design_id: 33, comfort_score: 8.5, geometry_label: "6.6×3.69×2.86", av_ratio: 1.2, wwr_percent: 14, T_min_C: 3.9, T_max_C: 14.8, swing_C: 10.9, hours_in_band_pct: 0, shortlisted: true, pareto: true },
-  { rank: 2, design_id: 15, comfort_score: -15.5, geometry_label: "4.84×4.58×2.94", av_ratio: 1.19, wwr_percent: 10, T_min_C: 0.6, T_max_C: 14.8, swing_C: 14.2, hours_in_band_pct: 0, shortlisted: true, pareto: false },
-  { rank: 3, design_id: 6, comfort_score: -23.5, geometry_label: "4.97×4.54×2.31", av_ratio: 1.28, wwr_percent: 13, T_min_C: -0.1, T_max_C: 14.7, swing_C: 14.8, hours_in_band_pct: 0, shortlisted: true, pareto: false },
-  { rank: 4, design_id: 2, comfort_score: -26.0, geometry_label: "6.58×3.77×2.89", av_ratio: 1.18, wwr_percent: 19, T_min_C: -0.2, T_max_C: 14.6, swing_C: 14.7, hours_in_band_pct: 0, shortlisted: false, pareto: false },
-  { rank: 5, design_id: 5, comfort_score: -31.3, geometry_label: "5.0×3.81×2.91", av_ratio: 1.27, wwr_percent: 11, T_min_C: -1.0, T_max_C: 14.7, swing_C: 15.7, hours_in_band_pct: 0, shortlisted: false, pareto: false },
+  { rank: 1, design_id: 33, comfort_score: 8.5, geometry_label: "6.0×4.2×2.6", av_ratio: 1.2, wwr_percent: 14, walls_label: "puf (95 mm) + stone_masonry (430 mm)", roof_label: "puf (110 mm) + wood_timber (160 mm)", floor_label: "puf (80 mm) + concrete (170 mm)", T_min_C: 3.9, T_max_C: 14.8, swing_C: 10.9, hours_in_band_pct: 0, shortlisted: true, pareto: true },
+  { rank: 2, design_id: 15, comfort_score: -15.5, geometry_label: "6.0×4.2×2.6", av_ratio: 1.2, wwr_percent: 14, walls_label: "puf (70 mm) + rammed_earth (410 mm)", roof_label: "puf (90 mm) + straw_clay (300 mm)", floor_label: "puf (60 mm) + concrete (180 mm)", T_min_C: 0.6, T_max_C: 14.8, swing_C: 14.2, hours_in_band_pct: 0, shortlisted: true, pareto: false },
+  { rank: 3, design_id: 6, comfort_score: -23.5, geometry_label: "6.0×4.2×2.6", av_ratio: 1.2, wwr_percent: 14, walls_label: "puf (60 mm) + reinforced_concrete (240 mm)", roof_label: "puf (55 mm) + straw_clay (320 mm)", floor_label: "puf (45 mm) + concrete (150 mm)", T_min_C: -0.1, T_max_C: 14.7, swing_C: 14.8, hours_in_band_pct: 0, shortlisted: true, pareto: false },
+  { rank: 4, design_id: 2, comfort_score: -26.0, geometry_label: "6.0×4.2×2.6", av_ratio: 1.2, wwr_percent: 14, walls_label: "adobe (480 mm)", roof_label: "concrete (190 mm)", floor_label: "stone_masonry (300 mm)", T_min_C: -0.2, T_max_C: 14.6, swing_C: 14.7, hours_in_band_pct: 0, shortlisted: false, pareto: false },
+  { rank: 5, design_id: 5, comfort_score: -31.3, geometry_label: "6.0×4.2×2.6", av_ratio: 1.2, wwr_percent: 14, walls_label: "straw_clay (380 mm)", roof_label: "wood_timber (180 mm)", floor_label: "concrete (140 mm)", T_min_C: -1.0, T_max_C: 14.7, swing_C: 15.7, hours_in_band_pct: 0, shortlisted: false, pareto: false },
 ];
 
 export const MOCK_RESULTS: RunResults = {
@@ -169,6 +169,22 @@ export const MOCK_RESULTS: RunResults = {
       { design_id: 33, RC_Tmin_C: 11.29, ANSYS_Tmin_C: 14.07, RC_Tmean_C: 13.0, ANSYS_Tmean_C: 14.97, RC_Tmax_C: 15.01, ANSYS_Tmax_C: 16.64, MAE_C: 1.19, RMSE_C: 1.48, RC_rank: 1, ANSYS_rank: 1 },
       { design_id: 15, RC_Tmin_C: 9.84, ANSYS_Tmin_C: 11.51, RC_Tmean_C: 12.11, ANSYS_Tmean_C: 12.8, RC_Tmax_C: 14.94, ANSYS_Tmax_C: 15.08, MAE_C: 0.6, RMSE_C: 0.66, RC_rank: 2, ANSYS_rank: 2 },
     ],
+    series: {
+      t_hours: Array.from({ length: 24 }, (_, i) => i),
+      outdoor_C: Array.from({ length: 24 }, (_, i) => -28 + 6 * Math.sin((i / 24) * 2 * Math.PI - 1.6)),
+      designs: [
+        {
+          design_id: 33,
+          rc_C: [15, 15, 14.9, 14.8, 14.6, 14.4, 14.1, 13.8, 13.5, 13.2, 13.0, 12.9, 12.9, 13.1, 13.4, 13.6, 13.5, 13.2, 12.9, 12.6, 12.3, 12.1, 11.9, 11.7],
+          ansys_C: [15.3, 15.6, 15.8, 15.9, 15.9, 15.8, 15.6, 15.4, 15.2, 15.1, 15.0, 15.0, 15.1, 15.4, 15.7, 15.9, 15.8, 15.5, 15.2, 14.9, 14.7, 14.5, 14.3, 14.1],
+        },
+        {
+          design_id: 15,
+          rc_C: [15, 14.8, 14.5, 14.2, 13.8, 13.4, 13.0, 12.6, 12.2, 11.9, 11.6, 11.5, 11.6, 11.9, 12.3, 12.6, 12.4, 12.0, 11.6, 11.2, 10.9, 10.6, 10.3, 10.1],
+          ansys_C: [15.1, 14.9, 14.6, 14.3, 13.9, 13.5, 13.1, 12.7, 12.4, 12.1, 11.9, 11.8, 11.9, 12.2, 12.6, 12.9, 12.7, 12.3, 11.9, 11.6, 11.3, 11.0, 10.8, 10.6],
+        },
+      ],
+    },
   },
   logistics: [
     { design_id: 33, envelope_mass_t: 84.4, material_cost_lakh_inr: 2.28, transportability_1to5: 3.99 },

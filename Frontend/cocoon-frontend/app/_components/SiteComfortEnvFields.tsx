@@ -18,9 +18,13 @@ const hintCls = "font-body-sm text-on-surface-variant";
 export default function SiteComfortEnvFields({
   startIndex = 5,
   showEnv = true,
+  showGround = true,
 }: {
   startIndex?: number;
   showEnv?: boolean;
+  /** hide the ground-temperature control (the optimize flow always uses
+   * the 10-yr annual-mean proxy) */
+  showGround?: boolean;
 }) {
   const t = useT();
   const [groundMode, setGroundMode] = useState<"auto" | "manual">("auto");
@@ -94,6 +98,7 @@ export default function SiteComfortEnvFields({
             <input name="env.ach" className={inputCls} type="number" defaultValue={0.7} step={0.1} />
             <span className={hintCls}>{t("cfg.env.achHint")}</span>
           </div>
+          {!showGround ? null : (
           <div className="space-y-space-xs">
             <span className={labelCls}>{t("cfg.env.ground")}</span>
             <div className="flex flex-col gap-space-2xs">
@@ -125,6 +130,7 @@ export default function SiteComfortEnvFields({
               </div>
             </div>
           </div>
+          )}
         </div>
       </SectionCard>
       )}

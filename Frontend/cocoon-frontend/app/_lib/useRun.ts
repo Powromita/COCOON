@@ -21,6 +21,8 @@ interface RunState {
   submit: (req: RunRequest) => Promise<void>;
   /** resume the run whose request was stashed by the configure page */
   resumeStashed: () => Promise<void>;
+  /** attach to an existing run by id */
+  attach: (id: string) => Promise<void>;
 }
 
 const POLL_MS = 1500;
@@ -110,5 +112,12 @@ export function useRun(): RunState {
     await submit(req);
   }, [submit]);
 
-  return { phase, runId, status, results, error, submit, resumeStashed };
+  /** attach to an already-running / finished run by id (no new submit) */
+  const attach = useCallback(async (id: string) => {
+    setRunId(id);
+    setError(null);
+    await drive(id);
+  }, [drive]);
+
+  return { phase, runId, status, results, error, submit, resumeStashed, attach };
 }

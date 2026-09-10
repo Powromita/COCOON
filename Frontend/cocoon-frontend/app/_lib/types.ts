@@ -95,12 +95,27 @@ export interface RatioConstraint {
   max: number;
 }
 
+/**
+ * The optimize flow. The user pins the box and the openings; the pipeline
+ * designs everything else — wall/roof/floor materials + thicknesses,
+ * insulation, and glazing type — and returns the best combination.
+ */
 export interface OptimizeSpec {
   designs: number;
   seed: number;
   trials: number;
-  constraints: RatioConstraint[];
-  allowed_materials: MaterialId[];
+  /** fixed envelope the user provides */
+  geometry: Geometry;
+  window_count: number;
+  window_width_m: number;
+  window_height_m: number;
+  door_count: number;
+  /** optional scenario applied uniformly to every candidate */
+  internal_heat_gain_W?: number;
+  air_changes_per_hour?: number;
+  initial_temperature_C?: number;
+  /** optional sourcing filter; omit / all = search the full palette */
+  allowed_materials?: MaterialId[];
   run_ansys: boolean;
   ansys_hours: number;
   ansys_designs: number;
@@ -254,6 +269,10 @@ export interface RankedDesign {
   geometry_label: string; // "6.6×3.69×2.86"
   av_ratio: number;
   wwr_percent: number;
+  /** the material combination this candidate uses (pipeline's choice) */
+  walls_label?: string; // "puf (90 mm) + stone_masonry (400 mm)"
+  roof_label?: string;
+  floor_label?: string;
   T_min_C: number;
   T_max_C: number;
   swing_C: number;
@@ -285,6 +304,13 @@ export interface AnsysRow {
   ANSYS_rank: number;
 }
 
+/** per-hour RC vs ANSYS indoor-temperature series, for the overlay chart */
+export interface AnsysSeries {
+  t_hours: number[];
+  outdoor_C: number[];
+  designs: { design_id: number; rc_C: number[]; ansys_C: number[] }[];
+}
+
 export interface AnsysResult {
   ran: boolean;
   rows: AnsysRow[];
@@ -292,6 +318,7 @@ export interface AnsysResult {
   mean_offset_C: number;
   worst_mae_C: number;
   contour_url?: string;
+  series?: AnsysSeries | null;
 }
 
 export interface LogisticsRow {

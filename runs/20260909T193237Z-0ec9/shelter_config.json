@@ -1,0 +1,59 @@
+{
+  "geometry": {
+    "length_m": 6.0,
+    "width_m": 4.0,
+    "height_m": 2.8
+  },
+  "walls": [
+    {
+      "material": "puf",
+      "thickness_mm": 80.0
+    },
+    {
+      "material": "stone_masonry",
+      "thickness_mm": 400.0
+    }
+  ],
+  "roof": [
+    {
+      "material": "puf",
+      "thickness_mm": 90.0
+    },
+    {
+      "material": "wood_timber",
+      "thickness_mm": 120.0
+    }
+  ],
+  "floor": [
+    {
+      "material": "puf",
+      "thickness_mm": 60.0
+    },
+    {
+      "material": "concrete",
+      "thickness_mm": 150.0
+    }
+  ],
+  "windows": {
+    "area_m2": 3.6,
+    "U_W_m2K": 2.8,
+    "SHGC": 0.7,
+    "glazing_type": "double",
+    "count": 2.0,
+    "width_m": 1.2,
+    "height_m": 1.5
+  },
+  "contents": {
+    "mass_kg": 0.0,
+    "specific_heat_J_kgK": 0.0
+  },
+  "heat_transfer": {
+    "h_inside_W_m2K": 2.5,
+    "h_outside_W_m2K": 10.0
+  },
+  "air_changes_per_hour": 0.7,
+  "ground_temperature_mode": "annual_mean",
+  "ground_temperature_C": -3.6,
+  "internal_heat_gain_W": 450.0,
+  "initial_temperature_C": 15.0
+}

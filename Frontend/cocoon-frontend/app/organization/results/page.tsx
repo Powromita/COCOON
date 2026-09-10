@@ -17,7 +17,7 @@ import { useT } from "@/app/_lib/i18n";
 
 export default function OrganizationResultsPage() {
   return (
-    <ResultsProvider>
+    <ResultsProvider demoMode="optimize">
       <OrganizationResultsBody />
     </ResultsProvider>
   );
@@ -58,7 +58,7 @@ function OrganizationResultsBody() {
 
       <main className="w-full flex-1 bg-surface pt-16">
         <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-8">
-          <RunProgress />
+          <RunProgress mode="optimize" />
 
           <div className="flex flex-col justify-between gap-space-lg pb-space-xs lg:flex-row lg:items-end">
             <div className="min-w-0 space-y-space-2xs">
@@ -76,17 +76,13 @@ function OrganizationResultsBody() {
             </div>
 
             <div className="flex flex-wrap items-center gap-space-sm">
-              <div className="inline-flex rounded-lg bg-surface-container p-1 shadow-sm">
-                <button type="button" className="rounded bg-primary px-space-sm py-1.5 font-body-sm font-semibold text-on-primary shadow-sm">
-                  {t("ores.physRC")}
-                </button>
-                <button type="button" disabled title={t("ires.mlDisabled")} className="cursor-not-allowed rounded px-space-sm py-1.5 font-body-sm font-medium text-outline-variant">
-                  {t("ores.mlSurrogate")}
-                </button>
+              <div className="inline-flex items-center gap-space-xs rounded-lg bg-surface-container px-space-sm py-1.5 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                <span className="font-body-sm font-semibold text-on-surface">{t("ores.physRC")}</span>
                 {ansys?.ran ? (
-                  <button type="button" className="rounded px-space-sm py-1.5 font-body-sm font-medium text-on-surface-variant">
+                  <span className="ml-space-2xs rounded bg-tertiary-container/15 px-space-xs py-space-2xs font-mono-metric-sm text-tertiary-container">
                     {t("ores.ansysVal")}
-                  </button>
+                  </span>
                 ) : null}
               </div>
               <div className="flex items-center gap-space-xs">

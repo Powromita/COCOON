@@ -1,0 +1,24 @@
+{
+  "stages": [
+    {
+      "stage": "1_weather",
+      "ok": true,
+      "note": "{'typical': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T193237Z-0ec9\\\\weather_typical.csv', 'worstcase': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T193237Z-0ec9\\\\weather_worstcase.csv', 'ground': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T193237Z-0ec9\\\\ground_temperature.json', 'annual_mean_air_C': -3.58}"
+    },
+    {
+      "stage": "4_features",
+      "ok": true,
+      "note": "single design"
+    },
+    {
+      "stage": "10_report",
+      "ok": true,
+      "note": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T193237Z-0ec9\\REPORT.md"
+    },
+    {
+      "stage": "11_results_json",
+      "ok": true,
+      "note": "results.json assembled"
+    }
+  ]
+}

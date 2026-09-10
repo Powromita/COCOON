@@ -42,13 +42,30 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
-    throw new ApiError(`${init?.method ?? "GET"} ${path} → ${res.status}`, res.status);
+    let detail: unknown;
+    try {
+      detail = await res.json();
+    } catch {
+      /* non-json body */
+    }
+    const fieldErrors =
+      detail && typeof detail === "object" && "errors" in detail
+        ? (detail as { errors: { field: string; message: string }[] }).errors
+        : undefined;
+    const msg = fieldErrors?.length
+      ? fieldErrors.map((e) => `${e.field}: ${e.message}`).join("; ")
+      : `${init?.method ?? "GET"} ${path} → ${res.status}`;
+    throw new ApiError(msg, res.status, fieldErrors);
   }
   return (await res.json()) as T;
 }
 
 export class ApiError extends Error {
-  constructor(message: string, public status?: number) {
+  constructor(
+    message: string,
+    public status?: number,
+    public fieldErrors?: { field: string; message: string }[],
+  ) {
     super(message);
     this.name = "ApiError";
   }

@@ -1,0 +1,54 @@
+{
+  "stages": [
+    {
+      "stage": "1_weather",
+      "ok": true,
+      "note": "{'typical': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T214915Z-259a\\\\weather_typical.csv', 'worstcase': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T214915Z-259a\\\\weather_worstcase.csv', 'ground': 'C:\\\\Users\\\\Atharva Nilesh Rane\\\\Desktop\\\\COCOON\\\\runs\\\\20260909T214915Z-259a\\\\ground_temperature.json', 'annual_mean_air_C': -3.58}"
+    },
+    {
+      "stage": "5_pool",
+      "ok": true,
+      "note": "50 designs"
+    },
+    {
+      "stage": "6_rank",
+      "ok": true,
+      "note": "top [46, 18, 27, 23, 14]"
+    },
+    {
+      "stage": "7_reliability",
+      "ok": true,
+      "note": "[46, 18]"
+    },
+    {
+      "stage": "8_ansys",
+      "ok": null,
+      "note": "not requested"
+    },
+    {
+      "stage": "9_recommend",
+      "ok": true,
+      "note": "chose 18"
+    },
+    {
+      "stage": "4_features_chosen",
+      "ok": true,
+      "note": "18"
+    },
+    {
+      "stage": "4_features_runner_up",
+      "ok": true,
+      "note": "46"
+    },
+    {
+      "stage": "10_report",
+      "ok": true,
+      "note": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T214915Z-259a\\REPORT.md"
+    },
+    {
+      "stage": "11_results_json",
+      "ok": true,
+      "note": "results.json assembled"
+    }
+  ]
+}

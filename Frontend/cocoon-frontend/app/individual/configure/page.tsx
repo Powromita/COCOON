@@ -5,11 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/_components/SiteHeader";
 import SiteComfortEnvFields from "@/app/_components/SiteComfortEnvFields";
-import IndividualLayerInput from "@/app/_components/IndividualLayerInput";
 import { buildRunRequest } from "@/app/_lib/buildRequest";
 import { stashRequest } from "@/app/_lib/api";
 import { useT } from "@/app/_lib/i18n";
-import type { MaterialId } from "@/app/_lib/types";
 
 const HEATER_W: Record<string, number> = { off: 0, low: 500, medium: 1200, high: 2500 };
 
@@ -30,7 +28,9 @@ export default function IndividualConfigurePage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    stashRequest(buildRunRequest(new FormData(e.currentTarget), "single"));
+    // the household user gives the box + openings + how they'll live in it;
+    // the pipeline designs the walls/roof/floor materials and thicknesses
+    stashRequest(buildRunRequest(new FormData(e.currentTarget), "optimize"));
     router.push("/individual/results");
   };
 
@@ -38,12 +38,6 @@ export default function IndividualConfigurePage() {
     { key: "icfg.len", hintKey: "icfg.ew", name: "geom.length_m", value: L, set: setL },
     { key: "icfg.wid", hintKey: "icfg.ns", name: "geom.width_m", value: W, set: setW },
     { key: "icfg.hgt", hintKey: "icfg.apex", name: "geom.height_m", value: H, set: setH },
-  ];
-
-  const presets: { titleKey: string; descKey: string; tagKey: string; color: string; dot: string; surface: "wall" | "roof" | "floor"; mat: MaterialId; th: number }[] = [
-    { titleKey: "icfg.wall.title", descKey: "icfg.wall.desc", tagKey: "icfg.wall.tag", color: "text-tertiary-container", dot: "bg-tertiary-container", surface: "wall", mat: "adobe", th: 600 },
-    { titleKey: "icfg.roof.title", descKey: "icfg.roof.desc", tagKey: "icfg.roof.tag", color: "text-secondary", dot: "bg-secondary", surface: "roof", mat: "straw_clay", th: 250 },
-    { titleKey: "icfg.floor.title", descKey: "icfg.floor.desc", tagKey: "icfg.floor.tag", color: "text-tertiary-container", dot: "bg-tertiary-container", surface: "floor", mat: "stone_masonry", th: 300 },
   ];
 
   const inputCls =
@@ -140,56 +134,26 @@ export default function IndividualConfigurePage() {
             </div>
           </section>
 
-          {/* 02 CONSTRUCTION */}
+          {/* 02 WINDOWS & DOORS */}
           <section className="mb-space-xl rounded-xl bg-surface-container-lowest p-card-padding shadow-sm">
             <div className="mb-space-lg flex items-center justify-between pb-space-sm">
               <div className="flex items-center gap-space-xs">
                 <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-container-high text-sm font-mono-metric-sm font-semibold text-primary">02</span>
-                <h2 className="font-headline-md text-on-surface">{t("icfg.s2")}</h2>
-              </div>
-              <span className="rounded-full bg-tertiary-fixed px-space-xs py-space-2xs font-mono-metric-sm text-on-tertiary-fixed">{t("icfg.s2tag")}</span>
-            </div>
-
-            <div className="grid gap-space-md md:grid-cols-3">
-              {presets.map((p) => (
-                <div key={p.titleKey} className="flex flex-col gap-space-xs rounded-lg bg-surface-container-low p-space-md">
-                  <div className="space-y-space-2xs">
-                    <div className="flex items-center gap-space-xs text-primary">
-                      <span className="text-[20px]">▣</span>
-                      <span className="font-headline-sm">{t(p.titleKey)}</span>
-                    </div>
-                    <p className="font-body-sm text-on-surface-variant">{t(p.descKey)}</p>
-                  </div>
-                  <IndividualLayerInput surface={p.surface} defaultMaterial={p.mat} defaultThickness={p.th} />
-                  <div className={`flex items-center gap-space-xs font-mono-metric-sm ${p.color}`}>
-                    <span className={`h-2 w-2 rounded-full ${p.dot}`} />
-                    <span>{t(p.tagKey)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 03 WINDOWS */}
-          <section className="mb-space-xl rounded-xl bg-surface-container-lowest p-card-padding shadow-sm">
-            <div className="mb-space-lg flex items-center justify-between pb-space-sm">
-              <div className="flex items-center gap-space-xs">
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-container-high text-sm font-mono-metric-sm font-semibold text-primary">03</span>
                 <h2 className="font-headline-md text-on-surface">{t("icfg.s3")}</h2>
               </div>
               <span className="font-mono-metric-sm text-on-surface-variant">{t("icfg.s3tag")}</span>
             </div>
 
-            <div className="grid gap-space-md sm:grid-cols-3">
+            <div className="grid gap-space-md sm:grid-cols-4">
               <div className="space-y-space-2xs">
                 <label className="block font-label-caps uppercase tracking-wider text-on-surface-variant">{t("icfg.numWin")}</label>
                 <div className="relative flex items-center">
-                  <input name="win.count" defaultValue={2} className={inputCls} type="number" min={0} />
+                  <input name="win.count" defaultValue={2} className={inputCls} type="number" min={0} step={1} />
                   <span className="pointer-events-none absolute right-9 font-mono-metric-sm text-outline">{t("icfg.units")}</span>
                 </div>
                 <span className="font-body-sm text-on-surface-variant">{t("icfg.winPriority")}</span>
               </div>
-              <div className="space-y-space-2xs">
+              <div className="space-y-space-2xs sm:col-span-2">
                 <label className="block font-label-caps uppercase tracking-wider text-on-surface-variant">{t("icfg.dims")}</label>
                 <div className="grid grid-cols-2 gap-space-xs">
                   <div className="relative">
@@ -204,29 +168,28 @@ export default function IndividualConfigurePage() {
                 <span className="font-body-sm text-on-surface-variant">{t("icfg.apArea")}</span>
               </div>
               <div className="space-y-space-2xs">
-                <label className="block font-label-caps uppercase tracking-wider text-on-surface-variant">{t("icfg.glzQ")}</label>
-                <div className="relative">
-                  <select name="win.glazing" className={`${inputCls} appearance-none pr-space-xl`} defaultValue="double">
-                    <option value="single">{t("icfg.opt.single")}</option>
-                    <option value="double">{t("icfg.opt.double")}</option>
-                    <option value="triple">{t("icfg.opt.triple")}</option>
-                  </select>
-                  <span className="pointer-events-none absolute right-space-sm top-1/2 -translate-y-1/2 text-[18px] leading-none text-on-surface-variant">⌄</span>
+                <label className="block font-label-caps uppercase tracking-wider text-on-surface-variant">{t("icfg.numDoor")}</label>
+                <div className="relative flex items-center">
+                  <input name="door.count" defaultValue={1} className={inputCls} type="number" min={0} step={1} />
+                  <span className="pointer-events-none absolute right-9 font-mono-metric-sm text-outline">{t("icfg.units")}</span>
                 </div>
-                <span className="font-body-sm text-on-surface-variant">{t("icfg.glzGrade")}</span>
               </div>
             </div>
+
+            <p className="mt-space-md rounded-lg bg-surface-container-low p-space-sm font-body-sm text-on-surface-variant">
+              {t("icfg.pipelineDesigns")}
+            </p>
           </section>
 
           <div className="mb-space-xl space-y-space-xl">
-            <SiteComfortEnvFields startIndex={5} />
+            <SiteComfortEnvFields startIndex={3} showGround={false} />
           </div>
 
-          {/* 08 COMFORT & INTERNAL HEATING */}
+          {/* 06 COMFORT & INTERNAL HEATING */}
           <section className="rounded-xl bg-surface-container-lowest p-card-padding shadow-sm">
             <div className="mb-space-lg flex items-center justify-between pb-space-sm">
               <div className="flex items-center gap-space-xs">
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-container-high text-sm font-mono-metric-sm font-semibold text-primary">08</span>
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-container-high text-sm font-mono-metric-sm font-semibold text-primary">06</span>
                 <h2 className="font-headline-md text-on-surface">{t("icfg.s4")}</h2>
               </div>
               <span className="font-mono-metric-sm text-on-surface-variant">{t("icfg.s4tag")}</span>
@@ -309,33 +272,12 @@ export default function IndividualConfigurePage() {
                 </div>
               </div>
 
-              <details className="rounded-lg bg-surface-container-low p-space-md">
-                <summary className="cursor-pointer font-headline-sm text-on-surface">{t("cfg.adv.title")}</summary>
-                <div className="mt-space-md grid gap-space-md sm:grid-cols-2 lg:grid-cols-4">
-                  {[
-                    ["adv.contents_mass_kg", "cfg.adv.contentsMass", 0, "kg"],
-                    ["adv.contents_cp", "cfg.adv.contentsCp", 0, "J/kg·K"],
-                    ["adv.h_inside", "cfg.adv.hIn", 2.5, "W/m²·K"],
-                    ["adv.h_outside", "cfg.adv.hOut", 10, "W/m²·K"],
-                  ].map(([nm, lk, dv, u]) => (
-                    <div key={nm as string} className="space-y-space-2xs">
-                      <label className="block font-label-caps uppercase tracking-wider text-on-surface-variant">{t(lk as string)}</label>
-                      <div className="flex items-center rounded bg-surface-container-lowest shadow-sm">
-                        <input name={nm as string} defaultValue={dv as number} type="number" step={0.1} className="w-full bg-transparent px-space-sm py-space-2xs font-mono-metric-md text-on-surface outline-none" />
-                        <span className="px-space-xs font-mono-metric-sm text-on-surface-variant">{u}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-space-sm font-body-sm text-on-surface-variant">{t("cfg.adv.hint")}</p>
-              </details>
-
               <div className="flex flex-wrap items-center justify-end gap-space-md pt-space-md">
                 <Link href="/" className="rounded bg-surface-container px-space-md py-space-sm font-body-md font-medium text-on-surface transition-colors hover:bg-surface-container-high">
                   {t("common.cancel")}
                 </Link>
                 <button type="submit" className="rounded bg-primary px-space-md py-space-sm font-body-md font-semibold text-on-primary transition-colors hover:bg-primary-container">
-                  {t("common.runSim")}
+                  {t("icfg.designCta")}
                 </button>
               </div>
             </div>

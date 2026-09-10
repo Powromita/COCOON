@@ -109,6 +109,74 @@ export default function OrganizationConfigurePage() {
               ) : null}
             </SectionCard>
 
+            {mode === "optimize" ? (
+              <div className="rounded-lg bg-surface-container-lowest p-card-padding shadow-sm">
+                <div className="mb-space-lg flex items-center justify-between pb-space-sm">
+                  <div className="flex items-center gap-space-xs">
+                    <span className="h-4 w-2 rounded-sm bg-primary" />
+                    <h2 className="font-headline-md text-on-surface">{t("ocfg.boxOpenings")}</h2>
+                  </div>
+                  <span className="rounded bg-surface-container px-space-xs py-space-2xs font-mono-metric-sm text-on-surface-variant">{t("ocfg.youProvide")}</span>
+                </div>
+
+                <div className="flex flex-col gap-space-lg lg:max-w-3xl">
+                  <div>
+                    <span className="mb-space-xs block font-label-caps uppercase tracking-wider text-on-surface-variant">{t("ocfg.s1")}</span>
+                    <div className="grid grid-cols-3 gap-space-sm">
+                      {dims.map((f) => (
+                        <div key={f.key} className="flex flex-col gap-space-2xs">
+                          <label className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t(f.key)}</label>
+                          <div className="flex items-center rounded bg-surface-container-low shadow-sm">
+                            <input name={f.name} value={f.v} onChange={(e) => f.set(+e.target.value)} className={inputCls} type="number" step={0.1} min={1} />
+                            <span className="bg-surface-container px-space-xs py-space-xs font-mono-metric-sm text-on-surface-variant">{f.unit}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-space-xs font-mono-metric-sm text-on-surface-variant">
+                      {t("ocfg.encVol")} {volume.toFixed(1)} m³ · A/V {av.toFixed(2)} m⁻¹
+                    </p>
+                  </div>
+
+                  <div className="grid gap-space-md sm:grid-cols-3">
+                    <div className="flex flex-col gap-space-2xs">
+                      <label className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t("ocfg.winCount")}</label>
+                      <div className="flex items-center rounded bg-surface-container-low shadow-sm">
+                        <input name="win.count" defaultValue={2} className={inputCls} type="number" min={0} step={1} />
+                        <span className="bg-surface-container px-space-xs py-space-xs font-mono-metric-sm text-on-surface-variant">{t("icfg.units")}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-space-2xs">
+                      <label className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t("ocfg.winW")}</label>
+                      <div className="flex items-center rounded bg-surface-container-low shadow-sm">
+                        <input name="win.width_m" defaultValue={1.2} className={inputCls} type="number" step={0.1} min={0.3} />
+                        <span className="bg-surface-container px-space-xs py-space-xs font-mono-metric-sm text-on-surface-variant">m</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-space-2xs">
+                      <label className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t("ocfg.winH")}</label>
+                      <div className="flex items-center rounded bg-surface-container-low shadow-sm">
+                        <input name="win.height_m" defaultValue={1.4} className={inputCls} type="number" step={0.1} min={0.3} />
+                        <span className="bg-surface-container px-space-xs py-space-xs font-mono-metric-sm text-on-surface-variant">m</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-space-md sm:grid-cols-3">
+                    <div className="flex flex-col gap-space-2xs">
+                      <label className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t("ocfg.doorCount")}</label>
+                      <div className="flex items-center rounded bg-surface-container-low shadow-sm">
+                        <input name="door.count" defaultValue={1} className={inputCls} type="number" min={0} step={1} />
+                        <span className="bg-surface-container px-space-xs py-space-xs font-mono-metric-sm text-on-surface-variant">{t("icfg.units")}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="rounded bg-surface-container-low p-space-sm font-body-sm text-on-surface-variant">{t("ocfg.pipelinePicks")}</p>
+                </div>
+              </div>
+            ) : null}
+
             {showEnvelope ? (
               <>
                 {/* GEOMETRY */}

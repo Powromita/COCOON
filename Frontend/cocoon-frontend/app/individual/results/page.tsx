@@ -6,6 +6,7 @@ import ResolvedConfigStrip from "@/app/_components/ResolvedConfigStrip";
 import SolarEnergyPanel from "@/app/_components/SolarEnergyPanel";
 import HeatFlowPanel from "@/app/_components/HeatFlowPanel";
 import TemperatureChart from "@/app/_components/TemperatureChart";
+import RecommendationCard from "@/app/_components/RecommendationCard";
 import { ResultsProvider, useResults } from "@/app/_components/ResultsProvider";
 import RunProgress from "@/app/_components/RunProgress";
 import { artifactUrl } from "@/app/_lib/api";
@@ -13,7 +14,7 @@ import { useT } from "@/app/_lib/i18n";
 
 export default function IndividualResultsPage() {
   return (
-    <ResultsProvider>
+    <ResultsProvider demoMode="optimize">
       <IndividualResultsBody />
     </ResultsProvider>
   );
@@ -91,21 +92,14 @@ function IndividualResultsBody() {
         </div>
 
         <div className="mx-auto flex max-w-7xl flex-col gap-space-xl px-space-lg py-space-xl">
-          <RunProgress />
+          <RunProgress mode="optimize" />
+
+          <RecommendationCard />
 
           <div className="flex flex-col justify-between gap-space-md md:flex-row md:items-center">
-            <div className="inline-flex rounded bg-surface-container-high p-space-2xs shadow-sm" role="tablist">
-              <button className="rounded bg-surface-container-lowest px-space-lg py-space-xs font-headline-sm text-primary shadow-sm" type="button">
-                {t("ires.physicsModel")}
-              </button>
-              <button
-                className="cursor-not-allowed rounded px-space-lg py-space-xs font-headline-sm text-outline-variant"
-                type="button"
-                disabled
-                title={t("ires.mlDisabled")}
-              >
-                {t("ires.mlRapid")}
-              </button>
+            <div className="inline-flex items-center gap-space-xs rounded bg-surface-container-high px-space-md py-space-xs shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              <span className="font-headline-sm text-primary">{t("ires.physicsModel")}</span>
             </div>
             <div className="flex flex-wrap items-center gap-space-md">
               <div className="flex items-center gap-space-xs rounded bg-surface-container-lowest px-space-sm py-space-xs shadow-sm">

@@ -394,11 +394,15 @@ def deployability_ranking(evaluated, logistics_rows, w_comfort=1.0,
 # ORCHESTRATOR
 # ==================================================
 
-def run_reliability(run_dir, trials=400, jitter=0.5, top_k=3):
+def run_reliability(run_dir, trials=400, jitter=0.5, top_k=3,
+                    scenario_overrides=None):
     """Stage 7. Reads the run folder's designs_pool.json,
     evaluated_typical.json and weather_worstcase.csv; writes
     reliability_sensitivity.png, reliability_pareto.png,
-    reliability_report.md, shortlist.json and logistics.csv back."""
+    reliability_report.md, shortlist.json and logistics.csv back.
+
+    ``scenario_overrides`` is passed to the worst-case re-rank so it uses
+    the same occupancy / ventilation the Stage 6 ranking did."""
 
     import json as _json
     from scenario_generator import load_pool
@@ -431,7 +435,8 @@ def run_reliability(run_dir, trials=400, jitter=0.5, top_k=3):
     print(line)
     wcs = pd.read_csv(run_dir / "weather_worstcase.csv", parse_dates=["timestamp"])
     gmean = annual_mean_air_C(load_archive())
-    wr = DesignRanker(wcs, ground_mean_C=gmean, ground_mode="annual_mean")
+    wr = DesignRanker(wcs, ground_mean_C=gmean, ground_mode="annual_mean",
+                      scenario_overrides=scenario_overrides)
     worst_eval = wr.evaluate_pool(str(run_dir / "designs_pool.json"))
     worst_rank = [d["design_id"] for d in worst_eval]
     print(f"typical-weather top 5 : {base_rank[:5]}")
@@ -484,6 +489,29 @@ def run_reliability(run_dir, trials=400, jitter=0.5, top_k=3):
     }
     with open(run_dir / "shortlist.json", "w", encoding="utf-8") as fh:
         _json.dump(shortlist, fh, indent=2)
+
+    # --- reliability.json (structured, for web_results) ------
+    st = sens["table"]
+    topk_col = f"freq_top{sens['top_k']}_pct"
+    reliability = {
+        "verdict": sens["verdict"],
+        "shortlist_ids": sens["shortlist"],
+        "pareto_ids": [p["design_id"] for p in front],
+        "top3_stable_across_weather": bool(stable_top3),
+        "sensitivity": [
+            {"design_id": int(r["design_id"]), "top3_pct": float(r[topk_col])}
+            for _, r in st.head(12).iterrows()
+        ],
+        "pareto_points": [
+            {"design_id": int(p["design_id"]),
+             "swing_C": float(p["swing_C"]),
+             "T_min_C": float(p["T_min"]),
+             "pareto": p["design_id"] in {q["design_id"] for q in front}}
+            for p in pts
+        ],
+    }
+    with open(run_dir / "reliability.json", "w", encoding="utf-8") as fh:
+        _json.dump(reliability, fh, indent=2)
 
     # --- report ---------------------------------------------
     report = run_dir / "reliability_report.md"
