@@ -165,6 +165,13 @@ export interface ResolvedProperties {
   C_total_MJ_per_K: number;
   infiltration_UA_W_K: number;
   envelope_mass_t: number;
+  /** BACKEND: emit — the glazing conductance (config carries windows.U_W_m2K).
+   * Until the pipeline forwards it the envelope panel shows "Not available". */
+  U_window_W_m2K?: number;
+  /** BACKEND: emit — total opaque + glazed envelope area (m²). */
+  envelope_area_m2?: number;
+  /** BACKEND: emit — window-to-wall ratio (%). */
+  window_to_wall_ratio_pct?: number;
 }
 
 /** DRDO Output 1 */
@@ -177,8 +184,20 @@ export interface TemperatureResult {
   T_final_C: number;
   outdoor_min_C: number;
   outdoor_max_C: number;
-  /** hourly series for the chart */
-  series: { t_hours: number[]; indoor_C: number[]; outdoor_C: number[] };
+  /** hourly series for the chart. `t_hours` is a 0-based hour index; real
+   * wall-clock timestamps arrive in `timestamps` once the backend forwards
+   * them (they exist in features/<id>/temperature.csv but are dropped today). */
+  series: {
+    t_hours: number[];
+    indoor_C: number[];
+    outdoor_C: number[];
+    /** BACKEND: emit — ISO-8601 timestamp per hour, aligned to the arrays above. */
+    timestamps?: string[];
+    /** BACKEND: emit — ground / earth-skin temperature per hour (°C). */
+    ground_C?: number[];
+    /** BACKEND: emit — horizontal solar irradiance per hour (W/m²). */
+    solar_radiation_W_m2?: number[];
+  };
 }
 
 /** DRDO Output 2 */
@@ -309,6 +328,11 @@ export interface AnsysSeries {
   t_hours: number[];
   outdoor_C: number[];
   designs: { design_id: number; rc_C: number[]; ansys_C: number[] }[];
+  /** BACKEND: emit — ISO-8601 timestamp per hour so the comparison aligns the
+   * two models by wall-clock time rather than array position. Both series
+   * already come from the identical weather window, so index alignment is a
+   * safe fallback. */
+  timestamps?: string[];
 }
 
 export interface AnsysResult {
@@ -333,6 +357,18 @@ export interface Recommendation {
   runner_up_id: number | string | null;
   thermal_tie: boolean;
   justification: string;
+  /** BACKEND: emit — rank of the chosen design (1 = best). */
+  rank?: number;
+  /** BACKEND: emit — how many candidate designs were ranked. When this is 1
+   * (or absent with no `comparison[]`) the card says "Evaluated Design", not
+   * "Recommended Design", and never calls it "best". */
+  designs_evaluated?: number;
+  /** BACKEND: emit — overall / comfort / energy sub-scores if the ranker keeps
+   * them split. `comfort_score` already exists on `chosen`. */
+  overall_score?: number;
+  energy_score?: number;
+  /** BACKEND: emit — concrete, measurable improvement suggestions. */
+  improvement_suggestions?: string[];
   chosen: {
     geometry_label: string;
     walls_label: string;
@@ -342,12 +378,39 @@ export interface Recommendation {
     comfort_score: number;
     T_min_C: number;
     envelope_mass_t: number;
+    /** BACKEND: emit — cardinal orientation of the main glazing. */
+    orientation?: string;
+    /** BACKEND: emit — average daily envelope heat loss / demand (W or kWh/day). */
+    avg_daily_heat_loss_W?: number;
   };
+}
+
+/** the analysis site — a single-site NASA POWER archive today, so the frontend
+ * falls back to a documented constant (app/_lib/site.ts) until the API sends it. */
+export interface SimLocation {
+  name: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+}
+
+/** wall-clock bounds of the simulated window. */
+export interface SimAnalysis {
+  start_time: string; // ISO-8601
+  end_time: string; // ISO-8601
+  timestep_seconds: number; // 3600 for the hourly RC model
+  total_hours: number;
 }
 
 export interface RunResults {
   run_id: string;
   mode: "single" | "optimize";
+  /** BACKEND: emit — ISO-8601 timestamp the run finished (drives "last simulation"). */
+  created_at?: string;
+  /** BACKEND: emit — analysis site; frontend falls back to SITE_LEH. */
+  location?: SimLocation;
+  /** BACKEND: emit — real start/end of the weather window and the timestep. */
+  analysis?: SimAnalysis;
   window: { typical_hours: number; worst_hours: number; typical_mean_C: number; worst_min_C: number };
   resolved: ResolvedProperties;
   features: FeatureReports;

@@ -103,7 +103,7 @@ export default function AnsysValidationPanel() {
   const t = useT();
   const { results, isReal } = useResults();
   const a = results.ansys;
-  if (!a || !a.ran) return null;
+  if (!a || (!a.ran && !a.rows?.length)) return null;
 
   const maeById: Record<number, number> = {};
   a.rows.forEach((r) => (maeById[r.design_id] = r.MAE_C));

@@ -1,0 +1,9 @@
+material,cost_inr_per_m3,transportability_score,notes
+adobe,1600,5,site-made from local earth; effectively zero transport load
+rammed_earth,2000,5,site-made from local earth + minimal stabiliser
+straw_clay,2400,4,local earth + imported straw
+stone_masonry,2800,4,stone usually available locally in Ladakh; labour-heavy
+wood_timber,13000,3,imported to the region; moderate weight
+concrete,6500,2,cement + aggregate + water + formwork all hauled in
+reinforced_concrete,9500,2,as concrete plus steel; heaviest logistics burden
+puf,8500,5,rigid boards; very light and ships easily

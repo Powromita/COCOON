@@ -114,6 +114,9 @@ export function buildRunRequest(
   const window = {
     season: str(fd, "site.season", "winter") as Season,
     typical_hours: num(fd, "site.typical_hours", mode === "single" ? 72 : 168),
+    // AnalysisWindow.worst_hours is required by the backend schema, but only the
+    // ANSYS validation + worst-case reliability re-rank read it. Forms that omit
+    // the input (the household optimize flow) fall back to this default.
     worst_hours: num(fd, "site.worst_hours", 48),
   };
   const comfort = {

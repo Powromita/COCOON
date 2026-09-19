@@ -13,18 +13,22 @@ export default function SolarEnergyPanel() {
   const daily = s.daily_MJ;
   const hourly = s.hourly_gain_kW;
   const maxD = Math.max(...daily, 1);
-  const maxH = Math.max(...hourly, 1);
+  const maxH = Math.max(...hourly, 0.001);
   const totalH = hourly.reduce((a, b) => a + b, 0) || 1;
   const cumPts = hourly
     .reduce<{ pts: string[]; run: number }>(
       (acc, h, i) => {
         const run = acc.run + h;
-        acc.pts.push(`${(i / (hourly.length - 1)) * 100},${100 - (run / totalH) * 100}`);
+        acc.pts.push(`${(i / Math.max(hourly.length - 1, 1)) * 100},${100 - (run / totalH) * 100}`);
         return { pts: acc.pts, run };
       },
       { pts: [], run: 0 },
     )
     .pts.join(" ");
+
+  const hourlyPts = hourly
+    .map((h, i) => `${(i / Math.max(hourly.length - 1, 1)) * 100},${100 - (h / maxH) * 100}`)
+    .join(" ");
 
   return (
     <SectionCard title={t("res.solar.title")} tag={t("res.solar.tag")}>
@@ -43,16 +47,22 @@ export default function SolarEnergyPanel() {
           <span className="font-label-caps uppercase tracking-wider text-on-surface-variant">
             {t("res.solar.hourlyTitle")}
           </span>
-          <div className="mt-space-sm flex h-28 items-end gap-1">
-            {hourly.map((h, i) => (
-              <div
-                key={i}
-                className="min-h-[2px] flex-1 rounded-t bg-secondary-container"
-                style={{ height: `${(h / maxH) * 100}%` }}
-                title={`${h.toFixed(1)} kW`}
-              />
-            ))}
-          </div>
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="mt-space-sm h-28 w-full">
+            {/* filled area */}
+            <polygon
+              points={`0,100 ${hourlyPts} 100,100`}
+              fill="var(--color-secondary-container, #9ecaff)"
+              fillOpacity="0.35"
+            />
+            {/* line on top */}
+            <polyline
+              points={hourlyPts}
+              fill="none"
+              stroke="var(--color-secondary, #4a90d9)"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
         </div>
 
         <div className="rounded-lg bg-surface-container-low p-space-md">
@@ -65,6 +75,11 @@ export default function SolarEnergyPanel() {
         </div>
       </div>
 
+      {daily.length <= 1 ? (
+        <p className="mt-space-lg rounded-lg bg-surface-container-low p-space-md font-body-sm text-on-surface-variant">
+          {t("res.solar.singleDay")}
+        </p>
+      ) : (
       <div className="mt-space-lg rounded-lg bg-surface-container-low p-space-md">
         <span className="font-label-caps uppercase tracking-wider text-on-surface-variant">
           {t("res.solar.dailyTitle")}
@@ -79,6 +94,7 @@ export default function SolarEnergyPanel() {
         </div>
         <span className="mt-space-xs block font-mono-metric-sm text-outline">MJ / day</span>
       </div>
+      )}
     </SectionCard>
   );
 }

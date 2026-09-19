@@ -38,3 +38,8 @@ ansys-pipeline/results/**/ansys_run/
 *.out
 cleanup-ansys-*.bat
 .__tmp__.*
+
+# Pipeline run outputs and intermediate solver cases
+runs/
+ansys-pipeline/results/opt_rank_*/
+*.tsbuildinfo

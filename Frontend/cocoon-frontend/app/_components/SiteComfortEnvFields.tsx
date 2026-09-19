@@ -19,12 +19,17 @@ export default function SiteComfortEnvFields({
   startIndex = 5,
   showEnv = true,
   showGround = true,
+  showWorstWindow = true,
 }: {
   startIndex?: number;
   showEnv?: boolean;
   /** hide the ground-temperature control (the optimize flow always uses
    * the 10-yr annual-mean proxy) */
   showGround?: boolean;
+  /** hide the worst-case-window control — only the ANSYS validation and the
+   * worst-case reliability re-rank consume it, so flows that run neither
+   * (e.g. the household optimize flow) fall back to the backend default */
+  showWorstWindow?: boolean;
 }) {
   const t = useT();
   const [groundMode, setGroundMode] = useState<"auto" | "manual">("auto");
@@ -55,11 +60,13 @@ export default function SiteComfortEnvFields({
             <input name="site.typical_hours" className={inputCls} type="number" defaultValue={168} />
             <span className={hintCls}>{t("cfg.site.typicalHint")}</span>
           </div>
+          {!showWorstWindow ? null : (
           <div className="space-y-space-2xs">
             <label className={labelCls}>{t("cfg.site.worstWindow")}</label>
             <input name="site.worst_hours" className={inputCls} type="number" defaultValue={48} />
             <span className={hintCls}>{t("cfg.site.worstHint")}</span>
           </div>
+          )}
         </div>
       </SectionCard>
 

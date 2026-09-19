@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "thermal-calculator"))
 
-RATIOS_CSV = "shelter_ratios_recommended.csv"
-ELEMENTS_CSV = "shelter_elements_dimensions__1_.csv"
+RATIOS_CSV = str(ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv") if (ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv").exists() else "shelter_ratios_recommended.csv"
+ELEMENTS_CSV = str(ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv") if (ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv").exists() else "shelter_elements_dimensions__1_.csv"
 
 _SEASONS = {"winter": (12, 1, 2), "summer": (6, 7, 8),
             "spring": (3, 4, 5), "autumn": (9, 10, 11)}

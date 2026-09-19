@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import SiteHeader from "@/app/_components/SiteHeader";
 import ResolvedConfigStrip from "@/app/_components/ResolvedConfigStrip";
 import SolarEnergyPanel from "@/app/_components/SolarEnergyPanel";
@@ -12,7 +13,7 @@ import LogisticsPanel from "@/app/_components/LogisticsPanel";
 import { ResultsProvider, useResults } from "@/app/_components/ResultsProvider";
 import RunProgress from "@/app/_components/RunProgress";
 import TemperatureChart from "@/app/_components/TemperatureChart";
-import { artifactUrl } from "@/app/_lib/api";
+import { downloadReport } from "@/app/_lib/generateReport";
 import { useT } from "@/app/_lib/i18n";
 
 export default function OrganizationResultsPage() {
@@ -25,7 +26,17 @@ export default function OrganizationResultsPage() {
 
 function OrganizationResultsBody() {
   const t = useT();
-  const { results, isReal } = useResults();
+  const { results, isReal, phase } = useResults();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = () => {
+    setDownloading(true);
+    try {
+      downloadReport(results);
+    } finally {
+      setTimeout(() => setDownloading(false), 1500);
+    }
+  };
   const temp = results.features.temperature;
   const cfg = results.config_echo;
   const ansys = results.ansys;
@@ -44,13 +55,6 @@ function OrganizationResultsBody() {
     },
   ];
 
-  const artifact = (name: string) =>
-    results.run_id && !results.run_id.startsWith("mock")
-      ? artifactUrl(results.run_id, name)
-      : undefined;
-
-  const csvHref = artifact(isOptimize ? "optimization_results.csv" : "features/single/temperature.csv");
-  const reportHref = artifact("REPORT.md");
 
   return (
     <main className="min-h-screen bg-surface text-on-surface antialiased">
@@ -86,24 +90,20 @@ function OrganizationResultsBody() {
                 ) : null}
               </div>
               <div className="flex items-center gap-space-xs">
-                <a
-                  href={csvHref ?? "#"}
-                  aria-disabled={!csvHref}
-                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm ${
-                    csvHref ? "bg-surface-container-lowest text-on-surface hover:bg-surface-container" : "pointer-events-none bg-surface-container text-on-surface-variant"
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading || phase === "submitting" || phase === "running"}
+                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm transition-all duration-200 ${
+                    downloading
+                      ? "bg-tertiary-container text-on-tertiary-container cursor-wait"
+                      : phase === "submitting" || phase === "running"
+                      ? "pointer-events-none bg-surface-container-high text-on-surface-variant"
+                      : "bg-primary text-on-primary hover:bg-primary-container active:scale-95"
                   }`}
                 >
-                  {t("res.exportCsv")}
-                </a>
-                <a
-                  href={reportHref ?? "#"}
-                  aria-disabled={!reportHref}
-                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm ${
-                    reportHref ? "bg-primary text-on-primary hover:bg-primary-container" : "pointer-events-none bg-surface-container-high text-on-surface-variant"
-                  }`}
-                >
-                  {t("res.exportReport")}
-                </a>
+                  {downloading ? "⏳ Generating…" : `⬇ ${t("res.exportReport")}`}
+                </button>
               </div>
             </div>
           </div>

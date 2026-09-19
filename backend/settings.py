@@ -33,8 +33,12 @@ CORS_ORIGINS = os.environ.get(
 DATA_DIR = REPO_ROOT / "thermal-calculator" / "data"
 MATERIALS_JSON = DATA_DIR / "material_properties.json"
 GLAZING_JSON = DATA_DIR / "glazing_profiles.json"
-RATIOS_CSV = REPO_ROOT / "shelter_ratios_recommended.csv"
-ELEMENTS_CSV = REPO_ROOT / "shelter_elements_dimensions__1_.csv"
+RATIOS_CSV = (REPO_ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv"
+              if (REPO_ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv").exists()
+              else REPO_ROOT / "shelter_ratios_recommended.csv")
+ELEMENTS_CSV = (REPO_ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv"
+                if (REPO_ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv").exists()
+                else REPO_ROOT / "shelter_elements_dimensions__1_.csv")
 
 # stages the pipeline is expected to emit, per mode (for status translation)
 EXPECTED_STAGES = {
