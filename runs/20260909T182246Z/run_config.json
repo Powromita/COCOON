@@ -1,0 +1,6 @@
+{
+  "mode": "single",
+  "config": "my_shelter.json",
+  "typical_hours": 72,
+  "worst_hours": 48
+}

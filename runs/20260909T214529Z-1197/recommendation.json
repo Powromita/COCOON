@@ -1,0 +1,17 @@
+{
+  "chosen_design_id": 18,
+  "runner_up_id": 46,
+  "thermal_tie": true,
+  "justification": "comfort scores span only 0.1 points across the shortlist -> treated as a tie; tie broken on logistics: design 18 is the lightest (67.68 t) with transportability 4.7/5.",
+  "basis": {
+    "shortlist": [
+      46,
+      18
+    ],
+    "comfort_spread_points": 0.1,
+    "chosen_comfort_score": 19.3,
+    "chosen_T_min_C": 4.59,
+    "chosen_mass_t": 67.68,
+    "ansys_ran": false
+  }
+}

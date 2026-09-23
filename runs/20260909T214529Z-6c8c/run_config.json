@@ -1,0 +1,24 @@
+{
+  "mode": "optimize",
+  "run_dir": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T214529Z-6c8c",
+  "comfort_target": 18.0,
+  "comfort_lo": 15.0,
+  "comfort_hi": 24.0,
+  "typical_hours": 168,
+  "worst_hours": 48,
+  "season": "winter",
+  "designs": 50,
+  "seed": 0,
+  "trials": 400,
+  "ratios": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T214529Z-6c8c\\ratios.csv",
+  "elements": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T214529Z-6c8c\\elements.csv",
+  "fixed_design": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T214529Z-6c8c\\fixed_design.json",
+  "ansys": false,
+  "ansys_hours": 24,
+  "ansys_designs": 2,
+  "comfort": {
+    "target_C": 18.0,
+    "band_lo_C": 15.0,
+    "band_hi_C": 24.0
+  }
+}

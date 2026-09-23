@@ -1,0 +1,44 @@
+{
+  "mode": "optimize",
+  "base_config": null,
+  "window": {
+    "season": "winter",
+    "typical_hours": 168,
+    "worst_hours": 48
+  },
+  "comfort": {
+    "target_C": 18.0,
+    "band_lo_C": 15.0,
+    "band_hi_C": 24.0
+  },
+  "optimize": {
+    "designs": 50,
+    "seed": 0,
+    "trials": 400,
+    "geometry": {
+      "length_m": 8.0,
+      "width_m": 6.0,
+      "height_m": 2.4
+    },
+    "window_count": 2,
+    "window_width_m": 1.2,
+    "window_height_m": 1.5,
+    "door_count": 1,
+    "internal_heat_gain_W": 950.0,
+    "air_changes_per_hour": 0.7,
+    "initial_temperature_C": 5.0,
+    "allowed_materials": [
+      "adobe",
+      "rammed_earth",
+      "straw_clay",
+      "stone_masonry",
+      "wood_timber",
+      "concrete",
+      "reinforced_concrete",
+      "puf"
+    ],
+    "run_ansys": false,
+    "ansys_hours": 24,
+    "ansys_designs": 2
+  }
+}

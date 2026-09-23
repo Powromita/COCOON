@@ -16,14 +16,30 @@ env/
 .DS_Store
 Thumbs.db
 
-# Generated results
-results/*.csv
-results/*.png
-results/*.jpg
-results/*.jpeg
-
-# ML models - add later if models become too large
-*.joblib
-
 # Environment variables
 .env
+
+# ML models
+*.joblib
+
+# ANSYS solver working files (large, regenerable)
+ansys-pipeline/results/**/ansys_run/
+*.rth
+*.esav
+*.full
+*.rdb
+*.db
+*.DSP
+*.ldhi
+*.mntr
+*.r001
+*.err
+*.log
+*.out
+cleanup-ansys-*.bat
+.__tmp__.*
+
+# Pipeline run outputs and intermediate solver cases
+runs/
+ansys-pipeline/results/opt_rank_*/
+*.tsbuildinfo

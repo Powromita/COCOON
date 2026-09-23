@@ -1,0 +1,28 @@
+{
+  "shortlist_ids": [
+    46,
+    18
+  ],
+  "verdict": "NOT a clean single winner: the top spot moves under weight perturbation. Report the robust shortlist [46, 18] instead of one design.",
+  "pareto_ids": [
+    46,
+    14,
+    10,
+    8
+  ],
+  "typical_top5": [
+    46,
+    18,
+    27,
+    23,
+    14
+  ],
+  "worstcase_top5": [
+    46,
+    27,
+    14,
+    2,
+    18
+  ],
+  "top3_stable_across_weather": false
+}

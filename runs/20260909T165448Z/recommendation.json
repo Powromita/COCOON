@@ -1,0 +1,18 @@
+{
+  "chosen_design_id": 33,
+  "runner_up_id": 15,
+  "thermal_tie": false,
+  "justification": "ANSYS FEM: designs 2.17 C apart, above the 1.19 C model error -> a real difference; design 33 has the top comfort score (8.5).",
+  "basis": {
+    "shortlist": [
+      33,
+      15,
+      6
+    ],
+    "comfort_spread_points": 32.0,
+    "chosen_comfort_score": 8.5,
+    "chosen_T_min_C": 3.88,
+    "chosen_mass_t": 84.42,
+    "ansys_ran": true
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "chosen_design_id": 9,
+  "runner_up_id": 12,
+  "thermal_tie": true,
+  "justification": "ANSYS FEM: the shortlisted designs are 2.35 C apart in mean indoor temperature, inside the 3.83 C RC-vs-FEM error -> thermally indistinguishable; tie broken on logistics: design 9 is the lightest (41.31 t) with transportability 3.46/5.",
+  "basis": {
+    "shortlist": [
+      12,
+      10,
+      9
+    ],
+    "comfort_spread_points": 20.8,
+    "chosen_comfort_score": 15.7,
+    "chosen_T_min_C": 4.49,
+    "chosen_mass_t": 41.31,
+    "ansys_ran": true
+  }
+}

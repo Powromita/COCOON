@@ -1,0 +1,9 @@
+{
+  "total_energy_Wh": 112267.063,
+  "total_energy_MJ": 404.161,
+  "peak_irradiance_W_m2": 692.05,
+  "peak_gain_W": 3197.271,
+  "avg_irradiance_W_m2": 144.644,
+  "capacity_factor_percent": 11.495,
+  "solar_temp_correlation": 0.973
+}

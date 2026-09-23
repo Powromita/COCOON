@@ -1,0 +1,534 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary-fixed": "#2f1500",
+          "primary-container": "#1e3a8a",
+          "primary": "#00236f",
+          "secondary-container": "#fe932c",
+          "on-secondary": "#ffffff",
+          "tertiary-container": "#004a32",
+          "secondary": "#904d00",
+          "surface-variant": "#d3e4fe",
+          "surface-tint": "#4059aa",
+          "outline-variant": "#c5c5d3",
+          "secondary-fixed": "#ffdcc3",
+          "on-primary-fixed": "#00164e",
+          "on-tertiary-fixed-variant": "#005137",
+          "tertiary-fixed": "#85f8c4",
+          "primary-fixed-dim": "#b6c4ff",
+          "on-tertiary-fixed": "#002114",
+          "on-error-container": "#93000a",
+          "on-primary-fixed-variant": "#264191",
+          "on-surface": "#0b1c30",
+          "on-secondary-container": "#663500",
+          "error-container": "#ffdad6",
+          "on-surface-variant": "#444651",
+          "tertiary": "#003120",
+          "surface-container-low": "#eff4ff",
+          "outline": "#757682",
+          "on-error": "#ffffff",
+          "inverse-surface": "#213145",
+          "surface-container": "#e5eeff",
+          "surface-dim": "#cbdbf5",
+          "secondary-fixed-dim": "#ffb77d",
+          "on-secondary-fixed-variant": "#6e3900",
+          "inverse-on-surface": "#eaf1ff",
+          "on-tertiary-container": "#4ac08f",
+          "on-tertiary": "#ffffff",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-highest": "#d3e4fe",
+          "surface-container-high": "#dce9ff",
+          "on-primary": "#ffffff",
+          "primary-fixed": "#dce1ff",
+          "background": "#f8f9ff",
+          "surface": "#f8f9ff",
+          "inverse-primary": "#b6c4ff",
+          "tertiary-fixed-dim": "#68dba9",
+          "surface-bright": "#f8f9ff",
+          "on-background": "#0b1c30",
+          "on-primary-container": "#90a8ff",
+          "error": "#ba1a1a"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-md": "1rem",
+          "grid-unit": "0.5rem",
+          "panel-gutter": "1rem",
+          "space-2xs": "0.25rem",
+          "card-padding": "1.5rem",
+          "space-xs": "0.5rem",
+          "space-sm": "0.75rem",
+          "space-2xl": "3rem",
+          "space-lg": "1.5rem",
+          "space-xl": "2rem"
+        },
+        "fontFamily": {
+          "body-md": ["Inter"],
+          "display-xl": ["Inter"],
+          "headline-sm": ["Inter"],
+          "label-caps": ["Inter"],
+          "body-sm": ["Inter"],
+          "headline-md": ["Inter"],
+          "mono-metric-lg": ["JetBrains Mono"],
+          "mono-metric-sm": ["JetBrains Mono"],
+          "body-lg": ["Inter"],
+          "mono-metric-md": ["JetBrains Mono"],
+          "display-lg": ["Inter"]
+        },
+        "fontSize": {
+          "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "display-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+          "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+          "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "mono-metric-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.03em", "fontWeight": "500"}],
+          "mono-metric-sm": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "body-lg": ["15px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "mono-metric-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "display-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-lg"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="text-primary font-headline-md font-bold tracking-tight">COCOON</span><span class="h-4 w-px bg-outline-variant"></span><span class="text-on-surface-variant font-mono-metric-sm text-outline uppercase tracking-wider">PGML Suite</span></div><span class="text-on-surface-variant font-label-caps text-outline tracking-wider">Predict. Compare. Validate.</span></div><nav class="hidden md:flex items-center gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-headline-sm"><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm" data-path="home" href="{{DATA:SCREEN:SCREEN_2}}">Home</a><a aria-current="page" class="px-space-md py-space-xs rounded transition-colors bg-surface-container-high text-primary font-headline-sm" data-path="configure" href="#">Configure</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm" data-path="results" href="{{DATA:SCREEN:SCREEN_4}}">Results</a></nav></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-2xs rounded-full shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-mono-metric-sm text-on-surface font-medium">Individual Mode</span><span class="text-outline-variant">|</span><a class="text-primary font-mono-metric-sm hover:underline hover:text-primary-container transition-colors" href="{{DATA:SCREEN:SCREEN_2}}">Switch Mode</a></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-5rem)]"><style class="">select { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem !important; } select option { white-space: normal; }</style><div class="flex flex-col w-full">
+<div class="mx-auto w-full px-space-md md:px-space-xl py-space-xl space-y-space-xl">
+<!-- Top Configuration Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs text-primary font-mono-metric-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span class="">Parametric Quick-Setup</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface-variant">Defense Habitability Standard</span>
+</div>
+<h1 class="font-display-xl text-on-surface tracking-tight font-semibold">Shelter Envelope Configuration</h1>
+<p class="font-body-md text-on-surface-variant max-w-2xl">Quick shelter thermal assessment using proven Himalayan vernacular &amp; insulated presets.</p>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full self-start md:self-auto shadow-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">home</span>
+<span class="font-mono-metric-sm font-medium text-on-surface">Individual Mode</span>
+<span class="text-outline-variant mx-space-2xs">|</span>
+<a class="text-primary font-mono-metric-sm hover:underline font-medium" href="{{DATA:SCREEN:SCREEN_2}}">Switch</a>
+</div>
+</div>
+<!-- Section 1: Geometry & Spatial Volume -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-card-padding">
+<div class="flex items-center justify-between pb-space-sm mb-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-6 h-6 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-metric-sm font-semibold">01</span>
+<h2 class="font-headline-md text-on-surface">Geometry &amp; Spatial Volume</h2>
+</div>
+<span class="font-mono-metric-sm text-on-surface-variant">Cartesian Bounds (Meters)</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-center">
+<!-- Input fields -->
+<div class="lg:col-span-6 grid grid-cols-3 gap-space-sm">
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="dim-length">Length (L)</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="dim-length" max="25.0" min="2.0" step="0.5" type="number" value="6.0">
+<span class="absolute right-3 text-outline font-mono-metric-sm pointer-events-none">m</span>
+</div>
+<span class="text-on-surface-variant font-body-sm">East-West</span>
+</div>
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="dim-width">Width (W)</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="dim-width" max="25.0" min="2.0" step="0.5" type="number" value="4.0">
+<span class="absolute right-3 text-outline font-mono-metric-sm pointer-events-none">m</span>
+</div>
+<span class="text-on-surface-variant font-body-sm">North-South</span>
+</div>
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="dim-height">Height (H)</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="dim-height" max="6.0" min="1.8" step="0.1" type="number" value="2.8">
+<span class="absolute right-3 text-outline font-mono-metric-sm pointer-events-none">m</span>
+</div>
+<span class="text-on-surface-variant font-body-sm">Clear Apex</span>
+</div>
+</div>
+<!-- Wireframe Isometric Box Representation -->
+<div class="lg:col-span-6 bg-surface-container-low rounded-lg p-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="relative w-44 h-32 flex items-center justify-center">
+<svg class="w-full h-full stroke-primary fill-transparent stroke-[1.5]" viewBox="0 0 180 120">
+<!-- Base Footprint -->
+<polygon class="stroke-outline fill-surface-container-high/40" points="30,75 90,105 150,75 90,45"></polygon>
+<!-- Vertical Edges -->
+<line class="stroke-primary" x1="30" x2="30" y1="75" y2="35"></line>
+<line class="stroke-primary" x1="90" x2="90" y1="105" y2="65"></line>
+<line class="stroke-primary" x1="150" x2="150" y1="75" y2="35"></line>
+<!-- Top Ceiling Face -->
+<polygon class="stroke-primary fill-surface-variant/40" points="30,35 90,65 150,35 90,10"></polygon>
+<!-- Perspective Guides / Labels -->
+<text class="text-[9px] fill-on-surface-variant font-mono-metric-sm stroke-none" x="50" y="98">L: <tspan id="lbl-len">6.0</tspan>m</text>
+<text class="text-[9px] fill-on-surface-variant font-mono-metric-sm stroke-none" x="122" y="98">W: <tspan id="lbl-wid">4.0</tspan>m</text>
+<text class="text-[9px] fill-primary font-mono-metric-sm stroke-none" x="12" y="55">H: <tspan id="lbl-hei">2.8</tspan>m</text>
+</svg>
+</div>
+<div class="flex sm:flex-col gap-space-md w-full sm:w-auto">
+<div class="flex-1 bg-surface-container-lowest p-space-sm rounded shadow-sm">
+<span class="block font-label-caps text-on-surface-variant uppercase tracking-wider">Floor Area</span>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-metric-lg text-primary font-semibold" id="metric-area">24.0</span>
+<span class="font-mono-metric-sm text-on-surface-variant">m²</span>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-space-sm rounded shadow-sm">
+<span class="block font-label-caps text-on-surface-variant uppercase tracking-wider">Enclosed Volume</span>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-metric-lg text-secondary font-semibold" id="metric-volume">67.2</span>
+<span class="font-mono-metric-sm text-on-surface-variant">m³</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Construction Presets (Simplified) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-card-padding">
+<div class="flex items-center justify-between pb-space-sm mb-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-6 h-6 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-metric-sm font-semibold">02</span>
+<h2 class="font-headline-md text-on-surface">Construction Presets (Simplified)</h2>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-mono-metric-sm px-space-xs py-space-2xs rounded-full font-medium">Himalayan Tested</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Wall Preset Selector -->
+<div class="space-y-space-xs bg-surface-container-low p-space-md rounded-lg flex flex-col justify-between">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs text-primary font-headline-sm">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+<span class="">Wall Assembly</span>
+</div>
+<p class="font-body-sm text-on-surface-variant">Primary thermal envelope perimeter</p>
+</div>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm py-space-xs px-space-sm rounded appearance-none focus:outline-none cursor-pointer shadow-sm" id="select-wall" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem;">
+<option selected="">Adobe Wall (600mm) — Traditional High Thermal Mass</option>
+<option>Stone Masonry Wall (600mm) — High-Altitude Vernacular</option>
+<option>Rammed Earth Wall (500mm) — Natural Passive</option>
+<option>Straw-Clay Wall (300mm) — Eco-Insulated</option>
+<option>Stone + PUF Insulation (Best Insulated)</option>
+<option>Concrete Block + 100mm Insulation</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-space-xs text-tertiary-container font-mono-metric-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="">Passive solar retention</span>
+</div>
+</div>
+<!-- Roof Preset Selector -->
+<div class="space-y-space-xs bg-surface-container-low p-space-md rounded-lg flex flex-col justify-between">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs text-primary font-headline-sm">
+<span class="material-symbols-outlined text-[20px]">roofing</span>
+<span class="">Roof Assembly</span>
+</div>
+<p class="font-body-sm text-on-surface-variant">Overhead heat loss prevention</p>
+</div>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm py-space-xs px-space-sm rounded appearance-none focus:outline-none cursor-pointer shadow-sm" id="select-roof" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem;">
+<option selected="">Corrugated Sheet + Double Mud-Straw / Timber</option>
+<option>Insulated Flat Roof with Rockwool &amp; Screed</option>
+<option>Pitched Metal Roof with 150mm PUF Sandwich</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-space-xs text-secondary font-mono-metric-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="">Vernacular ceiling deck</span>
+</div>
+</div>
+<!-- Floor Preset Selector -->
+<div class="space-y-space-xs bg-surface-container-low p-space-md rounded-lg flex flex-col justify-between">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs text-primary font-headline-sm">
+<span class="material-symbols-outlined text-[20px]">foundation</span>
+<span class="">Floor Assembly</span>
+</div>
+<p class="font-body-sm text-on-surface-variant">Subgrade cold sink barrier</p>
+</div>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm py-space-xs px-space-sm rounded appearance-none focus:outline-none cursor-pointer shadow-sm" id="select-floor" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem;">
+<option selected="">Elevated Timber with Underfloor Straw Mat</option>
+<option>Rammed Earth on Subgrade Gravel</option>
+<option>Insulated Concrete Slab with Aerogel Mat</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-space-xs text-tertiary-container font-mono-metric-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="">Timber gap buffer</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Windows & Daylight Glazing -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-card-padding">
+<div class="flex items-center justify-between pb-space-sm mb-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-6 h-6 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-metric-sm font-semibold">03</span>
+<h2 class="font-headline-md text-on-surface">Windows &amp; Daylight Glazing</h2>
+</div>
+<span class="font-mono-metric-sm text-on-surface-variant">Solar Gain Apertures</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+<!-- Number of windows -->
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="win-count">Number of Windows</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="win-count" max="12" min="0" type="number" value="2">
+<span class="absolute right-3 text-outline font-mono-metric-sm pointer-events-none">units</span>
+</div>
+<span class="text-on-surface-variant font-body-sm">South/East facing priority</span>
+</div>
+<!-- Window Dimensions -->
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider">Dimensions (W x H)</label>
+<div class="grid grid-cols-2 gap-space-xs">
+<div class="relative">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="win-w" max="3.0" min="0.4" step="0.1" type="number" value="1.2">
+<span class="absolute right-2 top-2 text-outline font-mono-metric-sm pointer-events-none">m</span>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-low rounded px-space-sm py-space-xs font-mono-metric-md text-on-surface focus:bg-surface-container-lowest focus:outline-none transition-colors" id="win-h" max="3.0" min="0.4" step="0.1" type="number" value="1.5">
+<span class="absolute right-2 top-2 text-outline font-mono-metric-sm pointer-events-none">m</span>
+</div>
+</div>
+<span class="text-on-surface-variant font-body-sm">Per aperture aperture area</span>
+</div>
+<!-- Glazing Quality Dropdown -->
+<div class="space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="glazing-spec">Glazing Quality</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low text-on-surface font-body-sm py-space-xs px-space-sm rounded appearance-none focus:bg-surface-container-lowest focus:outline-none cursor-pointer" id="glazing-spec" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem;">
+<option>Single Glazing — Basic (Drafty)</option>
+<option selected="">Double Glazing — Better (Recommended)</option>
+<option>Triple Glazing — Best Insulation (Arctic Grade)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<span class="text-on-surface-variant font-body-sm">Acoustic &amp; airtightness grade</span>
+</div>
+</div>
+</section>
+<!-- Section 4: Comfort & Internal Heating -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-card-padding">
+<div class="flex items-center justify-between pb-space-sm mb-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-6 h-6 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-metric-sm font-semibold">04</span>
+<h2 class="font-headline-md text-on-surface">Comfort &amp; Internal Heating</h2>
+</div>
+<span class="font-mono-metric-sm text-on-surface-variant">Occupancy &amp; Auxiliary Thermal</span>
+</div>
+<div class="space-y-space-lg">
+<!-- Initial Indoor Temp Slider -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between">
+<div>
+<label class="font-headline-sm text-on-surface block" for="init-temp">Initial Indoor Temperature</label>
+<p class="font-body-sm text-on-surface-variant">Pre-simulation base interior shelter temperature</p>
+</div>
+<div class="bg-surface-container-high px-space-sm py-space-2xs rounded">
+<span class="font-mono-metric-lg text-primary font-bold" id="temp-val">+5.0</span>
+<span class="font-mono-metric-sm text-primary">°C</span>
+</div>
+</div>
+<input class="w-full accent-primary bg-surface-container-high h-2 rounded cursor-pointer" id="init-temp" max="22" min="-10" step="0.5" type="range" value="5">
+<div class="flex justify-between font-mono-metric-sm text-on-surface-variant">
+<span class="">-10°C (Frozen)</span>
+<span class="">0°C (Freezing Point)</span>
+<span class="">+10°C (Cool Interior)</span>
+<span class="">+22°C (Comfort Target)</span>
+</div>
+</div>
+<!-- Heater Toggle & Heating Segmented Pills -->
+<div class="bg-surface-container-low p-space-md rounded-lg space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]">local_fire_department</span>
+</div>
+<div>
+<span class="font-headline-sm text-on-surface block">Any heaters or bukhari stoves running inside?</span>
+<span class="font-body-sm text-on-surface-variant">Calculates auxiliary energy offset against baseline cold envelope</span>
+</div>
+</div>
+<!-- Toggle Switch -->
+<button class="w-12 h-6 bg-primary rounded-full p-0.5 transition-colors relative focus:outline-none" id="toggle-heater" type="button">
+<div class="w-5 h-5 bg-on-primary rounded-full shadow-sm transform translate-x-6 transition-transform" id="toggle-thumb"></div>
+</button>
+</div>
+<!-- Segmented Heating Level Selector -->
+<div class="space-y-space-xs" id="heating-levels">
+<span class="block font-label-caps text-on-surface-variant uppercase tracking-wider">Auxiliary Heat Level</span>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-xs">
+<button class="heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container transition-all" data-heat-val="off" type="button">
+                Off
+              </button>
+<button class="heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container transition-all" data-heat-val="low" type="button">
+                Low <span class="block font-mono-metric-sm opacity-70">1 soldier heat</span>
+</button>
+<button class="heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-primary text-on-primary font-medium shadow-sm transition-all" data-heat-val="medium" type="button">
+                Medium <span class="block font-mono-metric-sm opacity-90">Bukhari / 800W</span>
+</button>
+<button class="heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container transition-all" data-heat-val="high" type="button">
+                High <span class="block font-mono-metric-sm opacity-70">Continuous Heater</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Climate Baseline / Location -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-card-padding">
+<div class="flex items-center justify-between pb-space-sm mb-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-6 h-6 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-metric-sm font-semibold">05</span>
+<h2 class="font-headline-md text-on-surface">Climate Baseline / Location</h2>
+</div>
+<span class="font-mono-metric-sm text-on-surface-variant">Meteorological Ingestion</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md items-center">
+<div class="md:col-span-6 space-y-space-2xs">
+<label class="block font-label-caps text-on-surface-variant uppercase tracking-wider" for="select-loc">Deployment Location</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low text-on-surface font-body-sm py-space-xs px-space-sm rounded appearance-none focus:bg-surface-container-lowest focus:outline-none cursor-pointer" id="select-loc" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 2rem;">
+<option selected="">Leh (-22°C Winter Solstice)</option>
+<option>Kargil (-28°C Deep Winter)</option>
+<option>Nubra Valley (-18°C Cold Regime)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+<div class="md:col-span-6 flex items-center gap-space-sm bg-surface-container-low p-space-sm rounded-lg">
+<span class="material-symbols-outlined text-primary text-[24px]">info</span>
+<p class="font-body-sm text-on-surface-variant">
+            Standard extreme winter seasonal dataset applied automatically. Solar radiation profiles and nocturnal chill factors calibrated to elevation.
+          </p>
+</div>
+</div>
+</section>
+<!-- Execution Card / Run Simulation -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-card-padding flex flex-col md:flex-row items-center justify-between gap-space-lg">
+<div class="space-y-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="font-mono-metric-sm uppercase tracking-wider text-tertiary-container font-semibold">Physics Engine Ready</span>
+</div>
+<div class="font-headline-sm text-on-surface">Estimated Heat Balance Margin: <span class="font-mono-metric-md text-primary font-bold" id="est-balance">+14.4°C Lift Potential</span></div>
+<p class="font-body-sm text-on-surface-variant">Full transient nodal matrix ready for numerical validation across 48h extreme diurnal loop.</p>
+</div>
+<a class="w-full md:w-auto px-space-xl py-space-md bg-primary hover:bg-primary-container text-on-primary rounded font-headline-sm font-semibold flex items-center justify-center gap-space-sm shadow-md hover:shadow-lg transition-all" href="{{DATA:SCREEN:SCREEN_4}}" id="btn-run"><span class="">Run Simulation</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></a>
+</div>
+</div>
+</div>
+<script>
+  // Dynamic calculation for floor area & enclosed volume
+  const lenInput = document.getElementById('dim-length');
+  const widInput = document.getElementById('dim-width');
+  const heiInput = document.getElementById('dim-height');
+  const lblLen = document.getElementById('lbl-len');
+  const lblWid = document.getElementById('lbl-wid');
+  const lblHei = document.getElementById('lbl-hei');
+  const areaMetric = document.getElementById('metric-area');
+  const volMetric = document.getElementById('metric-volume');
+  const tempSlider = document.getElementById('init-temp');
+  const tempVal = document.getElementById('temp-val');
+  const toggleHeater = document.getElementById('toggle-heater');
+  const toggleThumb = document.getElementById('toggle-thumb');
+  const heatingLevels = document.getElementById('heating-levels');
+  const heatPills = document.querySelectorAll('.heat-pill');
+  const runBtn = document.getElementById('btn-run');
+  const estBalance = document.getElementById('est-balance');
+
+  let heaterActive = true;
+
+  function updateGeometry() {
+    const l = parseFloat(lenInput.value) || 0;
+    const w = parseFloat(widInput.value) || 0;
+    const h = parseFloat(heiInput.value) || 0;
+
+    lblLen.textContent = l.toFixed(1);
+    lblWid.textContent = w.toFixed(1);
+    lblHei.textContent = h.toFixed(1);
+
+    const area = l * w;
+    const vol = area * h;
+
+    areaMetric.textContent = area.toFixed(1);
+    volMetric.textContent = vol.toFixed(1);
+
+    // Minor responsive estimate update
+    const estimatedLift = heaterActive ? (12 + (area / 10)).toFixed(1) : (3 + (area / 20)).toFixed(1);
+    estBalance.textContent = `+${estimatedLift}°C Lift Potential`;
+  }
+
+  lenInput.addEventListener('input', updateGeometry);
+  widInput.addEventListener('input', updateGeometry);
+  heiInput.addEventListener('input', updateGeometry);
+
+  tempSlider.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    tempVal.textContent = (val > 0 ? '+' : '') + val.toFixed(1);
+  });
+
+  // Heater Switch interaction
+  toggleHeater.addEventListener('click', () => {
+    heaterActive = !heaterActive;
+    if (heaterActive) {
+      toggleHeater.classList.remove('bg-outline-variant');
+      toggleHeater.classList.add('bg-primary');
+      toggleThumb.classList.add('translate-x-6');
+      heatingLevels.classList.remove('opacity-40', 'pointer-events-none');
+    } else {
+      toggleHeater.classList.remove('bg-primary');
+      toggleHeater.classList.add('bg-outline-variant');
+      toggleThumb.classList.remove('translate-x-6');
+      heatingLevels.classList.add('opacity-40', 'pointer-events-none');
+    }
+    updateGeometry();
+  });
+
+  // Heating pills selection
+  heatPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      heatPills.forEach(p => {
+        p.className = 'heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container transition-all';
+      });
+      pill.className = 'heat-pill px-space-sm py-space-xs rounded font-body-sm text-center bg-primary text-on-primary font-medium shadow-sm transition-all';
+    });
+  });
+
+  // Run Button state simulation
+  runBtn.addEventListener('click', () => {
+    runBtn.disabled = true;
+    runBtn.innerHTML = `
+      <span class="inline-block animate-spin material-symbols-outlined text-[20px]">sync</span>
+      <span>Simulating Physics...</span>
+    `;
+    setTimeout(() => {
+      runBtn.disabled = false;
+      runBtn.innerHTML = `
+        <span>Simulation Complete</span>
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+      `;
+    }, 1200);
+  });
+
+  // Initial Calculation
+  updateGeometry();
+</script></main><footer class="w-full bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full px-space-lg py-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><span class="font-label-caps text-on-surface-variant uppercase tracking-wider">Physics-Guided ML Platform</span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-mono-metric-sm text-on-surface">Extreme Sub-Zero Thermal Envelope Simulator</span></div><div class="flex items-center gap-space-md"><span class="font-body-sm text-on-surface-variant">Team <span class="font-medium text-on-surface">ByteFiesta</span></span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-mono-metric-sm text-primary font-medium bg-surface-container-low px-space-xs py-space-2xs rounded">SIH 2026 Defence Innovation</span></div></div></footer>
+
+</body></html>

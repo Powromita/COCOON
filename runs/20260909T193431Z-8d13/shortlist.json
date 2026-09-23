@@ -1,0 +1,27 @@
+{
+  "shortlist_ids": [
+    12,
+    10,
+    9
+  ],
+  "verdict": "STABLE: design 12 is rank 1 in >=80% of perturbed rankings -- a single winner is defensible.",
+  "pareto_ids": [
+    12,
+    13
+  ],
+  "typical_top5": [
+    12,
+    10,
+    9,
+    11,
+    1
+  ],
+  "worstcase_top5": [
+    12,
+    10,
+    9,
+    11,
+    1
+  ],
+  "top3_stable_across_weather": true
+}

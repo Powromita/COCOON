@@ -1,0 +1,9 @@
+{
+  "chosen_design_id": "single",
+  "runner_up_id": null,
+  "thermal_tie": false,
+  "justification": "Free-running, this envelope holds 2.89-14.85 C indoors over 168 h (0.0% of hours below the 15.0-24.0 C band, 100.0% frost-free). Holding the lower edge needs ~23.2 kWh/day (~3.22 L/day kerosene).",
+  "basis": {
+    "comfort_score": 2.7
+  }
+}

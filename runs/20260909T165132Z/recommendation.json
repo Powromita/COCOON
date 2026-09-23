@@ -1,0 +1,18 @@
+{
+  "chosen_design_id": 15,
+  "runner_up_id": 14,
+  "thermal_tie": false,
+  "justification": "comfort scores span 9.3 points -> a clear leader; design 15 has the top comfort score (-6.7).",
+  "basis": {
+    "shortlist": [
+      15,
+      14,
+      4
+    ],
+    "comfort_spread_points": 9.3,
+    "chosen_comfort_score": -6.7,
+    "chosen_T_min_C": 1.99,
+    "chosen_mass_t": 78.83,
+    "ansys_ran": false
+  }
+}

@@ -1,0 +1,177 @@
+"use client";
+
+import { useState } from "react";
+import SiteHeader from "@/app/_components/SiteHeader";
+import ResolvedConfigStrip from "@/app/_components/ResolvedConfigStrip";
+import SolarEnergyPanel from "@/app/_components/SolarEnergyPanel";
+import HeatFlowPanel from "@/app/_components/HeatFlowPanel";
+import AnsysValidationPanel from "@/app/_components/AnsysValidationPanel";
+import DesignComparisonTable from "@/app/_components/DesignComparisonTable";
+import ReliabilityPanel from "@/app/_components/ReliabilityPanel";
+import RecommendationCard from "@/app/_components/RecommendationCard";
+import LogisticsPanel from "@/app/_components/LogisticsPanel";
+import { ResultsProvider, useResults } from "@/app/_components/ResultsProvider";
+import RunProgress from "@/app/_components/RunProgress";
+import TemperatureChart from "@/app/_components/TemperatureChart";
+import { downloadReport } from "@/app/_lib/generateReport";
+import { useT } from "@/app/_lib/i18n";
+
+export default function OrganizationResultsPage() {
+  return (
+    <ResultsProvider demoMode="optimize">
+      <OrganizationResultsBody />
+    </ResultsProvider>
+  );
+}
+
+function OrganizationResultsBody() {
+  const t = useT();
+  const { results, isReal, phase } = useResults();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = () => {
+    setDownloading(true);
+    try {
+      downloadReport(results);
+    } finally {
+      setTimeout(() => setDownloading(false), 1500);
+    }
+  };
+  const temp = results.features.temperature;
+  const cfg = results.config_echo;
+  const ansys = results.ansys;
+  const isOptimize = results.mode === "optimize";
+  const fmt = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(1)}°C`;
+
+  const cards = [
+    { labelKey: "ores.minHab", value: fmt(temp.T_min_C), subKey: "ores.minHabSub", icon: "❄" },
+    { labelKey: "ores.maxHab", value: fmt(temp.T_max_C), subKey: "ores.maxHabSub", icon: "☀" },
+    { labelKey: "ores.avgReg", value: fmt(temp.T_mean_C), subKey: "ores.avgRegSub", icon: "◌" },
+    {
+      labelKey: "ores.envLoss",
+      value: `${Math.round(results.features.heatflow.avg_hourly_loss_W).toLocaleString()} W`,
+      subKey: "ores.envLossSub",
+      icon: "⚡",
+    },
+  ];
+
+
+  return (
+    <main className="min-h-screen bg-surface text-on-surface antialiased">
+      <SiteHeader mode="Organization" active="results" />
+
+      <main className="w-full flex-1 bg-surface pt-16">
+        <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-8">
+          <RunProgress mode="optimize" />
+
+          <div className="flex flex-col justify-between gap-space-lg pb-space-xs lg:flex-row lg:items-end">
+            <div className="min-w-0 space-y-space-2xs">
+              <div className="flex items-center gap-space-xs">
+                <span className="rounded bg-surface-container px-space-xs py-0.5 font-mono-metric-sm uppercase tracking-wider text-primary">{t("ores.eyebrow")}</span>
+                <span className="text-outline">•</span>
+                <span className="font-mono-metric-sm text-outline">RUN {results.run_id}</span>
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight text-on-surface sm:text-4xl">
+                {isOptimize ? t("res.mode.optimizeTitle") : t("res.mode.singleTitle")}
+              </h1>
+              <p className="w-full min-w-0 max-w-3xl font-body-md text-on-surface-variant">
+                {temp.hours} h · {cfg.footprint_label} · {cfg.wall_label} · {cfg.glazing_label} · Leh
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-space-sm">
+              <div className="inline-flex items-center gap-space-xs rounded-lg bg-surface-container px-space-sm py-1.5 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                <span className="font-body-sm font-semibold text-on-surface">{t("ores.physRC")}</span>
+                {ansys?.ran ? (
+                  <span className="ml-space-2xs rounded bg-tertiary-container/15 px-space-xs py-space-2xs font-mono-metric-sm text-tertiary-container">
+                    {t("ores.ansysVal")}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-space-xs">
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading || phase === "submitting" || phase === "running"}
+                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm transition-all duration-200 ${
+                    downloading
+                      ? "bg-tertiary-container text-on-tertiary-container cursor-wait"
+                      : phase === "submitting" || phase === "running"
+                      ? "pointer-events-none bg-surface-container-high text-on-surface-variant"
+                      : "bg-primary text-on-primary hover:bg-primary-container active:scale-95"
+                  }`}
+                >
+                  {downloading ? "⏳ Generating…" : `⬇ ${t("res.exportReport")}`}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <TemperatureChart />
+
+          <div className="grid gap-space-md sm:grid-cols-2 lg:grid-cols-4">
+            {cards.map((card) => (
+              <div key={card.labelKey} className="rounded-xl border border-surface-container-high/50 bg-surface-container-lowest p-6 shadow-sm">
+                <div className="mb-3 flex items-center justify-between text-outline">
+                  <span className="font-label-caps uppercase tracking-wider text-on-surface-variant">{t(card.labelKey)}</span>
+                  <span className="text-[20px]">{card.icon}</span>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="font-mono-metric-lg text-[28px] font-bold text-on-surface">{card.value}</div>
+                  <div className="font-mono-metric-sm text-xs text-on-surface">{t(card.subKey)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <ResolvedConfigStrip />
+
+          {/* physical rationale — shown in both modes */}
+          <div className="rounded-xl bg-surface-container-lowest p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="text-secondary-container">◍</span>
+                <h2 className="text-xl font-bold tracking-tight text-on-surface">{t("ores.whyTitle")}</h2>
+              </div>
+              <span className="font-mono-metric-sm text-xs tracking-wide text-outline">{t("ores.highAltSpecs")}</span>
+            </div>
+            <p className="mt-3 text-[15px] leading-7 text-on-surface-variant">
+              {results.recommendation?.justification ?? t("ores.whyBody")}
+            </p>
+            <div className="mt-3 grid gap-space-sm sm:grid-cols-3">
+              {results.highlights.map((h) => (
+                <div key={h.key} className="rounded-lg border border-surface-container-high/40 bg-surface-container-low p-3.5">
+                  <span className="font-headline-sm text-on-surface">{h.title}</span>
+                  <span className="mt-1 block font-body-sm text-on-surface-variant">{h.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 rounded-lg border border-surface-container-high/40 bg-surface-container-low p-4">
+              <p className="text-xs text-on-surface-variant sm:text-sm">{t("ores.opImpact")}</p>
+            </div>
+          </div>
+
+          <SolarEnergyPanel />
+          <HeatFlowPanel />
+
+          {isOptimize ? (
+            <>
+              <RecommendationCard />
+              <DesignComparisonTable />
+              <ReliabilityPanel />
+              <AnsysValidationPanel />
+              <LogisticsPanel />
+            </>
+          ) : ansys?.ran ? (
+            <AnsysValidationPanel />
+          ) : null}
+
+          {!isReal ? (
+            <p className="font-body-sm text-on-surface-variant">{t("common.mockNote")}</p>
+          ) : null}
+        </div>
+      </main>
+    </main>
+  );
+}

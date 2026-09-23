@@ -1,0 +1,366 @@
+{
+  "verdict": "NOT a clean single winner: the top spot moves under weight perturbation. Report the robust shortlist [46, 18] instead of one design.",
+  "shortlist_ids": [
+    46,
+    18
+  ],
+  "pareto_ids": [
+    46,
+    14,
+    10,
+    8
+  ],
+  "top3_stable_across_weather": false,
+  "sensitivity": [
+    {
+      "design_id": 46,
+      "top3_pct": 61.2
+    },
+    {
+      "design_id": 18,
+      "top3_pct": 55.0
+    },
+    {
+      "design_id": 23,
+      "top3_pct": 49.8
+    },
+    {
+      "design_id": 27,
+      "top3_pct": 43.5
+    },
+    {
+      "design_id": 14,
+      "top3_pct": 43.5
+    },
+    {
+      "design_id": 31,
+      "top3_pct": 37.5
+    },
+    {
+      "design_id": 8,
+      "top3_pct": 7.2
+    },
+    {
+      "design_id": 19,
+      "top3_pct": 1.2
+    },
+    {
+      "design_id": 44,
+      "top3_pct": 1.0
+    },
+    {
+      "design_id": 2,
+      "top3_pct": 0.0
+    },
+    {
+      "design_id": 7,
+      "top3_pct": 0.0
+    },
+    {
+      "design_id": 20,
+      "top3_pct": 0.0
+    }
+  ],
+  "pareto_points": [
+    {
+      "design_id": 46,
+      "swing_C": 2.51,
+      "T_min_C": 4.82,
+      "pareto": true
+    },
+    {
+      "design_id": 18,
+      "swing_C": 7.89,
+      "T_min_C": 4.59,
+      "pareto": false
+    },
+    {
+      "design_id": 27,
+      "swing_C": 2.55,
+      "T_min_C": 4.81,
+      "pareto": false
+    },
+    {
+      "design_id": 23,
+      "swing_C": 9.8,
+      "T_min_C": 4.43,
+      "pareto": false
+    },
+    {
+      "design_id": 14,
+      "swing_C": 2.33,
+      "T_min_C": 4.78,
+      "pareto": true
+    },
+    {
+      "design_id": 2,
+      "swing_C": 2.7,
+      "T_min_C": 4.74,
+      "pareto": false
+    },
+    {
+      "design_id": 7,
+      "swing_C": 3.42,
+      "T_min_C": 4.68,
+      "pareto": false
+    },
+    {
+      "design_id": 20,
+      "swing_C": 4.62,
+      "T_min_C": 4.65,
+      "pareto": false
+    },
+    {
+      "design_id": 44,
+      "swing_C": 6.58,
+      "T_min_C": 4.58,
+      "pareto": false
+    },
+    {
+      "design_id": 31,
+      "swing_C": 7.99,
+      "T_min_C": 4.31,
+      "pareto": false
+    },
+    {
+      "design_id": 32,
+      "swing_C": 5.37,
+      "T_min_C": 4.56,
+      "pareto": false
+    },
+    {
+      "design_id": 49,
+      "swing_C": 5.44,
+      "T_min_C": 4.6,
+      "pareto": false
+    },
+    {
+      "design_id": 47,
+      "swing_C": 3.31,
+      "T_min_C": 4.6,
+      "pareto": false
+    },
+    {
+      "design_id": 39,
+      "swing_C": 2.37,
+      "T_min_C": 4.6,
+      "pareto": false
+    },
+    {
+      "design_id": 48,
+      "swing_C": 7.31,
+      "T_min_C": 4.39,
+      "pareto": false
+    },
+    {
+      "design_id": 8,
+      "swing_C": 0.64,
+      "T_min_C": 4.42,
+      "pareto": true
+    },
+    {
+      "design_id": 19,
+      "swing_C": 1.04,
+      "T_min_C": 4.42,
+      "pareto": false
+    },
+    {
+      "design_id": 10,
+      "swing_C": 1.34,
+      "T_min_C": 4.43,
+      "pareto": true
+    },
+    {
+      "design_id": 4,
+      "swing_C": 2.67,
+      "T_min_C": 4.4,
+      "pareto": false
+    },
+    {
+      "design_id": 6,
+      "swing_C": 2.12,
+      "T_min_C": 4.13,
+      "pareto": false
+    },
+    {
+      "design_id": 29,
+      "swing_C": 2.78,
+      "T_min_C": 3.92,
+      "pareto": false
+    },
+    {
+      "design_id": 37,
+      "swing_C": 1.7,
+      "T_min_C": 3.67,
+      "pareto": false
+    },
+    {
+      "design_id": 25,
+      "swing_C": 1.94,
+      "T_min_C": 3.63,
+      "pareto": false
+    },
+    {
+      "design_id": 16,
+      "swing_C": 3.1,
+      "T_min_C": 3.66,
+      "pareto": false
+    },
+    {
+      "design_id": 34,
+      "swing_C": 1.41,
+      "T_min_C": 3.51,
+      "pareto": false
+    },
+    {
+      "design_id": 5,
+      "swing_C": 2.32,
+      "T_min_C": 3.51,
+      "pareto": false
+    },
+    {
+      "design_id": 28,
+      "swing_C": 2.2,
+      "T_min_C": 3.46,
+      "pareto": false
+    },
+    {
+      "design_id": 11,
+      "swing_C": 1.82,
+      "T_min_C": 3.38,
+      "pareto": false
+    },
+    {
+      "design_id": 3,
+      "swing_C": 2.84,
+      "T_min_C": 3.42,
+      "pareto": false
+    },
+    {
+      "design_id": 38,
+      "swing_C": 1.63,
+      "T_min_C": 3.3,
+      "pareto": false
+    },
+    {
+      "design_id": 45,
+      "swing_C": 2.3,
+      "T_min_C": 3.03,
+      "pareto": false
+    },
+    {
+      "design_id": 42,
+      "swing_C": 3.59,
+      "T_min_C": 2.93,
+      "pareto": false
+    },
+    {
+      "design_id": 40,
+      "swing_C": 2.07,
+      "T_min_C": 2.8,
+      "pareto": false
+    },
+    {
+      "design_id": 36,
+      "swing_C": 2.06,
+      "T_min_C": 2.85,
+      "pareto": false
+    },
+    {
+      "design_id": 41,
+      "swing_C": 2.33,
+      "T_min_C": 2.51,
+      "pareto": false
+    },
+    {
+      "design_id": 1,
+      "swing_C": 4.77,
+      "T_min_C": 2.3,
+      "pareto": false
+    },
+    {
+      "design_id": 21,
+      "swing_C": 2.66,
+      "T_min_C": 2.2,
+      "pareto": false
+    },
+    {
+      "design_id": 24,
+      "swing_C": 4.07,
+      "T_min_C": 1.2,
+      "pareto": false
+    },
+    {
+      "design_id": 0,
+      "swing_C": 3.48,
+      "T_min_C": 1.26,
+      "pareto": false
+    },
+    {
+      "design_id": 35,
+      "swing_C": 3.56,
+      "T_min_C": 1.24,
+      "pareto": false
+    },
+    {
+      "design_id": 43,
+      "swing_C": 3.76,
+      "T_min_C": 1.02,
+      "pareto": false
+    },
+    {
+      "design_id": 13,
+      "swing_C": 4.49,
+      "T_min_C": 0.47,
+      "pareto": false
+    },
+    {
+      "design_id": 22,
+      "swing_C": 5.94,
+      "T_min_C": -1.14,
+      "pareto": false
+    },
+    {
+      "design_id": 15,
+      "swing_C": 8.41,
+      "T_min_C": -3.86,
+      "pareto": false
+    },
+    {
+      "design_id": 12,
+      "swing_C": 9.2,
+      "T_min_C": -4.52,
+      "pareto": false
+    },
+    {
+      "design_id": 26,
+      "swing_C": 9.7,
+      "T_min_C": -4.91,
+      "pareto": false
+    },
+    {
+      "design_id": 30,
+      "swing_C": 10.3,
+      "T_min_C": -5.56,
+      "pareto": false
+    },
+    {
+      "design_id": 9,
+      "swing_C": 10.8,
+      "T_min_C": -6.35,
+      "pareto": false
+    },
+    {
+      "design_id": 33,
+      "swing_C": 12.88,
+      "T_min_C": -8.32,
+      "pareto": false
+    },
+    {
+      "design_id": 17,
+      "swing_C": 13.74,
+      "T_min_C": -9.17,
+      "pareto": false
+    }
+  ]
+}

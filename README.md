@@ -1,514 +1,898 @@
-# COCOON — Execution PRD
-## Physics-Guided ML + ANSYS-Validated Shelter Thermal Design Platform
+# COCOON
+### Physics-Guided ML + ANSYS-Validated Shelter Thermal Design Platform
 
-**Team:** ByteFiesta | **SIH 2026** | **Problem Statement ID: 26051** (DRDO — Dept. of Defence Production / IDEX)
-**Tagline:** *Predict. Compare. Validate. Recommend.*
-
-> This document supersedes the architecture assumptions in PRD v1.0 (lookup-table-first ANSYS validation) with the team's now-finalized pipeline: **Physics → ML surrogate → Selective ANSYS validation**, as shown in the submitted idea deck and system-architecture diagrams. It is the execution-level build spec: every module, every file, and the order to build them in.
-
----
-
-## 1. What We're Actually Building (Confirmed Architecture)
-
-The five-stage pipeline from the idea deck, expanded into an engineering pipeline:
-
-```
-STAGE 1: INPUT                STAGE 2: PHYSICS             STAGE 3: ML SURROGATE
-─────────────────             ─────────────────             ─────────────────────
-Geometry, layers,        →    Python RC model:         →    Trained OFFLINE on
-contents, weather              R → U → C → Q → T(t)          thousands of physics-
-                                (single scenario,               generated scenarios.
-                                hourly transient loop)          Serves INSTANT
-                                                                 predictions for any
-                                                                 new design at runtime.
-
-STAGE 4: ANSYS                STAGE 5: DECISION
-─────────────────             ─────────────────
-Validates only a small   →    Compare Python RC vs ML vs ANSYS
-set of REPRESENTATIVE          (MAE, RMSE, R²) → rank designs →
-or LOW-CONFIDENCE cases        recommend best + explain why
-(baseline, insulated,
-different material,
-extreme winter)
-```
-
-**Key architectural decision — read this before building anything:**
-The ML surrogate is trained on **physics-generated data** (thousands of Python RC runs across a sampled design space), *not* on ANSYS results. ANSYS is a separate, independent, high-fidelity simulation run only on a **small representative subset** of cases (or on any case the ML/physics flags as low-confidence). The three outputs are then compared against each other. This is why the deck calls it *"Selective ANSYS"* — ANSYS never sits in the interactive per-click path; it's a periodic/targeted accuracy-proofing step.
-
-| Layer | Speed | Role |
-|---|---|---|
-| **Physics (RC model)** | ~seconds per design | Ground-truth-for-the-fast-path; also the data generator for ML training |
-| **ML surrogate (Random Forest)** | Milliseconds per design | Makes large-scale search/comparison (100s–1000s of designs) tractable — this is what makes the optimizer feature (§8.1) possible |
-| **ANSYS (PyAnsys, transient thermal FEM)** | Minutes per case | Independent validation of representative or flagged cases; produces the accuracy claim ("±0.8°C") |
+**Team:** ByteFiesta | **SIH 2026** | **Problem Statement ID: 26051**
+**Organization:** DRDO — Department of Defence Production / IDEX
+**Tagline:** Predict. Compare. Validate. Recommend.
 
 ---
 
-## 2. Problem Statement (unchanged, for reference)
+## Table of Contents
 
-| Field | Detail |
+1. [What is COCOON?](#what-is-cocoon)
+2. [The Problem Being Solved](#the-problem-being-solved)
+3. [System Architecture Overview](#system-architecture-overview)
+4. [How It Works — End to End](#how-it-works--end-to-end)
+5. [The 11-Stage Pipeline](#the-11-stage-pipeline)
+6. [Frontend Web App](#frontend-web-app)
+7. [Backend API](#backend-api)
+8. [Thermal Calculator Engine](#thermal-calculator-engine)
+9. [Optimizer and Reliability](#optimizer-and-reliability)
+10. [ANSYS FEM Validation Pipeline](#ansys-fem-validation-pipeline)
+11. [Weather Data System](#weather-data-system)
+12. [Materials and Data Files](#materials-and-data-files)
+13. [Feature Reports (DRDO Outputs)](#feature-reports-drdo-outputs)
+14. [Two User Modes Explained](#two-user-modes-explained)
+15. [API Reference](#api-reference)
+16. [Directory Structure](#directory-structure)
+17. [Running the Project Locally](#running-the-project-locally)
+18. [Technology Stack](#technology-stack)
+19. [Physics Formulas Used](#physics-formulas-used)
+20. [Standards Compliance](#standards-compliance)
+
+---
+
+## What is COCOON?
+
+COCOON is a **full-stack scientific software platform** that designs, simulates, and validates **thermal shelters for extreme cold-climate environments** (specifically Leh, Ladakh — 3,500m altitude, -18 degrees C ambient).
+
+It was built as a **DRDO/IDEX challenge submission** to answer three mandated deliverables:
+
+| DRDO Output | What it means |
 |---|---|
-| PS ID | 26051 |
-| Title | Software Based Model Development for Design of Area Specific Shelter for Thermal Comfort Maintenance |
-| Organisation | DRDO — Department of Defence Production / IDEX |
-| Required outputs | (1) Predict shelter inside temperature from user inputs, (2) Predict thermal energy from solar radiation, (3) Report heat-flow from ambient/shelter temperature difference over a defined period |
+| **Output 1** | Predict the inside temperature of a shelter over time |
+| **Output 2** | Predict solar thermal energy harvested through the glazing |
+| **Output 3** | Report heat flow vs ambient/shelter temperature difference over a period |
+
+COCOON does not just run one simulation. It generates and evaluates **50 to 200 candidate shelter designs**, ranks them by a multi-objective comfort score, cross-validates with **ANSYS FEM**, and recommends the best one with a written justification. The whole workflow is exposed as a **professional web interface** with two user modes (Individual/Household and Organization/Engineer).
 
 ---
 
-## 3. Complete Physics Formula Reference (Authoritative — Member 3/4 version)
+## The Problem Being Solved
 
-This supersedes the simpler formula sheet used in PRD v1.0. It is the actual spec `heat_transfer.py` and `thermal_model.py` must implement.
+Designing a shelter for **sub-zero Himalayan conditions** is hard because:
 
-### 3.1 Geometry
+- Material choices (adobe vs stone vs PUF insulation) dramatically affect survivability
+- Geometry (length, width, height, aspect ratio, surface-to-volume ratio) interacts with thermal mass
+- Window area (WWR) trades solar gain against nighttime heat loss
+- No single design wins across all conditions: stability, survivability, and deployability all matter
+
+COCOON automates the design-and-evaluate loop, replacing manual engineering guesswork with a **physics simulation engine + optimization + FEM validation** pipeline.
+
+---
+
+## System Architecture Overview
+
 ```
-A_wall  = 2(L·H + W·H)
-A_roof  = L·W
-A_floor = L·W
-V       = L·W·H
++--------------------------------------------------------------------------+
+|                         COCOON ARCHITECTURE                              |
+|                                                                          |
+|  USER BROWSER                                                            |
+|  +------------------------------------------+                           |
+|  |  Next.js 16 Web App (TypeScript+Tailwind) |                           |
+|  |  +-- Home (mode picker)                   |                           |
+|  |  +-- /individual/configure -> results     |                           |
+|  |  +-- /organization/configure -> results   |                           |
+|  +--------------------+---------------------+                           |
+|                        | HTTP REST (JSON)                                 |
+|  +---------------------v--------------------+                           |
+|  |         FastAPI Backend (Python)          |                           |
+|  |  POST /api/run -> start subprocess        |                           |
+|  |  GET  /api/run/{id}/status -> progress    |                           |
+|  |  GET  /api/run/{id}/results -> final JSON |                           |
+|  |  GET  /api/reference -> materials         |                           |
+|  +---------------------+--------------------+                           |
+|                        | subprocess (CLI)                                 |
+|  +---------------------v--------------------+                           |
+|  |       run_pipeline.py  (11 Stages)        |                           |
+|  |  Stage  1: Weather Archive (NASA POWER)   |                           |
+|  |  Stage  5: Scenario Generator             |                           |
+|  |  Stage  6: Design Ranker (RC simulation)  |                           |
+|  |  Stage  7: Reliability Analysis           |                           |
+|  |  Stage  8: ANSYS FEM Validation (opt.)    |                           |
+|  |  Stage  9: Recommendation Engine          |                           |
+|  |  Stage  4: Feature Reports (DRDO outputs) |                           |
+|  |  Stage 10: Report Bundle                  |                           |
+|  |  Stage 11: results.json assembly          |                           |
+|  +---------------------+--------------------+                           |
+|                        |                                                  |
+|  +---------------------v--------------------+                           |
+|  |      thermal-calculator/ (RC Engine)      |                           |
+|  |  thermal_model.py  -> transient ODE loop  |                           |
+|  |  heat_transfer.py  -> U, R, C, Q formulas |                           |
+|  |  solar_analysis.py -> SHGC + solar gains  |                           |
+|  |  heat_flow_analysis.py -> per-path losses |                           |
+|  |  materials.py      -> material property DB|                           |
+|  +------------------------------------------+                           |
++--------------------------------------------------------------------------+
 ```
 
-### 3.2 Resistance
+The pipeline has **three simulation layers**, each serving a different purpose:
+
+| Layer | Tool | Speed | Role |
+|---|---|---|---|
+| Physics RC Model | thermal_model.py | seconds per design | Ground-truth for the fast path; simulates transient heat flow |
+| Optimizer RC Loop | design_ranker.py | seconds per design | Ranks 50 to 200 candidates |
+| ANSYS FEM | ansys-pipeline/ | minutes per case | Independent 3D validation of top designs (optional) |
+
+---
+
+## How It Works — End to End
+
+### Individual Mode (Simplified)
+
+1. User enters shelter size (L x W x H), window count, door count, and occupancy level (heater setting, air changes)
+2. Frontend builds an `OptimizeRunRequest` and POSTs to `/api/run`
+3. Backend spawns `run_pipeline.py optimize ...` as a subprocess
+4. Pipeline generates **50 candidate designs** varying materials, thicknesses, and glazing
+5. Each candidate is simulated using the RC thermal engine against a **72-hour typical winter weather window**
+6. Designs are ranked by a **comfort score** (not just mean temperature)
+7. A **reliability analysis** runs 400 Monte Carlo trials to find the robust shortlist
+8. The **best design** is selected and its full feature report computed
+9. Frontend polls `/status` and renders results when done
+
+### Organization Mode (Expert)
+
+1. User enters **full engineering configuration**: custom multi-layer wall/roof/floor assemblies, exact material thicknesses, glazing U-values and SHGC, heat transfer coefficients (h_i, h_o), infiltration ACH, ground temperature mode, internal heat gains, initial temperature
+2. This runs as a **single mode simulation** — evaluating exactly one specified design
+3. All three DRDO feature outputs are computed and rendered with full charts
+
+---
+
+## The 11-Stage Pipeline
+
+`run_pipeline.py` is the spine. Every run creates a timestamped folder `runs/<UTC-timestamp>/` and writes all artifacts there. Each stage reads only from that folder.
+
 ```
-R_layer = d / k                                  # single layer
-R_total = 1/h_i + Σ(d_j / k_j) + 1/h_o           # multi-layer, series, with inside/outside film coefficients
+Stage  1 | weather_archive.py     | Load 10-year NASA POWER archive for Leh;
+         |                        | extract a "typical" and "worst-case" seasonal window
+---------+------------------------+----------------------------------------------------
+Stage  5 | scenario_generator.py  | Generate N buildable candidate designs (default 50)
+         |                        | from the constraint CSV files; each design is a full
+         |                        | wall/roof/floor layered assembly + geometry + glazing
+---------+------------------------+----------------------------------------------------
+Stage  6 | design_ranker.py       | Run the RC thermal engine on every candidate;
+         |                        | rank by comfort score; save top 5 and full CSV
+---------+------------------------+----------------------------------------------------
+Stage  7 | optimizer_reliability  | 4-part reliability analysis:
+         | .py                    |   1. Sensitivity: 400 Monte Carlo weight perturbations
+         |                        |   2. Worst-case weather: coldest real NASA slice
+         |                        |   3. Pareto front: swing vs T_min vs in-band %
+         |                        |   4. Logistics: mass, cost, transportability
+---------+------------------------+----------------------------------------------------
+Stage  8 | validate_top_designs   | (Optional) ANSYS FEM 3D transient thermal on top 2
+         | _ansys.py              | designs; compare MAE/RMSE vs RC model; rank by FEM
+---------+------------------------+----------------------------------------------------
+Stage  9 | recommend.py           | Convert evidence -> single stated choice with
+         |                        | written justification (thermal tie -> logistics)
+---------+------------------------+----------------------------------------------------
+Stage  4 | feature_reports.py     | Full DRDO outputs for chosen + runner-up:
+         |                        |   Feature 1: hourly indoor temperature prediction
+         |                        |   Feature 2: solar thermal energy analysis
+         |                        |   Feature 3: heat flow by path (wall/roof/floor/window)
+         |                        |   + comfort, heating demand, highlights
+---------+------------------------+----------------------------------------------------
+Stage 10 | report_bundle.py       | Build a human-readable REPORT.md with all numbers
+---------+------------------------+----------------------------------------------------
+Stage 11 | web_results.py         | Assemble the final results.json consumed by the
+         |                        | frontend (shape: RunResults in types.ts)
+```
+
+**Non-critical stages** (ANSYS, runner-up features) are logged and the pipeline continues on failure.
+
+---
+
+## Frontend Web App
+
+**Location:** `Frontend/cocoon-frontend/`
+**Framework:** Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4
+
+### Pages and Routes
+
+| Route | Purpose |
+|---|---|
+| `/` | **Home / Mode Picker** — selects Individual or Organization mode |
+| `/individual/configure` | Simplified form: geometry, presets, occupancy; triggers optimize run |
+| `/individual/results` | Results display for optimize run |
+| `/organization/configure` | Full engineering form with layer builder, all thermal coefficients |
+| `/organization/results` | Results display for single-design run |
+
+### Key Components (19 total in `app/_components/`)
+
+| Component | What it does |
+|---|---|
+| `LayerBuilder.tsx` | Add multi-layer composite wall/roof/floor assemblies with live U-value preview |
+| `IndividualLayerInput.tsx` | Simplified material picker using preset names, not raw values |
+| `SiteComfortEnvFields.tsx` | Season, comfort target, band, analysis hours |
+| `OptimizerFields.tsx` | Design count, seed, trials for the optimizer |
+| `RunProgress.tsx` | Live pipeline stage tracker (polls `/status` every 2 seconds) |
+| `TemperatureChart.tsx` | Indoor vs outdoor hourly temperature chart (DRDO Output 1) |
+| `SolarEnergyPanel.tsx` | Solar thermal metrics and daily bars (DRDO Output 2) |
+| `HeatFlowPanel.tsx` | Heat loss by path, stacked chart (DRDO Output 3) |
+| `ReliabilityPanel.tsx` | Sensitivity %, Pareto front, worst-case weather verdict |
+| `DesignComparisonTable.tsx` | All ranked designs table with material labels |
+| `AnsysValidationPanel.tsx` | RC vs ANSYS comparison table + contour image |
+| `LogisticsPanel.tsx` | Envelope mass, cost, transportability per shortlisted design |
+| `RecommendationCard.tsx` | Final "chosen design" card with justification text |
+| `ResolvedConfigStrip.tsx` | U-values, total capacitance, infiltration UA strip |
+| `SiteHeader.tsx` | Nav bar with mode label, breadcrumbs, language switcher |
+| `LanguageSwitcher.tsx` | English / Hindi toggle (persisted in localStorage) |
+
+### Internationalization (i18n)
+
+Every user-facing string is stored in `app/_lib/i18n.tsx` under a short key, with both **English** and **Hindi** translations. Numbers, units (degrees C, W/m2K, mm), and standard names (ISO, ANSYS, NASA) are intentionally identical in both languages. The language selection is persisted with `localStorage`.
+
+### Lib Utilities
+
+| File | Purpose |
+|---|---|
+| `_lib/types.ts` | All TypeScript interfaces mirroring the backend Pydantic models and pipeline JSON output |
+| `_lib/api.ts` | All network calls: `startRun`, `pollStatus`, `fetchResults`, `fetchReference` |
+| `_lib/buildRequest.ts` | Transforms form state into a `RunRequest` object for the API |
+| `_lib/useRun.ts` | React hook that manages run lifecycle: idle, running, polling, done/failed |
+| `_lib/fixtures.ts` | Static mock result data for UI development without a backend |
+| `_lib/demoRequest.ts` | Demo request payload for the "try it" button |
+
+---
+
+## Backend API
+
+**Location:** `backend/`
+**Framework:** FastAPI, Python 3.10+
+**Start command:** `uvicorn backend.main:app --reload --port 8000`
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/health` | Health check: confirms pipeline script exists, shows runs dir and worker count |
+| POST | `/api/run` | Start a new run. Body: RunRequest JSON. Returns `{run_id}` |
+| GET | `/api/run/{run_id}/status` | Poll pipeline progress. Returns PipelineStatus with per-stage phase |
+| GET | `/api/run/{run_id}/results` | Get final results.json (409 if still running, 422 if failed) |
+| GET | `/api/run/{run_id}/artifact/{path}` | Download any artifact file from the run folder |
+| GET | `/api/reference` | Material properties, glazing profiles, and ratio constraints |
+
+### Key Backend Files
+
+| File | Role |
+|---|---|
+| `backend/main.py` | FastAPI app creation, CORS middleware, router registration, startup sweep of stale runs |
+| `backend/settings.py` | All configuration: paths, CORS origins, worker limits, TTL. All overridable via env vars |
+| `backend/models.py` | Pydantic models mirroring types.ts: ShelterConfig, OptimizeSpec, RunRequest, PipelineStatus |
+| `backend/pipeline_bridge.py` | Translates a RunRequest into CLI argv for run_pipeline.py; translates PIPELINE_STATUS.json into PipelineStatus |
+| `backend/jobs.py` | Thread-pool job manager: submits subprocess, tracks state (queued/running/exited), enforces timeout |
+| `backend/routes/run.py` | All /api/run/* route handlers |
+| `backend/routes/reference.py` | /api/reference route — reads from thermal-calculator/data/ |
+| `backend/reference_cache.py` | Caches reference data (materials, glazing) to avoid repeated file reads |
+
+### Configuration via Environment Variables
+
+| Env Var | Default | Meaning |
+|---|---|---|
+| `COCOON_RUNS_DIR` | `<repo>/runs` | Where run folders are written |
+| `COCOON_PIPELINE_PYTHON` | current Python | Interpreter used to spawn run_pipeline.py |
+| `COCOON_MAX_WORKERS` | 2 | Max concurrent pipeline subprocesses |
+| `COCOON_RUN_TTL_HOURS` | 168 (7 days) | Auto-sweep old run folders on startup |
+| `COCOON_RUN_TIMEOUT_S` | 2400 (40 min) | Hard-kill a stuck subprocess |
+| `COCOON_CORS_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins |
+
+---
+
+## Thermal Calculator Engine
+
+**Location:** `thermal-calculator/`
+
+This is the **core physics simulation engine**. It implements a **transient RC (Resistance-Capacitance) thermal model** — the same mathematical approach used in ISO 13790 dynamic building energy simulation.
+
+### How the RC Model Works
+
+Think of the shelter as a single electrical circuit analogy:
+- **Thermal resistance (R)** = how hard it is for heat to flow through a material (like electrical resistance)
+- **Thermal capacitance (C)** = how much heat the material can store (like a capacitor)
+- **Temperature (T)** = voltage
+- **Heat flow (Q)** = current
+
+The simulation solves this ODE at each hourly time step:
+
+```
+C_total x dT_in/dt = Q_solar + Q_internal - Q_wall - Q_roof - Q_floor - Q_window - Q_infiltration
+```
+
+### Files in the Engine
+
+| File | Purpose |
+|---|---|
+| `thermal_model.py` | Main simulation loop. Hourly explicit Euler integration. Returns per-hour DataFrame |
+| `heat_transfer.py` | All physics formulas: total_resistance, calculate_u_value, calculate_heat_transfer, calculate_solar_gain, calculate_layer_capacitance, position_weight, resistance_to_interior |
+| `solar_analysis.py` | Solar thermal calculations: SHGC-weighted gain, capacity factor, solar-temperature correlation |
+| `heat_flow_analysis.py` | Heat flow by path: per-hour per-surface breakdown |
+| `materials.py` | Loads data/material_properties.json: thermal conductivity, density, specific heat for all 8 materials |
+| `weather.py` | Weather data cleaning and normalization |
+| `user_input.py` | Command-line interface for standalone use |
+| `config.py` | Standalone configuration constants |
+| `main.py` | Standalone entry point |
+
+### Position-Weighted Thermal Capacitance
+
+A critical innovation in this model addresses a known flaw in lumped-node RC models:
+
+> A layer sitting behind thick insulation barely exchanges heat with the indoor air across a multi-day cold spell. Lumping its full mass onto the indoor node makes the shelter look far more thermally stable than it actually is.
+
+Each layer's capacitance is **exponentially weighted** by its thermal distance from the interior:
+
+```
+weight = exp(-R_layer_to_interior / Rc)
+```
+
+Where `Rc = 0.8 m2K/W` (calibrated against ANSYS 3D validation). This gives:
+
+| Configuration | Unweighted MAE | Weighted MAE |
+|---|---|---|
+| Mass-inside wall | 0.66 C | **0.31 C** |
+| Insulation-inside wall | 3.75 C | **0.53 C** |
+
+Both weighted results are within the plus/minus 0.8 C target.
+
+### Air Infiltration
+
+Infiltration is modeled as:
+
+```
+Q_infiltration = rho_air x Cp_air x (ACH x V / 3600) x (T_in - T_out)
+```
+
+Default ACH = 0.7 (moderately-sealed shelter). This is often the **largest heat loss path** in a real shelter.
+
+### Layer Ordering Convention
+
+**Index 0 = outermost layer.** External insulation goes first (cold-climate passive-solar strategy): insulation on the outside keeps the structural thermal mass exposed to indoor air so stored solar heat is available to stabilize indoor temperature overnight.
+
+---
+
+## Optimizer and Reliability
+
+### Scenario Generator (scenario_generator.py)
+
+Generates a **pool of buildable random shelter designs** from two CSV constraint files:
+
+- `shelter_ratios_recommended.csv` — bounds on aspect ratio, A/V ratio, WWR, ceiling height, floor area
+- `shelter_elements_dimensions__1_.csv` — per-element material options, layer roles (structural/insulation), and realistic thickness ranges
+
+**Design rules enforced:**
+- Every wall/roof/floor = one structural layer + optional insulation layer (never random slabs)
+- Insulation goes on the **outside face** (passive solar cold-climate approach)
+- Assembly thickness clamped to buildable envelope: Walls 250–650 mm, Roof 180–450 mm, Floor 130–400 mm
+- Cold-climate glazing preference: triple (38%) over double (50%) over single (12%)
+- Fixed geometry mode: user pins box dimensions + opening counts; pipeline designs only the envelope
+
+### Design Ranker (design_ranker.py)
+
+Runs the RC engine on every candidate and ranks by a **balanced comfort score**:
+
+```
+score = 100
+      - 3.0 x |T_median - TARGET|         (centered on the comfort target)
+      - 1.5 x (T_max - T_min)             (thermal stability, less swing = better)
+      - 4.0 x max(0, COLD_LIMIT - T_min)  (worst-hour survivability)
+      - 2.0 x max(0, T_max - HEAT_LIMIT)  (no daytime overheating)
+      + 20.0 x fraction_hours_in_band     (time inside 15-24 C comfort band)
+```
+
+Default targets: TARGET = 18 C, comfort band 15–24 C, COLD_LIMIT = 15 C, HEAT_LIMIT = 28 C.
+
+> **Why not rank by mean temperature?** Ranking by T_avg rewards thin, low-mass, over-glazed shelters that bake at midday and crash at night. Their average looks warm but the lived experience is terrible.
+
+### Reliability Analysis (optimizer_reliability.py)
+
+Makes the "best design" claim defensible with 4 sub-analyses:
+
+1. **Sensitivity Analysis** — Perturbs the 5 comfort-score weights by ±jitter for `--trials` (default 400) Monte Carlo trials. Reports how often each design lands in the top 3 across perturbations. Produces a robust shortlist if no single design dominates.
+
+2. **Worst-Case Weather** — Pulls the coldest contiguous N-hour slice from the full 10-year NASA archive and re-ranks. A design that wins on the typical day but fails the worst cold spell is not recommended.
+
+3. **Pareto Front** — Finds designs not dominated on all three objectives: high T_min (warmth), low swing (stability), high hours-in-band (comfort). Exposes tradeoffs the scalar score hides.
+
+4. **Logistics Profile** — From `shelter_material_logistics.csv`: estimates envelope mass (tonnes), material cost, and transportability (1 to 5 score). Used to break thermal ties.
+
+### Recommendation (recommend.py)
+
+Converts the multi-stage evidence into a **single stated choice**:
+
+- If ANSYS ran: check whether shortlisted designs are thermally indistinguishable (spread < RC-vs-ANSYS MAE). If tie, pick lightest/most-transportable.
+- If no ANSYS: check if comfort-score spread < 4.0 points. If tie, use logistics.
+- Otherwise: pick highest comfort score whose ANSYS rank is 2 or less.
+- Output: `recommendation.json` with `chosen_design_id`, `runner_up_id`, `thermal_tie` flag, and written `justification` string.
+
+---
+
+## ANSYS FEM Validation Pipeline
+
+**Location:** `ansys-pipeline/`
+
+An independent high-fidelity validation that cross-checks the RC model's predictions using **ANSYS Mechanical APDL (PyMAPDL)**.
+
+> The ANSYS model is **not in the interactive path** — it validates representative cases and produces the accuracy numbers behind the plus/minus 0.8 C claim.
+
+### RC Model vs ANSYS Model
+
+| RC Model | ANSYS Model |
+|---|---|
+| Single lumped indoor-air node | Solid indoor-air volume, near-isothermal via k=50 W/mK |
+| 1D per-surface heat flow | 3D conduction with full geometry |
+| Position-weighted capacitance | Real temperature gradient through each material |
+| Sol-air boundary at exterior | Sol-air temperature applied as exterior film boundary condition |
+| Inside film: 1/h_i resistance | 20mm inside-film layer: k = 0.02 x h_i |
+
+### Files
+
+| File | Role |
+|---|---|
+| `geometry_builder.py` | Builds multi-layer shelter geometry and mesh in MAPDL from SHELTER_CONFIG |
+| `pyansys_runner.py` | Orchestrates one case: geometry, materials, mesh, transient BCs, solve, extract |
+| `comparison.py` | Re-runs the Python RC engine on the same weather window, computes MAE/RMSE/R2 vs ANSYS |
+| `validate_weighted_capacitance.py` | Calibration script for the CAPACITANCE_COUPLING_RESISTANCE_M2K_W constant |
+| `VALIDATION_FINDINGS.md` | Detailed validation findings, MAE tables, and calibration history |
+
+### Validation Results
+
+| Configuration | RC MAE (unweighted) | RC MAE (position-weighted) |
+|---|---|---|
+| Mass-inside wall (standard) | 0.66 C | **0.31 C** (pass) |
+| Insulation-inside wall | 3.75 C | **0.53 C** (pass) |
+
+Target: plus/minus 0.8 C. Both configurations pass with position-weighted capacitance.
+
+---
+
+## Weather Data System
+
+**Location:** `weather_archive.py` and `leh_weather_merged.xlsx` and `leh_weather_archive.csv`
+
+### Data Source
+
+**10-year NASA POWER archive for Leh, Ladakh (34.1526 N, 77.5771 E), 2016–2026**
+
+Hourly data (~92,000 rows):
+
+| Raw Column | Pipeline Column | Description |
+|---|---|---|
+| T2M | temperature_C | 2-metre air temperature (C) |
+| ALLSKY_SFC_SW_DWN | solar_radiation_W_m2 | Surface solar irradiance (W/m2) |
+| WS10M | wind_speed_m_s | 10-metre wind speed (m/s) |
+| RH2M | humidity_percent | Relative humidity (%) |
+
+### Weather Windows
+
+| Window Type | Function | Use |
+|---|---|---|
+| Typical window | typical_window() — median-temperature N-hour seasonal slice | RC optimizer ranking (Stage 6) |
+| Worst-case window | worst_case_window() — coldest contiguous N-hour slice | Reliability analysis (Stage 7) |
+| Date-range slice | date_range() — explicit start/end | ANSYS validation cases |
+
+On first call, the xlsx is parsed and cached to `leh_weather_archive.csv`. Subsequent calls read the cache. The `annual_mean_air_C()` function computes the ground temperature proxy.
+
+---
+
+## Materials and Data Files
+
+### Material Properties (thermal-calculator/data/material_properties.json)
+
+8 materials are available:
+
+| Material ID | Display Name | Typical Use |
+|---|---|---|
+| adobe | Adobe/Mud Brick | Traditional Himalayan wall construction |
+| rammed_earth | Rammed Earth | Dense earthen walls |
+| straw_clay | Straw-Clay | Low-cost insulating infill |
+| stone_masonry | Stone Masonry | High thermal mass structural |
+| wood_timber | Wood/Timber | Lightweight structural |
+| concrete | Plain Concrete | Medium mass structural |
+| reinforced_concrete | Reinforced Concrete | High-strength structural |
+| puf | PUF Insulation | Polyurethane foam, primary insulation layer |
+
+Properties for each: **thermal conductivity** (W/mK), **density** (kg/m3), **specific heat** (J/kgK).
+
+### Glazing Profiles (thermal-calculator/data/glazing_profiles.json)
+
+| Glazing Type | U-value (W/m2K) | SHGC |
+|---|---|---|
+| single | ~5.8 | 0.86 |
+| double | ~2.8 | 0.76 |
+| triple | ~1.8 | 0.68 |
+
+Triple glazing is **strongly preferred** in the optimizer (weight 0.38 vs double 0.50 vs single 0.12).
+
+### Constraint CSV Files
+
+**shelter_ratios_recommended.csv** — geometry constraint bounds: Length-to-Width Aspect Ratio, Surface Area-to-Volume Ratio (A/V), Window-to-Wall Ratio (WWR %), Ceiling Height (m), Floor Area (m2).
+
+**shelter_elements_dimensions__1_.csv** — per-element material options with realistic thickness ranges and layer roles (structural/insulation).
+
+**shelter_material_logistics.csv** — deployability data: envelope mass (tonnes), cost, transportability score (1–5).
+
+---
+
+## Feature Reports (DRDO Outputs)
+
+`feature_reports.py` runs three DRDO-mandated analyses on the simulated hourly output:
+
+### Feature 1 — Indoor Temperature Prediction
+
+- Hourly indoor vs outdoor temperature time series
+- T_min, T_max, T_mean, T_median, T_final
+- Chart: indoor and outdoor temperature vs time (PNG)
+- CSV: temperature.csv
+
+### Feature 2 — Solar Thermal Energy
+
+- Total solar energy through glazing (Wh and MJ)
+- Peak irradiance (W/m2) and peak gain (W)
+- Capacity factor (%)
+- Daily MJ array and hourly gain (kW) array
+- Solar-temperature correlation coefficient
+- Chart: daily solar energy bars (PNG)
+
+### Feature 3 — Heat Flow vs Temperature Difference
+
+- Total heat loss (Wh), peak and average hourly loss (W)
+- Heat loss split by path (%): wall / roof / floor / window / infiltration
+- Per-hour per-path loss array (for stacked chart)
+- Peak and average indoor–outdoor temperature difference
+- Chart: stacked heat flow by path vs time (PNG)
+
+### Additional Outputs
+
+| Output | Content |
+|---|---|
+| Comfort | Hours in band %, hours below/above band %, frost-free %, comfort score |
+| Heating demand | Supplemental heat to hold the comfort band (kWh/day, kWh total, litres kerosene/day) |
+| Highlights | 5 plain-language derived facts: frost risk, solar yield, air quality, stability, thermal mass |
+| Resolved properties | U_wall, U_roof, U_floor (W/m2K), C_total (MJ/K), infiltration UA (W/K), envelope mass (t) |
+| Config echo | Human-readable summary of the design simulated |
+
+---
+
+## Two User Modes Explained
+
+### Individual / Household Mode (MOD_01)
+
+**Target user:** Non-engineer — villager, relief worker, NGO staff.
+
+**What you provide:**
+- Shelter dimensions (L x W x H in metres)
+- Number of windows and doors
+- Occupancy level (heater: Off/Low/Med/High — maps to internal heat gain in watts)
+- Air changes per hour (preset: tight/normal/drafty)
+
+**What COCOON does:**
+- Runs the optimizer with 50 candidate designs
+- Tries all material combinations for your box size
+- Returns the **best design** with predicted indoor temperatures
+
+**Estimation time:** Under 60 seconds (pipeline typically runs 2–5 minutes for 50 designs)
+
+### Organization / Engineer Mode (MOD_02)
+
+**Target user:** Defense engineer, DRDO analyst, structural engineer.
+
+**What you provide:**
+- Full multi-layer wall assembly (e.g., PUF 90mm + Stone Masonry 400mm)
+- Full roof assembly, floor assembly
+- Exact glazing U-value and SHGC
+- Heat transfer coefficients: h_inside (W/m2K), h_outside (W/m2K)
+- Air changes per hour (exact value)
+- Ground temperature mode (annual mean or manual)
+- Internal heat gain (W)
+- Initial indoor temperature (C)
+- Contents mass and specific heat
+
+**What COCOON does:**
+- Simulates your exact design (single-design mode)
+- Returns all three DRDO outputs with full charts and data
+
+**Solver accuracy:** FEM convergence 10^-4 (when ANSYS is enabled)
+
+---
+
+## API Reference
+
+### POST /api/run — Single Design (Organization Mode)
+
+```json
+{
+  "mode": "single",
+  "config": {
+    "geometry": {"length_m": 6.0, "width_m": 4.0, "height_m": 2.7},
+    "walls": [
+      {"material": "puf", "thickness_mm": 90},
+      {"material": "stone_masonry", "thickness_mm": 400}
+    ],
+    "roof": [
+      {"material": "puf", "thickness_mm": 80},
+      {"material": "concrete", "thickness_mm": 150}
+    ],
+    "floor": [{"material": "stone_masonry", "thickness_mm": 200}],
+    "windows": {"area_m2": 2.4, "U_W_m2K": 1.8, "SHGC": 0.68, "glazing_type": "triple"},
+    "contents": {"mass_kg": 200, "specific_heat_J_kgK": 900},
+    "heat_transfer": {"h_inside_W_m2K": 8.0, "h_outside_W_m2K": 25.0},
+    "air_changes_per_hour": 0.7,
+    "ground_temperature_mode": "annual_mean",
+    "ground_temperature_C": 3.2,
+    "internal_heat_gain_W": 150,
+    "initial_temperature_C": 5.0
+  },
+  "window": {"season": "winter", "typical_hours": 72, "worst_hours": 48},
+  "comfort": {"target_C": 18, "band_lo_C": 15, "band_hi_C": 24}
+}
+```
+
+### POST /api/run — Optimize (Individual Mode)
+
+```json
+{
+  "mode": "optimize",
+  "window": {"season": "winter", "typical_hours": 72, "worst_hours": 48},
+  "comfort": {"target_C": 18, "band_lo_C": 15, "band_hi_C": 24},
+  "optimize": {
+    "designs": 50,
+    "seed": 0,
+    "trials": 400,
+    "geometry": {"length_m": 5.0, "width_m": 3.5, "height_m": 2.5},
+    "window_count": 2,
+    "window_width_m": 1.2,
+    "window_height_m": 1.4,
+    "door_count": 1,
+    "internal_heat_gain_W": 200,
+    "air_changes_per_hour": 0.7,
+    "allowed_materials": ["adobe", "rammed_earth", "stone_masonry", "puf"],
+    "run_ansys": false,
+    "ansys_hours": 24,
+    "ansys_designs": 2
+  }
+}
+```
+
+**Response:** `{"run_id": "20260910T043000Z-ab12"}`
+
+### GET /api/run/{run_id}/status
+
+```json
+{
+  "run_id": "20260910T043000Z-ab12",
+  "done": false,
+  "failed": false,
+  "stages": [
+    {"stage": "1_weather", "phase": "ok", "note": "..."},
+    {"stage": "5_pool", "phase": "ok", "note": "50 designs"},
+    {"stage": "6_rank", "phase": "running"},
+    {"stage": "7_reliability", "phase": "pending"}
+  ]
+}
+```
+
+Stage phases: `pending` | `running` | `ok` | `failed` | `skipped`
+
+---
+
+## Directory Structure
+
+```
+COCOON/
+|
++-- Frontend/cocoon-frontend/         # Next.js web application
+|   +-- app/
+|   |   +-- page.tsx                  # Home / mode picker
+|   |   +-- layout.tsx                # Root layout
+|   |   +-- globals.css               # Global styles
+|   |   +-- _components/              # 19 React components
+|   |   +-- _lib/                     # Types, API, i18n, hooks
+|   |   +-- individual/               # /individual/* pages
+|   |   +-- organization/             # /organization/* pages
+|   +-- package.json
+|   +-- tailwind.config.ts
+|   +-- next.config.ts
+|
++-- backend/                          # FastAPI REST API
+|   +-- main.py                       # App + CORS + startup
+|   +-- settings.py                   # Configuration
+|   +-- models.py                     # Pydantic models
+|   +-- pipeline_bridge.py            # CLI translation + status parsing
+|   +-- jobs.py                       # Job/subprocess manager
+|   +-- routes/run.py                 # /api/run/* endpoints
+|   +-- routes/reference.py           # /api/reference endpoint
+|
++-- thermal-calculator/               # RC physics engine
+|   +-- thermal_model.py              # Main transient simulation loop
+|   +-- heat_transfer.py              # Physics formulas (U, R, C, Q)
+|   +-- solar_analysis.py             # Solar thermal analysis
+|   +-- heat_flow_analysis.py         # Heat flow by path
+|   +-- materials.py                  # Material DB loader
+|   +-- weather.py                    # Weather data cleaning
+|   +-- data/
+|   |   +-- material_properties.json  # 8 materials (k, density, Cp)
+|   |   +-- glazing_profiles.json     # 3 glazing types (U, SHGC)
+|   +-- README.md                     # Full physics PRD and formula reference
+|
++-- ansys-pipeline/                   # ANSYS FEM validation
+|   +-- geometry_builder.py           # MAPDL geometry builder
+|   +-- pyansys_runner.py             # Transient FEM orchestrator
+|   +-- comparison.py                 # RC vs ANSYS comparison
+|   +-- validate_weighted_capacitance.py
+|   +-- VALIDATION_FINDINGS.md        # Full validation report
+|   +-- results/                      # Per-case validation outputs
+|
++-- run_pipeline.py                   # The 11-stage pipeline spine
++-- scenario_generator.py             # Candidate shelter design generator
++-- design_ranker.py                  # RC simulation + comfort scoring
++-- optimizer_reliability.py          # 4-part reliability analysis
++-- recommend.py                      # Evidence -> single recommendation
++-- feature_reports.py                # DRDO outputs 1, 2, 3 + extras
++-- web_results.py                    # Assemble results.json
++-- report_bundle.py                  # REPORT.md builder
++-- weather_archive.py                # 10-year NASA POWER archive loader
++-- engine_adapter.py                 # Thin adapter: ShelterConfig dict -> engine call
++-- shelter_config.py                 # ShelterConfig dict builder
+|
++-- leh_weather_merged.xlsx           # 10-year NASA POWER data (raw)
++-- leh_weather_archive.csv           # Cached cleaned hourly archive
++-- shelter_ratios_recommended.csv    # Geometry constraint bounds
++-- shelter_elements_dimensions__1_.csv # Material + thickness options
++-- shelter_material_logistics.csv    # Mass, cost, transportability
+|
++-- runs/                             # Per-run output folders
+|   +-- <UTC-timestamp>/
+|       +-- request.json
+|       +-- PIPELINE_STATUS.json
+|       +-- designs_pool.json
+|       +-- optimization_results.csv
+|       +-- evaluated_typical.json
+|       +-- shortlist.json
+|       +-- logistics.csv
+|       +-- recommendation.json
+|       +-- results.json              # Final frontend payload
+|       +-- REPORT.md
+|       +-- features/
+|           +-- chosen/
+|           |   +-- temperature.csv
+|           |   +-- temperature.png
+|           |   +-- (solar, heatflow charts and CSVs)
+|           +-- runner_up/
+|
++-- results/                          # Persistent cross-run results
++-- Data Science/                     # ML experiments and notebooks
++-- .gitignore
+```
+
+---
+
+## Running the Project Locally
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- (Optional) ANSYS Mechanical APDL + ansys-mapdl-core for FEM validation
+
+### Backend Setup
+
+```bash
+# From the repo root
+pip install fastapi uvicorn pydantic pandas numpy matplotlib tqdm openpyxl
+
+# Start the API server
+uvicorn backend.main:app --reload --port 8000
+```
+
+Check health: `http://localhost:8000/api/health`
+
+### Frontend Setup
+
+```bash
+cd Frontend/cocoon-frontend
+npm install
+npm run dev
+```
+
+Visit: `http://localhost:3000`
+
+### Run the Pipeline Directly (CLI)
+
+```bash
+# Optimize mode — find best design
+python run_pipeline.py optimize --designs 50 --season winter
+
+# With ANSYS validation (requires ANSYS Student license)
+python run_pipeline.py optimize --designs 50 --ansys --ansys-hours 24 --ansys-designs 2
+
+# Single design — evaluate a specific config
+python run_pipeline.py single --config my_shelter.json
+
+# With a fixed geometry (equivalent to Individual mode)
+python run_pipeline.py optimize --fixed-design fixed_design.json --designs 50
+```
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4 |
+| Backend API | Python 3.10+, FastAPI, Uvicorn, Pydantic v2 |
+| Physics Engine | Pure Python (NumPy, Pandas, Matplotlib) |
+| Optimization | NumPy random, explicit Euler ODE integration |
+| FEM Validation | ANSYS Mechanical APDL via PyMAPDL (ansys-mapdl-core) |
+| Weather Data | NASA POWER API (10-year export), openpyxl for xlsx parsing |
+| Charting | Matplotlib (server-side PNG generation) |
+
+---
+
+## Physics Formulas Used
+
+### Geometry
+
+```
+A_wall  = 2(L x H + W x H)
+A_roof  = L x W
+A_floor = L x W
+V       = L x W x H
+```
+
+### Thermal Resistance and U-value
+
+```
+R_layer = d / k
+R_total = 1/h_i + sum(d_j / k_j) + 1/h_o
 U       = 1 / R_total
 ```
 
-### 3.3 Envelope heat transfer (per surface, per hour)
+### Envelope Heat Transfer (per surface, per hour)
+
 ```
-Q_wall  = U_wall  · A_wall  · (T_in − T_out)
-Q_roof  = U_roof  · A_roof  · (T_in − T_out)
-Q_floor = U_floor · A_floor · (T_in − T_ground)     # prefer ground temp; if unavailable, document the substitute explicitly
+Q_wall   = U_wall   x A_wall   x (T_in - T_out)
+Q_roof   = U_roof   x A_roof   x (T_in - T_out)
+Q_floor  = U_floor  x A_floor  x (T_in - T_ground)
+Q_window = U_window x A_window x (T_in - T_out)
 ```
 
-### 3.4 Thermal capacitance (mass)
-```
-C_layer     = density · Cp · A · d
-C_contents  = m_contents · Cp_contents
-C_total     = C_wall_layers + C_roof_layers + C_floor_layers + C_contents
-```
-> **Modeling note to carry into the PPT/report:** lumping the full envelope mass with the single indoor node is a deliberate simplification (single-zone lumped RC model). ANSYS resolves the real temperature gradient through materials; this is exactly the gap the validation step quantifies.
+### Solar Gain
 
-### 3.5 Gains
 ```
-Q_solar    = eta_solar · A_solar · G        # G = hourly solar irradiance from weather data
-Q_internal = user-defined (default 0 W, architecture keeps it configurable)
+Q_solar = SHGC x A_window x G        (G = hourly solar irradiance in W/m2)
 ```
 
-### 3.6 Net heat and governing equation
-```
-Q_loss = Q_wall + Q_roof + Q_floor
-Q_net  = Q_solar + Q_internal − Q_loss
+### Air Infiltration
 
-C_total · dT_in/dt = Q_net
+```
+Q_infiltration = rho_air x Cp_air x (ACH x V / 3600) x (T_in - T_out)
 ```
 
-### 3.7 Hourly numerical update (explicit Euler, Δt = 3600 s)
-```
-T_in(t+1) = T_in(t) + (Q_net(t) · 3600) / C_total
-```
-This loop, run once per row of the location's hourly weather data, **is** the physics engine (`thermal_model.py`).
+### Thermal Capacitance (Position-Weighted)
 
-### 3.8 Validation metrics (Python vs ML vs ANSYS)
 ```
-MAE  = (1/n) Σ |T_a − T_b|
-RMSE = sqrt[(1/n) Σ (T_a − T_b)²]
-R²   = 1 − (Σ(T_a−T_b)² / Σ(T_a−mean(T_a))²)
+weight   = exp(-R_layer_to_interior / Rc)    (Rc = 0.8 m2K/W)
+C_layer  = rho x Cp x A x d x weight
+C_total  = sum(C_wall_layers) + sum(C_roof_layers) + sum(C_floor_layers) + C_contents
 ```
-Target from the deck: **±0.8 °C** accuracy claim — this must be the *measured* MAE against ANSYS on the representative cases, not an assumed number; keep it live/recomputed as the validation set grows.
+
+### Governing Equation (Explicit Euler, dt = 3600 s)
+
+```
+Q_net      = Q_solar + Q_internal - Q_wall - Q_roof - Q_floor - Q_window - Q_infiltration
+T_in(t+1) = T_in(t) + (Q_net x dt) / C_total
+```
 
 ---
 
-## 4. Material Database — Status & What to Fix Before Wiring It In
+## Standards Compliance
 
-You already have `SIH26051_material_database_v3_thermal_complete.csv` (16 materials, BIS/ISO/peer-reviewed sourced, correctly computed derived columns — this is good, real data, a genuine improvement over generic textbook values). Before `materials.py` consumes it:
-
-| Action | Why |
+| Standard | Applied To |
 |---|---|
-| **Add Glass** | Missing entirely; needed for window/opening area in `Q_solar` and for glazed-opening heat loss. No wall/opening design is complete without it. |
-| **Add solar absorptivity (α) per material/surface** | The CSV covers conduction-side properties (k, ρ, Cp) only; `Q_solar` and `eta_solar` need α (or an effective gain factor) per material/finish — this is a separate small dataset to source (BIS/ASHRAE surface property tables). |
-| **Fix the one blank row** | Local granite is missing its `R_100mm_using_lambda_max/min` pair — trivial fix, recompute from existing λ_min/λ_max. |
-| **Decide the h_i / h_o convection coefficients** | Not in the CSV at all — these are separate constants/functions (§3.2) and should live in `heat_transfer.py` with wind-speed-refinable defaults, not the material file. |
-
-**Schema `materials.py` should load** (from the CSV, renamed to snake_case for code use): `material_id, category, k_typical, k_min, k_max, density_typical, density_min, density_max, cp_typical, confidence_level, source_url, alpha_typical (to be added)`.
+| ISO 13790 | Dynamic thermal simulation method (RC model approach) |
+| ASHRAE 55 | Comfort limits (15–24 C band, 18 C target) |
+| EN 12831 | Peak heating demand calculation |
 
 ---
 
-## 5. Module 1 — Physics Engine (`physics_engine/`)
-
-This is your existing `thermal_calculator/` package — keep the name and layout, it's already well designed. Below is the finalized structure with responsibilities and what each file must expose.
-
-```
-physics_engine/
-└── thermal_calculator/
-    ├── __init__.py
-    ├── main.py                 # orchestrates one full run: load config → load data → simulate → save → plot → export for ANSYS
-    ├── config.py                # dataclass/dict: geometry, layer lists (wall/roof/floor), contents, solar params, T_initial
-    ├── materials.py             # load material_properties.json (generated from the CSV); lookup(material_name) -> (k, density, cp, alpha)
-    ├── weather.py                # load + clean NASA POWER CSV; standardize columns: timestamp, temperature_C, solar_radiation_W_m2, wind_speed_m_s, humidity_percent
-    ├── heat_transfer.py          # pure functions: r_layer(), r_total(), u_value(), q_envelope(), q_solar(), capacitance()
-    ├── thermal_model.py          # ThermalModel class: prepares fixed properties once, then run_hourly_loop(weather_df) -> results DataFrame
-    ├── ventilation.py            # NEW (feature 3, §8.3): opening-schedule advisor, reads the same hourly loop's T_in/T_out and flags optimal open/close windows
-    ├── ansys_export.py           # writes ansys_boundary_conditions.csv (T_out, G, wind per hour) + a scenario JSON (geometry, materials, layer order) for the ANSYS team/pipeline
-    ├── data/
-    │   ├── material_properties.json   # generated once from the CSV (§4) — do not hand-maintain both
-    │   └── weather_data.csv           # per-location hourly NASA POWER data, cleaned
-    └── results/
-        ├── thermal_results.csv        # timestamp, T_out, G, Q_solar, Q_wall, Q_roof, Q_floor, Q_loss, Q_internal, Q_net, T_in
-        └── ansys_boundary_conditions.csv
-```
-
-**Function-level contract** (what `main.py` calls, in order — this is your literal runtime flow):
-```python
-config      = load_config()                          # config.py
-materials   = load_material_db()                     # materials.py
-weather_df  = load_weather(config.location)           # weather.py
-
-areas = compute_areas(config.L, config.W, config.H)   # heat_transfer.py
-r_u   = {surface: compute_r_and_u(layers, h_i, h_o) for surface in ['wall','roof','floor']}
-c_total = compute_total_capacitance(config.layers, config.contents, materials)
-
-model = ThermalModel(areas, r_u, c_total, config.T_initial, config.eta_solar, config.A_solar)
-results_df = model.run_hourly_loop(weather_df)         # thermal_model.py — implements §3.6/3.7
-
-save_results(results_df)                               # -> results/thermal_results.csv
-plot_temperature(results_df)                            # ambient vs indoor
-export_for_ansys(config, results_df)                    # ansys_export.py -> results/ansys_boundary_conditions.csv
-advise_ventilation(results_df, config.comfort_range)     # ventilation.py (feature 3)
-```
-
----
-
-## 6. Module 2 — ML Surrogate Pipeline (`ml_pipeline/`)
-
-Trains on **physics-generated** data (not ANSYS), so it can be built and iterated on immediately without waiting on ANSYS access.
-
-```
-ml_pipeline/
-├── scenario_generator.py     # samples the design space: geometry (L,W,H within realistic bounds), orientation,
-│                              # material combinations per surface, layer thicknesses, location/weather window.
-│                              # Use Latin Hypercube or randomized grid sampling — target ~2,000–5,000 scenarios
-│                              # (deck says "thousands"; start smaller, e.g. 1,000, for the 10 Sept prototype).
-├── dataset_builder.py         # for each sampled scenario: call physics_engine.thermal_calculator programmatically,
-│                              # capture inputs (X) and physics outputs (Y) -> writes training_dataset.csv
-├── feature_engineering.py     # turns raw scenario params into model features:
-│                              #   geometry (A_wall, A_roof, A_floor, volume, aspect ratio)
-│                              #   R/U values per surface, C_total, effective alpha, orientation (one-hot)
-│                              #   weather summary features (mean/min/max ambient temp, total solar, mean wind)
-├── train_model.py             # trains a multi-output RandomForestRegressor (scikit-learn) on:
-│                              #   Y = [min_indoor_temp, max_indoor_temp, avg_indoor_temp, final_temp, avg_heat_loss]
-│                              #   (full hourly profile prediction is a stretch goal — see note below)
-├── evaluate_model.py           # k-fold cross-validation, feature importance, MAE/RMSE/R² vs. held-out physics runs
-├── uncertainty.py               # NEW (feature 2, §8.2): confidence-gating —
-│                              #   flags a query design as "low confidence" if it falls outside the training
-│                              #   distribution (e.g. via a nearest-neighbor distance check or Random Forest's
-│                              #   prediction-variance-across-trees as a built-in uncertainty proxy)
-├── predict.py                  # serving wrapper: load(model_path) -> model; predict(design_features) -> instant result
-│                              #   this is what the backend's /api/ml-predict route calls
-├── models/
-│   ├── rf_surrogate_v1.joblib   # serialized trained model
-│   └── metadata.json             # training date, dataset size, feature list, validation scores
-└── data/
-    ├── scenarios_raw.csv          # every sampled scenario + its full physics output
-    └── training_dataset.csv       # cleaned X/Y matrix actually used for training
-```
-
-**Note on "full hourly profile" prediction:** the deck's Stage-3 box lists both scalar outputs (min/max/avg temp) and full profile prediction as ML outputs. For v1, predict the scalar summary stats (fast, simple, small model) and reuse the fast **Physics** run (not ML) whenever the full 24-hour curve needs to be *displayed* to the user (Stage 3 UI, §9). Only invest in full-sequence ML output (e.g. a small per-hour regressor or a lightweight sequence model) once the scalar surrogate is proven — it's a real jump in modeling complexity for a demo-timeline feature.
-
----
-
-## 7. Module 3 — ANSYS Validation Pipeline (`ansys_pipeline/`)
-
-```
-ansys_pipeline/
-├── representative_case_selector.py   # picks 3–5 fixed cases from the design space:
-│                                     #   Baseline, High-insulation, Different-material, Extreme-winter-weather
-│                                     # PLUS any case flagged low-confidence by uncertainty.py (§6)
-├── boundary_condition_builder.py      # reads ansys_export.py's output (from physics_engine) and converts it
-│                                     # into the exact input format PyAnsys/APDL expects (named selections,
-│                                     # transient load steps per hour, material property blocks)
-├── pyansys_runner.py                   # PyMechanical/PyMAPDL script: builds geometry, applies materials,
-│                                     # applies transient boundary conditions, solves, extracts nodal
-│                                     # temperature history for the same "indoor" reference point/volume
-├── contour_export.py                   # exports a temperature-contour image/snapshot per case (for the UI's
-│                                     # "visually impressive, builds credibility" contour display)
-├── comparison.py                       # for each representative case: runs Physics + ML + reads ANSYS output,
-│                                     # computes MAE/RMSE/R² (§3.8) pairwise (Python-vs-ANSYS, ML-vs-ANSYS)
-└── results/
-    ├── case_baseline/          (ANSYS output files + extracted temperature series + contour image)
-    ├── case_insulated/
-    ├── case_extreme_winter/
-    └── comparison_report.csv    # the numbers behind the "±0.8°C" accuracy claim on the pitch deck
-```
-
-**Critical rule (carried over from the physics doc, §9 of the Member 3/4 spec):** ANSYS must **never** take the Python-predicted temperature as an input boundary condition. Both Python and ANSYS independently simulate the *same physical scenario* (same geometry, materials, weather boundary) — comparison only happens *after* both have run. This is what makes the validation meaningful rather than circular.
-
-**Build-order reality check:** this module has the biggest external dependency (a licensed ANSYS seat + PyAnsys environment). For the 10 Sept prototype, build only `representative_case_selector.py` + `boundary_condition_builder.py`, and pre-run 1–2 cases manually/offline if a license is available; treat `pyansys_runner.py` as automatable once access is confirmed (this mirrors the Phase-0 static-validation fallback from PRD v1.0 §6.3).
-
----
-
-## 8. Additional Features — What to Build, Where
-
-### 8.1 Inverse design / auto-optimizer (highest "wow" factor)
-Flips the tool from *evaluate a design* to *recommend a design*. Only tractable because the ML surrogate (§6) makes evaluating hundreds of candidate designs instant.
-
-- **Where it lives:** `backend/app/api/routes/optimize.py` + a new `ml_pipeline/optimizer.py`
-- **How it works:** user submits constraints (target comfort range, budget/weight ceiling, allowed materials) instead of a single design → `optimizer.py` generates a candidate pool (same sampling approach as `scenario_generator.py`, but constrained) → scores every candidate via `ml_pipeline/predict.py` (milliseconds each) → returns the top-N designs, with the winner optionally cross-checked against Physics and (if flagged) ANSYS.
-- **Build order:** after the ML surrogate (§6) is trained and validated — it's a thin layer on top, not a new engine.
-
-### 8.2 Confidence-gated validation
-Answers "how do you know when to trust the fast number?" — a genuine technical answer, not a UI gimmick.
-
-- **Where it lives:** `ml_pipeline/uncertainty.py` (§6), surfaced via a `confidence` field on every `/api/ml-predict` response
-- **How it works:** compute an out-of-distribution signal (nearest-neighbor distance to training scenarios, or variance across the Random Forest's individual trees) → if above a threshold, the backend automatically queues the design for `ansys_pipeline` validation instead of only offering it as an optional button.
-- **UI impact:** Stage 3/4 (§9) needs a "Confidence: High / Medium — auto-validating with ANSYS" state, not just a static "Get Validated Result" button.
-
-### 8.3 Ventilation / operational advisor
-Cheap to add (reuses the existing hourly loop) and backed by a citable external reference (the FHNW Ladakh report you found, showing optimized opening schedules cut "too cold" hours by up to ~5%).
-
-- **Where it lives:** `physics_engine/thermal_calculator/ventilation.py`
-- **How it works:** after the hourly `T_in`/`T_out` series is computed, scan for hours where opening/closing a vent or door would measurably help (e.g. flag "open south-facing opening once ambient > X°C", "close by Y pm in winter") using simple threshold heuristics derived from the reference study, refinable later.
-- **Output:** a short text list of operational tips shown alongside Stage 6's recommendation (§9), and included in the exported report.
-
-### 8.4 Logistics/cost-aware ranking
-Answers "which is warmest given what we can actually get up there" — directly relevant to the defence deployment context every source you've gathered emphasizes.
-
-- **Where it lives:** `backend/app/services/ranking_service.py`
-- **How it works:** extend the material database (§4) with optional cost/weight/transportability fields per material (sourced later — flag as a data-gap now, similar to Glass/absorptivity); compute a weighted score = `w1·thermal_performance + w2·(1/cost) + w3·(1/weight) + w4·transportability`, with weights exposed as a simple slider/config the user can adjust.
-- **Build order:** last — depends on new material metadata fields that don't exist yet, and is additive to the existing comparison table (§9, Stage 5) rather than a new pipeline.
-
----
-
-## 9. Module 4 — Backend API (`backend/`)
-
-```
-backend/
-├── app/
-│   ├── main.py                       # FastAPI app instance, router registration, startup: load ML model into memory
-│   ├── core/
-│   │   ├── config.py                  # env vars, paths to physics_engine/, ml_pipeline/models/, ansys_pipeline/results/
-│   │   └── security.py                # NEW (§9.5): password hashing (passlib/bcrypt), JWT create_access_token()/decode_token()
-│   ├── api/
-│   │   ├── deps.py                     # shared dependencies (DB session, loaded ML model singleton, get_current_user — §9.5)
-│   │   └── routes/
-│   │       ├── auth.py                  # NEW (§9.5): POST /api/auth/signup, POST /api/auth/login, GET /api/auth/me
-│   │       ├── weather.py               # GET /api/weather?location=
-│   │       ├── materials.py             # GET /api/materials
-│   │       ├── simulate.py               # POST /api/quick-simulate (calls physics_engine)
-│   │       │                             # POST /api/ml-predict (calls ml_pipeline.predict, returns confidence — §8.2)
-│   │       ├── validate.py               # POST /api/detailed-simulate (queues/returns ansys_pipeline result)
-│   │       │                             # GET  /api/ansys-status/{job_id}
-│   │       ├── compare.py                # POST /api/compare (multi-design comparison table)
-│   │       ├── optimize.py               # POST /api/optimize (inverse design — §8.1)
-│   │       ├── ventilation.py             # GET  /api/ventilation-advice/{session_id} (§8.3)
-│   │       └── report.py                  # GET  /api/report/{session_id} (PDF/CSV export)
-│   ├── schemas/                          # Pydantic models: UserCreate, UserOut, Token (§9.5), ShelterDesignIn, SimulationResultOut, CompareRequest, OptimizeRequest, etc.
-│   ├── services/
-│   │   ├── report_service.py              # assembles PDF/CSV from stored results
-│   │   └── ranking_service.py             # §8.4
-│   └── db/
-│       ├── models.py                      # SQLAlchemy models: User (§9.5), Location, Material, ShelterDesign, SimulationResult, ComparisonSession, AnsysCase
-│       └── session.py                      # SQLite (prototype) / PostgreSQL (production) session factory
-├── tests/
-│   └── test_routes.py
-└── requirements.txt
-```
-
-### Updated API contract
-
-`Auth` column: **Public** = no token required. **User** = requires a valid JWT (`Depends(get_current_user)`, §9.5); the route also filters/tags results by the calling user's `user_id`.
-
-| Route | Purpose | Backing module | Auth |
-|---|---|---|---|
-| `POST /api/auth/signup` | Create account | `api/routes/auth.py` (§9.5) | Public |
-| `POST /api/auth/login` | Exchange credentials for a JWT | `api/routes/auth.py` (§9.5) | Public |
-| `GET /api/auth/me` | Current user's profile | `api/routes/auth.py` (§9.5) | User |
-| `GET /api/weather?location=` | Cached/pre-loaded weather | `physics_engine/thermal_calculator/weather.py` | Public |
-| `GET /api/materials` | Material property library | `physics_engine/thermal_calculator/materials.py` (§4) | Public |
-| `POST /api/quick-simulate` | Full physics run for one design | `physics_engine` | User — saved `ShelterDesign`/`SimulationResult` rows are tagged with `user_id` |
-| `POST /api/ml-predict` | Instant surrogate prediction + confidence | `ml_pipeline/predict.py`, `uncertainty.py` | User |
-| `POST /api/detailed-simulate` | Resolve/trigger ANSYS validation | `ansys_pipeline` | User |
-| `GET /api/ansys-status/{job_id}` | Poll async ANSYS job | `ansys_pipeline/pyansys_runner.py` | User — job must belong to the caller |
-| `POST /api/compare` | Multi-design comparison table | `db/models.py` (ComparisonSession) | User |
-| `GET /api/my-designs` | NEW (§9.5): list the caller's saved `ShelterDesign` + `ComparisonSession` history | `db/models.py` | User |
-| `POST /api/optimize` | Inverse design / auto-optimizer | `ml_pipeline/optimizer.py` (§8.1) | User |
-| `GET /api/ventilation-advice/{session_id}` | Opening-schedule tips | `physics_engine/thermal_calculator/ventilation.py` (§8.3) | User — session must belong to the caller |
-| `GET /api/report/{session_id}` | PDF/CSV export | `services/report_service.py` | User — session must belong to the caller |
-
-**Ownership check, not just a valid token:** for every `{session_id}`/`{job_id}` route, `get_current_user` proves *who* is asking, but the route handler still must check `session.user_id == current_user.id` before returning data — otherwise any logged-in user could read another user's results by guessing an ID.
-
----
-
-## 9.5 Authentication & Per-User Data (NEW)
-
-Purpose: when a user opens the app, they should see **their own** saved designs, comparisons, and simulation history — not a shared, anonymous pool. This is JWT-based auth (no OAuth/social login, no password reset flow — out of scope for the prototype) plus a `user_id` foreign key threaded through the data model.
-
-### 9.5.1 Flow
-1. `POST /api/auth/signup` — `{email, password, name}` → hash password (bcrypt via passlib) → create `User` row → return a JWT (auto-login on signup).
-2. `POST /api/auth/login` — `{email, password}` → verify hash → return `{access_token, token_type: "bearer"}`.
-3. Every protected route requires `Authorization: Bearer <token>`; `deps.get_current_user()` decodes the JWT, loads the `User` row, and raises `401` if the token is missing/expired/invalid.
-4. Frontend stores the token in Streamlit `session_state` (not on disk) and attaches it to every `api_client.py` call; on `401` the frontend clears the token and routes back to the login page.
-
-### 9.5.2 Schema additions (`backend/app/db/models.py`)
-
-This is the piece not yet defined anywhere in the doc — adding it now so `models.py` has a concrete spec to build against:
-
-```python
-class User(Base):
-    __tablename__ = "users"
-    id             = Column(Integer, primary_key=True)
-    email          = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    name           = Column(String, nullable=True)
-    created_at     = Column(DateTime, default=datetime.utcnow)
-
-    designs        = relationship("ShelterDesign", back_populates="owner")
-    comparisons    = relationship("ComparisonSession", back_populates="owner")
-```
-
-`ShelterDesign` and `ComparisonSession` (already listed as entities in §11) each gain:
-```python
-user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-owner   = relationship("User", back_populates="designs")   # or "comparisons"
-```
-
-`SimulationResult` doesn't need its own `user_id` — it already hangs off a `ShelterDesign`, and that design's `user_id` is enough to resolve ownership. `Location`, `Material`, and `AnsysCase` stay global/shared reference tables — they're not user-owned data, so they don't get a `user_id`.
-
-### 9.5.3 What this changes elsewhere in the doc
-- **§10 Frontend:** needs a login/signup page and a "My Designs" view (below).
-- **§13 Build sequence:** auth has to exist before any route that writes `ShelterDesign`/`ComparisonSession` rows, since those rows now require a `user_id` — see the updated build order.
-- **Dependencies to add to `backend/requirements.txt`:** `passlib[bcrypt]`, `python-jose[cryptography]`, `python-multipart` (form-encoded login).
-
-### 9.5.4 Explicitly out of scope for the prototype
-Social login, password reset/email verification, role-based permissions (admin vs. regular user), and refresh-token rotation. A single long-lived access token (e.g. 24h expiry) is sufficient for a hackathon demo login.
-
----
-
-## 10. Module 5 — Frontend (`frontend/streamlit_app/`)
-
-```
-frontend/
-└── streamlit_app/
-    ├── Home.py                       # Landing — redirects to Login if session_state has no token (§9.5)
-    ├── pages/
-    │   ├── 0_Login.py                 # NEW (§9.5): login + signup forms, calls /api/auth/login and /api/auth/signup,
-    │   │                              #   stores {access_token, user} in st.session_state on success
-    │   ├── 1_Input_Form.py            # Stage 2: geometry, layers, materials, comfort target
-    │   ├── 2_Instant_Result.py         # Stage 3: physics graph + ML instant stats + confidence badge (§8.2)
-    │   ├── 3_Validated_Result.py       # Stage 4: ANSYS graph + contour image + deviation %
-    │   ├── 4_Comparison.py             # Stage 5: multi-design table, best-option badge
-    │   ├── 5_Recommendation.py         # Stage 6: summary card, physical explanation, ventilation tips (§8.3), export
-    │   ├── 6_Optimizer.py              # NEW: inverse design — constraints in, ranked designs out (§8.1)
-    │   └── 7_My_Designs.py             # NEW (§9.5): calls GET /api/my-designs — the logged-in user's saved
-    │                                  #   ShelterDesigns and ComparisonSessions, with a link back into
-    │                                  #   Stage 3/4/5 pages to revisit a past result
-    ├── components/
-    │   ├── api_client.py               # thin wrapper around backend routes; attaches
-    │   │                              #   `Authorization: Bearer {st.session_state.access_token}` to every call;
-    │   │                              #   on a 401 response, clears session_state and st.switch_page("pages/0_Login.py")
-    │   ├── auth_guard.py                # NEW (§9.5): call at the top of every page except 0_Login.py —
-    │   │                              #   if no valid token in session_state, st.switch_page to Login
-    │   ├── charts.py                    # ambient-vs-indoor plot, comparison bar chart
-    │   └── forms.py                     # reusable geometry/material-layer input widgets
-    └── assets/
-        └── style.css (optional)
-```
-
-Each page (besides Login and My Designs) maps 1:1 to a user-flow stage from PRD v1.0 §9 — no new UX invention needed, just wiring these pages to the new/updated API routes above. Every page other than `0_Login.py` opens by calling `auth_guard.py`, so an unauthenticated user is bounced to login before seeing any input form or result.
-
----
-
-## 11. Module 6 — Data Layer (`data/`)
-
-```
-data/
-├── material_database/
-│   ├── SIH26051_material_database_v3_thermal_complete.csv   # source of truth (fix gaps per §4)
-│   └── material_properties.json                              # generated for physics_engine consumption
-├── weather/
-│   ├── leh_hourly.csv
-│   ├── kargil_hourly.csv
-│   └── nubra_hourly.csv
-└── db/
-    └── thermoshelter.db (SQLite, prototype)
-```
-
-**Core entities (SQLAlchemy models, `backend/app/db/models.py`):**
-`User` (§9.5 — email, hashed_password, name), `Location`, `Material` (extended with α, and later cost/weight/transportability — §8.4), `ShelterDesign` (now carries `user_id`), `SimulationResult` (physics + ML + ANSYS fields, nullable until each stage runs), `ComparisonSession` (now carries `user_id`), `AnsysCase` (the representative-case library, §7).
-
----
-
-## 12. Full Repository Layout (top level)
-
-```
-thermoshelter/
-├── README.md
-├── docker-compose.yml
-├── .env.example
-├── backend/                  (§9)
-├── physics_engine/           (§5 — your existing thermal_calculator/)
-├── ml_pipeline/               (§6)
-├── ansys_pipeline/             (§7)
-├── frontend/                    (§10)
-├── data/                          (§11)
-├── docs/
-│   ├── PRD.md (this file)
-│   └── formula_reference.md (§3, standalone for quick lookup)
-└── scripts/
-    ├── setup_env.sh
-    ├── build_ml_dataset.sh        # runs scenario_generator.py -> dataset_builder.py -> train_model.py end to end
-    └── run_dev.sh                  # starts backend (uvicorn) + frontend (streamlit) together
-```
-
----
-
-## 13. Build Sequence (what to build, in what order)
-
-| Order | What | Depends on | Notes |
-|---|---|---|---|
-| 1 | Physics engine (`physics_engine/`) | Material CSV fixes (§4), weather CSVs | Everything else calls this — build and unit-test it first |
-| 2 | Auth (`User` model, `/api/auth/*`, `get_current_user`, §9.5) | Nothing else | Build before step 3 — `ShelterDesign`/`ComparisonSession` now require `user_id`, so retrofitting auth after those tables exist means a migration, not just new code |
-| 3 | Backend `quick-simulate` + `weather` + `materials` routes | Steps 1, 2 | Gets Stages 1–3 of the UI working end to end, with results tagged to the logged-in user |
-| 4 | Frontend Login/Signup page + Stages 1–3 (Streamlit) | Step 3 | First demoable slice — login gate in front of everything else |
-| 5 | ML pipeline: scenario generation → dataset → training (§6) | Step 1 | Can run in parallel with steps 2–4 |
-| 6 | Backend `ml-predict` route + confidence gating (§8.2) | Step 5 | |
-| 7 | Comparison table + Stage 5 UI + `My Designs` page (§9.5) | Steps 3, 6 | |
-| 8 | ANSYS representative-case pipeline (§7) | Licensed ANSYS access (external dependency — flag early) | If access isn't confirmed in time, fall back to 1–2 manually pre-run cases for the demo, per PRD v1.0 §6.3 Phase 0 |
-| 9 | Stage 4 (validated result) UI + deviation reporting | Step 8 | |
-| 10 | Optimizer (§8.1) | Step 5/6 | |
-| 11 | Ventilation advisor (§8.3), logistics ranking (§8.4) | Steps 1, 5 respectively | Lower priority — add once the core loop is solid |
-| 12 | Recommendation/report export (Stage 6) | All of the above | |
-
----
-
-## 14. Team Ownership
-
-| Owner | Module(s) |
-|---|---|
-| Member 3 (Physics) | Formula correctness (§3), `heat_transfer.py`, `thermal_model.py`, ventilation heuristics (§8.3) |
-| Member 4 (Python/backend) | `physics_engine/` orchestration, `backend/` API, database models, auth (`core/security.py`, `routes/auth.py`, §9.5) |
-| ML owner | `ml_pipeline/` — scenario generation, training, uncertainty, optimizer |
-| ANSYS owner | `ansys_pipeline/` — PyAnsys scripting, representative-case validation, comparison metrics |
-| Frontend owner | `frontend/streamlit_app/` — all six stage pages |
-| Whole team | Material database cleanup (§4), pitch deck, demo rehearsal |
-
----
-
-## 15. Success / Validation Metrics
-
-- **Accuracy claim on the deck ("±0.8°C"):** must equal the live-computed MAE from `ansys_pipeline/comparison.py` on the representative cases (§3.8) — recompute and update this number as more ANSYS cases are run; never hardcode it.
-- **ML surrogate quality:** report R² and RMSE against held-out physics scenarios (not seen during training) from `ml_pipeline/evaluate_model.py`.
-- **Demo-readiness:** Stages 1–3 + comparison table working end to end is the non-negotiable floor for 10 Sept; ANSYS (Stage 4) and optimizer (§8.1) are the differentiators to layer on if time allows.
-
----
-
-## 16. Known Gaps / Risks Carried Forward
-
-| Gap | Action |
-|---|---|
-| Material database missing Glass and α (§4) | Source before wiring into `Q_solar` |
-| ANSYS license/access timeline uncertain | Keep `ansys_pipeline` code buildable/testable against a mocked case even without live access; fall back to pre-run static cases for the demo |
-| ML trained on physics, not ANSYS — surrogate can only ever be as accurate as the physics model it learns from | Make this explicit on the research/limitations slide; ANSYS comparison exists precisely to quantify this ceiling |
-| Full-hourly-curve ML prediction is a stretch goal, not v1 | Serve the curve from Physics directly (§6 note); don't over-promise ML curve prediction in the demo |
-| Cost/weight/transportability data for logistics ranking (§8.4) doesn't exist yet | Treat as a roadmap item, source before implementing the ranking service |
-| Auth was added after §11's entity list was drafted (§9.5) | Build `User` + `user_id` FKs *before* any other table with data to migrate exists — see updated build order (§13, step 2) |
-| No password reset / email verification / social login in scope | Fine for a demo login; call this out explicitly if a judge asks about production-readiness |
+*Built for Smart India Hackathon 2026 — DRDO Problem Statement 26051.*
+*Developed by Team ByteFiesta.*

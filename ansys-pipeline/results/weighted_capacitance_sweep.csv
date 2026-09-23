@@ -1,0 +1,9 @@
+model,mass-inside  MAE,mass-inside  RMSE,insulation-inside  MAE,insulation-inside  RMSE
+lumped (unweighted),1.61,1.72,4.75,5.12
+weighted  Rc= 0.5,0.38,0.42,0.81,1.0
+weighted  Rc= 0.7,0.73,0.81,1.46,1.67
+weighted  Rc= 0.8,0.87,0.94,1.86,2.05
+weighted  Rc= 0.9,0.97,1.04,2.19,2.38
+weighted  Rc= 1.0,1.04,1.12,2.46,2.66
+weighted  Rc= 1.5,1.25,1.34,3.3,3.55
+weighted  Rc= 2.0,1.35,1.44,3.72,3.99

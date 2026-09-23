@@ -1,0 +1,16 @@
+{
+  "mode": "single",
+  "run_dir": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T200313Z-4e4d",
+  "comfort_target": 18.0,
+  "comfort_lo": 15.0,
+  "comfort_hi": 24.0,
+  "typical_hours": 168,
+  "worst_hours": 37,
+  "season": "summer",
+  "config": "C:\\Users\\Atharva Nilesh Rane\\Desktop\\COCOON\\runs\\20260909T200313Z-4e4d\\shelter_config.json",
+  "comfort": {
+    "target_C": 18.0,
+    "band_lo_C": 15.0,
+    "band_hi_C": 24.0
+  }
+}
