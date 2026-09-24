@@ -189,7 +189,10 @@ def print_profile_metadata(
 # MAIN
 # ==================================================
 
-def main():
+def run_legacy_model():
+
+    """Legacy single-room model (physics + ML + ANSYS export)."""
+
 
 
     # ==============================================
@@ -1192,6 +1195,43 @@ def main():
 # ==================================================
 # RUN PROGRAM
 # ==================================================
+
+# ==================================================
+# MODEL SELECTION
+# ==================================================
+
+def main():
+
+    print()
+    print("=" * 60)
+    print("COCOON - DRDO SHELTER THERMAL CALCULATOR")
+    print("=" * 60)
+    print(
+        "1. Legacy single-room model "
+        "(walls/roof/floor + ML prediction + ANSYS export)"
+    )
+    print(
+        "2. RC network model "
+        "(single room with/without floor, or multi-room multi-storey)"
+    )
+
+    while True:
+        choice = input("\nSelect model: ").strip()
+
+        if choice in {"1", "2"}:
+            break
+
+        print("Please enter 1 or 2.")
+
+    if choice == "1":
+        run_legacy_model()
+    else:
+        # Imported here so the legacy model keeps working even if an
+        # RC-model dependency is missing.
+        from rc_main import run_rc_from_menu
+
+        run_rc_from_menu()
+
 
 if __name__ == "__main__":
 
