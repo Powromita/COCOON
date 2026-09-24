@@ -72,6 +72,36 @@
           "thickness_mm": 50
         }
       ]
+    },
+
+    "stone_puf_300_100": {
+      "display_name": "Stone Masonry 300 mm + PUF 100 mm",
+      "source_status": "Modern comparison profile; PUF properties are marked provisional in the material database",
+      "layers": [
+        {
+          "material": "stone_masonry",
+          "thickness_mm": 300
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 100
+        }
+      ]
+    },
+
+    "stone_puf_300_150": {
+      "display_name": "Stone Masonry 300 mm + PUF 150 mm",
+      "source_status": "Modern comparison profile; PUF properties are marked provisional in the material database",
+      "layers": [
+        {
+          "material": "stone_masonry",
+          "thickness_mm": 300
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 150
+        }
+      ]
     }
   },
 
@@ -113,6 +143,21 @@
         {
           "material": "puf",
           "thickness_mm": 50
+        }
+      ]
+    },
+
+    "concrete_puf_150_150": {
+      "display_name": "Concrete 150 mm + PUF 150 mm",
+      "source_status": "Modern engineered comparison profile; PUF properties are provisional",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 150
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 150
         }
       ]
     }
@@ -163,6 +208,21 @@
         {
           "material": "puf",
           "thickness_mm": 50
+        }
+      ]
+    },
+
+    "concrete_puf_150_100": {
+      "display_name": "Concrete 150 mm + PUF 100 mm",
+      "source_status": "Modern engineered comparison profile; PUF properties are provisional",
+      "layers": [
+        {
+          "material": "concrete",
+          "thickness_mm": 150
+        },
+        {
+          "material": "puf",
+          "thickness_mm": 100
         }
       ]
     }
