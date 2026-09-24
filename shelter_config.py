@@ -17,6 +17,11 @@ Schema (all keys required after validate()):
     ground_temperature_C  float          (used when mode == "manual")
     internal_heat_gain_W  float
     initial_temperature_C float
+
+Optional keys (absent == legacy behaviour; see environment/adapters.py):
+    physics_level         "legacy" | "enhanced"
+    physics_features      {enhanced_solar, enhanced_convection, enhanced_sky,
+                           enhanced_air, enhanced_ground, enhanced_doors: bool}
 """
 
 import json
@@ -25,6 +30,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "thermal-calculator"))
+
+from environment.adapters import resolve_physics_options  # noqa: E402
 
 _GLAZING_PATH = ROOT / "thermal-calculator" / "data" / "glazing_profiles.json"
 
@@ -76,6 +83,10 @@ def validate(cfg: dict) -> dict:
     if cfg["ground_temperature_mode"] not in ("manual", "annual_mean"):
         raise ValueError("ground_temperature_mode must be "
                          "'manual' or 'annual_mean'")
+
+    # optional physics switch: validated only, never inserted, so a config
+    # without it stays byte-identical
+    resolve_physics_options(cfg)
     return cfg
 
 

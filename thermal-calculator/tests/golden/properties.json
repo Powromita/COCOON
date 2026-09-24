@@ -1,0 +1,72 @@
+{
+  "baseline_worst48": {
+    "U_wall_W_m2K": 0.3801652892561983,
+    "U_roof_W_m2K": 0.38684416601409555,
+    "U_floor_W_m2K": 1.586206896551724,
+    "wall_area_m2": 32.5,
+    "window_area_m2": 2.5,
+    "infiltration_UA_W_K": 7.035,
+    "C_total_J_K": 20366245.022974737,
+    "C_lumped_total_J_K": 38826500.0
+  },
+  "baseline_typical168": {
+    "U_wall_W_m2K": 0.3801652892561983,
+    "U_roof_W_m2K": 0.38684416601409555,
+    "U_floor_W_m2K": 1.586206896551724,
+    "wall_area_m2": 32.5,
+    "window_area_m2": 2.5,
+    "infiltration_UA_W_K": 7.035,
+    "C_total_J_K": 20366245.022974737,
+    "C_lumped_total_J_K": 38826500.0
+  },
+  "design02_typical168": {
+    "U_wall_W_m2K": 0.260801329394387,
+    "U_roof_W_m2K": 0.18251681075888568,
+    "U_floor_W_m2K": 0.26571164510166356,
+    "wall_area_m2": 48.81640000000001,
+    "window_area_m2": 5.6,
+    "infiltration_UA_W_K": 15.068742066,
+    "C_total_J_K": 15660798.67814084,
+    "C_lumped_total_J_K": 31791383.309920006
+  },
+  "design03_typical168": {
+    "U_wall_W_m2K": 0.13432527381690434,
+    "U_roof_W_m2K": 0.1555337262606418,
+    "U_floor_W_m2K": 0.28031687995124926,
+    "wall_area_m2": 40.163199999999996,
+    "window_area_m2": 5.6,
+    "infiltration_UA_W_K": 12.154158449999997,
+    "C_total_J_K": 11373438.523139868,
+    "C_lumped_total_J_K": 62277803.57745
+  },
+  "design04_typical168": {
+    "U_wall_W_m2K": 0.39337474120082816,
+    "U_roof_W_m2K": 0.15621244893054556,
+    "U_floor_W_m2K": 1.7503805175038052,
+    "wall_area_m2": 44.0036,
+    "window_area_m2": 5.6,
+    "infiltration_UA_W_K": 13.171208399999998,
+    "C_total_J_K": 8138605.729014807,
+    "C_lumped_total_J_K": 27465520.752000004
+  },
+  "design07_typical168": {
+    "U_wall_W_m2K": 0.21482277121374868,
+    "U_roof_W_m2K": 0.28266960176105665,
+    "U_floor_W_m2K": 0.32316987494730925,
+    "wall_area_m2": 39.647999999999996,
+    "window_area_m2": 9.8,
+    "infiltration_UA_W_K": 12.788335559999998,
+    "C_total_J_K": 14226918.519992668,
+    "C_lumped_total_J_K": 27707078.754720002
+  },
+  "design11_typical168": {
+    "U_wall_W_m2K": 1.352941176470588,
+    "U_roof_W_m2K": 0.26266852626685266,
+    "U_floor_W_m2K": 0.34300631374453616,
+    "wall_area_m2": 42.95719999999999,
+    "window_area_m2": 5.6,
+    "infiltration_UA_W_K": 13.835342415999998,
+    "C_total_J_K": 39327275.68307998,
+    "C_lumped_total_J_K": 74482632.67575999
+  }
+}

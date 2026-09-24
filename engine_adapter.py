@@ -16,6 +16,9 @@ sys.path.insert(0, str(ROOT / "thermal-calculator"))
 
 from thermal_model import run_simulation          # noqa: E402
 from materials import load_materials               # noqa: E402
+from environment.adapters import (                 # noqa: E402
+    require_implemented, resolve_physics_options,
+)
 
 _MATERIALS_PATH = ROOT / "thermal-calculator" / "data" / "material_properties.json"
 
@@ -30,7 +33,8 @@ def get_materials():
 
 
 def simulate(cfg: dict, weather_df: pd.DataFrame, materials=None,
-             ground_mean_C: float | None = None):
+             ground_mean_C: float | None = None,
+             physics_level: str | None = None):
     """Run one design.
 
     Parameters
@@ -40,6 +44,9 @@ def simulate(cfg: dict, weather_df: pd.DataFrame, materials=None,
                             solar_radiation_W_m2 (+ optional wind/humidity)
     ground_mean_C : float   used when cfg["ground_temperature_mode"] ==
                             "annual_mean"
+    physics_level : str     optional override of cfg["physics_level"]
+                            ("legacy" default | "enhanced"); see
+                            environment/adapters.py
 
     Returns
     -------
@@ -49,6 +56,12 @@ def simulate(cfg: dict, weather_df: pd.DataFrame, materials=None,
 
     materials = materials or get_materials()
     run_cfg = dict(cfg)
+
+    # Physics switch. Only legacy physics exists so far; asking for an
+    # enhanced feature that is not implemented raises rather than silently
+    # running legacy.
+    physics = resolve_physics_options(run_cfg, level_override=physics_level)
+    require_implemented(physics)
 
     if run_cfg.get("ground_temperature_mode") == "annual_mean":
         if ground_mean_C is None:
