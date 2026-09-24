@@ -27,3 +27,10 @@ results/*.jpeg
 
 # Environment variables
 .env
+
+# Extra virtual environments (e.g. .venv-1)
+.venv*/
+
+# Scratch output from running multiroom_rc.py directly
+multiroom_rc_results.csv
+cache/
