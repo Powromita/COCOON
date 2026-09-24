@@ -5,7 +5,8 @@ The ONLY place that maps contract-shaped config dicts (backend/models.py,
 shelter_config) onto environment-function arguments. When the contract
 changes, only this file should need to change.
 
-Phase 0 content: the physics-level switch.
+Contents: the physics-level switch (Phase 0); contract layer conversion
+and default outer finishes (Phase 1).
 
 Config keys (both optional; absent == today's behaviour)::
 
@@ -21,8 +22,9 @@ ground model.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Mapping
+from typing import Mapping, Sequence
 
 PHYSICS_LEVELS = ("legacy", "enhanced")
 DEFAULT_PHYSICS_LEVEL = "legacy"
@@ -116,3 +118,87 @@ def require_implemented(options: PhysicsOptions) -> None:
             f"physics features not implemented yet: {missing}. "
             f"Use physics_level='legacy' (the default) or disable them in "
             f"physics_features.")
+
+
+# ======================================================================
+# CONTRACT LAYERS -> SI  (Phase 1)
+# ======================================================================
+
+MM_PER_M = 1000.0
+
+
+def contract_layers_to_si(layers: Sequence[Mapping]) -> list[tuple[str, float]]:
+    """Convert contract layers ``[{"material": id, "thickness_mm": d}, ...]``
+    (backend/models.py ``Layer``; shelter_config walls/roof/floor) into
+    ``[(material_id, thickness_m), ...]`` for
+    ``environment.materials.layered_construction``.
+
+    Order is preserved (OUTER -> INNER). Material ids are lower-cased and
+    stripped, matching thermal_model.prepare_layers. This is the ONLY
+    place in the environment package where mm are converted to m.
+    """
+
+    out = []
+    for i, layer in enumerate(layers):
+        if not isinstance(layer, Mapping) or "material" not in layer                 or "thickness_mm" not in layer:
+            raise ValueError(
+                f"Layer {i} must have 'material' and 'thickness_mm', got {layer!r}.")
+        try:
+            thickness_mm = float(layer["thickness_mm"])
+        except (TypeError, ValueError):
+            raise ValueError(
+                f"Layer {i}: thickness_mm must be numeric, got {layer['thickness_mm']!r}.") from None
+        if not (thickness_mm > 0 and math.isfinite(thickness_mm)):
+            raise ValueError(f"Layer {i}: thickness_mm must be > 0, got {thickness_mm}.")
+        out.append((str(layer["material"]).lower().strip(), thickness_mm / MM_PER_M))
+    return out
+
+
+# ======================================================================
+# DEFAULT OUTER FINISH  (Phase 1)
+# ======================================================================
+# An exposed PUF face is not a buildable exterior: PUF walls and roofs are
+# in practice PPGI-clad sandwich panels. So when the contract gives no
+# finish and the OUTERMOST layer is PUF, the construction's radiative
+# surface defaults to pre-painted steel sheet, medium colour. Every other
+# construction keeps the outermost material's own alpha / epsilon.
+#
+# This is a defaults-layer rule only: nothing in the legacy engine reads
+# finishes, so physics_level="legacy" results are unaffected.
+
+DEFAULT_FINISH_BY_OUTER_MATERIAL = {
+    "puf": "prepainted_steel_sheet",          # medium colour (entry default)
+}
+
+
+def default_outer_finish(layers_si: Sequence[tuple[str, float]],
+                         explicit_finish: str | None = None) -> str | None:
+    """Outer finish for a construction: ``explicit_finish`` if given,
+    else the default for its outermost material (see
+    ``DEFAULT_FINISH_BY_OUTER_MATERIAL``), else ``None`` (use the
+    material's own surface properties)."""
+
+    if explicit_finish is not None:
+        return explicit_finish
+    if not layers_si:
+        return None
+    return DEFAULT_FINISH_BY_OUTER_MATERIAL.get(layers_si[0][0])
+
+
+def construction_from_contract(layers: Sequence[Mapping], materials: Mapping,
+                               *, h_in_W_m2K: float, h_out_W_m2K: float | None,
+                               outer_finish: str | None = None,
+                               finishes: Mapping | None = None):
+    """Contract layers ``[{material, thickness_mm}]`` -> ``Construction``,
+    applying the mm->m conversion and the default-outer-finish rule.
+    ``finishes`` defaults to ``load_finishes()``."""
+
+    from environment.materials import layered_construction, load_finishes
+
+    layers_si = contract_layers_to_si(layers)
+    finish = default_outer_finish(layers_si, outer_finish)
+    if finish is not None and finishes is None:
+        finishes = load_finishes()
+    return layered_construction(layers_si, materials, h_in_W_m2K=h_in_W_m2K,
+                                h_out_W_m2K=h_out_W_m2K, outer_finish=finish,
+                                finishes=finishes)
