@@ -6,83 +6,14 @@ All heat transfer equations.
 
 import math
 
-
-def layer_resistance(
-    thickness_m,
-    thermal_conductivity
-):
-
-    if thickness_m <= 0:
-
-        raise ValueError(
-            "Thickness must be greater than zero."
-        )
-
-    if thermal_conductivity <= 0:
-
-        raise ValueError(
-            "Thermal conductivity must be greater than zero."
-        )
-
-    return (
-
-        thickness_m
-        /
-        thermal_conductivity
-
-    )
-
-
-def total_resistance(
-    layers,
-    h_inside,
-    h_outside
-):
-
-    R_inside = 1 / h_inside
-
-    R_outside = 1 / h_outside
-
-
-    R_materials = 0.0
-
-
-    for layer in layers:
-
-        R_materials += layer_resistance(
-
-            layer["thickness_m"],
-
-            layer["thermal_conductivity"]
-
-        )
-
-
-    R_total = (
-
-        R_inside
-
-        + R_materials
-
-        + R_outside
-
-    )
-
-
-    return R_total
-
-
-def calculate_u_value(
-    resistance
-):
-
-    if resistance <= 0:
-
-        raise ValueError(
-            "Resistance must be greater than zero."
-        )
-
-    return 1 / resistance
+# Moved to environment/materials.py (Person 2, Phase 1); re-exported here
+# so thermal_model.py and ansys-pipeline import exactly as before.
+from environment.materials import (  # noqa: F401
+    calculate_layer_capacitance,
+    calculate_u_value,
+    layer_resistance,
+    total_resistance,
+)
 
 
 def calculate_heat_transfer(
@@ -168,43 +99,6 @@ def resolve_solar_aperture(
         float(legacy.get("area_m2", 0.0)),
         float(legacy.get("eta_solar", 0.0))
     )
-
-
-def calculate_layer_capacitance(
-    area,
-    thickness_m,
-    density,
-    specific_heat
-):
-
-    volume = (
-
-        area
-
-        * thickness_m
-
-    )
-
-
-    mass = (
-
-        density
-
-        * volume
-
-    )
-
-
-    capacitance = (
-
-        mass
-
-        * specific_heat
-
-    )
-
-
-    return capacitance
 
 
 def calculate_contents_capacitance(

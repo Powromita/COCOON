@@ -1,0 +1,109 @@
+{
+  "_references": {
+    "ASHRAE_HoF_2021": "ASHRAE Handbook - Fundamentals (2021), Ch. 4 'Heat Transfer' (surface radiative properties) and Ch. 18 (sol-air / exterior surface absorptance)",
+    "Bergman_2011": "Bergman, Lavine, Incropera & DeWitt, Fundamentals of Heat and Mass Transfer, 7th ed. (Wiley 2011), Tables A.11 (emissivity) and A.12 (solar radiative properties)",
+    "CIBSE_A_2015": "CIBSE Guide A: Environmental Design (2015), Ch. 3",
+    "Warren_1982": "Warren, S.G. (1982) 'Optical properties of snow', Reviews of Geophysics 20(1), 67-89",
+    "Levinson_2007": "Levinson, R., Berdahl, P., Akbari, H., Miller, W., Joedicke, I., Reilly, J., Suzuki, Y., Vondran, M. (2007) 'Methods of creating solar-reflective nonwhite surfaces and their application to residential roofing materials', Solar Energy Materials & Solar Cells 91(4), 304-314",
+    "CRRC_directory": "Cool Roof Rating Council, Rated Products Directory (coil-coated / painted metal roofing: measured initial solar reflectance and thermal emittance, ANSI/CRRC S100)",
+    "_note": "Values are typical mid-range figures; absorptance varies with colour, soiling and age. Table numbers must be checked against the team's copy of each edition before the final report."
+  },
+
+  "mud_plaster": {
+    "display_name": "Mud / earth plaster (natural brown)",
+    "solar_absorptance": 0.65,
+    "emissivity": 0.90,
+    "source": "Earth render, light-to-mid brown, range 0.6-0.75 (ASHRAE_HoF_2021; CIBSE_A_2015)",
+    "notes": "Traditional Ladakhi exterior finish."
+  },
+
+  "lime_whitewash": {
+    "display_name": "Lime whitewash",
+    "solar_absorptance": 0.30,
+    "emissivity": 0.90,
+    "source": "White lime wash, fresh ~0.2-0.3, aged/dusty 0.35-0.5 (ASHRAE_HoF_2021; CIBSE_A_2015)",
+    "notes": "Common on Ladakhi buildings; strongly reduces opaque-wall solar gain."
+  },
+
+  "white_paint": {
+    "display_name": "White paint (acrylic)",
+    "solar_absorptance": 0.26,
+    "emissivity": 0.90,
+    "source": "White acrylic paint alpha_S ~0.26, epsilon ~0.90 (Bergman_2011 Table A.12)",
+    "notes": ""
+  },
+
+  "cement_render_grey": {
+    "display_name": "Cement / sand render (light grey)",
+    "solar_absorptance": 0.60,
+    "emissivity": 0.90,
+    "source": "Light grey render / concrete-like surface, range 0.55-0.7 (ASHRAE_HoF_2021; Bergman_2011 Table A.12 concrete ~0.60)",
+    "notes": ""
+  },
+
+  "dark_paint": {
+    "display_name": "Dark / black matte paint",
+    "solar_absorptance": 0.90,
+    "emissivity": 0.90,
+    "source": "Dark matte paints 0.85-0.97 (ASHRAE_HoF_2021; Bergman_2011 Table A.12)",
+    "notes": "Trombe / mass-wall absorber surfaces."
+  },
+
+  "red_brick": {
+    "display_name": "Red brick (exposed)",
+    "solar_absorptance": 0.70,
+    "emissivity": 0.90,
+    "source": "Red brick, range 0.63-0.77 (ASHRAE_HoF_2021; CIBSE_A_2015)",
+    "notes": ""
+  },
+
+  "bare_timber": {
+    "display_name": "Bare / weathered timber",
+    "solar_absorptance": 0.60,
+    "emissivity": 0.90,
+    "source": "Unpainted timber, range 0.5-0.75 (ASHRAE_HoF_2021)",
+    "notes": ""
+  },
+
+  "galvanised_steel_new": {
+    "display_name": "Galvanised steel sheet (new)",
+    "solar_absorptance": 0.65,
+    "emissivity": 0.13,
+    "source": "New galvanised iron alpha ~0.65, epsilon ~0.13; weathered alpha 0.8-0.9, epsilon 0.2-0.3 (ASHRAE_HoF_2021)",
+    "notes": "Low emissivity sharply cuts night-sky longwave loss (Phase 6) - matters for GI-sheet roofs."
+  },
+
+  "prepainted_steel_sheet": {
+    "display_name": "Pre-painted galvanised steel sheet (PPGI), medium colour",
+    "solar_absorptance": 0.60,
+    "emissivity": 0.87,
+    "source": "Polyester/SMP coil-coated steel: thermal emittance 0.85-0.90 (Levinson_2007; CRRC_directory); solar absorptance by colour, see colour_variants",
+    "notes": "Default outer finish for PUF-outermost constructions (adapters.default_outer_finish): an exposed PUF face is not buildable; PUF walls/roofs in practice are PPGI-clad sandwich panels. PPGI to IS 14246 (coating spec, not radiative properties).",
+    "default_colour": "medium",
+    "colour_variants": {
+      "light": {
+        "solar_absorptance": 0.30,
+        "emissivity": 0.87,
+        "source": "White / off-white / light grey coil coatings, solar reflectance ~0.6-0.75 -> absorptance 0.25-0.40 (Levinson_2007; CRRC_directory)"
+      },
+      "medium": {
+        "solar_absorptance": 0.60,
+        "emissivity": 0.87,
+        "source": "Mid grey / beige / terracotta / light green coil coatings, absorptance 0.5-0.7 (Levinson_2007; CRRC_directory)"
+      },
+      "dark": {
+        "solar_absorptance": 0.85,
+        "emissivity": 0.87,
+        "source": "Dark green / dark blue / brown / charcoal coil coatings, absorptance 0.8-0.92 (Levinson_2007; CRRC_directory)"
+      }
+    }
+  },
+
+  "snow_fresh": {
+    "display_name": "Fresh snow cover",
+    "solar_absorptance": 0.15,
+    "emissivity": 0.98,
+    "source": "Fresh snow albedo 0.8-0.9 (alpha 0.1-0.2), aged snow alpha 0.3-0.5; longwave emissivity 0.97-0.99 (Warren_1982)",
+    "notes": "Roof snow cover; the snow layer's thermal resistance is proposed separately (docs/materials_review_person2.md)."
+  }
+}

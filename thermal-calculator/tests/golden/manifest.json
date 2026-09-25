@@ -1,0 +1,26 @@
+{
+  "outputs_generated_utc": "2026-09-24T05:00:11+00:00",
+  "inputs_generated_utc": "2026-09-24T05:00:11+00:00",
+  "git_commit": "2f04ed3160ed211193bb38fa98baa2e595e8f53a",
+  "physics_level": "legacy",
+  "python": "3.13.15",
+  "numpy": "2.5.1",
+  "pandas": "3.0.5",
+  "design_seed": 2026,
+  "design_ids": [
+    2,
+    3,
+    4,
+    7,
+    11
+  ],
+  "cases": [
+    "baseline_worst48",
+    "baseline_typical168",
+    "design02_typical168",
+    "design03_typical168",
+    "design04_typical168",
+    "design07_typical168",
+    "design11_typical168"
+  ]
+}
