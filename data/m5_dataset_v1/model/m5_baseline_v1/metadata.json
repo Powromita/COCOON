@@ -1,0 +1,1062 @@
+{
+ "model_version": "m5_baseline_v1",
+ "created_at_unix": 1790352250,
+ "training_seconds": 100.9,
+ "git": {
+  "commit": "32d88bba3b5fe6bca011999350bf0c6104d4fc52",
+  "dirty": false
+ },
+ "training_script": "ml/m5_train_baselines.py",
+ "library_versions": {
+  "python": "3.14.6",
+  "scikit-learn": "1.9.1",
+  "numpy": "2.5.2",
+  "pandas": "3.0.5",
+  "joblib": "1.6.0"
+ },
+ "dataset": {
+  "version": "m5_dataset_v1",
+  "features_csv_sha256": "5e8b120ed6d3aeeec612792a9c24f10681dab19e1c7141bcef1f65bcefcafda4",
+  "raw_rows_sha256": {
+   "rows_00000.jsonl.gz": "7e2df645bad01c551040405dd5b35f0a3448de624b3f4f2381f2d403ce28ad66",
+   "rows_00001.jsonl.gz": "c66a44e2402703a52aa9c5654154d4cdd284a518eef06e39f6d74e50da7f2114",
+   "rows_00002.jsonl.gz": "d2f5fc835e3a2010b7fa6744c46110778664680ebb0d253297a8503ba0736190",
+   "rows_00003.jsonl.gz": "f3e632c1d98639391adcbb9a3107fac62c92fb69f40670a0ba7f29d9569385c4",
+   "rows_00004.jsonl.gz": "6b5833cb477db40babcc818f02b1a4f8a53e7031672fd28342e419596f0c4b0e",
+   "rows_00005.jsonl.gz": "675dee271b490b1d64378075164809eba34d8be50b8d1349d2f150e174d6cf89",
+   "rows_00006.jsonl.gz": "2c254cd5cce4a9857b6eeda01357eb8cfbdae99bb2bf3b08305972e276ce00eb",
+   "rows_00007.jsonl.gz": "6d9fd0e5937ada7df7c4b65bce687f67cbad2123fb50af836ea261c416583f56",
+   "rows_00008.jsonl.gz": "227198e4726edfbc6f1ece398e882fad8c0b8b2b7cc9486ff364aebd67bc71a7",
+   "rows_00009.jsonl.gz": "85903ef09f5c14c6753e3162cfe3218e8010b9e65c030a2cbbc362405866ec79",
+   "rows_00010.jsonl.gz": "ce52f94c45c9f5c9f3c9b2ae4b356a27ee78947fdb160f40fc829354b6cbce09",
+   "rows_00011.jsonl.gz": "8ca99d4b42bd5b3c79adb86c9d16e30438c5523903addb1553e80372b42cc32d",
+   "rows_00012.jsonl.gz": "c1bfaf8a3809f2114db63825f22a059dda87ac59a3ad4abe73a242ea25ff1c59",
+   "rows_00013.jsonl.gz": "c94810f2a09d0544f90a9663d0317ade6d6823c0ef1feffa1b0d7705be75c682",
+   "rows_00014.jsonl.gz": "89a2d4f1b8eb4cb3dc09845222d8db58a1d3b3194f46a9511aa24393e4e92ebb",
+   "rows_00015.jsonl.gz": "b7bbb3467d56dcf1308de7825eb20dd90ba9b42c0186e30f8496add40f4b6ac5",
+   "rows_00016.jsonl.gz": "f18de8555412f2ed52f6259621cdf1c0be2154c58a6d26d5d73abb9465f963ad",
+   "rows_00017.jsonl.gz": "48fbd415f4d1b5789a8b32f89608159bd56a6ab6a338a2bc434f944c50ac0f81",
+   "rows_00018.jsonl.gz": "28455670c1b4820edf18d05dbd6aeee0d6b96fbbde5b114ec90c010b52ee63fc",
+   "rows_00019.jsonl.gz": "79ac685061f495767bb9eb31df43b94f0baff736a35f5a5c5d1a80ea2553aab1",
+   "rows_00020.jsonl.gz": "79e92df3b03823763531aec17c8a01d081a23274805d5e20f4e2428ab2d235bd",
+   "rows_00021.jsonl.gz": "f57f52c66d58a6f49ecdcb6963d6b1c034048bb048812a1d441d89d5db37b9d6",
+   "rows_00022.jsonl.gz": "83c9860d32eb5976b4507179b520f3c522794adbb53f2cf1611ee92bf5f6fd36",
+   "rows_00023.jsonl.gz": "f0c968f5231d9a161bb0beee6e86ceb4b6f3c71792ecfdfdb2e6e58ea7a15c46",
+   "rows_00024.jsonl.gz": "83a32b3d854d26b50e39b41fe3477064d604c852b94e8216d2df1f690507e024",
+   "rows_00025.jsonl.gz": "f9053f373ca8b6aa6738b2e99ff4005b7982f02ae76947c6c99ceb3cec2c4d89",
+   "rows_00026.jsonl.gz": "bb162bcac8546c6824ac8feb31fffc8da884d9619ed9ea149351a6f57bce9382",
+   "rows_00027.jsonl.gz": "8f11217fc83b03af29bb2ab40f625e274c613fb7aba9780f84dd1c2bf9ca5d2a",
+   "rows_00028.jsonl.gz": "33efe3d53de59dc8287a8390ced8c06fcf5e7559c9e0bbef3f69315c27af9d3c",
+   "rows_00029.jsonl.gz": "370a55d6507f6a09eaf8c6183d6891c5628e5948d32c51df47efdea50fb4c542",
+   "rows_00030.jsonl.gz": "e73cf00036449af040b5adb896f51b3625cb756f3a3a67cbc4fd426097517c25",
+   "rows_00031.jsonl.gz": "b0ab94f00920ea12fa31e15143c60f86936b507b6f390ec879464c9b27ae9ebe",
+   "rows_00032.jsonl.gz": "5e82b2f06531e1e1dd996c940364726bca76df217d75bc9c1b35a7120bc018ae",
+   "rows_00033.jsonl.gz": "f1e44a8bb5d175d45084c09e9b16cf4313c65b0f5ad3ad2a9583a51826b241e0",
+   "rows_00034.jsonl.gz": "0ee52cee85e48f6cd77c29c7c953ecff5ce3c33e56eacdd0a20891b539b554e5",
+   "rows_00035.jsonl.gz": "657d1ef3f85b7fa0586a144d479bbd254f22ebb4963dac1004d68ac307e5ae37",
+   "rows_00036.jsonl.gz": "a5e709352d299a64afd68512e6fbf620b677e2a75493444f21e118f70737750b",
+   "rows_00037.jsonl.gz": "adb885d51f9e41cb618fff55bab5ecdcbb030e5ed2db53501d23f7d3b7fb9897",
+   "rows_00038.jsonl.gz": "1a68c3c292da0b4e8e83fc7f03197d06e320715f3a454f9e6870df66ebc71dea",
+   "rows_00039.jsonl.gz": "7d50e9e6cce98b6ed5b9acd0d02b900e944cffe961dc43f669c63a0ceffbead3",
+   "rows_00040.jsonl.gz": "33101011bc79da4f02c6f3bbeadd4865b9b9ed77e3709034f87b0427bdb2454c",
+   "rows_00041.jsonl.gz": "38b2779ecc22547419a9c41003873aa611f601091987116944ec3f7ba77043c1",
+   "rows_00042.jsonl.gz": "3f25e408211ddac1c5b93eff63fd4cee94f03aff6f900db6d3e9ea6a5bf96778",
+   "rows_00043.jsonl.gz": "73776e23ff57fda6be5b8e38dc179d3e34865178aa33997478456452207a43e0",
+   "rows_00044.jsonl.gz": "3a6959669d1c988b4dee4caecb9a4248e5c3d32cf9301155831ee2a96d89d1c5",
+   "rows_00045.jsonl.gz": "9592a61ef45898c6f677482dba2719ba5bb079477e6fc54061693de2ec563332",
+   "rows_00046.jsonl.gz": "6985be5b149642682b639819ab79e3e61cdd733f2772ca67021419e946e88a2d",
+   "rows_00047.jsonl.gz": "524fce8d73c43c6ce7d326cceb4427e37ba04d2a08bfe7c53fae24e6576df94a",
+   "rows_00048.jsonl.gz": "8cb5b8b0337ec50f8c66448c043dd6331f8ee409a69247cf77ce3adafb75fdcd",
+   "rows_00049.jsonl.gz": "66a869b168902ab6f27155422cd41862b12e353244bd2a2cc7dfb81ee2da0c3d",
+   "rows_00050.jsonl.gz": "33b025d4effb351d702b0e81bcd4cfb8cedd6e3a7cb119d841c3e1c308541c53",
+   "rows_00051.jsonl.gz": "f1226acb91f2ab99d281fa47aeb3cea6bd97826d680f11b0d72f5c7afdf74164",
+   "rows_00052.jsonl.gz": "51a119ec03260cc4cfd7ddec400611f38283438d43151a729b07791693ec1c79",
+   "rows_00053.jsonl.gz": "de7b761e623c5154759acc8f05ab85dcd13f8e6539e31331bdb929751122b105",
+   "rows_00054.jsonl.gz": "a2b976b7ae688064711f713d6112e23532223ef2d8b1715ee960eb41b7827706",
+   "rows_00055.jsonl.gz": "86bb029e51f11ebc73d46fe741fb2e261d1684fa8a56b877ea7941cf7d636210",
+   "rows_00056.jsonl.gz": "f6240e870c3d1d252d712a702b330dffab653a73423ab0f3039f512d0a2f0547",
+   "rows_00057.jsonl.gz": "a49654916a7409dfa407fb7ddc5ea748508229be47c9037cb88ec894bfe0d26c",
+   "rows_00058.jsonl.gz": "903af753789c7b60957dcb0d2da864b1550f5005413a2ad63f91a1bb4a492a88",
+   "rows_00059.jsonl.gz": "72f9a53b6b52c1ae57b31a3fdd51ac11330df0e5661bdce5f85b0ae6d7217a75",
+   "rows_00060.jsonl.gz": "d50522d80135a2528c7bcffed84668b5888e591da3dc3fb964170c07a6253ab5",
+   "rows_00061.jsonl.gz": "254f6d98f5abb2d761b2eb94061dcaa4b0f1d772512bfabd167a9fcb7eddbf6a",
+   "rows_00062.jsonl.gz": "3bc55c2279e9d661d74a15ef2cef74a823b3f8aad3a2338e2d093ca9a1673ee3",
+   "rows_00063.jsonl.gz": "929156b5c4ff7ae6a91fb98bf8fc46548edbe5c79c01f2e0f27d02d670c51843",
+   "rows_00064.jsonl.gz": "5dc7cbdc173801d1b1c1f201c85cddb580845a65ed70de46caafc0cc84f42673",
+   "rows_00065.jsonl.gz": "654ba7c98bd3c5a41dfe10b61f0d34dc0ac684c79a805c6ed5bdef281fb947a4",
+   "rows_00066.jsonl.gz": "b0f8a6f108f243bc8b4d1367298a8457ee7a6b487dd9096560b2359c16288a41",
+   "rows_00067.jsonl.gz": "03348b604cd0a5b3a62a856f03a6904cede75441ae9b6bf060069e718b823d80",
+   "rows_00068.jsonl.gz": "601d2fab02604dcb2274636e4c94e1d6ed2b4b3dd29715c730f1c79d52e1f587",
+   "rows_00069.jsonl.gz": "86209c7893863c2a57bb12f4285ae1e19ea4ecd008e2b3aff83602abb31d4c4f",
+   "rows_00070.jsonl.gz": "8362860d29f3df820d51c6f3b0a927bfa2546f513c01332754c706cf91df966c",
+   "rows_00071.jsonl.gz": "28ebb1b7c654ab03fc1fb88fee5203f22f5372f48cfc9c12d4914764c93a280b",
+   "rows_00072.jsonl.gz": "1bb7c3df4a4ab0d8cced3bc14381b9d149a147999dbf05cad80a1d79840cd3a9",
+   "rows_00073.jsonl.gz": "c25d316c144135f62b279485c58fd003fdbff2e4addf64bd6f7453452090b8cd",
+   "rows_00074.jsonl.gz": "d9dd24d9edf236050f96cd1a1c5e0bc26c0a33b4dbab66a6faab5c172c395682",
+   "rows_00075.jsonl.gz": "85a1459ed361e18bfc850105647ef6eb2dbe31a432fe688d1ab08ca16ac59b74",
+   "rows_00076.jsonl.gz": "de89dab4a2c3b5eac2d3f6a932d779977bead79a8128240e85180fbf295b4719",
+   "rows_00077.jsonl.gz": "43d28c7a2f83d4bf9e552788299f790643237b574fc5fdab57b0bf6b6e4b466f",
+   "rows_00078.jsonl.gz": "f40aa733b0ff23cf5b82e62336020d489ad4df45e57a2881990beb4c2dbc0bd6",
+   "rows_00079.jsonl.gz": "2da248b7c557a5d54517370e0f0c2692bd0c5cea1f1f6834f42a66a6d2fb0576",
+   "rows_00080.jsonl.gz": "6cd8c75409bd724c95ee8993fc1524dcff0cda335ad0ac080d0a81251e07f2b0",
+   "rows_00081.jsonl.gz": "131878add85b8e4f0fc1b35878ca0a18086beba07f2164fe712a8c8ceb731d38",
+   "rows_00082.jsonl.gz": "517eb3315c2f083b2c7858f26c5ec4337f2952c938b80fecd74cfbf564f8e509",
+   "rows_00083.jsonl.gz": "b6fb4ea175f4613338d50e46df29210dbc1e9f889e7b2d0714a1baee1b7a8cec",
+   "rows_00084.jsonl.gz": "d041452aa0c44e5dcf456e6bd2015a187e12a747ab3d0c32c128d95d275ab3e0",
+   "rows_00085.jsonl.gz": "b3885b8377fe856b9f8cba0768a9b7c9b0fbad94bb9cf24a6612208aa95e6ced",
+   "rows_00086.jsonl.gz": "88e94a5ef983224369de059bb4fd5b05f2b10f610661f22fadae2356a24166d8",
+   "rows_00087.jsonl.gz": "71c8d21cf445add9c9deb8a581b173e6f6fd2205581fae4a6a093cc57f4956cc",
+   "rows_00088.jsonl.gz": "d98313f5b8d279f3dad1a7022b2ca0d73e154fca0a3ebee823be6b4bae0f6f85",
+   "rows_00089.jsonl.gz": "808407b76022f134c03763a7e9421b6368ad9a3a0683522e8daf54154fd57574",
+   "rows_00090.jsonl.gz": "ce9c8e80b28b69cf17050e18ef7eb9273ffb6763836f18b079b7aa028ad27099",
+   "rows_00091.jsonl.gz": "00f5698fa03fe2e74bc420da05074ccbe2425ac65d6b3ace358f5e1b48adf832",
+   "rows_00092.jsonl.gz": "f92f851dbd5ebe7b34c2e01a804fc56aed2c0df67b7f42e9583a4eeb831e8b8b",
+   "rows_00093.jsonl.gz": "9dbd4b66b04b29c570b0a52a940ccadd4658104aee651fe498ce4deec85ff2da",
+   "rows_00094.jsonl.gz": "cf58e333373e918981469914a9f4b1e0d70fbcf4cf286c69b3a701d8f13db16d",
+   "rows_00095.jsonl.gz": "1c843b00fdbee62ecaa19401b041210baab0f34b5cac21557ec696d9c793c693",
+   "rows_00096.jsonl.gz": "4a26893d11aca33ec9db42c9a7d1979c52470a2d3f1200a581b2300eed559537",
+   "rows_00097.jsonl.gz": "34f433036dce222d83c630b880d65bda544ca544606a1c069ea6ec4ceb2e9525",
+   "rows_00098.jsonl.gz": "6d58a08a5ff6cc28c96b9bede44ed0cfc1a53b4f17b2dce460c7d4f32cea6e4f",
+   "rows_00099.jsonl.gz": "d33024532e581634d9cd9cfcebbed17d6a5c914642f4d08cedf5d91168276987",
+   "rows_00100.jsonl.gz": "fdc3aa018705463850ad8f36fb50c0b87623f332f7ddcdf80b2935b1784eac2e",
+   "rows_00101.jsonl.gz": "5718b67a4a03828413c97c0f4fadeb42b451b45a0ba41159017b815b1433f9d3",
+   "rows_00102.jsonl.gz": "05ea0e80bdf7206b1144a04edae44d958d3fdda7d80113daeabe41f2217fa219",
+   "rows_00103.jsonl.gz": "a8b5a95cb42e441a3fa1738d65b5e0d4d60aef2c94f8372c5e72e7303810c548",
+   "rows_00104.jsonl.gz": "5b359fb338f440238a5d2354d566285cbe6b6dbc610604e93dfa6598e6122185",
+   "rows_00105.jsonl.gz": "ce77e10483d26eac76a72ec6945c6c1e58350bbc1aa4e423659e51039c0cd955",
+   "rows_00106.jsonl.gz": "91b29c6da86b7df3c0499dd12dda84564f38497eefe745893398d3364141163c",
+   "rows_00107.jsonl.gz": "9924742c4797dc42d20067e828f61e82e310bb9b4f3f0b425087d936137e6465",
+   "rows_00108.jsonl.gz": "95c2b9504051c4dc4b7098ea831c69618169083e63ce9cdf61b43f8c5588e3b6",
+   "rows_00109.jsonl.gz": "fe85d48fe592605915eceb20752bce31916603c499e420d235d337624bdae86e",
+   "rows_00110.jsonl.gz": "1529ee847893b8af98169eb48acbde1537307395d345bbb115e2bc2429f8b9e1",
+   "rows_00111.jsonl.gz": "d0c51606ba291a3df09332349280c0b97bb7da2da770e70989f86ebe676d5d6f",
+   "rows_00112.jsonl.gz": "98058f347c9485f028af91ab176131ffbba2467a2443035b2760f52391c0f0fb",
+   "rows_00113.jsonl.gz": "faf5e6a1e7439fd81c4693f53edb48b635d62c1fd4daafcf4360960d677d1170",
+   "rows_00114.jsonl.gz": "1a2dd267233be84e254cb7779042c56c40c2c8519d6485596281f766cb388ae8",
+   "rows_00115.jsonl.gz": "4a07ffe95a16c66b3c0cdbddc9bb54f626c7bc5828382200565bcd11ef26c83f",
+   "rows_00116.jsonl.gz": "28bf770a2bc9164d7241a317996d202d5a820362fbb76abb0fbc3044f6890b18",
+   "rows_00117.jsonl.gz": "7de7ab7f387dc8eb5d0f3c3d29f7e85f2897386aaaff381e4d1dd5ed8948a622",
+   "rows_00118.jsonl.gz": "09e7c1e2f2afc40144ef51676a63020619879a27fb9e56cdaf88b143d5a05c67",
+   "rows_00119.jsonl.gz": "8a69b5cf3e0501cb5ccc1d87f7757d32e0f9ab436d33439e96c44b0fd7d88218",
+   "rows_00120.jsonl.gz": "1770791a11180aef1c3b63f49047523d905d99785dab64ad2e1f4e6dc16e6811",
+   "rows_00121.jsonl.gz": "a17d5939751ff511078cd2642ac93776564234809feeb69bc651d28e2ebcff0c",
+   "rows_00122.jsonl.gz": "e39cc447d466a0b2fd04ab5c06b20f1be08366664170fa945cb3bd375b5931ba",
+   "rows_00123.jsonl.gz": "4a91bad10e4dfb512e8fcbe880998f16bf185e38ddfe076959c74b7bc8182cc2",
+   "rows_00124.jsonl.gz": "09fbf477d32e1901d5bff513f6cdc2ea2d216bec8885e9af9d6399a057e88288",
+   "rows_00125.jsonl.gz": "865e17f3e8a5a6ccac12f951be6dc807263a319513b15d3a624a3b0efcc5abf0",
+   "rows_00126.jsonl.gz": "ca53de63dc463596f0d10aa896bdf05ecc31b5c1e29148b7d90686759c08f104",
+   "rows_00127.jsonl.gz": "61aba990a6c9046cce3593c99a9cab62b12207f0d13377d3efa74aa4dd781e46",
+   "rows_00128.jsonl.gz": "ba071236f41cd34ba2aef49b08aaf123b9a070b333eacf91692ee38ac2790579",
+   "rows_00129.jsonl.gz": "f0bbc30fb000b75eb8bbf5cfb9637f42282b473654ad2f035942e9abe8351085",
+   "rows_00130.jsonl.gz": "fd99d5f944c1a3a77f97ad0db95398e685df125c3e5d799150cebe6e4606f19e",
+   "rows_00131.jsonl.gz": "b8e99898dd87cdcc1dc2f8df077c45d3b7ee7dba8907c4d4380980f04af837fa",
+   "rows_00132.jsonl.gz": "19bc1aaae2a6487f1dfb0b3b41e7ef02cd793e6756c4bbefe277c6cd154a1dfd",
+   "rows_00133.jsonl.gz": "eb145d7d1bef9cc9dd427183efa2ab3fc11b1b8aca65cce208393374051178a0",
+   "rows_00134.jsonl.gz": "1fe4934b41be3edcfc8650e68e1546dc65bff3c26f672a04777339c62284377a",
+   "rows_00135.jsonl.gz": "e4e44cb9a8ac116d004be607e1feb5442a18a1e94d1998fa64a5c1e8891847da",
+   "rows_00136.jsonl.gz": "c2c13656526ed2461a52f296ac1d3bf83ba97d18be52bfeb477a6da9b637a584",
+   "rows_00137.jsonl.gz": "fe2768729ec592f8cce5804befa5622e2d5dfbedaa5b2b9161d12d3b05153dcb",
+   "rows_00138.jsonl.gz": "d6a2a4c32966588c4c0e2d5594051e71a1ca84daa88aaafb12440b060e51dfc6",
+   "rows_00139.jsonl.gz": "a07f646dc9e1e64e6e4dcf4b7916f0049652a3d93864c92f157b0f2747b1b5b1",
+   "rows_00140.jsonl.gz": "3dbfcab930e2dc59d8db45c24315a669b5d5dbc43990ce093f44c9327c0f1124",
+   "rows_00141.jsonl.gz": "28c6830915dce19bb65a3190e66cab24a38f56e032ad1610411fa4a5807bbdcf",
+   "rows_00142.jsonl.gz": "97a6bea31075ccb38452ccf8de49180dd8591cec97188eb3e09c9525b6257775",
+   "rows_00143.jsonl.gz": "1a3b14964324fb4763dd04a55fc52118dfc363c1325cce9ed1ca5630cf6efc17",
+   "rows_00144.jsonl.gz": "5ef066de2618a9e69c29844b46056ef1b55b4a1666fe9798aa72910b8c66a64f",
+   "rows_00145.jsonl.gz": "dbac7f619e44e2778e4a5d7e9506f0cbe6959f4d77c15be9f315a253cab87f8f",
+   "rows_00146.jsonl.gz": "14c19904e73956124cce696477c7729ca717a17369d89e814aa4d665fe71b60b",
+   "rows_00147.jsonl.gz": "23b4d795818a766be66217d215f38d899b811872a4aef4e9e65144ddc2f3468e",
+   "rows_00148.jsonl.gz": "8194f3a60311341ad5ac61876fbc87a9fdef6c71920705d71d492e5ebcd3becb",
+   "rows_00149.jsonl.gz": "08469274f0af79c068259862c1849aea6fd876e32835e3e55f7cebf92d081a2e",
+   "rows_00150.jsonl.gz": "e4f3739c520bd99f4922e4408d143733236c86535ef7e1b2939593530a3c15d2",
+   "rows_00151.jsonl.gz": "4c538c9be11bddd5d2f143f0e0bc42c6254432a5dc101e6205bad9991157930d",
+   "rows_00152.jsonl.gz": "cb2d9a2e3d032076261101e8ab458f48d98ad8999f03f2d450646b670ecdd638",
+   "rows_00153.jsonl.gz": "b42dcf698faae8eab9b2c5dcf993930bff66478d814bfb86f60fe9af946ccb14",
+   "rows_00154.jsonl.gz": "4e319be657336f5c62652a3681072da20f1df8546116e0376a591e9e45ff40a5",
+   "rows_00155.jsonl.gz": "3001f4b53aac279e905b353ff687ec4eec00c56fcbeeee6cd5d44e6ed19f784d",
+   "rows_00156.jsonl.gz": "88f78dedf00afb9ba2e953498019c9ff422fe2ce5dcc3346c5bed7792308d412",
+   "rows_00157.jsonl.gz": "8007ce4e07ab7a2cb79cbed964f2b1b173fd6dd2d117a4f48093fab8e7fba288",
+   "rows_00158.jsonl.gz": "3b39dac8c6df1fcf0d39410eb7fcde64cb1e0f1c931f7b272f8daf6babb15585",
+   "rows_00159.jsonl.gz": "d82858dba072076d98fcc79f2dcca1ce14a19df972009f6abccd2b20479d88fe",
+   "rows_00160.jsonl.gz": "7d810534fdc327653357b8cb8c09681d02d032017baaa9fb1a76ff512b7d0e2c",
+   "rows_00161.jsonl.gz": "b0ee592a0c39470190ae255dcc58df4ce56f3b7c7147702676946e7783672b85",
+   "rows_00162.jsonl.gz": "5a7d2dc22c3b5aaa27e44b297a36d58e7864a19ceb252d3295ef94a924062213",
+   "rows_00163.jsonl.gz": "2f102fc151a04ae7e7403fd2eba10c53d2d0e50690df55cb8959ca78e1e07117",
+   "rows_00164.jsonl.gz": "f8399013f1bba035b9602de0f96f45a7839d789b7f5d2d9584497ea7e8af351b",
+   "rows_00165.jsonl.gz": "6fb02943dd218df2c7e7ef7fb5f59af223698605da83e81bd6275964182f0c36",
+   "rows_00166.jsonl.gz": "2a5821632d573ff3c8734a26c85f044553100b531159a3af585b9946ea463f14",
+   "rows_00167.jsonl.gz": "1b0c97b4081c3e78d473e10ab22214d3c6a9f688104169f3307cb20ad9b98051",
+   "rows_00168.jsonl.gz": "b27144a0f4cd6e4ce2b8efa80f4a1a91793ca1569b801177ec665a00080a7254",
+   "rows_00169.jsonl.gz": "9736a8ac327623eebe306212364214842049ce3b9cc0946220b6b94803e9ae8f",
+   "rows_00170.jsonl.gz": "68cf669450901755e272195537525cdbf387b84af4c3d11ad9a12512cdbc2853",
+   "rows_00171.jsonl.gz": "0b3391b9116aad20a8c86ca9ee91652f6f4795c503f80b417322e66a7a60623f",
+   "rows_00172.jsonl.gz": "5790a1da018f43d7ba8e34f76c48644521f525f6753e702af56b9799f09bc24c",
+   "rows_00173.jsonl.gz": "fcf0449e5bb1300e33d61056ea7cd280bee9c008236deabc9d077f0f616adb82",
+   "rows_00174.jsonl.gz": "1c1fdc546b4e5d0489fde501b176e2d14d46b232a9a535c6dbaeefcec5e68cd6",
+   "rows_00175.jsonl.gz": "f1584417802d7ea0e6d884aeb5ae4dfd125be6ebd97b35cc5061ca76dcf41b5f",
+   "rows_00176.jsonl.gz": "6c9b6a335c15e8946925b55fba299b1cc925336ede962d74597bfc7f49ee1d88",
+   "rows_00177.jsonl.gz": "774056fab1b312fa84af6c5b1561c20fb09689635298a430a3f9cbd6d7543fa8",
+   "rows_00178.jsonl.gz": "ee493cf99bd33eea94ba77c168fb90057453b2a802211eea39c4a4e2888464fd",
+   "rows_00179.jsonl.gz": "d3c76a07063ebc2a033b36e90c9f09be1455972f821f223c5b39285d977552d4",
+   "rows_00180.jsonl.gz": "b8ccfb670a98674d4a7f1dd5921b3c1eefa80fa219d854c63675f77f085dc8cb",
+   "rows_00181.jsonl.gz": "c3d784db659110a082c7a5d9e50d95ad4eb545cdb3c9f5052c55edd46caf56be",
+   "rows_00182.jsonl.gz": "2cb6f183285874c4dd22cbbdfb93e6c21bec35d0b415791fa972c411d8c5b9b2",
+   "rows_00183.jsonl.gz": "2e5761caf30a65b0c59257dcf0b7c274cc2f986f2794e1ab5e6c7310ccfc0066",
+   "rows_00184.jsonl.gz": "2298795a7fd9536866aea6990d3aa9d7aba38d6f3f77307c4f14190e5a6d372e",
+   "rows_00185.jsonl.gz": "fd74ae3b77a5acbe1a696f1653ea8b482044667a14c16278aef0476d0ead784d",
+   "rows_00186.jsonl.gz": "4438f56c15add5722cb1a9dd254ad55e17fc62c49f2e151f050996df093fe78c",
+   "rows_00187.jsonl.gz": "44a78fb49b93d12433a1dd29130d064d827b787a9966091fd575d80c634f7f72",
+   "rows_00188.jsonl.gz": "9e7df1e55712d5282863f817dbf8edee61423c3bbd5a47804a664f346438b14d",
+   "rows_00189.jsonl.gz": "4d8146de61340d53c73c5e12c9f06c38a87667f7b234e1091b18a64edba83c4c",
+   "rows_00190.jsonl.gz": "721071e1f65f78163ca24d98f9655481ff5e3e1524b152cdb71e5deff14c2e7b",
+   "rows_00191.jsonl.gz": "739358d16662a7b26aff7664990c692625ea413f66650c8c477d41f69a43c979",
+   "rows_00192.jsonl.gz": "7dac28526fa24901c193b588bafeca052eda4ce80705dae2cef6e093f659b1ee",
+   "rows_00193.jsonl.gz": "a6ac181f17eeef29eef2296fb2af34065c5c44eeac8a6113e94e1139d8f5be56",
+   "rows_00194.jsonl.gz": "0f98ad0f6a3120cd6610e6d3e3bf8af38d1fdd228341359acc0049d120d47df1",
+   "rows_00195.jsonl.gz": "13262c64d2da977a8049fefc2187bb14933d50c7921fc4d7b9b538d3e9dba104",
+   "rows_00196.jsonl.gz": "c85811d9d8b4041257cda1b19695a489703b422833cb5577693f2e99dcacb950",
+   "rows_00197.jsonl.gz": "de6313060f8ed94a55af04ba0f07d78ba673886a2ec597873b1184daa4a66bd8",
+   "rows_00198.jsonl.gz": "22a9a28d5d471834a8fdfdca810f7c5f04c5baa8482bc786cf3d79b82439a57c",
+   "rows_00199.jsonl.gz": "a647e96db8818139be21796d3006030c400a8f1af43926150d1d8b476ac3a808"
+  },
+  "rows_total": 10000,
+  "rows_ok_used": 9401,
+  "generator_git_commit": "2883bff373093f22be20a5817e9a443664b556d8"
+ },
+ "engine": {
+  "name": "cocoon_multizone_rc",
+  "version": "0.1.0",
+  "options": {
+   "occupant_ventilation": true
+  },
+  "timestep_seconds": 900,
+  "warmup_hours": 48,
+  "window_days": 7
+ },
+ "targets": [
+  "heating_energy_kwh",
+  "peak_heating_kw",
+  "passive_min_temperature_c",
+  "passive_median_temperature_c",
+  "unmet_hours_ref"
+ ],
+ "target_definitions": {
+  "heating_energy_kwh": "ideal-load run, sum of heater power x step, after the first 48 h of the window",
+  "passive_median_temperature_c": "free-floating run, median over time of the mean occupied-zone temperature, after the first 48 h",
+  "passive_min_temperature_c": "free-floating run, lowest occupied-zone temperature, after the first 48 h",
+  "peak_heating_kw": "ideal-load run, maximum total heater power, after the first 48 h",
+  "unmet_hours_ref": "capacity-limited run with 4.0 kW in total shared equally by the heated zones, hours with any occupied zone below setpoint - 0.05 K, after the first 48 h"
+ },
+ "missing_targets_prd_11_4": {
+  "max_occupied_zone_temperature_c": "no per-timestep zone series retained",
+  "mean_occupied_zone_temperature_c": "only the median was stored",
+  "comfort_hours": "no per-timestep zone series retained; unmet_hours_ref is a different quantity (capacity-limited 4 kW run)",
+  "max_zone_imbalance_k": "no per-timestep zone series retained"
+ },
+ "features": [
+  "n_zones",
+  "n_floors",
+  "n_heated_zones",
+  "airlock_present",
+  "floor_area_m2",
+  "footprint_m2",
+  "volume_m3",
+  "heated_floor_area_m2",
+  "occupants",
+  "occupants_per_m2",
+  "setpoint_c",
+  "wall_area_m2",
+  "roof_area_m2",
+  "ground_floor_area_m2",
+  "internal_area_m2",
+  "window_area_m2",
+  "outdoor_door_area_m2",
+  "wwr",
+  "window_area_north_m2",
+  "window_area_east_m2",
+  "window_area_south_m2",
+  "window_area_west_m2",
+  "u_wall",
+  "u_roof",
+  "u_ground",
+  "u_window",
+  "r_layers_wall",
+  "r_layers_roof",
+  "shgc_x_shading",
+  "ua_outdoor_w_k",
+  "ua_ground_w_k",
+  "ua_total_w_k",
+  "ua_per_volume",
+  "ua_per_floor_area",
+  "solar_absorptivity_outer",
+  "mass_per_floor_area_kg_m2",
+  "heat_capacity_per_floor_area_kj_m2k",
+  "ach_design",
+  "ach_given",
+  "fresh_air_ach",
+  "ach_effective",
+  "door_open_fraction_x_area",
+  "internal_gain_w_per_m2",
+  "t_mean_c",
+  "t_min_c",
+  "t_std_c",
+  "degree_hours_below_setpoint",
+  "delta_t_mean_k",
+  "ghi_mean_w_m2",
+  "wind_mean_m_s",
+  "latitude_deg",
+  "elevation_m"
+ ],
+ "training_ranges": {
+  "n_zones": [
+   1.0,
+   4.0
+  ],
+  "n_floors": [
+   1.0,
+   2.0
+  ],
+  "n_heated_zones": [
+   1.0,
+   2.0
+  ],
+  "airlock_present": [
+   0.0,
+   1.0
+  ],
+  "floor_area_m2": [
+   6.25,
+   97.68
+  ],
+  "footprint_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "volume_m3": [
+   14.374999999999998,
+   286.2
+  ],
+  "heated_floor_area_m2": [
+   6.25,
+   83.62
+  ],
+  "occupants": [
+   2.0,
+   30.0
+  ],
+  "occupants_per_m2": [
+   0.1194743130227001,
+   1.5015015015015012
+  ],
+  "setpoint_c": [
+   12.0,
+   22.0
+  ],
+  "wall_area_m2": [
+   16.880000000000003,
+   148.2
+  ],
+  "roof_area_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "ground_floor_area_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "internal_area_m2": [
+   0.0,
+   70.39999999999999
+  ],
+  "window_area_m2": [
+   2.4,
+   29.04
+  ],
+  "outdoor_door_area_m2": [
+   1.8,
+   1.8
+  ],
+  "wwr": [
+   0.0541871921182266,
+   0.2142857142857143
+  ],
+  "window_area_north_m2": [
+   0.0,
+   7.44
+  ],
+  "window_area_east_m2": [
+   0.0,
+   11.759999999999998
+  ],
+  "window_area_south_m2": [
+   0.0,
+   13.44
+  ],
+  "window_area_west_m2": [
+   0.0,
+   11.999999999999998
+  ],
+  "u_wall": [
+   0.0776497994046848,
+   3.525641025641026
+  ],
+  "u_roof": [
+   0.0821692686935086,
+   3.971119133574008
+  ],
+  "u_ground": [
+   0.1131435036771638,
+   1.156271899088998
+  ],
+  "u_window": [
+   1.7999999999999998,
+   5.800000000000002
+  ],
+  "r_layers_wall": [
+   0.1136363636363636,
+   12.708333333333332
+  ],
+  "r_layers_roof": [
+   0.0818181818181817,
+   12.0
+  ],
+  "shgc_x_shading": [
+   0.5499999999999999,
+   0.8600000000000001
+  ],
+  "ua_outdoor_w_k": [
+   12.43155898621847,
+   356.5129192314928
+  ],
+  "ua_ground_w_k": [
+   0.7319929728674606,
+   82.38630423418715
+  ],
+  "ua_total_w_k": [
+   14.751485807301572,
+   400.92728589206666
+  ],
+  "ua_per_volume": [
+   0.2492175029990036,
+   6.345329593226071
+  ],
+  "ua_per_floor_area": [
+   0.6230437574975092,
+   17.132389901710393
+  ],
+  "solar_absorptivity_outer": [
+   0.2999999999999999,
+   0.75
+  ],
+  "mass_per_floor_area_kg_m2": [
+   175.24444444444444,
+   6950.66
+  ],
+  "heat_capacity_per_floor_area_kj_m2k": [
+   133.29375,
+   2830.59325
+  ],
+  "ach_design": [
+   0.35,
+   1.2
+  ],
+  "ach_given": [
+   1.0,
+   1.0
+  ],
+  "fresh_air_ach": [
+   1.1029411764705883,
+   17.62632197414806
+  ],
+  "ach_effective": [
+   1.1029411764705883,
+   17.62632197414806
+  ],
+  "door_open_fraction_x_area": [
+   0.02,
+   0.02
+  ],
+  "internal_gain_w_per_m2": [
+   16.420361247947454,
+   150.15015015015013
+  ],
+  "t_mean_c": [
+   -34.83809523809524,
+   10.325595238095238
+  ],
+  "t_min_c": [
+   -41.6,
+   3.6
+  ],
+  "t_std_c": [
+   1.331869945235047,
+   9.1389733000499
+  ],
+  "degree_hours_below_setpoint": [
+   562.7,
+   9380.8
+  ],
+  "delta_t_mean_k": [
+   2.6744047619047624,
+   55.83809523809524
+  ],
+  "ghi_mean_w_m2": [
+   95.61309523809524,
+   212.3392857142857
+  ],
+  "wind_mean_m_s": [
+   0.1924603174603174,
+   4.191964285714286
+  ],
+  "latitude_deg": [
+   33.2059,
+   35.39
+  ],
+  "elevation_m": [
+   2676.0,
+   5100.0
+  ]
+ },
+ "target_ranges": {
+  "heating_energy_kwh": [
+   0.0,
+   1849.921130982523
+  ],
+  "peak_heating_kw": [
+   0.0,
+   20.694563781887133
+  ],
+  "passive_min_temperature_c": [
+   -27.995805411344936,
+   21.018834878204924
+  ],
+  "passive_median_temperature_c": [
+   -26.1768868813257,
+   26.68891149530051
+  ],
+  "unmet_hours_ref": [
+   0.0,
+   120.0
+  ]
+ },
+ "split": {
+  "method": "GroupShuffleSplit on weather_period = window_start across all sites (no calendar weather window shared across splits); shipped models refit on train+validation",
+  "seed": 0,
+  "n_weather_periods": 1699,
+  "sizes": {
+   "train": 6628,
+   "validation": 1411,
+   "test": 1362
+  },
+  "site_holdout": {
+   "site": "kargil",
+   "n": 935,
+   "note": "separate fit on all other sites, not the shipped model"
+  },
+  "templates": {
+   "single_room": 2465,
+   "command_post": 1817,
+   "airlock_living_equipment": 1547,
+   "airlock_living": 1291,
+   "medical_post": 992,
+   "two_floor_compact": 808,
+   "living_sleeping_storage": 481
+  }
+ },
+ "hyperparameters": {
+  "extra_trees": {
+   "random_state": 0,
+   "grid": [
+    {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 3
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.5,
+     "min_samples_leaf": 2
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.5,
+     "min_samples_leaf": 3
+    }
+   ],
+   "chosen_per_target": {
+    "heating_energy_kwh": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "peak_heating_kw": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "passive_min_temperature_c": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "passive_median_temperature_c": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "unmet_hours_ref": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    }
+   }
+  },
+  "random_forest": {
+   "random_state": 0,
+   "grid": [
+    {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 3
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.5,
+     "min_samples_leaf": 2
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.5,
+     "min_samples_leaf": 3
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.33,
+     "min_samples_leaf": 2
+    },
+    {
+     "n_estimators": 100,
+     "max_features": 0.33,
+     "min_samples_leaf": 3
+    }
+   ],
+   "chosen_per_target": {
+    "heating_energy_kwh": {
+     "n_estimators": 100,
+     "max_features": 0.33,
+     "min_samples_leaf": 2
+    },
+    "peak_heating_kw": {
+     "n_estimators": 100,
+     "max_features": 0.33,
+     "min_samples_leaf": 2
+    },
+    "passive_min_temperature_c": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "passive_median_temperature_c": {
+     "n_estimators": 100,
+     "max_features": 1.0,
+     "min_samples_leaf": 2
+    },
+    "unmet_hours_ref": {
+     "n_estimators": 100,
+     "max_features": 0.5,
+     "min_samples_leaf": 3
+    }
+   }
+  },
+  "gbt_reference": {
+   "random_state": 0,
+   "grid": [
+    {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    }
+   ],
+   "chosen_per_target": {
+    "heating_energy_kwh": {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    },
+    "peak_heating_kw": {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    },
+    "passive_min_temperature_c": {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    },
+    "passive_median_temperature_c": {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    },
+    "unmet_hours_ref": {
+     "learning_rate": 0.06,
+     "max_iter": 300,
+     "max_leaf_nodes": 31,
+     "min_samples_leaf": 20,
+     "l2_regularization": 1.0,
+     "early_stopping": false
+    }
+   }
+  }
+ },
+ "metrics": {
+  "extra_trees": {
+   "heating_energy_kwh": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9792989379884948,
+     "mae": 28.317899583625614,
+     "label_std": 269.3638716978721
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9747826090547211,
+     "mae": 29.915288550231455,
+     "label_std": 277.54215279311023
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9716920474256089,
+     "mae": 26.494788105320584,
+     "label_std": 212.48496411177328
+    }
+   },
+   "peak_heating_kw": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9672043084239018,
+     "mae": 0.38940148090030713,
+     "label_std": 3.131742777015784
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9695549249159366,
+     "mae": 0.373489003348023,
+     "label_std": 3.1484089894541634
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9593511337699264,
+     "mae": 0.3867389354450052,
+     "label_std": 2.60217438171367
+    }
+   },
+   "passive_min_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9494094836005824,
+     "mae": 1.279679170349401,
+     "label_std": 7.465779755965766
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9511613455934652,
+     "mae": 1.2323842103489557,
+     "label_std": 7.3115381229221486
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9320214609358718,
+     "mae": 1.2500156253771368,
+     "label_std": 6.200090210787963
+    }
+   },
+   "passive_median_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9611747165546349,
+     "mae": 1.0403300759672303,
+     "label_std": 7.080413874575732
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9655537700919722,
+     "mae": 0.989904927284784,
+     "label_std": 7.061013424818967
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9501816428660971,
+     "mae": 1.0030451252543449,
+     "label_std": 5.901774605076339
+    }
+   },
+   "unmet_hours_ref": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9579412652682334,
+     "mae": 5.9810356130403965,
+     "label_std": 50.093070105762756
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9551774548397294,
+     "mae": 6.13183614782183,
+     "label_std": 50.685089992507955
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9446962117263334,
+     "mae": 6.272994206773618,
+     "label_std": 44.56631318589043
+    }
+   }
+  },
+  "random_forest": {
+   "heating_energy_kwh": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9749935561784798,
+     "mae": 30.55559867075912,
+     "label_std": 269.3638716978721
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9691739395703723,
+     "mae": 32.61234341190369,
+     "label_std": 277.54215279311023
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9677232756079647,
+     "mae": 28.597571179145596,
+     "label_std": 212.48496411177328
+    }
+   },
+   "peak_heating_kw": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9602481448618836,
+     "mae": 0.42653145047035107,
+     "label_std": 3.131742777015784
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9630264135698827,
+     "mae": 0.409296999817635,
+     "label_std": 3.1484089894541634
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9513303171887761,
+     "mae": 0.4200686123281293,
+     "label_std": 2.60217438171367
+    }
+   },
+   "passive_min_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9471424342824759,
+     "mae": 1.3086530250087152,
+     "label_std": 7.465779755965766
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9497605624380645,
+     "mae": 1.2394790903509267,
+     "label_std": 7.3115381229221486
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9256198475391422,
+     "mae": 1.3031074305694177,
+     "label_std": 6.200090210787963
+    }
+   },
+   "passive_median_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9578318655956212,
+     "mae": 1.0790774147807956,
+     "label_std": 7.080413874575732
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.962578404665309,
+     "mae": 1.0324134458808412,
+     "label_std": 7.061013424818967
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9432800198752945,
+     "mae": 1.0762080962694405,
+     "label_std": 5.901774605076339
+    }
+   },
+   "unmet_hours_ref": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9535764360647796,
+     "mae": 6.501748755727893,
+     "label_std": 50.093070105762756
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9483598404191761,
+     "mae": 6.784403871698336,
+     "label_std": 50.685089992507955
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9360783603602073,
+     "mae": 6.720872587276063,
+     "label_std": 44.56631318589043
+    }
+   }
+  },
+  "gbt_reference": {
+   "heating_energy_kwh": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9842778462959069,
+     "mae": 24.017900061564248,
+     "label_std": 269.3638716978721
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9838797088257027,
+     "mae": 23.86990289312894,
+     "label_std": 277.54215279311023
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9792755216681042,
+     "mae": 22.428259840826584,
+     "label_std": 212.48496411177328
+    }
+   },
+   "peak_heating_kw": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9799138033056118,
+     "mae": 0.2945948359440346,
+     "label_std": 3.131742777015784
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9815441003317888,
+     "mae": 0.2816042683954452,
+     "label_std": 3.1484089894541634
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9711691109281432,
+     "mae": 0.3138134537735166,
+     "label_std": 2.60217438171367
+    }
+   },
+   "passive_min_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9663542504688438,
+     "mae": 1.0444936715398663,
+     "label_std": 7.465779755965766
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.96915614114545,
+     "mae": 0.9942237322560512,
+     "label_std": 7.3115381229221486
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9483390200008227,
+     "mae": 1.0689652795151423,
+     "label_std": 6.200090210787963
+    }
+   },
+   "passive_median_temperature_c": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9795950282142919,
+     "mae": 0.7752156968972035,
+     "label_std": 7.080413874575732
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.983195646698945,
+     "mae": 0.7037187233483052,
+     "label_std": 7.061013424818967
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.9660222367467621,
+     "mae": 0.8099421317706448,
+     "label_std": 5.901774605076339
+    }
+   },
+   "unmet_hours_ref": {
+    "validation": {
+     "n": 1411,
+     "r2": 0.9605627052595578,
+     "mae": 6.030039112247288,
+     "label_std": 50.093070105762756
+    },
+    "test": {
+     "n": 1362,
+     "r2": 0.9576430185245159,
+     "mae": 6.2713432845061945,
+     "label_std": 50.685089992507955
+    },
+    "site_holdout_kargil": {
+     "n": 935,
+     "r2": 0.948209432087723,
+     "mae": 6.445956447530017,
+     "label_std": 44.56631318589043
+    }
+   }
+  }
+ },
+ "artifacts": {
+  "extra_trees__heating_energy_kwh.joblib": "d723332b5700658b0a7fba4479beaaa9739cd568c08a022e8675c9538620a738",
+  "extra_trees__peak_heating_kw.joblib": "55169632c9d5a7538411d89f12505745e208a30211d72689b761f833b1b85138",
+  "extra_trees__passive_min_temperature_c.joblib": "8e5b6f708af5347d9aa5d4eccb55d77ff309b25951177bdb2de99b39ba89da73",
+  "extra_trees__passive_median_temperature_c.joblib": "a5a668f0a262f690d91595288a5c08ad41e311c2a7433df9cc1b5db3130141cf",
+  "extra_trees__unmet_hours_ref.joblib": "ba4c31af2b723a804e06c385c6b594287433a556b6717e9850d36299ee29ad70",
+  "random_forest__heating_energy_kwh.joblib": "fb5d3357deb399fa88fa449cd38f9058acef4410916fbb7b3895de92ac794abf",
+  "random_forest__peak_heating_kw.joblib": "5ef8111f60ca2bf5bfbadf8c35ff9f52c39172f9fbe1b161ff4421d2e960772e",
+  "random_forest__passive_min_temperature_c.joblib": "29668df799f89b2a813cc21b80591a967219a1fa8d8501493bb8eedbf17d5777",
+  "random_forest__passive_median_temperature_c.joblib": "32138c694e05bf9101fafea1d79ed35712702e25b7c844003f4d19c5ba5dbe6e",
+  "random_forest__unmet_hours_ref.joblib": "3f2031815d68aa4aec921f1e0e47e6516b5187584a06972262a55fd8df926ec9",
+  "gbt_reference__heating_energy_kwh.joblib": "33d78ee8c3ff34a11401c562cf481314763317bccd53b3e757f12c8c3a1b4cbd",
+  "gbt_reference__peak_heating_kw.joblib": "eb52c2a868a0e29a047a2df08e685e67cc3aedad18c9365b5a24acc2cdf047d7",
+  "gbt_reference__passive_min_temperature_c.joblib": "a5ff040d22d183c8558ce195632ca7a4eeebfbfcef974a770a5fc5ff7a12c059",
+  "gbt_reference__passive_median_temperature_c.joblib": "63e5916c301a07100e626f932c441ed23c1c0c106c20ae4eb69dabf1dc9ed741",
+  "gbt_reference__unmet_hours_ref.joblib": "b0247a6855cd702ca5ac0bd07f31f55efcf184734b2e59adf8dd3eb8a24acab5"
+ }
+}
