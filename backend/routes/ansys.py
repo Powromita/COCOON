@@ -36,14 +36,29 @@ from .. import settings
 
 sys.path.insert(0, str(settings.ANSYS_PIPELINE_DIR))
 
-from cocoon_ansys.contracts_io import (                        # noqa: E402
-    BuildingModel, MaterialSnapshot, WeatherSnapshot)
-from cocoon_ansys.validation_package import create_package     # noqa: E402
-from cocoon_ansys.worker import (                              # noqa: E402
-    cancel as _cancel_job, latest_status, read_status, run_job)
-from cocoon_contracts import AnsysSolverConfig                 # noqa: E402
+# The M8 stack pulls in the RC engine and the M0 contracts. If any of that
+# can't be imported (e.g. an upstream module changed underneath it), the
+# ANSYS endpoints report 503 with the real reason instead of the import
+# error taking the whole API down at startup. IMPORT_ERROR is also surfaced
+# by /api/health so capability reporting stays truthful (PRD §16.1).
+try:
+    from cocoon_ansys.contracts_io import (
+        BuildingModel, MaterialSnapshot, WeatherSnapshot)
+    from cocoon_ansys.validation_package import create_package
+    from cocoon_ansys.worker import (
+        cancel as _cancel_job, latest_status, read_status, run_job)
+    from cocoon_contracts import AnsysSolverConfig
+    IMPORT_ERROR: str | None = None
+except Exception as _exc:                                       # noqa: BLE001
+    IMPORT_ERROR = f"{type(_exc).__name__}: {_exc}"
 
 router = APIRouter(prefix="/api/ansys", tags=["ansys"])
+
+
+def _require_available() -> None:
+    if IMPORT_ERROR is not None:
+        raise HTTPException(503, {"error": "ANSYS validation is unavailable on this server",
+                                  "status": "UNAVAILABLE", "error_reason": IMPORT_ERROR})
 _sem = threading.Semaphore(settings.MAX_ANSYS_WORKERS)
 
 DEFAULT_WEATHER = settings.ANSYS_CASES_DIR / "wx_leh_20260124T11_48h.json"
@@ -118,6 +133,7 @@ def get_case(name: str):
 
 @router.post("/jobs", status_code=201)
 def submit_job(body: SubmitBody):
+    _require_available()
     if body.case:
         if ".." in body.case or "/" in body.case or "\\" in body.case:
             raise HTTPException(422, f"invalid case name '{body.case}'")
@@ -156,6 +172,7 @@ def submit_job(body: SubmitBody):
 
 @router.get("/jobs")
 def list_jobs(limit: int = 50):
+    _require_available()
     limit = max(1, min(limit, 200))
     rows = sorted(settings.ANSYS_JOBS_DIR.glob("ans_*/status.json"),
                  key=lambda p: p.stat().st_mtime, reverse=True)[:limit]
@@ -164,20 +181,26 @@ def list_jobs(limit: int = 50):
 
 @router.get("/jobs/{job_id}")
 def job_status(job_id: str):
-    return JSONResponse(read_status(_job_dir(job_id)).model_dump(mode="json"))
+    jd = _job_dir(job_id)
+    _require_available()
+    return JSONResponse(read_status(jd).model_dump(mode="json"))
 
 
 @router.post("/jobs/{job_id}/cancel")
 def job_cancel(job_id: str):
+    jd = _job_dir(job_id)
+    _require_available()
     try:
-        return JSONResponse(_cancel_job(_job_dir(job_id)).model_dump(mode="json"))
+        return JSONResponse(_cancel_job(jd).model_dump(mode="json"))
     except RuntimeError as exc:
         raise HTTPException(409, str(exc))
 
 
 @router.get("/jobs/{job_id}/artifacts")
 def job_artifacts(job_id: str):
-    st = read_status(_job_dir(job_id))
+    jd = _job_dir(job_id)
+    _require_available()
+    st = read_status(jd)
     if st.status.value != "COMPLETED" or not st.artifacts:
         raise HTTPException(409, {"status": st.status.value, "error_reason": st.error_reason})
     base = f"/api/ansys/jobs/{job_id}/artifact/"
@@ -202,4 +225,5 @@ def job_artifact(job_id: str, path: str):
 def revision_latest(revision_id: str):
     """The latest job for a design revision, or NOT_REQUESTED (PRD §22.2) —
     never a substituted benchmark."""
+    _require_available()
     return latest_status(revision_id, settings.ANSYS_JOBS_DIR)

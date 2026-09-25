@@ -37,6 +37,30 @@ def test_health_reports_ansys_capability():
     body = r.json()
     assert "ansys" in body
     assert body["ansys"]["max_ansys_workers"] >= 1
+    assert isinstance(body["ansys"]["available"], bool)
+
+
+def test_api_survives_when_the_ansys_stack_cannot_import(monkeypatch):
+    """An upstream import failure must degrade ONLY the ANSYS endpoints (503
+    with the real reason, /api/health reports it) - never take the API down."""
+    import backend.routes.ansys as ansys_route
+    monkeypatch.setattr(ansys_route, "IMPORT_ERROR", "ImportError: simulated upstream break")
+
+    health = client.get("/api/health").json()
+    assert health["ok"] is True
+    assert health["ansys"]["available"] is False
+    assert "simulated upstream break" in health["ansys"]["unavailable_reason"]
+
+    r = client.post("/api/ansys/jobs", json={"case": "case_03_airlock_living"})
+    assert r.status_code == 503
+    assert r.json()["detail"]["status"] == "UNAVAILABLE"
+    assert "simulated upstream break" in r.json()["detail"]["error_reason"]
+    assert client.get("/api/ansys/revisions/rev_x/latest").status_code == 503
+    assert client.get("/api/ansys/jobs").status_code == 503
+
+    # things that never needed the M8 stack keep working, and unknown ids are still 404
+    assert client.get("/api/ansys/cases").status_code == 200
+    assert client.get("/api/ansys/jobs/not-a-real-job").status_code == 404
 
 
 def test_list_cases_includes_evidence_fixtures():

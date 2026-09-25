@@ -42,6 +42,8 @@ def health() -> dict:
         "pipeline": settings.PIPELINE_SCRIPT.exists(),
         "max_workers": settings.MAX_WORKERS,
         "ansys": {
+            "available": ansys.IMPORT_ERROR is None,
+            "unavailable_reason": ansys.IMPORT_ERROR,
             "jobs_dir": str(settings.ANSYS_JOBS_DIR),
             "max_ansys_workers": settings.MAX_ANSYS_WORKERS,
             "cases_available": settings.ANSYS_CASES_DIR.exists(),
