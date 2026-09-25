@@ -4,7 +4,6 @@ import SectionCard from "@/app/_components/SectionCard";
 import MockNote from "@/app/_components/MockNote";
 import { useResults } from "@/app/_components/ResultsProvider";
 import { artifactUrl } from "@/app/_lib/api";
-import { deriveWhy } from "@/app/_lib/simulation";
 import { useT } from "@/app/_lib/i18n";
 
 export default function RecommendationCard() {
@@ -14,27 +13,20 @@ export default function RecommendationCard() {
   if (!rec) return null;
   const c = rec.chosen;
 
-  // "Recommended" only when more than one design was actually ranked; a single
-  // evaluated design is labelled "Evaluated Design" and never called "best".
-  const evaluatedCount = rec.designs_evaluated ?? results.comparison?.length ?? 0;
-  const multiple = evaluatedCount > 1;
-  const why = deriveWhy(results);
-
   const reportHref =
     results.report_md_url && results.report_md_url !== "#mock-report"
       ? artifactUrl(results.run_id, "REPORT.md")
       : undefined;
 
   return (
-    <SectionCard title={multiple ? t("res.rec.title") : t("res.rec.titleSingle")} tag={t("res.rec.tag")}>
+    <SectionCard title={t("res.rec.title")} tag={t("res.rec.tag")}>
       {!isReal ? <MockNote className="mb-space-md" /> : null}
 
       <div className="grid gap-space-lg lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-space-sm">
           <div className="flex flex-wrap items-center gap-space-sm">
             <span className="rounded-full bg-primary px-space-sm py-space-2xs font-headline-sm text-on-primary">
-              {multiple ? t("res.rec.chosen") : t("res.rec.evaluated")} · #{rec.chosen_design_id}
-              {rec.rank != null && multiple ? ` · rank ${rec.rank}` : ""}
+              {t("res.rec.chosen")} · #{rec.chosen_design_id}
             </span>
             {rec.runner_up_id != null ? (
               <span className="rounded-full bg-surface-container px-space-sm py-space-2xs font-mono-metric-sm text-on-surface-variant">
@@ -86,34 +78,7 @@ export default function RecommendationCard() {
             <span className="font-label-caps uppercase tracking-wider text-outline">
               {t("res.rec.justification")}
             </span>
-            <p className="mt-space-xs font-body-md leading-relaxed text-on-surface">
-              {rec.justification || t("common.notAvailable")}
-            </p>
-            {why.length ? (
-              <ul className="mt-space-sm space-y-space-2xs">
-                {why.map((line) => (
-                  <li key={line} className="flex gap-space-2xs font-body-sm text-on-surface-variant">
-                    <span aria-hidden className="text-tertiary-container">✓</span>
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            {rec.improvement_suggestions?.length ? (
-              <div className="mt-space-sm">
-                <span className="font-label-caps uppercase tracking-wider text-outline">
-                  {t("res.rec.improve")}
-                </span>
-                <ul className="mt-space-2xs space-y-space-2xs">
-                  {rec.improvement_suggestions.map((line) => (
-                    <li key={line} className="flex gap-space-2xs font-body-sm text-on-surface-variant">
-                      <span aria-hidden className="text-secondary">→</span>
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+            <p className="mt-space-xs font-body-md leading-relaxed text-on-surface">{rec.justification}</p>
           </div>
           <a
             href={reportHref ?? "#"}

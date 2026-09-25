@@ -30,12 +30,8 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "thermal-calculator"))
 from weather import clean_weather_data                     # noqa: E402
 
-ARCHIVE_XLSX = (ROOT / "data" / "weather" / "leh_weather_merged.xlsx"
-                if (ROOT / "data" / "weather" / "leh_weather_merged.xlsx").exists()
-                else ROOT / "leh_weather_merged.xlsx")
-ARCHIVE_CACHE = (ROOT / "data" / "weather" / "leh_weather_archive.csv"
-                 if (ROOT / "data" / "weather" / "leh_weather_archive.csv").exists()
-                 else ROOT / "leh_weather_archive.csv")
+ARCHIVE_XLSX = ROOT / "leh_weather_merged.xlsx"
+ARCHIVE_CACHE = ROOT / "leh_weather_archive.csv"
 
 # xlsx column -> engine column
 _RENAME = {

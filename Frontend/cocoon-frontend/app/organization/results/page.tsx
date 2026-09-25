@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import SiteHeader from "@/app/_components/SiteHeader";
 import ResolvedConfigStrip from "@/app/_components/ResolvedConfigStrip";
 import SolarEnergyPanel from "@/app/_components/SolarEnergyPanel";
@@ -13,12 +12,12 @@ import LogisticsPanel from "@/app/_components/LogisticsPanel";
 import { ResultsProvider, useResults } from "@/app/_components/ResultsProvider";
 import RunProgress from "@/app/_components/RunProgress";
 import TemperatureChart from "@/app/_components/TemperatureChart";
-import { downloadReport } from "@/app/_lib/generateReport";
+import { artifactUrl } from "@/app/_lib/api";
 import { useT } from "@/app/_lib/i18n";
 
 export default function OrganizationResultsPage() {
   return (
-    <ResultsProvider demoMode="optimize">
+    <ResultsProvider>
       <OrganizationResultsBody />
     </ResultsProvider>
   );
@@ -26,17 +25,7 @@ export default function OrganizationResultsPage() {
 
 function OrganizationResultsBody() {
   const t = useT();
-  const { results, isReal, phase } = useResults();
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = () => {
-    setDownloading(true);
-    try {
-      downloadReport(results);
-    } finally {
-      setTimeout(() => setDownloading(false), 1500);
-    }
-  };
+  const { results, isReal } = useResults();
   const temp = results.features.temperature;
   const cfg = results.config_echo;
   const ansys = results.ansys;
@@ -55,6 +44,13 @@ function OrganizationResultsBody() {
     },
   ];
 
+  const artifact = (name: string) =>
+    results.run_id && !results.run_id.startsWith("mock")
+      ? artifactUrl(results.run_id, name)
+      : undefined;
+
+  const csvHref = artifact(isOptimize ? "optimization_results.csv" : "features/single/temperature.csv");
+  const reportHref = artifact("REPORT.md");
 
   return (
     <main className="min-h-screen bg-surface text-on-surface antialiased">
@@ -62,7 +58,7 @@ function OrganizationResultsBody() {
 
       <main className="w-full flex-1 bg-surface pt-16">
         <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-8">
-          <RunProgress mode="optimize" />
+          <RunProgress />
 
           <div className="flex flex-col justify-between gap-space-lg pb-space-xs lg:flex-row lg:items-end">
             <div className="min-w-0 space-y-space-2xs">
@@ -80,30 +76,38 @@ function OrganizationResultsBody() {
             </div>
 
             <div className="flex flex-wrap items-center gap-space-sm">
-              <div className="inline-flex items-center gap-space-xs rounded-lg bg-surface-container px-space-sm py-1.5 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                <span className="font-body-sm font-semibold text-on-surface">{t("ores.physRC")}</span>
+              <div className="inline-flex rounded-lg bg-surface-container p-1 shadow-sm">
+                <button type="button" className="rounded bg-primary px-space-sm py-1.5 font-body-sm font-semibold text-on-primary shadow-sm">
+                  {t("ores.physRC")}
+                </button>
+                <button type="button" disabled title={t("ires.mlDisabled")} className="cursor-not-allowed rounded px-space-sm py-1.5 font-body-sm font-medium text-outline-variant">
+                  {t("ores.mlSurrogate")}
+                </button>
                 {ansys?.ran ? (
-                  <span className="ml-space-2xs rounded bg-tertiary-container/15 px-space-xs py-space-2xs font-mono-metric-sm text-tertiary-container">
+                  <button type="button" className="rounded px-space-sm py-1.5 font-body-sm font-medium text-on-surface-variant">
                     {t("ores.ansysVal")}
-                  </span>
+                  </button>
                 ) : null}
               </div>
               <div className="flex items-center gap-space-xs">
-                <button
-                  type="button"
-                  onClick={handleDownload}
-                  disabled={downloading || phase === "submitting" || phase === "running"}
-                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm transition-all duration-200 ${
-                    downloading
-                      ? "bg-tertiary-container text-on-tertiary-container cursor-wait"
-                      : phase === "submitting" || phase === "running"
-                      ? "pointer-events-none bg-surface-container-high text-on-surface-variant"
-                      : "bg-primary text-on-primary hover:bg-primary-container active:scale-95"
+                <a
+                  href={csvHref ?? "#"}
+                  aria-disabled={!csvHref}
+                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm ${
+                    csvHref ? "bg-surface-container-lowest text-on-surface hover:bg-surface-container" : "pointer-events-none bg-surface-container text-on-surface-variant"
                   }`}
                 >
-                  {downloading ? "⏳ Generating…" : `⬇ ${t("res.exportReport")}`}
-                </button>
+                  {t("res.exportCsv")}
+                </a>
+                <a
+                  href={reportHref ?? "#"}
+                  aria-disabled={!reportHref}
+                  className={`rounded px-space-sm py-2 font-body-sm font-medium shadow-sm ${
+                    reportHref ? "bg-primary text-on-primary hover:bg-primary-container" : "pointer-events-none bg-surface-container-high text-on-surface-variant"
+                  }`}
+                >
+                  {t("res.exportReport")}
+                </a>
               </div>
             </div>
           </div>

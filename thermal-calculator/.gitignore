@@ -27,6 +27,3 @@ results/*.jpeg
 
 # Environment variables
 .env
-cache/
-
-cache/

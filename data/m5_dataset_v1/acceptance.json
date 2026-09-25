@@ -1,0 +1,133 @@
+{
+ "requests_run": 40,
+ "requests_used": 30,
+ "requests_skipped": [
+  {
+   "index": 1,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 5,
+   "why": "too_few_designs"
+  },
+  {
+   "index": 8,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 12,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 18,
+   "why": "too_few_labelled"
+  },
+  {
+   "index": 20,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 26,
+   "why": "too_few_labelled"
+  },
+  {
+   "index": 29,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 30,
+   "why": "request_refused: InfeasibleRequirementsError"
+  },
+  {
+   "index": 39,
+   "why": "too_few_labelled"
+  }
+ ],
+ "designs": 1500,
+ "settings": {
+  "margin 0.05, no cap": {
+   "kept_share_mean": 0.65,
+   "dropped_share_mean": 0.35,
+   "front_recall_mean": 0.987251461988304,
+   "front_recall_worst_request": 0.6842105263157895,
+   "top10_recall_mean": 0.97,
+   "top10_recall_worst_request": 0.8,
+   "best_design_kept_share": 1.0,
+   "energy_regret_pct_mean": 0.0,
+   "energy_regret_pct_worst": 0.0,
+   "m4_time_saved_pct_mean": 35.240275712951345,
+   "front_size_mean": 13.766666666666667
+  },
+  "margin 0.10, no cap": {
+   "kept_share_mean": 0.8066666666666666,
+   "dropped_share_mean": 0.19333333333333336,
+   "front_recall_mean": 1.0,
+   "front_recall_worst_request": 1.0,
+   "top10_recall_mean": 1.0,
+   "top10_recall_worst_request": 1.0,
+   "best_design_kept_share": 1.0,
+   "energy_regret_pct_mean": 0.0,
+   "energy_regret_pct_worst": 0.0,
+   "m4_time_saved_pct_mean": 19.165272865836034,
+   "front_size_mean": 13.766666666666667
+  },
+  "margin 0.20, no cap": {
+   "kept_share_mean": 0.9326666666666666,
+   "dropped_share_mean": 0.06733333333333336,
+   "front_recall_mean": 1.0,
+   "front_recall_worst_request": 1.0,
+   "top10_recall_mean": 1.0,
+   "top10_recall_worst_request": 1.0,
+   "best_design_kept_share": 1.0,
+   "energy_regret_pct_mean": 0.0,
+   "energy_regret_pct_worst": 0.0,
+   "m4_time_saved_pct_mean": 6.970761967976578,
+   "front_size_mean": 13.766666666666667
+  },
+  "margin 0.10, cap 20": {
+   "kept_share_mean": 0.4,
+   "dropped_share_mean": 0.6,
+   "front_recall_mean": 0.8863474247916973,
+   "front_recall_worst_request": 0.5789473684210527,
+   "top10_recall_mean": 0.85,
+   "top10_recall_worst_request": 0.7,
+   "best_design_kept_share": 0.9666666666666667,
+   "energy_regret_pct_mean": 0.0217218115305733,
+   "energy_regret_pct_worst": 0.6299325343866258,
+   "m4_time_saved_pct_mean": 60.24588571320969,
+   "front_size_mean": 13.766666666666667
+  }
+ },
+ "prediction_accuracy_on_fresh_designs": {
+  "heating_energy_kwh": {
+   "n": 1500,
+   "mae": 27.060780208718477,
+   "r2": 0.9769944919736728,
+   "coverage": 0.852
+  },
+  "peak_heating_kw": {
+   "n": 1500,
+   "mae": 0.2520528714705146,
+   "r2": 0.9856426051341551,
+   "coverage": 0.858
+  },
+  "passive_min_temperature_c": {
+   "n": 1500,
+   "mae": 0.8383358524598311,
+   "r2": 0.9715576799908929,
+   "coverage": 0.866
+  },
+  "passive_median_temperature_c": {
+   "n": 1500,
+   "mae": 0.8124164226003695,
+   "r2": 0.9702975345886081,
+   "coverage": 0.8253333333333334
+  }
+ },
+ "prediction_status_counts": {
+  "ok": 1500
+ },
+ "m4_seconds_per_design": 0.24850665283203124,
+ "m5_seconds_per_design": 0.02180847724278768,
+ "unseen_groups": 56
+}

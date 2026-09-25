@@ -62,20 +62,6 @@ COMFORT_BAND_C = (15.0, 24.0)
 COLD_LIMIT_C = 15.0
 HEAT_LIMIT_C = 28.0
 
-
-def set_comfort(target_C=None, band_lo_C=None, band_hi_C=None):
-    """Override the module comfort model (used by the pipeline to honour a
-    per-run comfort target). ``comfort_score`` and everything downstream
-    read these module globals."""
-    global COMFORT_TARGET_C, COMFORT_BAND_C, COLD_LIMIT_C, HEAT_LIMIT_C
-    if target_C is not None:
-        COMFORT_TARGET_C = float(target_C)
-    lo = COMFORT_BAND_C[0] if band_lo_C is None else float(band_lo_C)
-    hi = COMFORT_BAND_C[1] if band_hi_C is None else float(band_hi_C)
-    COMFORT_BAND_C = (lo, hi)
-    COLD_LIMIT_C = lo
-    HEAT_LIMIT_C = hi + 4.0
-
 _SCORE_WEIGHTS = {
     "median_gap": 3.0,
     "swing": 1.5,
@@ -132,25 +118,17 @@ class DesignRanker:
     """Evaluate and rank a pool of shelter designs by comfort score."""
 
     def __init__(self, weather, target_hours=None, ground_mean_C=None,
-                 ground_mode="manual", scenario_overrides=None):
+                 ground_mode="manual"):
         """``weather`` is a DataFrame or a CSV path. ``target_hours`` only
         tiles/truncates when set (the pipeline passes a ready window and
         leaves it None). ``ground_mode`` / ``ground_mean_C`` are threaded
-        into every design's config.
-
-        ``scenario_overrides`` (optional dict) is applied uniformly to
-        every candidate -- e.g. ``internal_heat_gain_W``,
-        ``air_changes_per_hour``, ``initial_temperature_C`` when the user
-        wants the pool ranked for *their* occupancy / ventilation rather
-        than the bare shell. Uniform, so the comparison still isolates the
-        envelope."""
+        into every design's config."""
 
         self.materials = get_materials()
         with open(_GLAZING_PATH, encoding="utf-8") as fh:
             self.glazing = json.load(fh)
         self.ground_mean_C = ground_mean_C
         self.ground_mode = ground_mode
-        self.scenario_overrides = scenario_overrides or {}
 
         if isinstance(weather, pd.DataFrame):
             self.weather_df = weather.reset_index(drop=True)
@@ -228,8 +206,7 @@ class DesignRanker:
         return _sc.from_design(design, self.glazing,
                                ground_mode=self.ground_mode,
                                ground_C=(0.0 if self.ground_mean_C is None
-                                         else self.ground_mean_C),
-                               overrides=(self.scenario_overrides or None))
+                                         else self.ground_mean_C))
 
     def evaluate_design(self, design):
         try:

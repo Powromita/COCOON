@@ -2,8 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useResults } from "@/app/_components/ResultsProvider";
-import { deriveTimestamps } from "@/app/_lib/simulation";
-import { fmtClock, fmtTimestamp } from "@/app/_lib/format";
 import { useT } from "@/app/_lib/i18n";
 
 /**
@@ -18,16 +16,7 @@ export default function TemperatureChart() {
   const c = results.comfort;
 
   const n = s.t_hours.length;
-  const timestamps = deriveTimestamps(results);
-  const tz = results.location?.timezone;
   const [cursor, setCursor] = useState(Math.floor(n * 0.375));
-
-  /** X label for hour index `i` — wall-clock when the response carries it. */
-  const xLabel = (i: number) =>
-    timestamps && timestamps[i]
-      ? fmtClock(timestamps[i], tz)
-      : `T+${s.t_hours[i]}h`;
-  const inBand = (v: number) => v >= c.band_lo_C && v <= c.band_hi_C;
 
   const { path, geom, yTicks, xTicks } = useMemo(() => {
     const all = [...s.indoor_C, ...s.outdoor_C, c.band_hi_C, c.band_lo_C];
@@ -44,12 +33,10 @@ export default function TemperatureChart() {
     for (let v = lo; v <= hi; v += Math.max(5, Math.round((hi - lo) / 5 / 5) * 5)) yTickVals.push(v);
 
     const totalH = s.t_hours[n - 1] - s.t_hours[0];
-    const step = totalH <= 48 ? 12 : totalH <= 96 ? 24 : totalH <= 192 ? 48 : 72;
-    const xTickVals: { i: number; frac: number }[] = [];
-    for (let h = s.t_hours[0]; h <= s.t_hours[n - 1]; h += step) {
-      const i = h - s.t_hours[0];
-      xTickVals.push({ i, frac: (h - s.t_hours[0]) / (totalH || 1) });
-    }
+    const step = totalH <= 48 ? 12 : totalH <= 96 ? 24 : 48;
+    const xTickVals: { h: number; frac: number }[] = [];
+    for (let h = s.t_hours[0]; h <= s.t_hours[n - 1]; h += step)
+      xTickVals.push({ h, frac: (h - s.t_hours[0]) / (totalH || 1) });
 
     return {
       geom: { W, H, x, y, lo, hi },
@@ -71,19 +58,14 @@ export default function TemperatureChart() {
             {n} h · 1 h step
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-space-md rounded bg-surface-container px-space-md py-space-xs shadow-sm">
-          <span className="font-mono-metric-md font-semibold text-on-surface">
-            {timestamps && timestamps[cursor] ? fmtTimestamp(timestamps[cursor], tz) : `T+${s.t_hours[cursor]}h`}
-          </span>
+        <div className="flex items-center gap-space-md rounded bg-surface-container px-space-md py-space-xs shadow-sm">
+          <span className="font-mono-metric-md font-semibold text-on-surface">T+{s.t_hours[cursor]}h</span>
           <span className="text-outline-variant">|</span>
           <span className="flex items-center gap-space-2xs">
             <span className="h-2 w-2 rounded-full bg-secondary-container" />
             <span className="font-label-caps uppercase text-on-surface-variant">{t("ires.indoor")}</span>
             <span className="font-mono-metric-md font-semibold text-secondary">
               {s.indoor_C[cursor].toFixed(1)}°C
-            </span>
-            <span className="font-mono-metric-sm text-on-surface-variant">
-              {inBand(s.indoor_C[cursor]) ? "· in band" : s.indoor_C[cursor] < c.band_lo_C ? "· below band" : "· above band"}
             </span>
           </span>
           <span className="text-outline-variant">|</span>
@@ -119,8 +101,8 @@ export default function TemperatureChart() {
           ))}
           <line x1={0} x2={geom.W} y1={geom.y(0)} y2={geom.y(0)} stroke="#c0392b" strokeOpacity="0.5" vectorEffect="non-scaling-stroke" />
           {xTicks.map((tk) => (
-            <text key={tk.i} x={tk.frac * geom.W} y={geom.H + 18} textAnchor="middle" fontSize="10" fill="#757682" fontFamily="JetBrains Mono">
-              {xLabel(tk.i)}
+            <text key={tk.h} x={tk.frac * geom.W} y={geom.H + 18} textAnchor="middle" fontSize="10" fill="#757682" fontFamily="JetBrains Mono">
+              T+{tk.h}h
             </text>
           ))}
           <path d={path.outdoor} fill="none" stroke="#1e3a8a" strokeWidth="2" vectorEffect="non-scaling-stroke" />

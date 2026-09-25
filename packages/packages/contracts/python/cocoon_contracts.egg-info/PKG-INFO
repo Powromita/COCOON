@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: cocoon-contracts
+Version: 4.0.0
+Summary: Shared data contracts, validation rules, and schemas for the COCOON thermal shelter platform
+Author: ByteFiesta Team
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic>=2.6.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: jsonschema>=4.20.0; extra == "dev"
+
+# cocoon-contracts
+
+Authoritative data contracts, validation rules, and schemas for the COCOON thermal shelter platform.
+Built with Python 3.10+ and Pydantic v2.

@@ -64,25 +64,10 @@ _MAX_WINDOWS = 8
 class ScenarioGenerator:
     """Buildable random-shelter-design factory."""
 
-    def __init__(self, csv_ratios_path, csv_elements_path, seed=None, fixed=None):
-        """``fixed`` (optional) pins the box and the openings so the pool
-        only varies the envelope the pipeline is asked to design:
-
-            {"geometry": {"length_m", "width_m", "height_m"},
-             "window":   {"count", "width_m", "height_m"},   # width/height optional
-             "door":     {"count"}}                          # optional
-
-        With ``fixed`` set, geometry is taken verbatim (the aspect / A/V /
-        height / floor-area bounds are not enforced) and the window count
-        is used as given instead of being derived from a WWR target. The
-        wall / roof / floor materials + thicknesses, the insulation, and
-        the glazing type are still sampled -- that is the design work the
-        pipeline does."""
-
+    def __init__(self, csv_ratios_path, csv_elements_path, seed=None):
         self.ratios_df = pd.read_csv(csv_ratios_path)
         self.elements_df = pd.read_csv(csv_elements_path)
         self.rng = np.random.default_rng(seed)
-        self.fixed = fixed or None
 
         self.constraints = self._parse_constraints()
         self.materials = self._parse_materials()
@@ -204,15 +189,6 @@ class ScenarioGenerator:
     # ---------------------------------------------------------------
 
     def _random_geometry(self):
-        if self.fixed and self.fixed.get("geometry"):
-            g = self.fixed["geometry"]
-            L = float(g["length_m"])
-            W = float(g["width_m"])
-            H = float(g["height_m"])
-            aspect = L / W
-            av = self._envelope_area(L, W, H) / (L * W * H)
-            return L, W, H, aspect, av, L * W
-
         for _ in range(_MAX_GEOMETRY_TRIES):
             L = float(self.rng.uniform(*_L_RANGE))
             W = float(self.rng.uniform(*_W_RANGE))
@@ -296,33 +272,22 @@ class ScenarioGenerator:
         floor = self._compose_assembly("floor")
 
         win = self._pick_glazing()
-        fixed_win = (self.fixed or {}).get("window") or {}
-        win_w = float(fixed_win.get("width_m") or win["width_m"])
-        win_h = float(fixed_win.get("height_m") or win["height_m"])
-        win = {**win, "width_m": win_w, "height_m": win_h}
-        per_window = win_w * win_h
+        per_window = win["width_m"] * win["height_m"]
 
-        if fixed_win.get("count") is not None:
-            # user pinned the opening count -- honour it exactly
-            count = max(0, int(round(fixed_win["count"])))
-            window_area = count * per_window
-            wwr_ok, wwr = self._check_wwr(window_area, gross_wall_area)
-            wwr_ok = True
-        else:
-            target_wwr = float(
-                self.rng.uniform(
-                    self.constraints["Window-to-Wall Ratio (WWR)"]["min"],
-                    self.constraints["Window-to-Wall Ratio (WWR)"]["max"],
-                )
+        target_wwr = float(
+            self.rng.uniform(
+                self.constraints["Window-to-Wall Ratio (WWR)"]["min"],
+                self.constraints["Window-to-Wall Ratio (WWR)"]["max"],
             )
-            count = max(
-                1,
-                min(_MAX_WINDOWS, int(round(gross_wall_area * target_wwr / 100 / per_window))),
-            )
-            window_area = count * per_window
-            wwr_ok, wwr = self._check_wwr(window_area, gross_wall_area)
+        )
+        count = max(
+            1,
+            min(_MAX_WINDOWS, int(round(gross_wall_area * target_wwr / 100 / per_window))),
+        )
+        window_area = count * per_window
+        wwr_ok, wwr = self._check_wwr(window_area, gross_wall_area)
 
-        if not wwr_ok and not fixed_win.get("count"):
+        if not wwr_ok:
             lo = self.constraints["Window-to-Wall Ratio (WWR)"]["min"]
             hi = self.constraints["Window-to-Wall Ratio (WWR)"]["max"]
             lo_n = max(1, int(np.ceil(gross_wall_area * lo / 100 / per_window)))
@@ -361,12 +326,7 @@ class ScenarioGenerator:
                 "height_m": win["height_m"],
                 "area_m2": round(window_area, 3),
             },
-            "doors": {
-                "type": door["type"],
-                "count": (int((self.fixed or {}).get("door", {}).get("count"))
-                          if (self.fixed or {}).get("door", {}).get("count") is not None
-                          else int(self.rng.integers(1, 3))),
-            },
+            "doors": {"type": door["type"], "count": int(self.rng.integers(1, 3))},
             "aspect_ratio": round(aspect, 3),
             "av_ratio": round(av, 3),
             "floor_area_m2": round(floor_area, 1),

@@ -95,7 +95,6 @@ def run_validation(run_dir, ids=None, hours=24, fast=True,
 
     materials = get_materials()
     rows = []
-    series_rows = []
     for design_id in ids:
         # ANSYS has no infiltration term -> compare both sides at ACH 0
         cfg = _sc.from_design(pool[design_id], ground_mode="annual_mean",
@@ -114,13 +113,6 @@ def run_validation(run_dir, ids=None, hours=24, fast=True,
         hourly, _ = _simulate(cfg, weather_df, materials, ground_mean_C=gmean)
         tr = hourly["indoor_temperature_C"].to_numpy(float)
 
-        n = min(len(tr), len(ta))
-        series_rows.append({
-            "design_id": design_id,
-            "rc_C": [round(float(x), 2) for x in tr[:n]],
-            "ansys_C": [round(float(x), 2) for x in ta[:n]],
-        })
-
         mae, rmse, r2 = _metrics(tr, ta)
         rows.append({
             "design_id": design_id,
@@ -137,20 +129,6 @@ def run_validation(run_dir, ids=None, hours=24, fast=True,
     res["RC_rank"] = res["RC_Tmean_C"].rank(ascending=False).astype(int)
     res["ANSYS_rank"] = res["ANSYS_Tmean_C"].rank(ascending=False).astype(int)
     res.to_csv(run_dir / "ansys_validation_summary.csv", index=False)
-
-    # per-hour RC vs FEM series, for the results-page overlay chart
-    n_series = min((len(s["rc_C"]) for s in series_rows), default=0)
-    out_T = weather_df["temperature_C"].to_numpy(float)[:n_series]
-    (run_dir / "ansys_validation_series.json").write_text(json.dumps({
-        "t_hours": list(range(n_series)),
-        "outdoor_C": [round(float(x), 2) for x in out_T],
-        "designs": [
-            {"design_id": s["design_id"],
-             "rc_C": s["rc_C"][:n_series],
-             "ansys_C": s["ansys_C"][:n_series]}
-            for s in series_rows
-        ],
-    }, indent=2), encoding="utf-8")
 
     agree = bool((res["RC_rank"] == res["ANSYS_rank"]).all())
     spread = float((res["ANSYS_Tmean_C"] - res["RC_Tmean_C"]).mean())

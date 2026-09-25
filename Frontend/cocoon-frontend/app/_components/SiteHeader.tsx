@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LanguageSwitcher from "@/app/_components/LanguageSwitcher";
 import { useT } from "@/app/_lib/i18n";
+import { createClient } from "@/utils/supabase/client";
 
 type Mode = "Individual" | "Organization";
 type NavKey = "home" | "configure" | "results";
@@ -21,7 +24,21 @@ const NAV_ITEM_ACTIVE = "rounded bg-surface-container-high px-space-md py-space-
  */
 export default function SiteHeader({ mode, active }: { mode: Mode; active: NavKey }) {
   const t = useT();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
   const base = mode === "Organization" ? "/organization" : "/individual";
+
+  // "Switch Mode" also ends the session — you pick a mode by logging in, so
+  // returning to the picker means signing out of the current one first.
+  const handleSwitchMode = async () => {
+    setSigningOut(true);
+    try {
+      await createClient().auth.signOut();
+    } finally {
+      router.push("/");
+      router.refresh();
+    }
+  };
   const items: { key: NavKey; label: string; href: string }[] = [
     { key: "home", label: t("nav.home"), href: "/" },
     { key: "configure", label: t("nav.configure"), href: `${base}/configure` },
@@ -61,9 +78,14 @@ export default function SiteHeader({ mode, active }: { mode: Mode; active: NavKe
             <span className="h-2 w-2 rounded-full bg-primary" />
             <span className="font-mono-metric-sm font-medium text-on-surface">{t(`hdr.mode.${mode}`)}</span>
             <span className="text-outline-variant">|</span>
-            <Link href="/" className="font-mono-metric-sm text-primary transition-colors hover:underline">
-              {t("hdr.switchMode")}
-            </Link>
+            <button
+              type="button"
+              onClick={handleSwitchMode}
+              disabled={signingOut}
+              className="font-mono-metric-sm text-primary transition-colors hover:underline disabled:opacity-60"
+            >
+              {signingOut ? "…" : t("hdr.switchMode")}
+            </button>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-on-primary">
             <span className="text-[18px]">◔</span>

@@ -19,6 +19,7 @@ import { MOCK_REFERENCE } from "./fixtures";
 import type {
   GlazingType,
   Layer,
+  MaterialId,
   OptimizeSpec,
   RunRequest,
   Season,
@@ -114,9 +115,6 @@ export function buildRunRequest(
   const window = {
     season: str(fd, "site.season", "winter") as Season,
     typical_hours: num(fd, "site.typical_hours", mode === "single" ? 72 : 168),
-    // AnalysisWindow.worst_hours is required by the backend schema, but only the
-    // ANSYS validation + worst-case reliability re-rank read it. Forms that omit
-    // the input (the household optimize flow) fall back to this default.
     worst_hours: num(fd, "site.worst_hours", 48),
   };
   const comfort = {
@@ -129,47 +127,28 @@ export function buildRunRequest(
     return { mode: "single", config: buildShelterConfig(fd), window, comfort };
   }
 
-  // optimize: the user pins the box + openings, the pipeline designs the
-  // envelope. `opt.spec` carries only the run params (designs/seed/trials/
-  // ansys); geometry + window/door counts come from the form fields.
-  let runParams: Partial<OptimizeSpec> = {};
+  let spec: OptimizeSpec | undefined;
   try {
     const raw = fd.get("opt.spec");
-    if (typeof raw === "string") runParams = JSON.parse(raw) as Partial<OptimizeSpec>;
+    spec = typeof raw === "string" ? (JSON.parse(raw) as OptimizeSpec) : undefined;
   } catch {
-    runParams = {};
+    spec = undefined;
   }
 
-  const winCount = Math.max(0, Math.round(num(fd, "win.count", 2)));
-
-  // scenario fields are only present on the household (Individual) form
-  const scenario: Partial<OptimizeSpec> = {};
-  if (fd.get("gain.internal_W") != null)
-    scenario.internal_heat_gain_W = Math.max(0, num(fd, "gain.internal_W", 0));
-  if (fd.get("env.ach") != null)
-    scenario.air_changes_per_hour = num(fd, "env.ach", 0.7);
-  if (fd.get("gain.initial_C") != null)
-    scenario.initial_temperature_C = num(fd, "gain.initial_C", 15);
-
-  const optimize: OptimizeSpec = {
-    designs: runParams.designs ?? 50,
-    seed: runParams.seed ?? 0,
-    trials: runParams.trials ?? 400,
-    geometry: {
-      length_m: num(fd, "geom.length_m", 6),
-      width_m: num(fd, "geom.width_m", 4),
-      height_m: num(fd, "geom.height_m", 2.8),
+  return {
+    mode: "optimize",
+    base_config: buildShelterConfig(fd),
+    window,
+    comfort,
+    optimize: spec ?? {
+      designs: 50,
+      seed: 0,
+      trials: 400,
+      constraints: MOCK_REFERENCE.ratio_constraints,
+      allowed_materials: MOCK_REFERENCE.materials.map((m) => m.id) as MaterialId[],
+      run_ansys: false,
+      ansys_hours: 24,
+      ansys_designs: 2,
     },
-    window_count: winCount,
-    window_width_m: num(fd, "win.width_m", 1.2),
-    window_height_m: num(fd, "win.height_m", 1.4),
-    door_count: Math.max(0, Math.round(num(fd, "door.count", 1))),
-    ...scenario,
-    allowed_materials: runParams.allowed_materials,
-    run_ansys: runParams.run_ansys ?? false,
-    ansys_hours: runParams.ansys_hours ?? 24,
-    ansys_designs: runParams.ansys_designs ?? 2,
   };
-
-  return { mode: "optimize", window, comfort, optimize };
 }

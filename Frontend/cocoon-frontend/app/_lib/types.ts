@@ -95,27 +95,12 @@ export interface RatioConstraint {
   max: number;
 }
 
-/**
- * The optimize flow. The user pins the box and the openings; the pipeline
- * designs everything else — wall/roof/floor materials + thicknesses,
- * insulation, and glazing type — and returns the best combination.
- */
 export interface OptimizeSpec {
   designs: number;
   seed: number;
   trials: number;
-  /** fixed envelope the user provides */
-  geometry: Geometry;
-  window_count: number;
-  window_width_m: number;
-  window_height_m: number;
-  door_count: number;
-  /** optional scenario applied uniformly to every candidate */
-  internal_heat_gain_W?: number;
-  air_changes_per_hour?: number;
-  initial_temperature_C?: number;
-  /** optional sourcing filter; omit / all = search the full palette */
-  allowed_materials?: MaterialId[];
+  constraints: RatioConstraint[];
+  allowed_materials: MaterialId[];
   run_ansys: boolean;
   ansys_hours: number;
   ansys_designs: number;
@@ -165,13 +150,6 @@ export interface ResolvedProperties {
   C_total_MJ_per_K: number;
   infiltration_UA_W_K: number;
   envelope_mass_t: number;
-  /** BACKEND: emit — the glazing conductance (config carries windows.U_W_m2K).
-   * Until the pipeline forwards it the envelope panel shows "Not available". */
-  U_window_W_m2K?: number;
-  /** BACKEND: emit — total opaque + glazed envelope area (m²). */
-  envelope_area_m2?: number;
-  /** BACKEND: emit — window-to-wall ratio (%). */
-  window_to_wall_ratio_pct?: number;
 }
 
 /** DRDO Output 1 */
@@ -184,20 +162,8 @@ export interface TemperatureResult {
   T_final_C: number;
   outdoor_min_C: number;
   outdoor_max_C: number;
-  /** hourly series for the chart. `t_hours` is a 0-based hour index; real
-   * wall-clock timestamps arrive in `timestamps` once the backend forwards
-   * them (they exist in features/<id>/temperature.csv but are dropped today). */
-  series: {
-    t_hours: number[];
-    indoor_C: number[];
-    outdoor_C: number[];
-    /** BACKEND: emit — ISO-8601 timestamp per hour, aligned to the arrays above. */
-    timestamps?: string[];
-    /** BACKEND: emit — ground / earth-skin temperature per hour (°C). */
-    ground_C?: number[];
-    /** BACKEND: emit — horizontal solar irradiance per hour (W/m²). */
-    solar_radiation_W_m2?: number[];
-  };
+  /** hourly series for the chart */
+  series: { t_hours: number[]; indoor_C: number[]; outdoor_C: number[] };
 }
 
 /** DRDO Output 2 */
@@ -288,10 +254,6 @@ export interface RankedDesign {
   geometry_label: string; // "6.6×3.69×2.86"
   av_ratio: number;
   wwr_percent: number;
-  /** the material combination this candidate uses (pipeline's choice) */
-  walls_label?: string; // "puf (90 mm) + stone_masonry (400 mm)"
-  roof_label?: string;
-  floor_label?: string;
   T_min_C: number;
   T_max_C: number;
   swing_C: number;
@@ -323,18 +285,6 @@ export interface AnsysRow {
   ANSYS_rank: number;
 }
 
-/** per-hour RC vs ANSYS indoor-temperature series, for the overlay chart */
-export interface AnsysSeries {
-  t_hours: number[];
-  outdoor_C: number[];
-  designs: { design_id: number; rc_C: number[]; ansys_C: number[] }[];
-  /** BACKEND: emit — ISO-8601 timestamp per hour so the comparison aligns the
-   * two models by wall-clock time rather than array position. Both series
-   * already come from the identical weather window, so index alignment is a
-   * safe fallback. */
-  timestamps?: string[];
-}
-
 export interface AnsysResult {
   ran: boolean;
   rows: AnsysRow[];
@@ -342,7 +292,6 @@ export interface AnsysResult {
   mean_offset_C: number;
   worst_mae_C: number;
   contour_url?: string;
-  series?: AnsysSeries | null;
 }
 
 export interface LogisticsRow {
@@ -357,18 +306,6 @@ export interface Recommendation {
   runner_up_id: number | string | null;
   thermal_tie: boolean;
   justification: string;
-  /** BACKEND: emit — rank of the chosen design (1 = best). */
-  rank?: number;
-  /** BACKEND: emit — how many candidate designs were ranked. When this is 1
-   * (or absent with no `comparison[]`) the card says "Evaluated Design", not
-   * "Recommended Design", and never calls it "best". */
-  designs_evaluated?: number;
-  /** BACKEND: emit — overall / comfort / energy sub-scores if the ranker keeps
-   * them split. `comfort_score` already exists on `chosen`. */
-  overall_score?: number;
-  energy_score?: number;
-  /** BACKEND: emit — concrete, measurable improvement suggestions. */
-  improvement_suggestions?: string[];
   chosen: {
     geometry_label: string;
     walls_label: string;
@@ -378,39 +315,12 @@ export interface Recommendation {
     comfort_score: number;
     T_min_C: number;
     envelope_mass_t: number;
-    /** BACKEND: emit — cardinal orientation of the main glazing. */
-    orientation?: string;
-    /** BACKEND: emit — average daily envelope heat loss / demand (W or kWh/day). */
-    avg_daily_heat_loss_W?: number;
   };
-}
-
-/** the analysis site — a single-site NASA POWER archive today, so the frontend
- * falls back to a documented constant (app/_lib/site.ts) until the API sends it. */
-export interface SimLocation {
-  name: string;
-  latitude: number;
-  longitude: number;
-  timezone: string;
-}
-
-/** wall-clock bounds of the simulated window. */
-export interface SimAnalysis {
-  start_time: string; // ISO-8601
-  end_time: string; // ISO-8601
-  timestep_seconds: number; // 3600 for the hourly RC model
-  total_hours: number;
 }
 
 export interface RunResults {
   run_id: string;
   mode: "single" | "optimize";
-  /** BACKEND: emit — ISO-8601 timestamp the run finished (drives "last simulation"). */
-  created_at?: string;
-  /** BACKEND: emit — analysis site; frontend falls back to SITE_LEH. */
-  location?: SimLocation;
-  /** BACKEND: emit — real start/end of the weather window and the timestep. */
-  analysis?: SimAnalysis;
   window: { typical_hours: number; worst_hours: number; typical_mean_C: number; worst_min_C: number };
   resolved: ResolvedProperties;
   features: FeatureReports;

@@ -86,7 +86,6 @@ export default function HeatFlowPanel() {
             </div>
           );
         })()}
-        <p className="mt-space-sm font-body-sm text-on-surface-variant">{t("res.heat.signNote")}</p>
       </div>
     </SectionCard>
   );

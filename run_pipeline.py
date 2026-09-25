@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "thermal-calculator"))
 
-RATIOS_CSV = str(ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv") if (ROOT / "data" / "shelter" / "shelter_ratios_recommended.csv").exists() else "shelter_ratios_recommended.csv"
-ELEMENTS_CSV = str(ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv") if (ROOT / "data" / "shelter" / "shelter_elements_dimensions__1_.csv").exists() else "shelter_elements_dimensions__1_.csv"
+RATIOS_CSV = "shelter_ratios_recommended.csv"
+ELEMENTS_CSV = "shelter_elements_dimensions__1_.csv"
 
 _SEASONS = {"winter": (12, 1, 2), "summer": (6, 7, 8),
             "spring": (3, 4, 5), "autumn": (9, 10, 11)}
@@ -61,11 +61,6 @@ def run_optimize(args, rd):
 
     months = _SEASONS[args.season]
 
-    # honour a per-run comfort target across the ranker + reliability
-    from design_ranker import set_comfort
-    c = getattr(args, "comfort", None) or {}
-    set_comfort(c.get("target_C"), c.get("band_lo_C"), c.get("band_hi_C"))
-
     # Stage 1 - weather
     info = write_windows(rd, season_months=months,
                          typical_hours=args.typical_hours,
@@ -75,30 +70,14 @@ def run_optimize(args, rd):
     gmean = info["annual_mean_air_C"]
 
     # Stage 5 - design pool
-    fixed = None
-    scenario = {}
-    if getattr(args, "fixed_design", None):
-        fixed = json.loads(Path(args.fixed_design).read_text(encoding="utf-8"))
-        g = fixed.get("geometry", {})
-        print(f"[pipeline] fixed envelope: {g.get('length_m')}x{g.get('width_m')}"
-              f"x{g.get('height_m')} m, {fixed.get('window', {}).get('count')} window(s)"
-              f" -- pool varies materials/thickness/insulation/glazing only")
-        # scenario params the user set (occupancy heat, ventilation, start
-        # temp) -- applied uniformly to every candidate so the ranking is
-        # for the user's real conditions, not the bare shell
-        scenario = {k: v for k, v in (fixed.get("scenario") or {}).items()
-                    if v is not None}
-        if scenario:
-            print(f"[pipeline] scenario overrides (all candidates): {scenario}")
-    gen = ScenarioGenerator(args.ratios, args.elements, seed=args.seed, fixed=fixed)
+    gen = ScenarioGenerator(RATIOS_CSV, ELEMENTS_CSV, seed=args.seed)
     pool = gen.generate_candidates(args.designs)
     gen.save_pool(pool, rd / "designs_pool.json")
     _status(rd, "5_pool", True, f"{len(pool)} designs")
 
     # Stage 6 - RC ranking on the typical window
     typ = typical_window(arch, months=months, hours=args.typical_hours)
-    ranker = DesignRanker(typ, ground_mean_C=gmean, ground_mode="annual_mean",
-                          scenario_overrides=scenario)
+    ranker = DesignRanker(typ, ground_mean_C=gmean, ground_mode="annual_mean")
     evaluated = ranker.evaluate_pool(str(rd / "designs_pool.json"))
     ranker.display_results(evaluated, top_n=5)
     ranker.save_results(evaluated, rd / "optimization_results.csv")
@@ -106,8 +85,7 @@ def run_optimize(args, rd):
     _status(rd, "6_rank", True, f"top {[d['design_id'] for d in evaluated[:5]]}")
 
     # Stage 7 - reliability
-    shortlist = run_reliability(rd, trials=args.trials,
-                                scenario_overrides=scenario)
+    shortlist = run_reliability(rd, trials=args.trials)
     _status(rd, "7_reliability", True, str(shortlist["shortlist_ids"]))
 
     # Stage 8 - ANSYS (optional, non-critical)
@@ -136,14 +114,12 @@ def run_optimize(args, rd):
             continue
         try:
             cfg = sc.from_design(dmap[did], ground_mode="annual_mean",
-                                 ground_C=gmean,
-                                 overrides=(scenario or None))
+                                 ground_C=gmean)
             hourly, props = simulate(cfg, typ, ground_mean_C=gmean)
             run_feature_reports(
                 hourly, cfg, rd / "features" / str(did),
                 properties=props,
-                comfort_spec=(getattr(args, "comfort", None)
-                              or {"target_C": 18, "band_lo_C": 15, "band_hi_C": 24}),
+                comfort_spec={"target_C": 18, "band_lo_C": 15, "band_hi_C": 24},
                 materials_db=_materials(),
                 window_meta={"typical_hours": args.typical_hours,
                              "worst_hours": args.worst_hours},
@@ -171,13 +147,11 @@ def run_single(args, rd):
     comfort_spec = dict(getattr(args, "comfort", None) or
                         {"target_C": 18, "band_lo_C": 15, "band_hi_C": 24})
 
-    months = _SEASONS[args.season]
-    info = write_windows(rd, season_months=months,
-                         typical_hours=args.typical_hours,
+    info = write_windows(rd, typical_hours=args.typical_hours,
                          worst_hours=args.worst_hours)
     _status(rd, "1_weather", True, str(info))
     arch = load_archive()
-    typ = typical_window(arch, months=months, hours=args.typical_hours)
+    typ = typical_window(arch, hours=args.typical_hours)
     gmean = annual_mean_air_C(arch)
 
     hourly, props = simulate(cfg, typ, ground_mean_C=gmean)
@@ -225,56 +199,34 @@ def run_single(args, rd):
 # CLI
 # ==================================================
 
-def _add_common(p):
-    p.add_argument("--run-dir", default=None,
-                   help="write into this existing folder instead of minting one")
-    p.add_argument("--comfort-target", type=float, default=18.0)
-    p.add_argument("--comfort-lo", type=float, default=15.0)
-    p.add_argument("--comfort-hi", type=float, default=24.0)
-    p.add_argument("--typical-hours", type=int, default=72)
-    p.add_argument("--worst-hours", type=int, default=48)
-    p.add_argument("--season", choices=list(_SEASONS), default="winter")
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="mode", required=True)
 
     o = sub.add_parser("optimize")
-    _add_common(o)
     o.add_argument("--designs", type=int, default=50)
+    o.add_argument("--season", choices=list(_SEASONS), default="winter")
     o.add_argument("--seed", type=int, default=0)
     o.add_argument("--trials", type=int, default=400)
-    o.add_argument("--ratios", default=RATIOS_CSV)
-    o.add_argument("--elements", default=ELEMENTS_CSV)
-    o.add_argument("--fixed-design", default=None,
-                   help="JSON file pinning geometry + window/door counts; the "
-                        "pool then only designs the envelope (materials, "
-                        "thicknesses, insulation, glazing)")
+    o.add_argument("--typical-hours", type=int, default=168)
+    o.add_argument("--worst-hours", type=int, default=48)
     o.add_argument("--ansys", action="store_true",
                    help="also run the ANSYS FEM cross-check (slow)")
     o.add_argument("--ansys-hours", type=int, default=24)
     o.add_argument("--ansys-designs", type=int, default=2)
 
     s = sub.add_parser("single")
-    _add_common(s)
     s.add_argument("--config", required=True)
+    s.add_argument("--typical-hours", type=int, default=72)
+    s.add_argument("--worst-hours", type=int, default=48)
 
     args = ap.parse_args()
-    args.comfort = {"target_C": args.comfort_target,
-                    "band_lo_C": args.comfort_lo,
-                    "band_hi_C": args.comfort_hi}
-
-    rd = Path(args.run_dir) if args.run_dir else _new_run_dir()
-    rd.mkdir(parents=True, exist_ok=True)
+    rd = _new_run_dir()
     (rd / "run_config.json").write_text(json.dumps(vars(args), indent=2))
     print(f"[pipeline] run folder: {rd}\n")
 
     try:
         report = (run_optimize if args.mode == "optimize" else run_single)(args, rd)
-        from web_results import write_results
-        write_results(rd, args.mode, rd.name)
-        _status(rd, "11_results_json", True, "results.json assembled")
     except Exception:                                          # noqa: BLE001
         _status(rd, "FATAL", False, traceback.format_exc())
         print(traceback.format_exc())

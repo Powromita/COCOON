@@ -21,35 +21,13 @@ const STAGE_LABEL: Record<string, string> = {
  * short "using preview data" note; in live mode it shows the pipeline
  * stages as they complete.
  */
-export default function RunProgress({ mode = "single" }: { mode?: "single" | "optimize" }) {
-  const { phase, status, error, isReal, retry, runDemo, needsInput } = useResults();
+export default function RunProgress() {
+  const { phase, status, error, isReal, retry } = useResults();
   const t = useT();
 
   if (phase === "done" && isReal) return null;
 
   const isBusy = phase === "submitting" || phase === "running";
-
-  if (needsInput) {
-    return (
-      <div className="rounded-xl border border-surface-container-high bg-surface-container-lowest p-space-md shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-space-sm">
-          <div>
-            <span className="font-headline-sm text-on-surface">No run submitted</span>
-            <p className="font-body-sm text-on-surface-variant">
-              Fill the configuration form, or run a canned demo against the connected solver.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => runDemo(mode)}
-            className="rounded bg-primary px-space-md py-space-xs font-body-sm font-semibold text-on-primary hover:bg-primary-container"
-          >
-            Run demo analysis
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div

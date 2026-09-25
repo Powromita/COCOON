@@ -47,8 +47,8 @@ const DICT: Record<string, { en: string; hi: string }> = {
     hi: "एक-क्लिक पारंपरिक दीवार व छत प्रीसेट (एडोब, पत्थर, रैम्ड अर्थ)",
   },
   "home.ind.f2": {
-    en: "Plain-language glazing choices (Single, Double, Triple)",
-    hi: "सरल भाषा में ग्लेज़िंग विकल्प (सिंगल, डबल, ट्रिपल)",
+    en: "Plain-language glazing & heater levels (Off, Low, Med, High)",
+    hi: "सरल भाषा में ग्लेज़िंग व हीटर स्तर (बंद, कम, मध्यम, अधिक)",
   },
   "home.ind.f3": {
     en: "Instant 48-hr room temperature forecast with habitability zone",
@@ -90,17 +90,11 @@ const DICT: Record<string, { en: string; hi: string }> = {
   // ---- individual / configure -------------------------------------------------
   "icfg.crumb1": { en: "Parametric Quick-Setup", hi: "पैरामीट्रिक त्वरित-सेटअप" },
   "icfg.crumb2": { en: "Defense Habitability Standard", hi: "रक्षा रहने-योग्यता मानक" },
-  "icfg.title": { en: "Design My Shelter", hi: "मेरा आश्रय डिज़ाइन करें" },
+  "icfg.title": { en: "Shelter Envelope Configuration", hi: "आश्रय एन्वेलप कॉन्फ़िगरेशन" },
   "icfg.sub": {
-    en: "Give the size, the windows and doors, and how you'll live in it. The model designs the walls, roof, floor and insulation for Leh's winter and predicts the inside temperature.",
-    hi: "आकार, खिड़कियाँ व दरवाज़े, और आप इसमें कैसे रहेंगे यह बताएँ। मॉडल लेह की सर्दी के लिए दीवारें, छत, फ़र्श व इन्सुलेशन डिज़ाइन करता है और अंदर का तापमान बताता है।",
+    en: "Quick shelter thermal assessment using proven Himalayan vernacular & insulated presets.",
+    hi: "सिद्ध हिमालयी पारंपरिक व इंसुलेटेड प्रीसेट से त्वरित आश्रय थर्मल आकलन।",
   },
-  "icfg.numDoor": { en: "Number of Doors", hi: "दरवाज़ों की संख्या" },
-  "icfg.pipelineDesigns": {
-    en: "You don't choose the materials — the model tries many wall / roof / floor material and thickness combinations for this box and returns the best one on the results page.",
-    hi: "आप सामग्री नहीं चुनते — मॉडल इस बॉक्स हेतु अनेक दीवार / छत / फ़र्श सामग्री व मोटाई संयोजन आज़माता है और परिणाम पृष्ठ पर सर्वोत्तम देता है।",
-  },
-  "icfg.designCta": { en: "Design My Shelter", hi: "मेरा आश्रय डिज़ाइन करें" },
   "icfg.s1": { en: "Geometry & Spatial Volume", hi: "ज्यामिति व स्थानिक आयतन" },
   "icfg.s1tag": { en: "Cartesian Bounds (Meters)", hi: "कार्टेशियन सीमाएँ (मीटर)" },
   "icfg.len": { en: "Length (L)", hi: "लंबाई (L)" },
@@ -149,11 +143,8 @@ const DICT: Record<string, { en: string; hi: string }> = {
     hi: "ट्रिपल ग्लेज़िंग — सर्वोत्तम इंसुलेशन (आर्कटिक ग्रेड)",
   },
   "icfg.glzGrade": { en: "Acoustic & airtightness grade", hi: "ध्वनिक व वायुरोधन ग्रेड" },
-  "icfg.s4": { en: "Occupancy & Initial Conditions", hi: "अधिवास व प्रारंभिक स्थितियाँ" },
-  "icfg.s4tag": {
-    en: "Starting temperature and occupant heat gains",
-    hi: "प्रारंभिक तापमान व रहवासी ऊष्मा-लाभ",
-  },
+  "icfg.s4": { en: "Comfort & Internal Heating", hi: "आराम व आंतरिक हीटिंग" },
+  "icfg.s4tag": { en: "Occupancy & Auxiliary Thermal", hi: "अधिवास व सहायक थर्मल" },
   "icfg.initTemp": { en: "Initial Indoor Temperature", hi: "प्रारंभिक इनडोर तापमान" },
   "icfg.initTempDesc": {
     en: "Pre-simulation base interior shelter temperature",
@@ -167,109 +158,62 @@ const DICT: Record<string, { en: string; hi: string }> = {
     en: "Cumulative metabolic heat output and breathing load",
     hi: "संचयी चयापचय ऊष्मा-उत्पादन व श्वसन भार",
   },
-  "icfg.occupants": { en: "occupants", hi: "रहवासी" },
-  "icfg.calcTag": { en: "Calculated", hi: "परिकलित" },
-  "icfg.gainTip": {
-    en: "Total internal heat added by occupants — used as a starting condition for the simulation.",
-    hi: "रहवासियों द्वारा जोड़ी गई कुल आंतरिक ऊष्मा — सिमुलेशन की प्रारंभिक स्थिति के रूप में प्रयुक्त।",
+  "icfg.heater": { en: "Heater Setting", hi: "हीटर सेटिंग" },
+  "icfg.opt.off": { en: "Off", hi: "बंद" },
+  "icfg.opt.low": { en: "Low", hi: "कम" },
+  "icfg.opt.medium": { en: "Medium", hi: "मध्यम" },
+  "icfg.opt.high": { en: "High", hi: "अधिक" },
+  "icfg.heaterDesc": {
+    en: "Auxiliary heat and comfort reserve for overnight survival",
+    hi: "रात-भर के लिए सहायक ऊष्मा व आराम आरक्षित",
   },
 
   // ---- individual / results -------------------------------------------------
   "ires.eyebrow": { en: "Thermal Telemetry Evaluation", hi: "थर्मल टेलीमेट्री मूल्यांकन" },
+  "ires.simId": { en: "Simulation ID: LEH-IND-2026-08A", hi: "सिमुलेशन ID: LEH-IND-2026-08A" },
+  "ires.title": { en: "48-Hour Household Thermal Assessment", hi: "48-घंटे घरेलू थर्मल आकलन" },
+  "ires.sub": {
+    en: "Estimated room temperature for 6.0 × 4.0m Adobe Wall shelter in Leh winter conditions.",
+    hi: "लेह सर्दी की स्थिति में 6.0 × 4.0मी एडोब-दीवार आश्रय के लिए अनुमानित कमरा-तापमान।",
+  },
+  "ires.exportSummary": { en: "Export Summary", hi: "सारांश निर्यात करें" },
   "ires.physicsModel": { en: "Physics Model", hi: "भौतिकी मॉडल" },
+  "ires.mlRapid": { en: "ML Rapid Estimate", hi: "ML त्वरित अनुमान" },
   "ires.legPredicted": { en: "Predicted Room Temp", hi: "अनुमानित कमरा-तापमान" },
   "ires.legOutdoor": { en: "Outdoor Sub-Zero Temp", hi: "बाहरी सब-ज़ीरो तापमान" },
-  "ires.legComfort": { en: "Comfort band", hi: "आराम बैंड" },
-  "ires.legGround": { en: "Ground temperature", hi: "भूमि तापमान" },
-  "ires.chartTitle": { en: "Transient Thermal Response", hi: "क्षणिक थर्मल प्रतिक्रिया" },
+  "ires.legComfort": { en: "Comfort Zone (+16°C to +22°C)", hi: "आराम क्षेत्र (+16°C से +22°C)" },
+  "ires.chartTitle": { en: "Transient Thermal Response (0h - 48h)", hi: "क्षणिक थर्मल प्रतिक्रिया (0घं - 48घं)" },
+  "ires.timestep": { en: "Timestep: 1.0 hr", hi: "टाइमस्टेप: 1.0 घं" },
+  "ires.elapsed": { en: "Elapsed:", hi: "बीता समय:" },
   "ires.indoor": { en: "Indoor:", hi: "इनडोर:" },
   "ires.outdoor": { en: "Outdoor:", hi: "आउटडोर:" },
+  "ires.hoverHint": { en: "Hover along graph to sample hours", hi: "घंटे देखने के लिए ग्राफ़ पर होवर करें" },
   "ires.minTemp": { en: "Minimum Room Temp", hi: "न्यूनतम कमरा-तापमान" },
+  "ires.minDetail": { en: "Occurs: 05:30 AM (Coldest Exterior)", hi: "समय: 05:30 AM (सबसे ठंडा बाहर)" },
   "ires.maxTemp": { en: "Maximum Room Temp", hi: "अधिकतम कमरा-तापमान" },
+  "ires.maxDetail": { en: "Occurs: 15:15 PM (South Glazing)", hi: "समय: 15:15 PM (दक्षिण ग्लेज़िंग)" },
   "ires.avgTemp": { en: "Average Room Temp", hi: "औसत कमरा-तापमान" },
-  "ires.dailyRange": { en: "Avg Daily Range", hi: "औसत दैनिक परिसर" },
-  "ires.comfortHours": { en: "Comfortable Hours", hi: "आरामदायक घंटे" },
+  "ires.avgDetail": { en: "ΔT vs Outdoor: +36.2°C Delta", hi: "बाहर की तुलना में ΔT: +36.2°C" },
   "ires.fuel": { en: "Daily Fuel Equivalent", hi: "दैनिक ईंधन समतुल्य" },
+  "ires.fuelDetail": { en: "Passive envelope insulation benefit", hi: "निष्क्रिय एन्वेलप इंसुलेशन लाभ" },
   "ires.meansTitle": { en: "What This Means For Your Shelter", hi: "आपके आश्रय के लिए इसका क्या अर्थ है" },
-  "ires.certified": { en: "Within comfort band > 40% of hours", hi: "40% से अधिक घंटे आराम बैंड में" },
-  "ires.shelterParams": { en: "Simulation inputs", hi: "सिमुलेशन इनपुट" },
+  "ires.certified": { en: "Safe Habitat Certified", hi: "सुरक्षित आवास प्रमाणित" },
+  "ires.meansBody": {
+    en: "Your selected 600mm Adobe walls and double-glazed windows store warmth gathered during sunny daylight hours and release it gently through the sub-zero night. Even when the outside temperature drops to -24.8°C, the shelter stays comfortably above freezing without requiring dangerously heavy fuel stoves.",
+    hi: "आपकी चुनी हुई 600mm एडोब दीवारें और डबल-ग्लेज़्ड खिड़कियाँ धूप वाले दिन में जमा हुई गर्मी को संग्रहित करती हैं और सब-ज़ीरो रात में धीरे-धीरे छोड़ती हैं। बाहर का तापमान -24.8°C तक गिरने पर भी, आश्रय खतरनाक रूप से भारी ईंधन-स्टोव के बिना आराम से हिमांक से ऊपर रहता है।",
+  },
+  "ires.frost.title": { en: "Frost Protected", hi: "पाला-रोधी" },
+  "ires.frost.val": { en: "100% Freezing Avoidance", hi: "100% हिमीकरण से बचाव" },
+  "ires.solar.title": { en: "Solar Retention", hi: "सौर संधारण" },
+  "ires.solar.val": { en: "4.8 hrs passive heat storage", hi: "4.8 घंटे निष्क्रिय ऊष्मा-भंडारण" },
+  "ires.air.title": { en: "Air Quality", hi: "वायु गुणवत्ता" },
+  "ires.air.val": { en: "Low indoor smoke dependency", hi: "कम इनडोर धुआँ-निर्भरता" },
+  "ires.shelterParams": { en: "Shelter Parameters", hi: "आश्रय पैरामीटर" },
   "ires.footprint": { en: "Footprint", hi: "क्षेत्रफल" },
+  "ires.wallMat": { en: "Wall Material", hi: "दीवार सामग्री" },
+  "ires.wallMatVal": { en: "Adobe Earth (600 mm)", hi: "एडोब मिट्टी (600 mm)" },
   "ires.glazing": { en: "Glazing", hi: "ग्लेज़िंग" },
-  "ires.occursAt": { en: "Occurred on {when}", hi: "{when} को हुआ" },
-  "ires.vsComfortLo": { en: "{delta} the selected comfort minimum", hi: "चयनित आराम न्यूनतम से {delta}" },
-  "ires.vsComfortHi": { en: "{delta} the selected comfort maximum", hi: "चयनित आराम अधिकतम से {delta}" },
-  "ires.withinComfort": { en: "within the selected comfort band", hi: "चयनित आराम बैंड के भीतर" },
-  "ires.dtVsOutdoor": { en: "ΔT vs outdoor {delta}", hi: "बाहर की तुलना में ΔT {delta}" },
-  "ires.hourAxis": { en: "Elapsed hours (no wall-clock timestamps in this response)", hi: "बीते घंटे (इस प्रतिक्रिया में वॉल-क्लॉक टाइमस्टैम्प नहीं)" },
-
-  // simulation status (spec §4)
-  "ires.status.preparing": { en: "Preparing inputs", hi: "इनपुट तैयार हो रहे हैं" },
-  "ires.status.weather": { en: "Fetching NASA weather", hi: "NASA मौसम प्राप्त हो रहा है" },
-  "ires.status.physics": { en: "Running physics model", hi: "भौतिकी मॉडल चल रहा है" },
-  "ires.status.physicsDone": { en: "Physics model completed", hi: "भौतिकी मॉडल पूर्ण" },
-  "ires.status.ansysQueued": { en: "ANSYS queued", hi: "ANSYS कतार में" },
-  "ires.status.ansysRunning": { en: "ANSYS running", hi: "ANSYS चल रहा है" },
-  "ires.status.ansysDone": { en: "ANSYS completed", hi: "ANSYS पूर्ण" },
-  "ires.status.comparison": { en: "Comparison available", hi: "तुलना उपलब्ध" },
-  "ires.status.failed": { en: "Simulation failed", hi: "सिमुलेशन विफल" },
-
-  // ANSYS ↔ Physics comparison (spec §7)
-  "ires.cmp.title": { en: "ANSYS and Physics Model Comparison", hi: "ANSYS व भौतिकी मॉडल तुलना" },
-  "ires.cmp.subtitle": {
-    en: "Independent hourly comparison using the same geometry, materials, initial condition and external boundary conditions.",
-    hi: "समान ज्यामिति, सामग्री, प्रारंभिक स्थिति व बाहरी सीमा-स्थितियों के साथ स्वतंत्र प्रति-घंटा तुलना।",
-  },
-  "ires.cmp.notRun": { en: "ANSYS validation has not been run for this design.", hi: "इस डिज़ाइन के लिए ANSYS सत्यापन नहीं चलाया गया।" },
-  "ires.cmp.queued": { en: "ANSYS validation is queued — physics-model results are shown above.", hi: "ANSYS सत्यापन कतार में — भौतिकी-मॉडल परिणाम ऊपर दिखाए गए हैं।" },
-  "ires.cmp.running": { en: "ANSYS validation is running — physics-model results are shown above.", hi: "ANSYS सत्यापन चल रहा है — भौतिकी-मॉडल परिणाम ऊपर दिखाए गए हैं।" },
-  "ires.cmp.failed": { en: "ANSYS validation failed for this run. Physics-model results remain valid.", hi: "इस रन के लिए ANSYS सत्यापन विफल। भौतिकी-मॉडल परिणाम मान्य हैं।" },
-  "ires.cmp.physicsMean": { en: "Physics model mean", hi: "भौतिकी मॉडल औसत" },
-  "ires.cmp.ansysMean": { en: "ANSYS mean", hi: "ANSYS औसत" },
-  "ires.cmp.mae": { en: "Mean absolute error (MAE)", hi: "माध्य निरपेक्ष त्रुटि (MAE)" },
-  "ires.cmp.rmse": { en: "Root-mean-square error (RMSE)", hi: "वर्ग-माध्य-मूल त्रुटि (RMSE)" },
-  "ires.cmp.maxErr": { en: "Maximum absolute error", hi: "अधिकतम निरपेक्ष त्रुटि" },
-  "ires.cmp.bias": { en: "Mean bias (physics − ANSYS)", hi: "माध्य पूर्वाग्रह (भौतिकी − ANSYS)" },
-  "ires.cmp.points": { en: "Aligned hourly points", hi: "संरेखित प्रति-घंटा बिंदु" },
-  "ires.cmp.legPhysics": { en: "Physics model", hi: "भौतिकी मॉडल" },
-  "ires.cmp.legAnsys": { en: "ANSYS FEM", hi: "ANSYS FEM" },
-  "ires.cmp.achNote": {
-    en: "Both models run at 0 air changes per hour so the comparison isolates conduction and solar gain.",
-    hi: "दोनों मॉडल 0 वायु-परिवर्तन प्रति घंटा पर चलते हैं ताकि तुलना केवल चालन व सौर लाभ को अलग करे।",
-  },
-  "ires.cmp.alignIndex": {
-    en: "Aligned by array position — both series come from the same weather window.",
-    hi: "सरणी स्थिति द्वारा संरेखित — दोनों श्रृंखलाएँ एक ही मौसम विंडो से हैं।",
-  },
-
-  // envelope / heat-flow relabels
-  "res.cfg.uWindow": { en: "Window U-value", hi: "खिड़की U-मान" },
-  "res.heat.signNote": {
-    en: "Positive = heat leaving the shelter. Negative = net gain through that surface (usually the floor when indoor air is below the ground temperature).",
-    hi: "धनात्मक = आश्रय से ऊष्मा बाहर जाना। ऋणात्मक = उस सतह से शुद्ध लाभ (सामान्यतः फ़र्श, जब इनडोर वायु भूमि तापमान से नीचे हो)।",
-  },
-
-  "common.notAvailable": { en: "Not available", hi: "उपलब्ध नहीं" },
-  "common.awaitingSimulation": { en: "Awaiting simulation", hi: "सिमुलेशन की प्रतीक्षा" },
-  "common.tip.uValue": {
-    en: "U-value measures how easily heat passes through an assembly. A lower value generally indicates better insulation.",
-    hi: "U-मान मापता है कि किसी असेंबली से ऊष्मा कितनी आसानी से गुज़रती है। कम मान आम तौर पर बेहतर इंसुलेशन दर्शाता है।",
-  },
-  "common.tip.capacitance": {
-    en: "Effective thermal capacitance is how much heat the coupled envelope mass stores per degree — higher means the shelter coasts through cold spells more slowly.",
-    hi: "प्रभावी तापीय धारिता यह है कि युग्मित एन्वेलप द्रव्यमान प्रति डिग्री कितनी ऊष्मा संग्रहीत करता है — अधिक का अर्थ है आश्रय ठंडी अवधि में धीरे-धीरे ठंडा होता है।",
-  },
-  "common.tip.airExchange": {
-    en: "Air-exchange UA is the conductance of the infiltration/ventilation path — warm indoor air leaking out and cold air leaking in.",
-    hi: "वायु-विनिमय UA अंतःस्राव/संवातन पथ की चालकता है — गर्म इनडोर वायु बाहर और ठंडी वायु अंदर।",
-  },
-  "common.tip.thermalGain": {
-    en: "Thermal gain is heat added to the shelter — here from sunlight through the glazing and from the people inside.",
-    hi: "तापीय लाभ आश्रय में जोड़ी गई ऊष्मा है — यहाँ ग्लेज़िंग से सूर्य-प्रकाश व अंदर के लोगों से।",
-  },
-  "common.tip.analysisPeriod": {
-    en: "The analysis period is the stretch of historical hourly weather the shelter is simulated against.",
-    hi: "विश्लेषण अवधि ऐतिहासिक प्रति-घंटा मौसम की वह अवधि है जिसके विरुद्ध आश्रय का सिमुलेशन होता है।",
-  },
+  "ires.glazingVal": { en: "Double Pane", hi: "डबल पेन" },
 
   // ---- organization / configure -------------------------------------------
   "ocfg.tier": { en: "TIER-IV CALIBRATION", hi: "टियर-IV कैलिब्रेशन" },
@@ -291,16 +235,6 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "ocfg.customBuilder": { en: "Custom Layer Builder", hi: "कस्टम लेयर बिल्डर" },
   "ocfg.s1": { en: "1. Geometry & Spatial Volume", hi: "1. ज्यामिति व स्थानिक आयतन" },
   "ocfg.s1tag": { en: "Euler Boundary Grid: Hexahedral", hi: "यूलर बाउंड्री ग्रिड: हेक्साहेड्रल" },
-  "ocfg.boxOpenings": { en: "Shelter Size & Openings", hi: "आश्रय आकार व द्वार-खिड़कियाँ" },
-  "ocfg.youProvide": { en: "YOU PROVIDE", hi: "आप देते हैं" },
-  "ocfg.winCount": { en: "Number of windows", hi: "खिड़कियों की संख्या" },
-  "ocfg.winW": { en: "Window width", hi: "खिड़की चौड़ाई" },
-  "ocfg.winH": { en: "Window height", hi: "खिड़की ऊँचाई" },
-  "ocfg.doorCount": { en: "Number of doors", hi: "दरवाज़ों की संख्या" },
-  "ocfg.pipelinePicks": {
-    en: "The pipeline chooses the wall, roof and floor materials, their thicknesses, the insulation and the glazing type — and returns the best combination for this box.",
-    hi: "पाइपलाइन दीवार, छत व फ़र्श की सामग्री, उनकी मोटाई, इन्सुलेशन व ग्लेज़िंग प्रकार चुनती है — और इस बॉक्स हेतु सर्वोत्तम संयोजन देती है।",
-  },
   "ocfg.len": { en: "Length (L)", hi: "लंबाई (L)" },
   "ocfg.wid": { en: "Width (W)", hi: "चौड़ाई (W)" },
   "ocfg.hgt": { en: "Height (H)", hi: "ऊँचाई (H)" },
@@ -472,18 +406,11 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "opt.mode.evaluateDesc": { en: "One shelter → temperature / solar / heat-flow reports.", hi: "एक आश्रय → तापमान / सौर / ऊष्मा-प्रवाह रिपोर्ट।" },
   "opt.mode.optimize": { en: "Find the best design", hi: "सर्वोत्तम डिज़ाइन खोजें" },
   "opt.mode.optimizeDesc": { en: "Search a design space → ranked shortlist → recommendation.", hi: "डिज़ाइन स्पेस खोजें → क्रमबद्ध शॉर्टलिस्ट → सिफ़ारिश।" },
-  "opt.title": { en: "Optimizer — Search Settings", hi: "ऑप्टिमाइज़र — खोज सेटिंग्स" },
+  "opt.title": { en: "Optimizer — Design Space", hi: "ऑप्टिमाइज़र — डिज़ाइन स्पेस" },
   "opt.tag": { en: "INVERSE DESIGN", hi: "प्रतिलोम डिज़ाइन" },
-  "opt.pipelineNote": {
-    en: "You've set the shelter size and openings above. The pipeline now generates this many envelope designs for that box — trying different wall / roof / floor materials, thicknesses, insulation and glazing — simulates each, and returns the best combination.",
-    hi: "आपने ऊपर आश्रय का आकार व द्वार-खिड़कियाँ तय कीं। अब पाइपलाइन उस बॉक्स के लिए इतने एन्वेलप डिज़ाइन बनाती है — अलग-अलग दीवार / छत / फ़र्श सामग्री, मोटाई, इन्सुलेशन व ग्लेज़िंग आज़माकर — प्रत्येक का अनुकरण करती है, और सर्वोत्तम संयोजन देती है।",
-  },
   "opt.designs": { en: "Number of candidate designs", hi: "उम्मीदवार डिज़ाइनों की संख्या" },
-  "opt.designsHint": { en: "Envelope combinations tried for your box", hi: "आपके बॉक्स हेतु आज़माए गए एन्वेलप संयोजन" },
   "opt.seed": { en: "Random seed", hi: "रैंडम सीड" },
-  "opt.seedHint": { en: "Same seed ⇒ same candidate pool", hi: "समान सीड ⇒ समान उम्मीदवार पूल" },
   "opt.trials": { en: "Sensitivity trials", hi: "संवेदनशीलता परीक्षण" },
-  "opt.trialsHint": { en: "Robustness checks on the ranking", hi: "रैंकिंग पर मज़बूती जाँच" },
   "opt.constraints": { en: "Design-space constraints", hi: "डिज़ाइन-स्पेस बाधाएँ" },
   "opt.constraintsHint": { en: "Pre-filled from shelter_ratios_recommended.csv", hi: "shelter_ratios_recommended.csv से पूर्व-भरित" },
   "opt.materials": { en: "Allowed materials", hi: "अनुमत सामग्री" },
@@ -499,8 +426,8 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "opt.f.floor": { en: "Floor area (m²)", hi: "फ़र्श क्षेत्र (m²)" },
   "opt.cta": { en: "Run Optimization", hi: "ऑप्टिमाइज़ेशन चलाएँ" },
   "opt.envHidden": {
-    en: "In optimize mode you give the shelter size and the window / door counts. The pipeline designs the envelope — it picks the wall, roof and floor materials, their thicknesses, the insulation and the glazing, then returns the best combination.",
-    hi: "ऑप्टिमाइज़ मोड में आप आश्रय का आकार व खिड़की / दरवाज़े की संख्या देते हैं। पाइपलाइन एन्वेलप डिज़ाइन करती है — दीवार, छत व फ़र्श की सामग्री, उनकी मोटाई, इन्सुलेशन व ग्लेज़िंग चुनती है, फिर सर्वोत्तम संयोजन देती है।",
+    en: "In optimize mode the solver generates the geometry and envelope — you set the search space (constraints + materials) below, not one design.",
+    hi: "ऑप्टिमाइज़ मोड में सॉल्वर ज्यामिति व एन्वेलप स्वयं बनाता है — नीचे आप खोज-स्थान (बाधाएँ + सामग्री) तय करते हैं, एक डिज़ाइन नहीं।",
   },
   "ocfg.timeConst": { en: "Thermal time constant τ", hi: "तापीय समय-स्थिरांक τ" },
   "res.mode.singleTitle": { en: "Single-Design Thermal Assessment", hi: "एकल-डिज़ाइन तापीय मूल्यांकन" },
@@ -513,10 +440,8 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "res.cfg.uWall": { en: "Wall U-value", hi: "दीवार U-मान" },
   "res.cfg.uRoof": { en: "Roof U-value", hi: "छत U-मान" },
   "res.cfg.uFloor": { en: "Floor U-value", hi: "फ़र्श U-मान" },
-  "res.cfg.capacitance": { en: "Effective thermal capacitance", hi: "प्रभावी थर्मल धारिता" },
-  "res.cfg.infilUA": { en: "Air-exchange UA", hi: "वायु-विनिमय UA" },
-  "res.cfg.envArea": { en: "Envelope area", hi: "एन्वेलप क्षेत्र" },
-  "res.cfg.wwr": { en: "Window-to-wall ratio", hi: "खिड़की-दीवार अनुपात" },
+  "res.cfg.capacitance": { en: "Thermal capacitance", hi: "थर्मल धारिता" },
+  "res.cfg.infilUA": { en: "Infiltration UA", hi: "अंतःस्राव UA" },
   "res.cfg.mass": { en: "Envelope mass", hi: "एन्वेलप द्रव्यमान" },
 
   // ---- Feature 2 : solar thermal energy ------------------------------
@@ -528,10 +453,6 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "res.solar.capFactor": { en: "Aperture capacity factor", hi: "द्वार क्षमता कारक" },
   "res.solar.corr": { en: "Solar ↔ ΔT correlation", hi: "सौर ↔ ΔT सहसंबंध" },
   "res.solar.dailyTitle": { en: "Daily captured energy", hi: "दैनिक संग्रहीत ऊर्जा" },
-  "res.solar.singleDay": {
-    en: "The analysis period is a single day — see the hourly solar gain above for the intraday detail.",
-    hi: "विश्लेषण अवधि एक ही दिन है — दिन-भर के विवरण के लिए ऊपर प्रति-घंटा सौर लाभ देखें।",
-  },
   "res.solar.hourlyTitle": { en: "Hourly solar gain", hi: "प्रति घंटा सौर लाभ" },
   "res.solar.cumTitle": { en: "Cumulative solar energy", hi: "संचयी सौर ऊर्जा" },
 
@@ -548,7 +469,7 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "res.heat.roof": { en: "Roof", hi: "छत" },
   "res.heat.floor": { en: "Floor", hi: "फ़र्श" },
   "res.heat.windows": { en: "Windows", hi: "खिड़कियाँ" },
-  "res.heat.infil": { en: "Air exchange (infiltration)", hi: "वायु विनिमय (अंतःस्राव)" },
+  "res.heat.infil": { en: "Infiltration", hi: "अंतःस्राव" },
   "res.heat.stackTitle": { en: "Hourly loss by surface", hi: "सतह अनुसार प्रति-घंटा हानि" },
 
   // ---- ANSYS validation panel -------------------------------------
@@ -559,22 +480,10 @@ const DICT: Record<string, { en: string; hi: string }> = {
   "res.ansys.design": { en: "Design", hi: "डिज़ाइन" },
   "res.ansys.agree": { en: "Ranking agrees between RC and FEM.", hi: "RC व FEM के बीच रैंकिंग सहमत।" },
   "res.ansys.tie": { en: "Ranking differs but design spread < model error → thermal tie; decide on logistics.", hi: "रैंकिंग भिन्न पर डिज़ाइन-अंतर < मॉडल-त्रुटि → तापीय बराबरी; लॉजिस्टिक्स पर निर्णय।" },
-  "res.ansys.overlayTitle": { en: "RC engine vs ANSYS FEM — indoor temperature, hour by hour", hi: "RC इंजन बनाम ANSYS FEM — इनडोर तापमान, घंटे-दर-घंटे" },
-  "res.ansys.fem": { en: "ANSYS FEM (3D)", hi: "ANSYS FEM (3D)" },
-  "res.ansys.rc": { en: "RC model", hi: "RC मॉडल" },
-  "res.ansys.gap": { en: "mean gap", hi: "औसत अंतर" },
-  "res.ansys.overlayNote": {
-    en: "Both models are run independently on the same worst-case weather (infiltration off on both sides). Lines that track each other = the fast RC model reproduces the 3D FEM; a sustained gap flags a design whose layer ordering the single-node model handles less well.",
-    hi: "दोनों मॉडल एक ही न्यूनतम-स्थिति मौसम पर स्वतंत्र रूप से चलते हैं (दोनों में घुसपैठ बंद)। एक-दूसरे का अनुसरण करती रेखाएँ = तेज़ RC मॉडल 3D FEM को दोहराता है; लगातार अंतर उस डिज़ाइन को दर्शाता है जिसकी परत-क्रम को एकल-नोड मॉडल कम अच्छे से संभालता है।",
-  },
 
   // ---- design comparison ----------------------------------------
   "res.compare.title": { en: "Design Comparison", hi: "डिज़ाइन तुलना" },
   "res.compare.tag": { en: "RANKED CANDIDATE POOL", hi: "क्रमबद्ध उम्मीदवार पूल" },
-  "res.compare.note": {
-    en: "Every candidate is the same box with a different envelope — wall / roof / floor material and thickness, insulation and glazing chosen by the pipeline. Ranked by comfort score.",
-    hi: "हर उम्मीदवार वही बॉक्स है, अलग एन्वेलप के साथ — दीवार / छत / फ़र्श सामग्री व मोटाई, इन्सुलेशन व ग्लेज़िंग पाइपलाइन द्वारा चुने गए। आराम स्कोर से क्रमबद्ध।",
-  },
   "res.compare.rank": { en: "Rank", hi: "रैंक" },
   "res.compare.id": { en: "ID", hi: "ID" },
   "res.compare.geom": { en: "L × W × H (m)", hi: "L × W × H (m)" },
@@ -593,9 +502,6 @@ const DICT: Record<string, { en: string; hi: string }> = {
 
   // ---- recommendation ----------------------------------------
   "res.rec.title": { en: "Recommended Design", hi: "अनुशंसित डिज़ाइन" },
-  "res.rec.titleSingle": { en: "Evaluated Design", hi: "मूल्यांकित डिज़ाइन" },
-  "res.rec.evaluated": { en: "Evaluated", hi: "मूल्यांकित" },
-  "res.rec.improve": { en: "Most useful improvement", hi: "सर्वाधिक उपयोगी सुधार" },
   "res.rec.tag": { en: "DECISION", hi: "निर्णय" },
   "res.rec.chosen": { en: "Chosen", hi: "चयनित" },
   "res.rec.runnerUp": { en: "Runner-up", hi: "उपविजेता" },
@@ -658,19 +564,5 @@ export function useT() {
       return entry[lang] || entry.en || key;
     },
     [lang],
-  );
-}
-
-/**
- * Like `useT` but fills `{placeholder}` tokens — used for the generated
- * plain-language sentences on the results page.
- *   tfmt("ires.occursAt", { when: "11 January at 05:00" })
- */
-export function useTfmt() {
-  const t = useT();
-  return useCallback(
-    (key: string, vars: Record<string, string | number> = {}) =>
-      t(key).replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`)),
-    [t],
   );
 }
