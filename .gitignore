@@ -21,6 +21,8 @@ Thumbs.db
 
 # ML models
 *.joblib
+# M5 baseline surrogates are committed deliberately (PRD §11.5)
+!data/m5_dataset_v1/model/m5_baseline_v1/*.joblib
 
 # ANSYS solver working files (large, regenerable)
 ansys-pipeline/results/**/ansys_run/
