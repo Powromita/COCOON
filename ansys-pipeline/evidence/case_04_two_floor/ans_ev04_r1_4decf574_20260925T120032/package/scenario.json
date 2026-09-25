@@ -1,0 +1,214 @@
+{
+  "assumptions": {
+    "airflow": "infiltration, door-opening and stair airflow excluded on both sides",
+    "exterior_convection": {
+      "applied_to": "ANSYS opaque exterior wall/roof faces only (per-hour table); openings and ground floors keep the static contract h_outside; RC keeps the static contract h_outside on every exterior surface (no per-hour U input) - a disclosed, ANSYS-only refinement",
+      "correlation": "McAdams (1954) simple combined: h = 5.7 + 3.8*V [5.0, 50.0] W/m2K, V = 10 m wind speed",
+      "windward_sheltered_split": "not applied: weather snapshot has no wind_direction_deg"
+    },
+    "gain_application": "ANSYS: heat flux on the zone floor slab top face; RC: added to the zone node",
+    "ground": {
+      "amplitude_K": 13.62021456500489,
+      "annual_mean_C": -3.4000817059276796,
+      "coldest_day_of_year": 15,
+      "depth_m": 1.0,
+      "source": "Kusuda-Achenbach, monthly means of leh_weather_archive.csv"
+    },
+    "hvac": "free-floating; heaters not operated",
+    "loads_within_hour": "hourly-constant (value of hour k held over (t_k, t_k+1])",
+    "occupant_sensible_W_per_person": 75.0,
+    "opaque_solar_and_sky_longwave": "excluded on both sides",
+    "solar": {
+      "albedo": 0.2,
+      "model": "Erbs diffuse split + isotropic sky (thermal-calculator/solar.py)",
+      "note": "archive timestamps are local solar time labelled +05:30",
+      "time_standard": "solar"
+    }
+  },
+  "design_id": "des_ev04_two_floor",
+  "design_revision_id": "rev_ev04_r1",
+  "hours": 48,
+  "independence": "ANSYS receives geometry, materials, films and the hourly inputs in boundary_conditions.csv only; no RC result is an input.",
+  "initial_temperature_c": 10.0,
+  "job_id": "ans_ev04_r1_4decf574_20260925T120032",
+  "material_snapshot_id": "mat_snap_himalayan_v1",
+  "mesh": {
+    "element_size_m": 0.25,
+    "element_type": "SOLID70",
+    "max_layer_slice_m": 0.05
+  },
+  "model_summary": {
+    "elements": 37374,
+    "grid_lines": [
+      49,
+      31,
+      44
+    ],
+    "interfaces": 2,
+    "junction_conflict_cells": {},
+    "materials": 17,
+    "nodes": 42352,
+    "openings": 5,
+    "surfaces": 16,
+    "warnings": [],
+    "zones": 3
+  },
+  "schema_version": "4.0",
+  "software": {
+    "cocoon_ansys": "1.0.0"
+  },
+  "start": "2026-01-24T11:00:00+05:30",
+  "surfaces": {
+    "surf_airlock_f0_floor": {
+      "area_deviation": 0.0,
+      "boundary": "ground",
+      "built_area_m2": 4.8,
+      "contract_area_m2": 4.8,
+      "surface_type": "floor",
+      "zone_id": "airlock_f0"
+    },
+    "surf_airlock_f0_living_f0_partition": {
+      "area_deviation": 0.0,
+      "boundary": "adjacent_zone",
+      "built_area_m2": 11.2,
+      "contract_area_m2": 11.2,
+      "surface_type": "partition",
+      "zone_id": "airlock_f0"
+    },
+    "surf_airlock_f0_north": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 3.36,
+      "contract_area_m2": 3.36,
+      "surface_type": "exterior_wall",
+      "zone_id": "airlock_f0"
+    },
+    "surf_airlock_f0_roof": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 4.8,
+      "contract_area_m2": 4.8,
+      "surface_type": "roof",
+      "zone_id": "airlock_f0"
+    },
+    "surf_airlock_f0_south": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 3.36,
+      "contract_area_m2": 3.36,
+      "surface_type": "exterior_wall",
+      "zone_id": "airlock_f0"
+    },
+    "surf_airlock_f0_west": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 11.2,
+      "contract_area_m2": 11.2,
+      "surface_type": "exterior_wall",
+      "zone_id": "airlock_f0"
+    },
+    "surf_living_f0_east": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 11.2,
+      "contract_area_m2": 11.2,
+      "surface_type": "exterior_wall",
+      "zone_id": "living_f0"
+    },
+    "surf_living_f0_floor": {
+      "area_deviation": 0.0,
+      "boundary": "ground",
+      "built_area_m2": 19.2,
+      "contract_area_m2": 19.2,
+      "surface_type": "floor",
+      "zone_id": "living_f0"
+    },
+    "surf_living_f0_north": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 13.44,
+      "contract_area_m2": 13.44,
+      "surface_type": "exterior_wall",
+      "zone_id": "living_f0"
+    },
+    "surf_living_f0_sleeping_f1_ceiling": {
+      "area_deviation": 0.0,
+      "boundary": "adjacent_zone",
+      "built_area_m2": 19.2,
+      "contract_area_m2": 19.2,
+      "surface_type": "ceiling",
+      "zone_id": "living_f0"
+    },
+    "surf_living_f0_south": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 13.44,
+      "contract_area_m2": 13.44,
+      "surface_type": "exterior_wall",
+      "zone_id": "living_f0"
+    },
+    "surf_sleeping_f1_east": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 11.2,
+      "contract_area_m2": 11.2,
+      "surface_type": "exterior_wall",
+      "zone_id": "sleeping_f1"
+    },
+    "surf_sleeping_f1_north": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 13.44,
+      "contract_area_m2": 13.44,
+      "surface_type": "exterior_wall",
+      "zone_id": "sleeping_f1"
+    },
+    "surf_sleeping_f1_roof": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 19.2,
+      "contract_area_m2": 19.2,
+      "surface_type": "roof",
+      "zone_id": "sleeping_f1"
+    },
+    "surf_sleeping_f1_south": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 13.44,
+      "contract_area_m2": 13.44,
+      "surface_type": "exterior_wall",
+      "zone_id": "sleeping_f1"
+    },
+    "surf_sleeping_f1_west": {
+      "area_deviation": 0.0,
+      "boundary": "outdoors",
+      "built_area_m2": 11.2,
+      "contract_area_m2": 11.2,
+      "surface_type": "exterior_wall",
+      "zone_id": "sleeping_f1"
+    }
+  },
+  "time_integration": "backward Euler (MAPDL TINTP theta=1), fixed step",
+  "timestep_s": 900.0,
+  "weather_snapshot_id": "wx_leh_20260124T11_48h",
+  "zones": {
+    "airlock_f0": {
+      "gain_area_m2": 4.8,
+      "level": 0,
+      "type": "airlock",
+      "volume_m3": 13.44
+    },
+    "living_f0": {
+      "gain_area_m2": 19.2,
+      "level": 0,
+      "type": "living",
+      "volume_m3": 53.76
+    },
+    "sleeping_f1": {
+      "gain_area_m2": 19.2,
+      "level": 1,
+      "type": "sleeping",
+      "volume_m3": 53.76
+    }
+  }
+}

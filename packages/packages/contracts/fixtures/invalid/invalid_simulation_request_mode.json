@@ -1,0 +1,14 @@
+{
+  "schema_version": "4.0",
+  "request_id": "sim_req_001",
+  "design_revision_id": "rev_airlock_living_v1",
+  "weather_snapshot_id": "wx_leh_january",
+  "engine": {
+    "name": "cocoon_multizone_rc",
+    "version": "1.0.0",
+    "mode": "conditioned",
+    "timestep_seconds": 900
+  },
+  "time_window_start": "2026-01-01T00:00:00+05:30",
+  "time_window_end": "2026-01-08T00:00:00+05:30"
+}

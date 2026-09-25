@@ -8,6 +8,9 @@ Env overrides (all optional):
   COCOON_RUN_TTL_HOURS   default 168 (run folders older than this are swept)
   COCOON_CORS_ORIGINS    default http://localhost:3000,http://127.0.0.1:3000
   COCOON_RUN_TIMEOUT_S   default 2400 (hard kill for a stuck subprocess)
+  COCOON_ANSYS_JOBS_DIR  default <repo>/ansys-pipeline/jobs (M8 job queue)
+  COCOON_MAX_ANSYS_WORKERS default 1 (concurrent MAPDL solves; one ANSYS
+                         Student session at a time)
 """
 
 import os
@@ -52,4 +55,11 @@ EXPECTED_STAGES = {
 CRITICAL_STAGES = {"1_weather", "5_pool", "6_rank", "4_features",
                    "4_features_chosen", "10_report", "FATAL"}
 
+# Module M8 (ANSYS validation) integration
+ANSYS_PIPELINE_DIR = REPO_ROOT / "ansys-pipeline"
+ANSYS_JOBS_DIR = Path(os.environ.get("COCOON_ANSYS_JOBS_DIR", ANSYS_PIPELINE_DIR / "jobs"))
+ANSYS_CASES_DIR = ANSYS_PIPELINE_DIR / "cases"
+MAX_ANSYS_WORKERS = int(os.environ.get("COCOON_MAX_ANSYS_WORKERS", "1"))
+
 RUNS_DIR.mkdir(parents=True, exist_ok=True)
+ANSYS_JOBS_DIR.mkdir(parents=True, exist_ok=True)

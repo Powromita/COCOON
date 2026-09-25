@@ -1,0 +1,25 @@
+{
+  "schema_version": "4.0",
+  "project_id": "prj_leh_winter_001",
+  "mode": "new_shelter",
+  "site": {
+    "latitude_deg": 34.1526,
+    "longitude_deg": 77.5771,
+    "elevation_m": 3500.0,
+    "timezone": "Asia/Kolkata",
+    "weather_source": "NASA_POWER",
+    "analysis_start": "2026-01-01T00:00:00+05:30",
+    "analysis_end": "2026-01-08T00:00:00+05:30"
+  },
+  "mission": {
+    "type": "living",
+    "occupants": 10,
+    "required_rooms": ["living"],
+    "target_temperature_c": 15.0,
+    "maximum_unmet_hours": 12
+  },
+  "constraints": {
+    "preferred_orientation_deg": 450.0
+  },
+  "economic_assumption_set_id": "econ_ladakh_expected_v1"
+}

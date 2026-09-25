@@ -1,0 +1,16 @@
+{
+  "schema_version": "4.0",
+  "request_id": "sim_req_leh_001",
+  "design_revision_id": "rev_airlock_living_r1",
+  "weather_snapshot_id": "wx_leh_winter_2026",
+  "engine": {
+    "name": "cocoon_multizone_rc",
+    "version": "1.0.0",
+    "mode": "ideal_load_conditioned",
+    "timestep_seconds": 900
+  },
+  "time_window_start": "2026-01-21T00:00:00+05:30",
+  "time_window_end": "2026-01-22T00:00:00+05:30",
+  "initial_temperature_c": -25.0,
+  "ground_temperature_c": -10.0
+}

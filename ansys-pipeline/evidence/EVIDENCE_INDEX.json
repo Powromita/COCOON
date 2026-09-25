@@ -1,0 +1,276 @@
+{
+  "cases": {
+    "case_01_baseline_single": {
+      "elements": 17932,
+      "job": "case_01_baseline_single/ans_ev01_r1_c2db93c8_20260925T115409",
+      "metrics": {
+        "bias_c": -1.1229,
+        "mae_c": 1.3658,
+        "max_abs_error_c": 2.7006,
+        "r_squared": 0.9644,
+        "rmse_c": 1.5644
+      },
+      "nodes": 20398,
+      "revision": "rev_ev01_r1",
+      "runtime_s": 114.7,
+      "title": "Baseline single-zone (uninsulated stone)",
+      "zones": {
+        "room": {
+          "ansys_mean_c": -8.762,
+          "ansys_min_c": -18.967,
+          "bias_c": -1.1229,
+          "envelope_loss_ansys_mean_w": 202.1,
+          "envelope_loss_mae_w": 4343.1,
+          "envelope_loss_rc_mean_w": 4540.5,
+          "mae_c": 1.3658,
+          "max_abs_error_c": 2.7006,
+          "outer_face_loss_ansys_mean_w": 13831.1,
+          "r_squared": 0.9644,
+          "rc_mean_c": -7.639,
+          "rc_min_c": -17.128,
+          "rmse_c": 1.5644
+        }
+      }
+    },
+    "case_02_insulated_single": {
+      "elements": 19228,
+      "job": "case_02_insulated_single/ans_ev02_r1_00e7abbf_20260925T115613",
+      "metrics": {
+        "bias_c": 0.4341,
+        "mae_c": 0.4468,
+        "max_abs_error_c": 1.0784,
+        "r_squared": 0.4938,
+        "rmse_c": 0.5383
+      },
+      "nodes": 21826,
+      "revision": "rev_ev02_r1",
+      "runtime_s": 123.9,
+      "title": "Improved insulated single-zone (mass inside PUF)",
+      "zones": {
+        "room": {
+          "ansys_mean_c": 9.127,
+          "ansys_min_c": 7.866,
+          "bias_c": 0.4341,
+          "envelope_loss_ansys_mean_w": 104.2,
+          "envelope_loss_mae_w": 939.9,
+          "envelope_loss_rc_mean_w": 1044.1,
+          "mae_c": 0.4468,
+          "max_abs_error_c": 1.0784,
+          "outer_face_loss_ansys_mean_w": 1617.6,
+          "r_squared": 0.4938,
+          "rc_mean_c": 8.693,
+          "rc_min_c": 6.832,
+          "rmse_c": 0.5383
+        }
+      }
+    },
+    "case_03_airlock_living": {
+      "elements": 18184,
+      "job": "case_03_airlock_living/ans_airlock_living_r1_8c859f15_20260925T115825",
+      "metrics": {
+        "bias_c": -1.6901,
+        "mae_c": 1.7501,
+        "max_abs_error_c": 3.78,
+        "r_squared": 0.9519,
+        "rmse_c": 2.0056
+      },
+      "nodes": 20958,
+      "revision": "rev_airlock_living_r1",
+      "runtime_s": 117.6,
+      "title": "Airlock + living room (M0 fixture)",
+      "zones": {
+        "airlock": {
+          "ansys_mean_c": 0.802,
+          "ansys_min_c": -4.806,
+          "bias_c": -2.1527,
+          "envelope_loss_ansys_mean_w": 201.7,
+          "envelope_loss_mae_w": 139.3,
+          "envelope_loss_rc_mean_w": 340.6,
+          "mae_c": 2.1797,
+          "max_abs_error_c": 3.78,
+          "outer_face_loss_ansys_mean_w": 2055.6,
+          "r_squared": 0.657,
+          "rc_mean_c": 2.954,
+          "rc_min_c": -1.532,
+          "rmse_c": 2.4285
+        },
+        "living": {
+          "ansys_mean_c": 17.563,
+          "ansys_min_c": 11.203,
+          "bias_c": -1.2275,
+          "envelope_loss_ansys_mean_w": -36.5,
+          "envelope_loss_mae_w": 1280.7,
+          "envelope_loss_rc_mean_w": 1244.2,
+          "mae_c": 1.3205,
+          "max_abs_error_c": 2.3009,
+          "outer_face_loss_ansys_mean_w": 5208.1,
+          "r_squared": 0.7787,
+          "rc_mean_c": 18.79,
+          "rc_min_c": 10.847,
+          "rmse_c": 1.4655
+        }
+      }
+    },
+    "case_04_two_floor": {
+      "elements": 37374,
+      "job": "case_04_two_floor/ans_ev04_r1_4decf574_20260925T120032",
+      "metrics": {
+        "bias_c": 0.7679,
+        "mae_c": 1.139,
+        "max_abs_error_c": 3.9187,
+        "r_squared": 0.6476,
+        "rmse_c": 1.6287
+      },
+      "nodes": 42352,
+      "revision": "rev_ev04_r1",
+      "runtime_s": 224.3,
+      "title": "Two-floor: airlock + living, sleeping above living",
+      "zones": {
+        "airlock_f0": {
+          "ansys_mean_c": 5.425,
+          "ansys_min_c": 1.54,
+          "bias_c": 2.467,
+          "envelope_loss_ansys_mean_w": 117.9,
+          "envelope_loss_mae_w": 192.7,
+          "envelope_loss_rc_mean_w": 310.6,
+          "mae_c": 2.467,
+          "max_abs_error_c": 3.9187,
+          "outer_face_loss_ansys_mean_w": 534.8,
+          "r_squared": -0.3119,
+          "rc_mean_c": 2.958,
+          "rc_min_c": -2.377,
+          "rmse_c": 2.7113
+        },
+        "living_f0": {
+          "ansys_mean_c": 10.85,
+          "ansys_min_c": 10.02,
+          "bias_c": -0.1726,
+          "envelope_loss_ansys_mean_w": 32.7,
+          "envelope_loss_mae_w": 730.2,
+          "envelope_loss_rc_mean_w": 762.8,
+          "mae_c": 0.5538,
+          "max_abs_error_c": 1.0153,
+          "outer_face_loss_ansys_mean_w": 1103.5,
+          "r_squared": -0.6881,
+          "rc_mean_c": 11.023,
+          "rc_min_c": 9.356,
+          "rmse_c": 0.6312
+        },
+        "sleeping_f1": {
+          "ansys_mean_c": 7.947,
+          "ansys_min_c": 5.52,
+          "bias_c": 0.0092,
+          "envelope_loss_ansys_mean_w": 533.6,
+          "envelope_loss_mae_w": 322.2,
+          "envelope_loss_rc_mean_w": 802.4,
+          "mae_c": 0.3961,
+          "max_abs_error_c": 0.8206,
+          "outer_face_loss_ansys_mean_w": 1293.3,
+          "r_squared": 0.8958,
+          "rc_mean_c": 7.938,
+          "rc_min_c": 5.894,
+          "rmse_c": 0.4563
+        }
+      }
+    }
+  },
+  "generated_at": "2026-09-25T12:25:20+00:00",
+  "mesh_check": {
+    "case_03_airlock_living": {
+      "0.15": {
+        "job": "mesh_check/case_03_airlock_living/h0.15/ans_airlock_living_r1_ca12f308_20260925T120516",
+        "nodes": 72777,
+        "vs_finest": {}
+      },
+      "0.25": {
+        "job": "case_03_airlock_living/ans_airlock_living_r1_8c859f15_20260925T115825",
+        "nodes": 20958,
+        "vs_finest": {
+          "airlock": {
+            "max_abs_diff_c": 0.1014,
+            "mean_abs_diff_c": 0.0761
+          },
+          "living": {
+            "max_abs_diff_c": 0.2977,
+            "mean_abs_diff_c": 0.1973
+          }
+        }
+      },
+      "0.40": {
+        "job": "mesh_check/case_03_airlock_living/h0.40/ans_airlock_living_r1_19ab6f83_20260925T120426",
+        "nodes": 8240,
+        "vs_finest": {
+          "airlock": {
+            "max_abs_diff_c": 0.1529,
+            "mean_abs_diff_c": 0.1072
+          },
+          "living": {
+            "max_abs_diff_c": 0.5727,
+            "mean_abs_diff_c": 0.3416
+          }
+        }
+      }
+    },
+    "case_04_two_floor": {
+      "0.18": {
+        "job": "mesh_check/case_04_two_floor/h0.18/ans_ev04_r1_54e82fbf_20260925T121320",
+        "nodes": 85944,
+        "vs_finest": {}
+      },
+      "0.25": {
+        "job": "case_04_two_floor/ans_ev04_r1_4decf574_20260925T120032",
+        "nodes": 42352,
+        "vs_finest": {
+          "airlock_f0": {
+            "max_abs_diff_c": 0.0421,
+            "mean_abs_diff_c": 0.023
+          },
+          "living_f0": {
+            "max_abs_diff_c": 0.0475,
+            "mean_abs_diff_c": 0.0223
+          },
+          "sleeping_f1": {
+            "max_abs_diff_c": 0.0659,
+            "mean_abs_diff_c": 0.0339
+          }
+        }
+      },
+      "0.40": {
+        "job": "mesh_check/case_04_two_floor/h0.40/ans_ev04_r1_8f011e94_20260925T121158",
+        "nodes": 20422,
+        "vs_finest": {
+          "airlock_f0": {
+            "max_abs_diff_c": 0.1087,
+            "mean_abs_diff_c": 0.059
+          },
+          "living_f0": {
+            "max_abs_diff_c": 0.0948,
+            "mean_abs_diff_c": 0.0445
+          },
+          "sleeping_f1": {
+            "max_abs_diff_c": 0.1449,
+            "mean_abs_diff_c": 0.07
+          }
+        }
+      }
+    }
+  },
+  "standard_element_size_m": 0.25,
+  "timestep_check": {
+    "case_03_airlock_living": {
+      "diff": {
+        "airlock": {
+          "max_abs_diff_c": 0.0355,
+          "mean_abs_diff_c": 0.0158
+        },
+        "living": {
+          "max_abs_diff_c": 0.0237,
+          "mean_abs_diff_c": 0.0067
+        }
+      },
+      "dt_fine_s": 450.0,
+      "dt_standard_s": 900
+    }
+  },
+  "weather": "wx_leh_20260124T11_48h.json"
+}

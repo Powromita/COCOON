@@ -1,0 +1,21 @@
+{
+  "code_commit": "6223abd34256a955b9c72191994c544a8895dce6+dirty",
+  "created_at": "2026-09-25T12:00:32+00:00",
+  "files": {
+    "boundary_conditions.csv": "package/boundary_conditions.csv",
+    "building.json": "package/building.json",
+    "materials.json": "package/materials.json",
+    "scenario.json": "package/scenario.json",
+    "solver_config.json": "package/solver_config.json",
+    "weather.json": "package/weather.json"
+  },
+  "job_id": "ans_ev04_r1_4decf574_20260925T120032",
+  "sha256": {
+    "boundary_conditions.csv": "2ae640346a2c445d55868df885f1d14539dce502c7e224c6501986b0225014aa",
+    "building.json": "2ef7d24b861edbdb628189cfaa9fed2ac1f66057e5c8260ba878c25a9334710a",
+    "materials.json": "6e9c50067762c59007645839123f13ab8af5a4a5f6530cb1d301d5e9c421d0f6",
+    "scenario.json": "e991e86f75e3d04863021b7d26c6e571a361a7649d3d114f196ef1568d68f4a0",
+    "solver_config.json": "8d36c0be6bdbe000a115353f3c9eaaa4a663a7c191e630b1f01a60e933ad25b1",
+    "weather.json": "92460f5a870258806da1d31ff6bbe356c5d3cb860254045a6a52deba03b99679"
+  }
+}

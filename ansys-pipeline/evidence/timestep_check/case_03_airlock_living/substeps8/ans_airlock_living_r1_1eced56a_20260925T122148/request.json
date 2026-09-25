@@ -1,0 +1,24 @@
+{
+  "design_revision_id": "rev_airlock_living_r1",
+  "imposed_indoor_temp_forbidden": true,
+  "input_hashes": {
+    "boundary_conditions.csv": "36ad46d44fb675f97a9bc2c51d2f6882c6401f814956def31215c2e22288d4a2",
+    "building.json": "b5308661eb34ab39f89fa7b4623acf41b6e046a461a95977fd55d9344c45ad06",
+    "materials.json": "6e9c50067762c59007645839123f13ab8af5a4a5f6530cb1d301d5e9c421d0f6",
+    "scenario.json": "0114afa01e17e38d042da83e1b4768010ccc94c318f1c85dc58d4741d0019ccc",
+    "solver_config.json": "41b9626b85306d6421cdbad01b9d6aef3cb32d32eeaf13c118b322f3f2c183c6",
+    "weather.json": "92460f5a870258806da1d31ff6bbe356c5d3cb860254045a6a52deba03b99679"
+  },
+  "job_id": "ans_airlock_living_r1_1eced56a_20260925T122148",
+  "priority": 0,
+  "schema_version": "4.0",
+  "solver_config": {
+    "element_size_m": 0.25,
+    "element_type": "SOLID70",
+    "substeps_max": 8,
+    "substeps_min": 8,
+    "timeout_seconds": 5400
+  },
+  "submitted_at": "2026-09-25T12:21:48Z",
+  "weather_snapshot_id": "wx_leh_20260124T11_48h"
+}

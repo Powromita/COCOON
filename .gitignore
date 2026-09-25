@@ -38,3 +38,8 @@ ansys-pipeline/results/**/ansys_run/
 *.out
 cleanup-ansys-*.bat
 .__tmp__.*
+
+# M8 ANSYS worker: runtime job queue and MAPDL scratch (evidence/ IS tracked)
+ansys-pipeline/jobs/
+ansys-pipeline/**/_mapdl_work/
+ansys-pipeline/**/.lock

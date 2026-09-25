@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": "DESIGN_OUTSIDE_ML_COVERAGE",
+    "message": "ML screening was skipped; RC verification was started.",
+    "details": {
+      "reason": "Geometry features exceed training envelope bounds",
+      "action_taken": "direct_rc_dispatch"
+    },
+    "trace_id": "7b7e8d2e-42c2-4841-9494-b746142a59f1",
+    "retryable": false
+  }
+}

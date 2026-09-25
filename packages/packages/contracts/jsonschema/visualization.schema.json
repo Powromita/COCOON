@@ -1,0 +1,363 @@
+{
+  "$defs": {
+    "ContourArtifactRef": {
+      "additionalProperties": false,
+      "description": "Reference to an exported ANSYS or FEA 2D contour map frame.",
+      "properties": {
+        "caption": {
+          "description": "Human-readable descriptive caption",
+          "title": "Caption",
+          "type": "string"
+        },
+        "image_path": {
+          "description": "Relative path or asset URI to rendered contour PNG",
+          "title": "Image Path",
+          "type": "string"
+        },
+        "step_number": {
+          "description": "Simulation hour or substep index",
+          "title": "Step Number",
+          "type": "integer"
+        },
+        "timestamp": {
+          "description": "Associated observation timestamp",
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_number",
+        "timestamp",
+        "image_path",
+        "caption"
+      ],
+      "title": "ContourArtifactRef",
+      "type": "object"
+    },
+    "MeshBox": {
+      "additionalProperties": false,
+      "description": "Axis-aligned geometric box representation of a room or envelope wall.",
+      "properties": {
+        "floor_level": {
+          "default": 0,
+          "description": "Floor index for layer toggling",
+          "title": "Floor Level",
+          "type": "integer"
+        },
+        "id": {
+          "description": "Unique mesh box identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "material_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional material styling ID (mat_...)",
+          "title": "Material Id"
+        },
+        "name": {
+          "description": "Display label (e.g. 'Zone: living', 'South Wall')",
+          "title": "Name",
+          "type": "string"
+        },
+        "origin_m": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "World origin corner coordinates (m)"
+        },
+        "size_m": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "Bounding box dimensions (m)"
+        },
+        "zone_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Owning thermal zone ID if applicable",
+          "title": "Zone Id"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "origin_m",
+        "size_m"
+      ],
+      "title": "MeshBox",
+      "type": "object"
+    },
+    "OpeningVisual": {
+      "additionalProperties": false,
+      "description": "Window or door cutout overlay positioned on a parent surface.",
+      "properties": {
+        "id": {
+          "description": "Unique opening visual identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "opening_type": {
+          "description": "Opening classification ('window' or 'door')",
+          "title": "Opening Type",
+          "type": "string"
+        },
+        "parent_surface_id": {
+          "description": "Owning surface visual ID",
+          "title": "Parent Surface Id",
+          "type": "string"
+        },
+        "position_m": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "Local or world translation offset (m)"
+        },
+        "size_m": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "Opening width, height, and depth (m)"
+        }
+      },
+      "required": [
+        "id",
+        "opening_type",
+        "parent_surface_id",
+        "position_m",
+        "size_m"
+      ],
+      "title": "OpeningVisual",
+      "type": "object"
+    },
+    "SurfaceVisual": {
+      "additionalProperties": false,
+      "description": "Polygonal surface facet for 3D rendering and raycast selection.",
+      "properties": {
+        "boundary_type": {
+          "description": "Boundary condition ('outdoors', 'ground', 'adjacent_zone')",
+          "title": "Boundary Type",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique visual facet identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "is_exterior": {
+          "default": true,
+          "description": "Whether surface faces outdoor ambient weather",
+          "title": "Is Exterior",
+          "type": "boolean"
+        },
+        "normal": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "Outward surface unit normal vector"
+        },
+        "parent_mesh_id": {
+          "description": "Reference ID of parent MeshBox",
+          "title": "Parent Mesh Id",
+          "type": "string"
+        },
+        "surface_type": {
+          "description": "Surface category ('wall', 'roof', 'floor', 'partition')",
+          "title": "Surface Type",
+          "type": "string"
+        },
+        "vertices": {
+          "description": "Perimeter corner coordinates (m)",
+          "items": {
+            "$ref": "#/$defs/Vector3D"
+          },
+          "title": "Vertices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "parent_mesh_id",
+        "surface_type",
+        "boundary_type"
+      ],
+      "title": "SurfaceVisual",
+      "type": "object"
+    },
+    "Vector3D": {
+      "additionalProperties": false,
+      "description": "3-dimensional Cartesian coordinate or dimension vector in meters.",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "title": "Vector3D",
+      "type": "object"
+    },
+    "VisualizationSource": {
+      "description": "Origin of the visual model payload.",
+      "enum": [
+        "geometry",
+        "rc",
+        "ansys"
+      ],
+      "title": "VisualizationSource",
+      "type": "string"
+    },
+    "ZoneTemperatureSeries": {
+      "additionalProperties": false,
+      "description": "Synchronized timeseries associating temperature colors with 3D zones.",
+      "properties": {
+        "temperatures_c": {
+          "description": "Calculated air temperatures (\u00b0C)",
+          "items": {
+            "type": "number"
+          },
+          "title": "Temperatures C",
+          "type": "array"
+        },
+        "timestamps": {
+          "description": "Series timestamps corresponding to temperature points",
+          "items": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "title": "Timestamps",
+          "type": "array"
+        },
+        "zone_id": {
+          "description": "Target zone identifier",
+          "title": "Zone Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "zone_id",
+        "timestamps",
+        "temperatures_c"
+      ],
+      "title": "ZoneTemperatureSeries",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/visualization.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: VisualizationModel in cocoon_contracts. Complete 3D visual scene consumed identically by web and mobile viewers.",
+  "properties": {
+    "boxes": {
+      "description": "3D rectangular volume blocks (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/MeshBox"
+      },
+      "title": "Boxes",
+      "type": "array"
+    },
+    "contour_artifacts": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ContourArtifactRef"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Pre-rendered FEM contour snapshots if available",
+      "title": "Contour Artifacts"
+    },
+    "design_revision_id": {
+      "description": "Target design revision ID (rev_...)",
+      "title": "Design Revision Id",
+      "type": "string"
+    },
+    "generated_at": {
+      "description": "Visual model creation timestamp",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "model_id": {
+      "description": "Visualization model identifier starting with 'viz_'",
+      "title": "Model Id",
+      "type": "string"
+    },
+    "openings": {
+      "description": "Glazing and door visual penetrations (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/OpeningVisual"
+      },
+      "title": "Openings",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/VisualizationSource",
+      "description": "Data source driving the visual representation"
+    },
+    "surfaces": {
+      "description": "Explicit polygon boundary surfaces (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/SurfaceVisual"
+      },
+      "title": "Surfaces",
+      "type": "array"
+    },
+    "temperature_series": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ZoneTemperatureSeries"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Thermal timeseries for interactive slider playback",
+      "title": "Temperature Series"
+    }
+  },
+  "required": [
+    "schema_version",
+    "model_id",
+    "design_revision_id",
+    "source",
+    "boxes",
+    "surfaces",
+    "openings",
+    "generated_at"
+  ],
+  "title": "VisualizationModel",
+  "type": "object"
+}

@@ -1,0 +1,15 @@
+# Python build & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# Node & TypeScript
+node_modules/
+*.tsbuildinfo
+
+# Scratch & temporary test artifacts
+scratch/

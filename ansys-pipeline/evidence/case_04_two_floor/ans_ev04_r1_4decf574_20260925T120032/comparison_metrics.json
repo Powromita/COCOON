@@ -1,0 +1,303 @@
+{
+  "pooled": {
+    "mae_c": 1.139,
+    "rmse_c": 1.6287,
+    "max_abs_error_c": 3.9187,
+    "bias_c": 0.7679,
+    "r_squared": 0.6476
+  },
+  "zones": {
+    "airlock_f0": {
+      "mae_c": 2.467,
+      "rmse_c": 2.7113,
+      "max_abs_error_c": 3.9187,
+      "bias_c": 2.467,
+      "r_squared": -0.3119,
+      "ansys_mean_c": 5.425,
+      "rc_mean_c": 2.958,
+      "ansys_min_c": 1.54,
+      "rc_min_c": -2.377,
+      "envelope_loss_ansys_mean_w": 117.9,
+      "envelope_loss_rc_mean_w": 310.6,
+      "envelope_loss_mae_w": 192.7,
+      "outer_face_loss_ansys_mean_w": 534.8
+    },
+    "living_f0": {
+      "mae_c": 0.5538,
+      "rmse_c": 0.6312,
+      "max_abs_error_c": 1.0153,
+      "bias_c": -0.1726,
+      "r_squared": -0.6881,
+      "ansys_mean_c": 10.85,
+      "rc_mean_c": 11.023,
+      "ansys_min_c": 10.02,
+      "rc_min_c": 9.356,
+      "envelope_loss_ansys_mean_w": 32.7,
+      "envelope_loss_rc_mean_w": 762.8,
+      "envelope_loss_mae_w": 730.2,
+      "outer_face_loss_ansys_mean_w": 1103.5
+    },
+    "sleeping_f1": {
+      "mae_c": 0.3961,
+      "rmse_c": 0.4563,
+      "max_abs_error_c": 0.8206,
+      "bias_c": 0.0092,
+      "r_squared": 0.8958,
+      "ansys_mean_c": 7.947,
+      "rc_mean_c": 7.938,
+      "ansys_min_c": 5.52,
+      "rc_min_c": 5.894,
+      "envelope_loss_ansys_mean_w": 533.6,
+      "envelope_loss_rc_mean_w": 802.4,
+      "envelope_loss_mae_w": 322.2,
+      "outer_face_loss_ansys_mean_w": 1293.3
+    }
+  },
+  "zone_ranking_by_mean_temperature": {
+    "ansys": [
+      "living_f0",
+      "sleeping_f1",
+      "airlock_f0"
+    ],
+    "rc": [
+      "living_f0",
+      "sleeping_f1",
+      "airlock_f0"
+    ],
+    "agree": true
+  },
+  "hours": 48,
+  "compared_quantity": "volume-weighted zone air temperature (ANSYS) vs zone node temperature (RC), end of each hour",
+  "rc": {
+    "engine": "thermal-calculator/multiroom_rc.py run_multiroom_simulation",
+    "effective_mass_fraction": 0.5,
+    "rooms": {
+      "airlock_f0": {
+        "capacitance_MJ_K": 3.4987,
+        "volume_m3": 13.44
+      },
+      "living_f0": {
+        "capacitance_MJ_K": 10.3601,
+        "volume_m3": 53.76
+      },
+      "sleeping_f1": {
+        "capacitance_MJ_K": 8.7705,
+        "volume_m3": 53.76
+      }
+    },
+    "surfaces": [
+      {
+        "id": "surf_airlock_f0_west",
+        "room": "airlock_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.2,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_airlock_f0_south",
+        "room": "airlock_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 1.56,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_airlock_f0_north",
+        "room": "airlock_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 3.36,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_airlock_f0_floor",
+        "room": "airlock_f0",
+        "boundary": "ground",
+        "adjacent": null,
+        "area_m2": 4.8,
+        "U_W_m2K": 0.4166
+      },
+      {
+        "id": "surf_airlock_f0_roof",
+        "room": "airlock_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 4.8,
+        "U_W_m2K": 0.2223
+      },
+      {
+        "id": "surf_living_f0_east",
+        "room": "living_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.2,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_living_f0_south",
+        "room": "living_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.04,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_living_f0_north",
+        "room": "living_f0",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 13.44,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_living_f0_floor",
+        "room": "living_f0",
+        "boundary": "ground",
+        "adjacent": null,
+        "area_m2": 19.2,
+        "U_W_m2K": 0.4166
+      },
+      {
+        "id": "surf_sleeping_f1_west",
+        "room": "sleeping_f1",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.2,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_sleeping_f1_east",
+        "room": "sleeping_f1",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 10.2,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_sleeping_f1_south",
+        "room": "sleeping_f1",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.64,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_sleeping_f1_north",
+        "room": "sleeping_f1",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 13.44,
+        "U_W_m2K": 0.3643
+      },
+      {
+        "id": "surf_sleeping_f1_roof",
+        "room": "sleeping_f1",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 19.2,
+        "U_W_m2K": 0.2223
+      },
+      {
+        "id": "surf_airlock_f0_living_f0_partition",
+        "room": "airlock_f0",
+        "boundary": "adjacent",
+        "adjacent": "living_f0",
+        "area_m2": 9.4,
+        "U_W_m2K": 0.3956
+      },
+      {
+        "id": "op_airlock_living_door",
+        "room": "airlock_f0",
+        "boundary": "adjacent",
+        "adjacent": "living_f0",
+        "area_m2": 1.8,
+        "U_W_m2K": 2.2
+      },
+      {
+        "id": "surf_living_f0_sleeping_f1_ceiling",
+        "room": "living_f0",
+        "boundary": "adjacent",
+        "adjacent": "sleeping_f1",
+        "area_m2": 19.2,
+        "U_W_m2K": 1.8736
+      }
+    ],
+    "windows": [
+      {
+        "id": "op_airlock_entry_door",
+        "room": "airlock_f0",
+        "area_m2": 1.8,
+        "U_W_m2K": 2.2,
+        "SHGC": 0.0
+      },
+      {
+        "id": "op_living_south_window",
+        "room": "living_f0",
+        "area_m2": 2.4,
+        "U_W_m2K": 1.8,
+        "SHGC": 0.62
+      },
+      {
+        "id": "op_sleeping_east_window",
+        "room": "sleeping_f1",
+        "area_m2": 1.0,
+        "U_W_m2K": 1.8,
+        "SHGC": 0.62
+      },
+      {
+        "id": "op_sleeping_south_window",
+        "room": "sleeping_f1",
+        "area_m2": 1.8,
+        "U_W_m2K": 1.8,
+        "SHGC": 0.62
+      }
+    ]
+  },
+  "envelope_loss_definition": "room side: inside-film flow of exterior opaque surfaces + opening outer-face flow; 'outer_face_loss' also includes heat released by mass outboard of the room",
+  "diagnostics": {
+    "position_weighted_capacitance": {
+      "purpose": "diagnostic only - NOT the official RC result",
+      "rule": "layer mass x exp(-R_to_room / 0.8) (legacy heat_transfer.position_weight) instead of EFFECTIVE_MASS_FRACTION=0.5",
+      "pooled": {
+        "mae_c": 0.4433,
+        "rmse_c": 0.5663,
+        "max_abs_error_c": 1.4985,
+        "bias_c": -0.0266,
+        "r_squared": 0.9574
+      },
+      "zones": {
+        "airlock_f0": {
+          "mae_c": 0.4617,
+          "rmse_c": 0.549,
+          "max_abs_error_c": 0.8432,
+          "bias_c": 0.4617,
+          "r_squared": 0.9462,
+          "rc_mean_c": 4.963
+        },
+        "living_f0": {
+          "mae_c": 0.2383,
+          "rmse_c": 0.2694,
+          "max_abs_error_c": 0.4641,
+          "bias_c": -0.0375,
+          "r_squared": 0.6925,
+          "rc_mean_c": 10.888
+        },
+        "sleeping_f1": {
+          "mae_c": 0.63,
+          "rmse_c": 0.7668,
+          "max_abs_error_c": 1.4985,
+          "bias_c": -0.5041,
+          "r_squared": 0.7058,
+          "rc_mean_c": 8.451
+        }
+      },
+      "rooms_capacitance_MJ_K": {
+        "airlock_f0": 5.4547,
+        "living_f0": 16.2815,
+        "sleeping_f1": 13.5098
+      }
+    }
+  },
+  "note": "Descriptive agreement for this exact revision and scenario only; not a general accuracy claim."
+}

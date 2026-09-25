@@ -1,0 +1,28 @@
+{
+  "design_revision_id": "rev_airlock_living_r1",
+  "element_size_m": 0.4,
+  "element_type": "SOLID70",
+  "elements": 6669,
+  "grid_lines": [
+    34,
+    22,
+    19
+  ],
+  "hours": 48,
+  "images": {},
+  "job_id": "ans_airlock_living_r1_19ab6f83_20260925T120426",
+  "mapdl_version": "26.1",
+  "max_layer_slice_m": 0.05,
+  "nodes": 8240,
+  "runtime_s": 42.4,
+  "solver_type": "SPARSE (MAPDL default for transient thermal)",
+  "time_integration": "backward Euler",
+  "timestep_s": 900.0,
+  "timings_s": {
+    "extract_s": 2.4,
+    "mesh_s": 18.8,
+    "prepare_s": 0.1,
+    "solve_s": 21.0
+  },
+  "warnings": []
+}

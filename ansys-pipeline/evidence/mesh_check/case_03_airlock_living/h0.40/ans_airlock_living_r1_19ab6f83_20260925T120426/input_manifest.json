@@ -1,0 +1,21 @@
+{
+  "code_commit": "6223abd34256a955b9c72191994c544a8895dce6+dirty",
+  "created_at": "2026-09-25T12:04:26+00:00",
+  "files": {
+    "boundary_conditions.csv": "package/boundary_conditions.csv",
+    "building.json": "package/building.json",
+    "materials.json": "package/materials.json",
+    "scenario.json": "package/scenario.json",
+    "solver_config.json": "package/solver_config.json",
+    "weather.json": "package/weather.json"
+  },
+  "job_id": "ans_airlock_living_r1_19ab6f83_20260925T120426",
+  "sha256": {
+    "boundary_conditions.csv": "36ad46d44fb675f97a9bc2c51d2f6882c6401f814956def31215c2e22288d4a2",
+    "building.json": "b5308661eb34ab39f89fa7b4623acf41b6e046a461a95977fd55d9344c45ad06",
+    "materials.json": "6e9c50067762c59007645839123f13ab8af5a4a5f6530cb1d301d5e9c421d0f6",
+    "scenario.json": "c1f8d41e3cef8b9afceb01f06e8ebf180bd0e697a28e2272f86dc91e79911daf",
+    "solver_config.json": "1f3163954f6984d714a922487da93f7dc402596ec777c470a3497af3fd2005e9",
+    "weather.json": "92460f5a870258806da1d31ff6bbe356c5d3cb860254045a6a52deba03b99679"
+  }
+}

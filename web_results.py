@@ -104,28 +104,9 @@ def _logistics(run_dir: Path) -> list:
 def _ansys(run_dir: Path) -> dict:
     p = run_dir / "ansys_validation_summary.csv"
     if not p.exists():
-        bench_ref = Path(__file__).parent / "benchmarks" / "ansys_reference"
-        bench_legacy = Path(__file__).parent / "runs" / "20260909T193431Z-8d13"
-        bench = bench_ref if (bench_ref / "ansys_validation_summary.csv").exists() else bench_legacy
-        if (bench / "ansys_validation_summary.csv").exists():
-            try:
-                b_df = pd.read_csv(bench / "ansys_validation_summary.csv")
-                rows = [{
-                    "design_id": int(r["design_id"]),
-                    "RC_Tmin_C": float(r["RC_Tmin_C"]), "ANSYS_Tmin_C": float(r["ANSYS_Tmin_C"]),
-                    "RC_Tmean_C": float(r["RC_Tmean_C"]), "ANSYS_Tmean_C": float(r["ANSYS_Tmean_C"]),
-                    "RC_Tmax_C": float(r["RC_Tmax_C"]), "ANSYS_Tmax_C": float(r["ANSYS_Tmax_C"]),
-                    "MAE_C": float(r["MAE_C"]), "RMSE_C": float(r["RMSE_C"]),
-                    "RC_rank": int(r["RC_rank"]), "ANSYS_rank": int(r["ANSYS_rank"]),
-                } for _, r in b_df.iterrows()]
-                agree = bool((b_df["RC_rank"] == b_df["ANSYS_rank"]).all())
-                offset = round(float((b_df["ANSYS_Tmean_C"] - b_df["RC_Tmean_C"]).mean()), 2)
-                return {"ran": False, "is_benchmark": True, "rows": rows, "rankings_agree": agree,
-                        "mean_offset_C": offset, "worst_mae_C": round(float(b_df["MAE_C"].max()), 2),
-                        "series": _load(bench / "ansys_validation_series.json")}
-            except Exception:
-                pass
-        return {"ran": False, "rows": [], "rankings_agree": True,
+        # No ANSYS result for THIS run. Never substitute a stored benchmark
+        # (PRD v4 §14.12 / FR-019); see ansys-pipeline/quarantined/QUARANTINE.md
+        return {"ran": False, "is_benchmark": False, "rows": [], "rankings_agree": True,
                 "mean_offset_C": 0.0, "worst_mae_C": 0.0, "series": None}
     df = pd.read_csv(p)
     rows = [{

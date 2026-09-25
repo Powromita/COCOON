@@ -1,0 +1,28 @@
+{
+  "design_revision_id": "rev_ev04_r1",
+  "element_size_m": 0.18,
+  "element_type": "SOLID70",
+  "elements": 78067,
+  "grid_lines": [
+    60,
+    40,
+    54
+  ],
+  "hours": 48,
+  "images": {},
+  "job_id": "ans_ev04_r1_54e82fbf_20260925T121320",
+  "mapdl_version": "26.1",
+  "max_layer_slice_m": 0.045,
+  "nodes": 85944,
+  "runtime_s": 498.7,
+  "solver_type": "SPARSE (MAPDL default for transient thermal)",
+  "time_integration": "backward Euler",
+  "timestep_s": 900.0,
+  "timings_s": {
+    "extract_s": 19.7,
+    "mesh_s": 21.2,
+    "prepare_s": 1.0,
+    "solve_s": 456.9
+  },
+  "warnings": []
+}

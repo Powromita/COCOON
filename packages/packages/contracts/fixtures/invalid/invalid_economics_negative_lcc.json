@@ -1,0 +1,28 @@
+{
+  "schema_version": "4.0",
+  "analysis_id": "econ_ladakh_airlock_v1",
+  "design_id": "des_airlock_living",
+  "design_revision_id": "rev_airlock_living_v1",
+  "assumption_set_id": "econ_ladakh_expected_v1",
+  "scenario": "expected",
+  "capex": {
+    "materials_inr": 850000.0,
+    "labour_inr": 250000.0,
+    "transport_inr": 350000.0,
+    "equipment_inr": 150000.0,
+    "total_capex_inr": 1600000.0
+  },
+  "annual_cash_flows": [
+    {
+      "year": 1,
+      "fuel_cost_inr": 120000.0,
+      "maintenance_cost_inr": 15000.0,
+      "logistics_cost_inr": 30000.0,
+      "total_opex_inr": 165000.0,
+      "discounted_opex_inr": 152777.78
+    }
+  ],
+  "lcc_inr": -1000.0,
+  "annual_fuel_litres": 1250.0,
+  "created_at": "2026-01-01T00:00:00+05:30"
+}

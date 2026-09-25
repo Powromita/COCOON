@@ -1,0 +1,48 @@
+{
+  "schema_version": "4.0",
+  "project_id": "invalid_project_prefix_without_prj",
+  "name": "Invalid Project",
+  "mode": "new_shelter",
+  "site": {
+    "latitude_deg": 34.1526,
+    "longitude_deg": 77.5771,
+    "elevation_m": 3500.0,
+    "timezone": "Asia/Kolkata",
+    "weather_source": "NASA_POWER",
+    "analysis_start": "2026-01-01T00:00:00+05:30",
+    "analysis_end": "2026-01-08T00:00:00+05:30"
+  },
+  "requirements": {
+    "schema_version": "4.0",
+    "project_id": "prj_valid_id",
+    "mode": "new_shelter",
+    "site": {
+      "latitude_deg": 34.1526,
+      "longitude_deg": 77.5771,
+      "elevation_m": 3500.0,
+      "timezone": "Asia/Kolkata",
+      "weather_source": "NASA_POWER",
+      "analysis_start": "2026-01-01T00:00:00+05:30",
+      "analysis_end": "2026-01-08T00:00:00+05:30"
+    },
+    "mission": {
+      "type": "living_sleeping",
+      "occupants": 30,
+      "required_rooms": ["airlock", "living"],
+      "occupancy_schedule_id": "continuous_30",
+      "target_temperature_c": 15.0,
+      "maximum_unmet_hours": 12.0
+    },
+    "constraints": {
+      "maximum_footprint_m2": 48.0,
+      "maximum_floors": 1,
+      "maximum_capex_inr": 2500000.0,
+      "available_material_ids": ["stone"],
+      "heater_fuels": ["kerosene"],
+      "preferred_orientation_deg": null
+    },
+    "economic_assumption_set_id": "econ_ladakh_expected_v1"
+  },
+  "created_at": "2026-01-01T00:00:00+05:30",
+  "updated_at": "2026-01-01T00:00:00+05:30"
+}

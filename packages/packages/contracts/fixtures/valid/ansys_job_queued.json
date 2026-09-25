@@ -1,0 +1,20 @@
+{
+  "schema_version": "4.0",
+  "job_id": "ans_job_airlock_living_001",
+  "design_revision_id": "rev_airlock_living_r1",
+  "weather_snapshot_id": "wx_leh_winter_2026",
+  "solver_config": {
+    "element_size_m": 0.25,
+    "element_type": "SOLID70",
+    "substeps_min": 1,
+    "substeps_max": 20,
+    "timeout_seconds": 3600
+  },
+  "input_hashes": {
+    "design_json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "weather_csv": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+  },
+  "priority": 0,
+  "submitted_at": "2026-09-20T15:00:00+05:30",
+  "imposed_indoor_temp_forbidden": true
+}

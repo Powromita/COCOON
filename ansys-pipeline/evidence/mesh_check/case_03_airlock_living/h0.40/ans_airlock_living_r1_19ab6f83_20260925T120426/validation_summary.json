@@ -1,0 +1,56 @@
+{
+  "artifacts": {
+    "artifacts": {
+      "boundary_conditions_csv": "package/boundary_conditions.csv",
+      "checksums": "checksums.sha256",
+      "comparison_metrics": "comparison_metrics.json",
+      "comparison_plot_png": "rc_vs_ansys.png",
+      "heat_flux_series_csv": "heat_flux_series.csv",
+      "input_manifest": "input_manifest.json",
+      "rc_series_csv": "rc_series.csv",
+      "scenario": "package/scenario.json",
+      "solver_manifest": "solver_manifest.json",
+      "surface_temperature_series_csv": "surface_temperature_series.csv",
+      "temperature_series_csv": "temperature_series.csv",
+      "viewer_payload": "mesh_temperature.json"
+    },
+    "checksums_sha256": {
+      "boundary_conditions_csv": "36ad46d44fb675f97a9bc2c51d2f6882c6401f814956def31215c2e22288d4a2",
+      "comparison_metrics": "6466bd3c3ba3bf6304487b3ae642940926a9e1a86479bd10650c06d8fa90408b",
+      "comparison_plot_png": "e1a2ab35ed8381a30ae997231f8ed468447b5c81f9181a80d3ae5a8efd7ef47d",
+      "heat_flux_series_csv": "b2e18a56197b93b065d80c5dfdc2645e7d194140ac128c9459873e62bff453ac",
+      "input_manifest": "5ae44caa56e2ba274ba7dd617eb070adda186804ebcc7f005206679056b856af",
+      "rc_series_csv": "5e5935365d3ff81648a4bd445e07a9310589e829f51ecee30cf1de8b280c5bf2",
+      "scenario": "c1f8d41e3cef8b9afceb01f06e8ebf180bd0e697a28e2272f86dc91e79911daf",
+      "solver_manifest": "1fe24a4d7bc26158dd10c7e3e58ab58be5ae0ae41b8de5f8480d825391d9bcd6",
+      "surface_temperature_series_csv": "d0b62198ba32d0876782a8e2ec1e43919699d549f4c3f137408865d7c4827a21",
+      "temperature_series_csv": "3fafa95ba1957cbebbaff4a2252f156b80d8c18f49c6225ba27ff1e506bc72bd",
+      "viewer_payload": "3d8582cda6dc941c0f7d81d91aed69559bcbd0b00fffd81402478d939291ac7a"
+    }
+  },
+  "completed_at": "2026-09-25T12:05:15Z",
+  "design_revision_id": "rev_airlock_living_r1",
+  "error_reason": null,
+  "job_id": "ans_airlock_living_r1_19ab6f83_20260925T120426",
+  "metrics": {
+    "bias_c": -1.7778,
+    "mae_c": 1.8376,
+    "max_abs_error_c": 3.8276,
+    "r_squared": 0.9472,
+    "rmse_c": 2.0879
+  },
+  "schema_version": "4.0",
+  "solver_summary": {
+    "element_size_m": 0.4,
+    "element_type": "SOLID70",
+    "elements": 6669,
+    "hours": 48,
+    "mapdl_version": "26.1",
+    "nodes": 8240,
+    "runtime_s": 42.4,
+    "solver_type": "SPARSE (MAPDL default for transient thermal)",
+    "timestep_s": 900.0
+  },
+  "started_at": "2026-09-25T12:04:26Z",
+  "status": "COMPLETED"
+}

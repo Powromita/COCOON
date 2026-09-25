@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "MaterialRecord": {
+      "additionalProperties": false,
+      "description": "Standardized material entry with full provenance and validity boundaries.",
+      "properties": {
+        "category": {
+          "description": "Material classification (e.g. 'insulation', 'masonry', 'finish', 'glazing')",
+          "title": "Category",
+          "type": "string"
+        },
+        "display_name": {
+          "description": "Human-readable material name",
+          "title": "Display Name",
+          "type": "string"
+        },
+        "effective_date": {
+          "description": "Date when properties/prices were verified",
+          "format": "date-time",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique material ID with 'mat_' prefix",
+          "title": "Id",
+          "type": "string"
+        },
+        "max_temperature_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum operational temperature in \u00b0C",
+          "title": "Max Temperature C"
+        },
+        "min_temperature_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minimum operational temperature in \u00b0C",
+          "title": "Min Temperature C"
+        },
+        "properties": {
+          "$ref": "#/$defs/MaterialThermalProperties",
+          "description": "Thermophysical attributes"
+        },
+        "source_reference": {
+          "description": "Bibliographic or laboratory source (e.g. 'ASHRAE Fundamentals', 'DRDO Lab')",
+          "title": "Source Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "category",
+        "properties",
+        "source_reference",
+        "effective_date"
+      ],
+      "title": "MaterialRecord",
+      "type": "object"
+    },
+    "MaterialThermalProperties": {
+      "additionalProperties": false,
+      "description": "Thermophysical parameters required for steady-state and transient heat transfer.",
+      "properties": {
+        "cost_inr_per_m2": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Estimated unit cost per m\u00b2 area (for standard sheet/panel)",
+          "title": "Cost Inr Per M2"
+        },
+        "cost_inr_per_m3": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Estimated unit cost per m\u00b3 volume",
+          "title": "Cost Inr Per M3"
+        },
+        "density_kg_m3": {
+          "description": "Material bulk density in kg/m\u00b3",
+          "exclusiveMinimum": 0.0,
+          "title": "Density Kg M3",
+          "type": "number"
+        },
+        "emissivity": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Thermal longwave emissivity [0..1]",
+          "title": "Emissivity"
+        },
+        "solar_absorptivity": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Solar shortwave absorptivity [0..1]",
+          "title": "Solar Absorptivity"
+        },
+        "specific_heat_j_kgk": {
+          "description": "Specific heat capacity in J/(kg\u00b7K)",
+          "exclusiveMinimum": 0.0,
+          "title": "Specific Heat J Kgk",
+          "type": "number"
+        },
+        "thermal_conductivity_w_mk": {
+          "description": "Thermal conductivity in W/(m\u00b7K)",
+          "exclusiveMinimum": 0.0,
+          "title": "Thermal Conductivity W Mk",
+          "type": "number"
+        }
+      },
+      "required": [
+        "thermal_conductivity_w_mk",
+        "density_kg_m3",
+        "specific_heat_j_kgk"
+      ],
+      "title": "MaterialThermalProperties",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/material.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: MaterialSnapshot in cocoon_contracts. Immutable collection of material records frozen for a specific simulation or analysis.",
+  "properties": {
+    "checksum_sha256": {
+      "description": "SHA-256 integrity hash of materials collection",
+      "title": "Checksum Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "description": "Snapshot generation timestamp",
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "materials": {
+      "additionalProperties": {
+        "$ref": "#/$defs/MaterialRecord"
+      },
+      "description": "Dictionary mapping material ID to MaterialRecord",
+      "title": "Materials",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "description": "Snapshot identifier starting with 'mat_'",
+      "title": "Snapshot Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "materials",
+    "checksum_sha256",
+    "created_at"
+  ],
+  "title": "MaterialSnapshot",
+  "type": "object"
+}

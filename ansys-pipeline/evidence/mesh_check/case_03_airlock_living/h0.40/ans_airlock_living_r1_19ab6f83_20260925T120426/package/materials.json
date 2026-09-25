@@ -1,0 +1,80 @@
+{
+  "checksum_sha256": "8f3b202a39a039efc50406857d301e74a896d744f6f89761f237ef654d2f0907",
+  "created_at": "2026-09-20T12:00:00+05:30",
+  "materials": {
+    "mat_concrete": {
+      "category": "structural",
+      "display_name": "Dense Concrete (Sub-floor)",
+      "effective_date": "2026-01-01T00:00:00+05:30",
+      "id": "mat_concrete",
+      "max_temperature_c": 120.0,
+      "min_temperature_c": -40.0,
+      "properties": {
+        "cost_inr_per_m2": null,
+        "cost_inr_per_m3": 6500.0,
+        "density_kg_m3": 2400.0,
+        "emissivity": 0.92,
+        "solar_absorptivity": 0.65,
+        "specific_heat_j_kgk": 1000.0,
+        "thermal_conductivity_w_mk": 1.4
+      },
+      "source_reference": "IS 456: Plain and Reinforced Concrete Code"
+    },
+    "mat_plywood": {
+      "category": "structural",
+      "display_name": "Marine Grade Structural Plywood",
+      "effective_date": "2026-01-01T00:00:00+05:30",
+      "id": "mat_plywood",
+      "max_temperature_c": 80.0,
+      "min_temperature_c": -50.0,
+      "properties": {
+        "cost_inr_per_m2": 850.0,
+        "cost_inr_per_m3": null,
+        "density_kg_m3": 650.0,
+        "emissivity": 0.85,
+        "solar_absorptivity": 0.6,
+        "specific_heat_j_kgk": 1600.0,
+        "thermal_conductivity_w_mk": 0.13
+      },
+      "source_reference": "IS 710: Marine Plywood Specification"
+    },
+    "mat_puf": {
+      "category": "insulation",
+      "display_name": "Polyurethane Foam Insulation",
+      "effective_date": "2026-01-01T00:00:00+05:30",
+      "id": "mat_puf",
+      "max_temperature_c": 90.0,
+      "min_temperature_c": -60.0,
+      "properties": {
+        "cost_inr_per_m2": 650.0,
+        "cost_inr_per_m3": 13000.0,
+        "density_kg_m3": 35.0,
+        "emissivity": 0.9,
+        "solar_absorptivity": 0.3,
+        "specific_heat_j_kgk": 1500.0,
+        "thermal_conductivity_w_mk": 0.024
+      },
+      "source_reference": "IS 12436: Preformed Rigid Polyurethane Insulation"
+    },
+    "mat_stone": {
+      "category": "masonry",
+      "display_name": "Granite / Field Stone",
+      "effective_date": "2026-01-01T00:00:00+05:30",
+      "id": "mat_stone",
+      "max_temperature_c": 100.0,
+      "min_temperature_c": -50.0,
+      "properties": {
+        "cost_inr_per_m2": null,
+        "cost_inr_per_m3": 4500.0,
+        "density_kg_m3": 2300.0,
+        "emissivity": 0.9,
+        "solar_absorptivity": 0.7,
+        "specific_heat_j_kgk": 880.0,
+        "thermal_conductivity_w_mk": 2.0
+      },
+      "source_reference": "ASHRAE Handbook of Fundamentals 2021"
+    }
+  },
+  "schema_version": "4.0",
+  "snapshot_id": "mat_snap_himalayan_v1"
+}

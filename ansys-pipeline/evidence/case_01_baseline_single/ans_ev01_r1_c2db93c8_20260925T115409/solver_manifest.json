@@ -1,0 +1,41 @@
+{
+  "design_revision_id": "rev_ev01_r1",
+  "element_size_m": 0.25,
+  "element_type": "SOLID70",
+  "elements": 17932,
+  "grid_lines": [
+    42,
+    31,
+    23
+  ],
+  "hours": 48,
+  "images": {
+    "animation": "temperature_animation.gif",
+    "cutaway_h012": "contour_frames/cutaway_h012.png",
+    "cutaway_h024": "contour_frames/cutaway_h024.png",
+    "cutaway_h036": "contour_frames/cutaway_h036.png",
+    "cutaway_h048": "contour_frames/cutaway_h048.png",
+    "envelope_h012": "contour_frames/envelope_h012.png",
+    "envelope_h024": "contour_frames/envelope_h024.png",
+    "envelope_h036": "contour_frames/envelope_h036.png",
+    "envelope_h048": "contour_frames/envelope_h048.png",
+    "geometry_png": "geometry.png",
+    "mesh_png": "mesh.png"
+  },
+  "job_id": "ans_ev01_r1_c2db93c8_20260925T115409",
+  "mapdl_version": "26.1",
+  "max_layer_slice_m": 0.05,
+  "nodes": 20398,
+  "runtime_s": 114.7,
+  "solver_type": "SPARSE (MAPDL default for transient thermal)",
+  "time_integration": "backward Euler",
+  "timestep_s": 900.0,
+  "timings_s": {
+    "extract_s": 5.8,
+    "images_s": 26.0,
+    "mesh_s": 19.3,
+    "prepare_s": 0.2,
+    "solve_s": 61.8
+  },
+  "warnings": []
+}

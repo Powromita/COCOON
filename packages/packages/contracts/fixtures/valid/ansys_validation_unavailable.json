@@ -1,0 +1,12 @@
+{
+  "schema_version": "4.0",
+  "job_id": "ans_job_airlock_living_002",
+  "design_revision_id": "rev_airlock_living_r1",
+  "status": "UNAVAILABLE",
+  "started_at": null,
+  "completed_at": null,
+  "error_reason": "ANSYS Student worker is currently offline; RC simulation and economics remain fully valid.",
+  "solver_summary": null,
+  "metrics": null,
+  "artifacts": null
+}

@@ -1,0 +1,7 @@
+{
+  "element_size_m": 0.25,
+  "element_type": "SOLID70",
+  "substeps_max": 4,
+  "substeps_min": 4,
+  "timeout_seconds": 5400
+}

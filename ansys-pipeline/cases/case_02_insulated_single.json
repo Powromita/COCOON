@@ -1,0 +1,283 @@
+{
+  "assemblies": {
+    "asm_floor_concrete150_puf50": {
+      "category": "floor",
+      "id": "asm_floor_concrete150_puf50",
+      "layers": [
+        {
+          "material_id": "mat_concrete",
+          "thickness_mm": 150.0
+        },
+        {
+          "material_id": "mat_puf",
+          "thickness_mm": 50.0
+        }
+      ],
+      "name": "Concrete 150 on PUF 50",
+      "r_inside_film_m2k_w": 0.17,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": null
+    },
+    "asm_roof_concrete150_puf100": {
+      "category": "roof",
+      "id": "asm_roof_concrete150_puf100",
+      "layers": [
+        {
+          "material_id": "mat_concrete",
+          "thickness_mm": 150.0
+        },
+        {
+          "material_id": "mat_puf",
+          "thickness_mm": 100.0
+        }
+      ],
+      "name": "Concrete 150 inside, PUF 100 outside",
+      "r_inside_film_m2k_w": 0.1,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": null
+    },
+    "asm_wall_stone200_puf80": {
+      "category": "wall",
+      "id": "asm_wall_stone200_puf80",
+      "layers": [
+        {
+          "material_id": "mat_stone",
+          "thickness_mm": 200.0
+        },
+        {
+          "material_id": "mat_puf",
+          "thickness_mm": 80.0
+        }
+      ],
+      "name": "Stone 200 inside, PUF 80 outside",
+      "r_inside_film_m2k_w": 0.13,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": null
+    }
+  },
+  "connections": [],
+  "design_id": "des_ev02_insulated_single",
+  "floors": [
+    {
+      "elevation_m": 0.0,
+      "id": "floor_0",
+      "level": 0,
+      "zones": [
+        {
+          "equipment_schedule_id": "eq_100",
+          "hvac_id": null,
+          "id": "room",
+          "occupancy_schedule_id": "occ_4",
+          "origin_m": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "size_m": {
+            "height_m": 2.8,
+            "length_m": 6.0,
+            "width_m": 4.0
+          },
+          "type": "living"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-09-25T10:00:00+05:30",
+    "generator_version": "m8_evidence_cases_v1",
+    "seed": 2
+  },
+  "openings": [
+    {
+      "area_m2": 2.4,
+      "avg_open_duration_s": null,
+      "connected_boundary": null,
+      "discharge_coefficient": null,
+      "frame_fraction": null,
+      "glazing_id": null,
+      "id": "op_room_south_window",
+      "is_operable": false,
+      "open_events_per_hour": null,
+      "opening_type": "window",
+      "parent_surface_id": "surf_room_south",
+      "shading_factor": 1.0,
+      "shgc": 0.62,
+      "u_value_w_m2k": 1.8
+    },
+    {
+      "area_m2": 1.8,
+      "avg_open_duration_s": null,
+      "connected_boundary": "outdoors",
+      "discharge_coefficient": null,
+      "frame_fraction": null,
+      "glazing_id": null,
+      "id": "op_room_south_door",
+      "is_operable": true,
+      "open_events_per_hour": null,
+      "opening_type": "door",
+      "parent_surface_id": "surf_room_south",
+      "shading_factor": null,
+      "shgc": null,
+      "u_value_w_m2k": 1.5
+    }
+  ],
+  "orientation_deg": 180.0,
+  "revision_id": "rev_ev02_r1",
+  "schedules": {
+    "eq_100": {
+      "hourly_values": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      "id": "eq_100",
+      "name": "Radio + lighting",
+      "points": [],
+      "type": "equipment",
+      "unit": "watts"
+    },
+    "occ_4": {
+      "hourly_values": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "id": "occ_4",
+      "name": "4 occupants continuous",
+      "points": [],
+      "type": "occupancy",
+      "unit": "occupants"
+    }
+  },
+  "schema_version": "4.0",
+  "source": "benchmark",
+  "surfaces": [
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 11.2,
+      "assembly_id": "asm_wall_stone200_puf80",
+      "azimuth_deg": 270.0,
+      "boundary_type": "outdoors",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_west",
+      "owning_zone_id": "room",
+      "surface_type": "exterior_wall",
+      "tilt_deg": 90.0,
+      "vertices": null
+    },
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 11.2,
+      "assembly_id": "asm_wall_stone200_puf80",
+      "azimuth_deg": 90.0,
+      "boundary_type": "outdoors",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_east",
+      "owning_zone_id": "room",
+      "surface_type": "exterior_wall",
+      "tilt_deg": 90.0,
+      "vertices": null
+    },
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 16.8,
+      "assembly_id": "asm_wall_stone200_puf80",
+      "azimuth_deg": 180.0,
+      "boundary_type": "outdoors",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_south",
+      "owning_zone_id": "room",
+      "surface_type": "exterior_wall",
+      "tilt_deg": 90.0,
+      "vertices": null
+    },
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 16.8,
+      "assembly_id": "asm_wall_stone200_puf80",
+      "azimuth_deg": 0.0,
+      "boundary_type": "outdoors",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_north",
+      "owning_zone_id": "room",
+      "surface_type": "exterior_wall",
+      "tilt_deg": 90.0,
+      "vertices": null
+    },
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 24.0,
+      "assembly_id": "asm_floor_concrete150_puf50",
+      "azimuth_deg": 0.0,
+      "boundary_type": "ground",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_floor",
+      "owning_zone_id": "room",
+      "surface_type": "floor",
+      "tilt_deg": 180.0,
+      "vertices": null
+    },
+    {
+      "adjacent_surface_id": null,
+      "adjacent_zone_id": null,
+      "area_m2": 24.0,
+      "assembly_id": "asm_roof_concrete150_puf100",
+      "azimuth_deg": 0.0,
+      "boundary_type": "outdoors",
+      "exposed_fraction": 1.0,
+      "id": "surf_room_roof",
+      "owning_zone_id": "room",
+      "surface_type": "roof",
+      "tilt_deg": 0.0,
+      "vertices": null
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "pooled": {
+    "mae_c": 0.4468,
+    "rmse_c": 0.5383,
+    "max_abs_error_c": 1.0784,
+    "bias_c": 0.4341,
+    "r_squared": 0.4938
+  },
+  "zones": {
+    "room": {
+      "mae_c": 0.4468,
+      "rmse_c": 0.5383,
+      "max_abs_error_c": 1.0784,
+      "bias_c": 0.4341,
+      "r_squared": 0.4938,
+      "ansys_mean_c": 9.127,
+      "rc_mean_c": 8.693,
+      "ansys_min_c": 7.866,
+      "rc_min_c": 6.832,
+      "envelope_loss_ansys_mean_w": 104.2,
+      "envelope_loss_rc_mean_w": 1044.1,
+      "envelope_loss_mae_w": 939.9,
+      "outer_face_loss_ansys_mean_w": 1617.6
+    }
+  },
+  "zone_ranking_by_mean_temperature": {
+    "ansys": [
+      "room"
+    ],
+    "rc": [
+      "room"
+    ],
+    "agree": true
+  },
+  "hours": 48,
+  "compared_quantity": "volume-weighted zone air temperature (ANSYS) vs zone node temperature (RC), end of each hour",
+  "rc": {
+    "engine": "thermal-calculator/multiroom_rc.py run_multiroom_simulation",
+    "effective_mass_fraction": 0.5,
+    "rooms": {
+      "room": {
+        "capacitance_MJ_K": 19.4086,
+        "volume_m3": 67.19999999999999
+      }
+    },
+    "surfaces": [
+      {
+        "id": "surf_room_west",
+        "room": "room",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.2,
+        "U_W_m2K": 0.2775
+      },
+      {
+        "id": "surf_room_east",
+        "room": "room",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 11.2,
+        "U_W_m2K": 0.2775
+      },
+      {
+        "id": "surf_room_south",
+        "room": "room",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 12.6,
+        "U_W_m2K": 0.2775
+      },
+      {
+        "id": "surf_room_north",
+        "room": "room",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 16.8,
+        "U_W_m2K": 0.2775
+      },
+      {
+        "id": "surf_room_floor",
+        "room": "room",
+        "boundary": "ground",
+        "adjacent": null,
+        "area_m2": 24.0,
+        "U_W_m2K": 0.4166
+      },
+      {
+        "id": "surf_room_roof",
+        "room": "room",
+        "boundary": "outdoor",
+        "adjacent": null,
+        "area_m2": 24.0,
+        "U_W_m2K": 0.2266
+      }
+    ],
+    "windows": [
+      {
+        "id": "op_room_south_window",
+        "room": "room",
+        "area_m2": 2.4,
+        "U_W_m2K": 1.8,
+        "SHGC": 0.62
+      },
+      {
+        "id": "op_room_south_door",
+        "room": "room",
+        "area_m2": 1.8,
+        "U_W_m2K": 1.5,
+        "SHGC": 0.0
+      }
+    ]
+  },
+  "envelope_loss_definition": "room side: inside-film flow of exterior opaque surfaces + opening outer-face flow; 'outer_face_loss' also includes heat released by mass outboard of the room",
+  "diagnostics": {
+    "position_weighted_capacitance": {
+      "purpose": "diagnostic only - NOT the official RC result",
+      "rule": "layer mass x exp(-R_to_room / 0.8) (legacy heat_transfer.position_weight) instead of EFFECTIVE_MASS_FRACTION=0.5",
+      "pooled": {
+        "mae_c": 0.1043,
+        "rmse_c": 0.1263,
+        "max_abs_error_c": 0.2763,
+        "bias_c": -0.0159,
+        "r_squared": 0.9721
+      },
+      "zones": {
+        "room": {
+          "mae_c": 0.1043,
+          "rmse_c": 0.1263,
+          "max_abs_error_c": 0.2763,
+          "bias_c": -0.0159,
+          "r_squared": 0.9721,
+          "rc_mean_c": 9.143
+        }
+      },
+      "rooms_capacitance_MJ_K": {
+        "room": 30.5289
+      }
+    }
+  },
+  "note": "Descriptive agreement for this exact revision and scenario only; not a general accuracy claim."
+}

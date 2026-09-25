@@ -1,0 +1,10 @@
+{
+  "schema_version": "4.0",
+  "model_id": "viz_model_airlock_v1",
+  "design_revision_id": "bad_rev_prefix_without_rev",
+  "source": "geometry",
+  "boxes": [],
+  "surfaces": [],
+  "openings": [],
+  "generated_at": "2026-01-01T00:00:00+05:30"
+}

@@ -1,0 +1,248 @@
+{
+  "$defs": {
+    "AnnualOpexPoint": {
+      "additionalProperties": false,
+      "description": "Single-year cash outflow during shelter operational lifetime.",
+      "properties": {
+        "discounted_opex_inr": {
+          "description": "Present-value discounted cash outflow",
+          "minimum": 0.0,
+          "title": "Discounted Opex Inr",
+          "type": "number"
+        },
+        "fuel_cost_inr": {
+          "description": "Fuel consumption expense in nominal INR",
+          "minimum": 0.0,
+          "title": "Fuel Cost Inr",
+          "type": "number"
+        },
+        "logistics_cost_inr": {
+          "default": 0.0,
+          "description": "Ongoing fuel delivery and transport surcharge",
+          "minimum": 0.0,
+          "title": "Logistics Cost Inr",
+          "type": "number"
+        },
+        "maintenance_cost_inr": {
+          "description": "Routine servicing expenditure",
+          "minimum": 0.0,
+          "title": "Maintenance Cost Inr",
+          "type": "number"
+        },
+        "replacement_cost_inr": {
+          "default": 0.0,
+          "description": "Scheduled component overhaul/replacement",
+          "minimum": 0.0,
+          "title": "Replacement Cost Inr",
+          "type": "number"
+        },
+        "total_opex_inr": {
+          "description": "Total undiscounted operating expenditure for this year",
+          "minimum": 0.0,
+          "title": "Total Opex Inr",
+          "type": "number"
+        },
+        "year": {
+          "description": "Operation year index (1..N)",
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "year",
+        "fuel_cost_inr",
+        "maintenance_cost_inr",
+        "total_opex_inr",
+        "discounted_opex_inr"
+      ],
+      "title": "AnnualOpexPoint",
+      "type": "object"
+    },
+    "CapexBreakdown": {
+      "additionalProperties": false,
+      "description": "Direct initial acquisition and construction expenditures.",
+      "properties": {
+        "equipment_inr": {
+          "description": "HVAC, heater, and control hardware purchase",
+          "minimum": 0.0,
+          "title": "Equipment Inr",
+          "type": "number"
+        },
+        "labour_inr": {
+          "description": "On-site fabrication and assembly labor",
+          "minimum": 0.0,
+          "title": "Labour Inr",
+          "type": "number"
+        },
+        "materials_inr": {
+          "description": "Envelope and structural materials cost",
+          "minimum": 0.0,
+          "title": "Materials Inr",
+          "type": "number"
+        },
+        "total_capex_inr": {
+          "description": "Total capital cost (sum of categories)",
+          "minimum": 0.0,
+          "title": "Total Capex Inr",
+          "type": "number"
+        },
+        "transport_inr": {
+          "description": "Haulage and logistics freight expenditure",
+          "minimum": 0.0,
+          "title": "Transport Inr",
+          "type": "number"
+        }
+      },
+      "required": [
+        "materials_inr",
+        "labour_inr",
+        "transport_inr",
+        "equipment_inr",
+        "total_capex_inr"
+      ],
+      "title": "CapexBreakdown",
+      "type": "object"
+    },
+    "CostScenario": {
+      "description": "Sensitivity uncertainty bracket for cost projections.",
+      "enum": [
+        "low",
+        "expected",
+        "high"
+      ],
+      "title": "CostScenario",
+      "type": "string"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/economics.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: EconomicAnalysisResult in cocoon_contracts. Complete lifecycle cost (LCC) evaluation result contract.",
+  "properties": {
+    "analysis_id": {
+      "description": "Economic run identifier starting with 'econ_'",
+      "title": "Analysis Id",
+      "type": "string"
+    },
+    "annual_cash_flows": {
+      "description": "Year-by-year cash flow projections",
+      "items": {
+        "$ref": "#/$defs/AnnualOpexPoint"
+      },
+      "title": "Annual Cash Flows",
+      "type": "array"
+    },
+    "annual_fuel_litres": {
+      "description": "Predicted annual heating fuel consumption in liters",
+      "minimum": 0.0,
+      "title": "Annual Fuel Litres",
+      "type": "number"
+    },
+    "assumption_set_id": {
+      "description": "Reference ID of assumptions applied (econ_...)",
+      "title": "Assumption Set Id",
+      "type": "string"
+    },
+    "break_even_year": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Calendar year in which cumulative savings turn positive",
+      "title": "Break Even Year"
+    },
+    "capex": {
+      "$ref": "#/$defs/CapexBreakdown",
+      "description": "Initial investment breakdown"
+    },
+    "created_at": {
+      "description": "Timestamp of economic calculation",
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "design_revision_id": {
+      "description": "Target design revision ID (rev_...)",
+      "title": "Design Revision Id",
+      "type": "string"
+    },
+    "discounted_payback_years": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Discounted payback duration in years",
+      "title": "Discounted Payback Years"
+    },
+    "lcc_inr": {
+      "description": "Total discounted Lifecycle Cost (CAPEX + NPV of OPEX)",
+      "minimum": 0.0,
+      "title": "Lcc Inr",
+      "type": "number"
+    },
+    "npv_vs_baseline_inr": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Net Present Value savings compared to baseline",
+      "title": "Npv Vs Baseline Inr"
+    },
+    "scenario": {
+      "$ref": "#/$defs/CostScenario",
+      "description": "Scenario category (low, expected, high)"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "simple_payback_years": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Undiscounted payback duration in years",
+      "title": "Simple Payback Years"
+    }
+  },
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "design_revision_id",
+    "assumption_set_id",
+    "scenario",
+    "capex",
+    "annual_cash_flows",
+    "lcc_inr",
+    "annual_fuel_litres",
+    "created_at"
+  ],
+  "title": "EconomicAnalysisResult",
+  "type": "object"
+}

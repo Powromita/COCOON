@@ -1,0 +1,24 @@
+{
+  "design_revision_id": "rev_ev04_r1",
+  "imposed_indoor_temp_forbidden": true,
+  "input_hashes": {
+    "boundary_conditions.csv": "2ae640346a2c445d55868df885f1d14539dce502c7e224c6501986b0225014aa",
+    "building.json": "2ef7d24b861edbdb628189cfaa9fed2ac1f66057e5c8260ba878c25a9334710a",
+    "materials.json": "6e9c50067762c59007645839123f13ab8af5a4a5f6530cb1d301d5e9c421d0f6",
+    "scenario.json": "89263d69d27d85e0caa1e51df27c59a9513d3f94bd90e92fc72a328d4f505c88",
+    "solver_config.json": "1f3163954f6984d714a922487da93f7dc402596ec777c470a3497af3fd2005e9",
+    "weather.json": "92460f5a870258806da1d31ff6bbe356c5d3cb860254045a6a52deba03b99679"
+  },
+  "job_id": "ans_ev04_r1_8f011e94_20260925T121158",
+  "priority": 0,
+  "schema_version": "4.0",
+  "solver_config": {
+    "element_size_m": 0.4,
+    "element_type": "SOLID70",
+    "substeps_max": 4,
+    "substeps_min": 4,
+    "timeout_seconds": 5400
+  },
+  "submitted_at": "2026-09-25T12:11:58Z",
+  "weather_snapshot_id": "wx_leh_20260124T11_48h"
+}

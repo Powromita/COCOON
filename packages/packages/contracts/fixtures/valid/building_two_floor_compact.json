@@ -1,0 +1,185 @@
+{
+  "schema_version": "4.0",
+  "design_id": "des_two_floor_compact_002",
+  "revision_id": "rev_two_floor_r1",
+  "source": "generated",
+  "orientation_deg": 180.0,
+  "floors": [
+    {
+      "id": "floor_0",
+      "level": 0,
+      "elevation_m": 0.0,
+      "zones": [
+        {
+          "id": "airlock_f0",
+          "type": "airlock",
+          "origin_m": {"x": 0.0, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 1.2, "width_m": 4.0, "height_m": 2.8},
+          "occupancy_schedule_id": null,
+          "equipment_schedule_id": null,
+          "hvac_id": null
+        },
+        {
+          "id": "living_f0",
+          "type": "living",
+          "origin_m": {"x": 1.2, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 4.8, "width_m": 4.0, "height_m": 2.8},
+          "occupancy_schedule_id": null,
+          "equipment_schedule_id": null,
+          "hvac_id": "heater_f0"
+        }
+      ]
+    },
+    {
+      "id": "floor_1",
+      "level": 1,
+      "elevation_m": 2.8,
+      "zones": [
+        {
+          "id": "sleeping_f1",
+          "type": "sleeping",
+          "origin_m": {"x": 1.2, "y": 0.0, "z": 2.8},
+          "size_m": {"length_m": 4.8, "width_m": 4.0, "height_m": 2.8},
+          "occupancy_schedule_id": null,
+          "equipment_schedule_id": null,
+          "hvac_id": "heater_f1"
+        }
+      ]
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "surf_f0_airlock_west",
+      "owning_zone_id": "airlock_f0",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 11.2,
+      "azimuth_deg": 270.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_f0_airlock_floor",
+      "owning_zone_id": "airlock_f0",
+      "boundary_type": "ground",
+      "surface_type": "floor",
+      "area_m2": 4.8,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 180.0,
+      "assembly_id": "asm_floor_slab",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_f0_living_ceiling",
+      "owning_zone_id": "living_f0",
+      "boundary_type": "adjacent_zone",
+      "surface_type": "ceiling",
+      "area_m2": 19.2,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 0.0,
+      "assembly_id": "asm_interfloor_slab",
+      "adjacent_zone_id": "sleeping_f1",
+      "adjacent_surface_id": null,
+      "exposed_fraction": 0.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_f1_sleeping_floor",
+      "owning_zone_id": "sleeping_f1",
+      "boundary_type": "adjacent_zone",
+      "surface_type": "floor",
+      "area_m2": 19.2,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 180.0,
+      "assembly_id": "asm_interfloor_slab",
+      "adjacent_zone_id": "living_f0",
+      "adjacent_surface_id": null,
+      "exposed_fraction": 0.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_f1_sleeping_roof",
+      "owning_zone_id": "sleeping_f1",
+      "boundary_type": "outdoors",
+      "surface_type": "roof",
+      "area_m2": 19.2,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 0.0,
+      "assembly_id": "asm_roof_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    }
+  ],
+  "openings": [],
+  "connections": [
+    {
+      "id": "conn_f0_airlock_living",
+      "zone_a_id": "airlock_f0",
+      "zone_b_id": "living_f0",
+      "connection_type": "partition",
+      "shared_area_m2": 11.2,
+      "is_conditioned": true
+    },
+    {
+      "id": "conn_stair_f0_f1",
+      "zone_a_id": "living_f0",
+      "zone_b_id": "sleeping_f1",
+      "connection_type": "stair",
+      "shared_area_m2": 4.0,
+      "is_conditioned": true
+    }
+  ],
+  "assemblies": {
+    "asm_wall_insulated": {
+      "id": "asm_wall_insulated",
+      "name": "Insulated Wall",
+      "category": "wall",
+      "layers": [{"material_id": "mat_puf", "thickness_mm": 50.0}],
+      "r_inside_film_m2k_w": 0.13,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.75
+    },
+    "asm_floor_slab": {
+      "id": "asm_floor_slab",
+      "name": "Ground Floor Slab",
+      "category": "floor",
+      "layers": [{"material_id": "mat_concrete", "thickness_mm": 100.0}],
+      "r_inside_film_m2k_w": 0.17,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.95
+    },
+    "asm_interfloor_slab": {
+      "id": "asm_interfloor_slab",
+      "name": "Intermediate Timber Floor",
+      "category": "floor",
+      "layers": [{"material_id": "mat_plywood", "thickness_mm": 25.0}],
+      "r_inside_film_m2k_w": 0.13,
+      "r_outside_film_m2k_w": 0.13,
+      "u_value_w_m2k": 1.2
+    },
+    "asm_roof_insulated": {
+      "id": "asm_roof_insulated",
+      "name": "Insulated Roof",
+      "category": "roof",
+      "layers": [{"material_id": "mat_puf", "thickness_mm": 80.0}],
+      "r_inside_film_m2k_w": 0.10,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.45
+    }
+  },
+  "schedules": {},
+  "metadata": {
+    "generator_version": "layout_generator_v1",
+    "seed": 101,
+    "created_at": "2026-09-20T11:00:00+05:30"
+  }
+}
