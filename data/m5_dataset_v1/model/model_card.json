@@ -1,0 +1,396 @@
+{
+ "conformal_offset": {
+  "heating_energy_kwh": 12.511469445439843,
+  "passive_median_temperature_c": 0.39416844218410674,
+  "passive_min_temperature_c": 0.555547039822847,
+  "peak_heating_kw": 0.15924005756938087,
+  "unmet_hours_ref": 0.0
+ },
+ "feature_names": [
+  "n_zones",
+  "n_floors",
+  "n_heated_zones",
+  "airlock_present",
+  "floor_area_m2",
+  "footprint_m2",
+  "volume_m3",
+  "heated_floor_area_m2",
+  "occupants",
+  "occupants_per_m2",
+  "setpoint_c",
+  "wall_area_m2",
+  "roof_area_m2",
+  "ground_floor_area_m2",
+  "internal_area_m2",
+  "window_area_m2",
+  "outdoor_door_area_m2",
+  "wwr",
+  "window_area_north_m2",
+  "window_area_east_m2",
+  "window_area_south_m2",
+  "window_area_west_m2",
+  "u_wall",
+  "u_roof",
+  "u_ground",
+  "u_window",
+  "r_layers_wall",
+  "r_layers_roof",
+  "shgc_x_shading",
+  "ua_outdoor_w_k",
+  "ua_ground_w_k",
+  "ua_total_w_k",
+  "ua_per_volume",
+  "ua_per_floor_area",
+  "solar_absorptivity_outer",
+  "mass_per_floor_area_kg_m2",
+  "heat_capacity_per_floor_area_kj_m2k",
+  "ach_design",
+  "ach_given",
+  "fresh_air_ach",
+  "ach_effective",
+  "door_open_fraction_x_area",
+  "internal_gain_w_per_m2",
+  "t_mean_c",
+  "t_min_c",
+  "t_std_c",
+  "degree_hours_below_setpoint",
+  "delta_t_mean_k",
+  "ghi_mean_w_m2",
+  "wind_mean_m_s",
+  "latitude_deg",
+  "elevation_m"
+ ],
+ "feature_ranges": {
+  "ach_design": [
+   0.35,
+   1.2
+  ],
+  "ach_effective": [
+   1.0613207547169812,
+   17.62632197414806
+  ],
+  "ach_given": [
+   1.0,
+   1.0
+  ],
+  "airlock_present": [
+   0.0,
+   1.0
+  ],
+  "degree_hours_below_setpoint": [
+   562.7,
+   9380.8
+  ],
+  "delta_t_mean_k": [
+   2.6744047619047624,
+   55.83809523809524
+  ],
+  "door_open_fraction_x_area": [
+   0.02,
+   0.02
+  ],
+  "elevation_m": [
+   2676.0,
+   5100.0
+  ],
+  "floor_area_m2": [
+   6.25,
+   97.68
+  ],
+  "footprint_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "fresh_air_ach": [
+   1.0613207547169812,
+   17.62632197414806
+  ],
+  "ghi_mean_w_m2": [
+   95.61309523809524,
+   212.3392857142857
+  ],
+  "ground_floor_area_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "heat_capacity_per_floor_area_kj_m2k": [
+   133.29375,
+   2830.59325
+  ],
+  "heated_floor_area_m2": [
+   6.25,
+   83.62
+  ],
+  "internal_area_m2": [
+   0.0,
+   70.39999999999999
+  ],
+  "internal_gain_w_per_m2": [
+   16.420361247947454,
+   150.15015015015013
+  ],
+  "latitude_deg": [
+   33.2059,
+   35.39
+  ],
+  "mass_per_floor_area_kg_m2": [
+   175.24444444444444,
+   6950.66
+  ],
+  "n_floors": [
+   1.0,
+   2.0
+  ],
+  "n_heated_zones": [
+   1.0,
+   2.0
+  ],
+  "n_zones": [
+   1.0,
+   4.0
+  ],
+  "occupants": [
+   2.0,
+   30.0
+  ],
+  "occupants_per_m2": [
+   0.1179245283018867,
+   1.5015015015015012
+  ],
+  "outdoor_door_area_m2": [
+   1.8,
+   1.8
+  ],
+  "r_layers_roof": [
+   0.0818181818181817,
+   12.0
+  ],
+  "r_layers_wall": [
+   0.1136363636363636,
+   12.708333333333332
+  ],
+  "roof_area_m2": [
+   6.25,
+   79.78999999999999
+  ],
+  "setpoint_c": [
+   12.0,
+   22.0
+  ],
+  "shgc_x_shading": [
+   0.5499999999999999,
+   0.8600000000000001
+  ],
+  "solar_absorptivity_outer": [
+   0.2999999999999999,
+   0.75
+  ],
+  "t_mean_c": [
+   -34.83809523809524,
+   10.778571428571428
+  ],
+  "t_min_c": [
+   -41.6,
+   3.6
+  ],
+  "t_std_c": [
+   1.331869945235047,
+   9.1389733000499
+  ],
+  "u_ground": [
+   0.1131435036771638,
+   1.156271899088998
+  ],
+  "u_roof": [
+   0.0821692686935086,
+   3.971119133574008
+  ],
+  "u_wall": [
+   0.0776497994046848,
+   3.525641025641026
+  ],
+  "u_window": [
+   1.7999999999999998,
+   5.800000000000002
+  ],
+  "ua_ground_w_k": [
+   0.7319929728674606,
+   82.38630423418715
+  ],
+  "ua_outdoor_w_k": [
+   12.43155898621847,
+   365.9332967414798
+  ],
+  "ua_per_floor_area": [
+   0.6230437574975092,
+   17.132389901710393
+  ],
+  "ua_per_volume": [
+   0.2492175029990036,
+   6.345329593226071
+  ],
+  "ua_total_w_k": [
+   14.751485807301572,
+   406.4527772609603
+  ],
+  "volume_m3": [
+   14.374999999999998,
+   286.2
+  ],
+  "wall_area_m2": [
+   16.880000000000003,
+   148.2
+  ],
+  "wind_mean_m_s": [
+   0.1924603174603174,
+   4.191964285714286
+  ],
+  "window_area_east_m2": [
+   0.0,
+   11.759999999999998
+  ],
+  "window_area_m2": [
+   2.4,
+   29.04
+  ],
+  "window_area_north_m2": [
+   0.0,
+   7.44
+  ],
+  "window_area_south_m2": [
+   0.0,
+   13.44
+  ],
+  "window_area_west_m2": [
+   0.0,
+   11.999999999999998
+  ],
+  "wwr": [
+   0.048780487804878,
+   0.2142857142857143
+  ]
+ },
+ "holdout_site": "kargil",
+ "labels": [
+  "heating_energy_kwh",
+  "peak_heating_kw",
+  "passive_min_temperature_c",
+  "passive_median_temperature_c",
+  "unmet_hours_ref"
+ ],
+ "metrics": {
+  "holdout": {
+   "heating_energy_kwh": {
+    "coverage": 0.8160427807486631,
+    "label_std": 212.48496411177328,
+    "mae": 23.745542869529995,
+    "mean_width": 88.55724438490655,
+    "n": 935,
+    "r2": 0.9761675814140582
+   },
+   "passive_median_temperature_c": {
+    "coverage": 0.774331550802139,
+    "label_std": 5.901774605076339,
+    "mae": 0.8883736648299,
+    "mean_width": 3.26220047552712,
+    "n": 935,
+    "r2": 0.958457235477074
+   },
+   "passive_min_temperature_c": {
+    "coverage": 0.8117647058823529,
+    "label_std": 6.200090210787963,
+    "mae": 1.1919527674402992,
+    "mean_width": 4.5548839779629064,
+    "n": 935,
+    "r2": 0.9380585064584727
+   },
+   "peak_heating_kw": {
+    "coverage": 0.8010695187165775,
+    "label_std": 2.60217438171367,
+    "mae": 0.3229053487385609,
+    "mean_width": 1.1484642917877224,
+    "n": 935,
+    "r2": 0.9699586944930245
+   },
+   "unmet_hours_ref": {
+    "coverage": 0.893048128342246,
+    "label_std": 44.56631318589043,
+    "mae": 6.424258001420253,
+    "mean_width": 46.079281805767934,
+    "n": 935,
+    "r2": 0.9282519710385955
+   }
+  },
+  "test": {
+   "heating_energy_kwh": {
+    "coverage": 0.8155223880597015,
+    "label_std": 285.691157956225,
+    "mae": 25.36083781888078,
+    "mean_width": 107.08881821401592,
+    "n": 1675,
+    "r2": 0.9802579093663649
+   },
+   "passive_median_temperature_c": {
+    "coverage": 0.8047761194029851,
+    "label_std": 7.45884266455679,
+    "mae": 0.8064854938437226,
+    "mean_width": 3.119876198689878,
+    "n": 1675,
+    "r2": 0.9788818983467265
+   },
+   "passive_min_temperature_c": {
+    "coverage": 0.8119402985074626,
+    "label_std": 7.690493293759617,
+    "mae": 1.0416226666896085,
+    "mean_width": 4.063811950399606,
+    "n": 1675,
+    "r2": 0.9692798180170061
+   },
+   "peak_heating_kw": {
+    "coverage": 0.8316417910447761,
+    "label_std": 3.1515007578810077,
+    "mae": 0.297603666734019,
+    "mean_width": 1.206154271371506,
+    "n": 1675,
+    "r2": 0.9802047583163
+   },
+   "unmet_hours_ref": {
+    "coverage": 0.8895522388059701,
+    "label_std": 50.78385279934866,
+    "mae": 5.751932465005825,
+    "mean_width": 58.55816466146119,
+    "n": 1675,
+    "r2": 0.9503635139718996
+   }
+  }
+ },
+ "nominal_coverage": 0.8,
+ "params": {
+  "early_stopping": false,
+  "l2_regularization": 1.0,
+  "learning_rate": 0.06,
+  "max_iter": 300,
+  "max_leaf_nodes": 31,
+  "min_samples_leaf": 20
+ },
+ "seed": 0,
+ "split_sizes": {
+  "calibration": 1659,
+  "holdout": 935,
+  "test": 1675,
+  "train": 5132
+ },
+ "training_sites": [
+  "chushul",
+  "daulat_beg_oldi",
+  "dras",
+  "leh",
+  "nubra_diskit",
+  "nyoma",
+  "pangong_tso",
+  "siachen_base_camp",
+  "turtuk"
+ ],
+ "training_table_sha256": "5e8b120ed6d3aeeec612792a9c24f10681dab19e1c7141bcef1f65bcefcafda4",
+ "version": "m5_gbt_v1"
+}
