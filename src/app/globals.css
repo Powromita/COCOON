@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+  }
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+  /* DESIGN.md: tabular figures + slashed zeros for mono telemetry; tabular figures for Inter labels. */
+  .font-data,
+  .font-mono {
+    font-feature-settings: "tnum" 1, "zero" 1;
+  }
+  [class*="font-label-mono"] {
+    font-feature-settings: "tnum" 1;
+  }
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Buttons: subtle lift on hover. Doubled class beats Tailwind's transition-* utilities. */
+.hover-lift.hover-lift {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-lift:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+.hover-lift:active:not(:disabled) {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Live solver log: the whole panel is a terminal, so everything except icons stays monospace. */
+.mono-scope,
+.mono-scope *:not(.material-symbols-outlined) {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Data opt-in must beat the label families (font-label-mono-* are Inter) regardless of stylesheet order. */
+.font-data.font-data {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Hindi: tracked-out uppercase styling is meaningless for Devanagari and breaks up conjuncts. */
+html[lang="hi"] [class*="tracking-"] {
+  letter-spacing: normal;
+}
