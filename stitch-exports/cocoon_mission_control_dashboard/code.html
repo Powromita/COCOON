@@ -1,0 +1,810 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-tint": "#4059aa",
+        "on-error": "#ffffff",
+        "surface-container-lowest": "#ffffff",
+        "on-primary-container": "#90a8ff",
+        "background": "#f8f9ff",
+        "on-surface": "#0d1c2f",
+        "primary-container": "#1e3a8a",
+        "on-surface-variant": "#444651",
+        "secondary-container": "#94eafe",
+        "secondary-fixed-dim": "#7dd3e7",
+        "on-error-container": "#93000a",
+        "outline-variant": "#c5c5d3",
+        "secondary": "#006878",
+        "surface-variant": "#d5e3fd",
+        "on-primary-fixed": "#00164e",
+        "on-background": "#0d1c2f",
+        "tertiary-fixed-dim": "#ffb77d",
+        "inverse-surface": "#233144",
+        "on-primary": "#ffffff",
+        "on-primary-fixed-variant": "#264191",
+        "on-secondary": "#ffffff",
+        "on-tertiary-container": "#fc922b",
+        "surface-container-high": "#dde9ff",
+        "on-tertiary": "#ffffff",
+        "surface-container-highest": "#d5e3fd",
+        "on-tertiary-fixed-variant": "#6e3900",
+        "on-tertiary-fixed": "#2f1500",
+        "tertiary": "#442100",
+        "surface-bright": "#f8f9ff",
+        "tertiary-fixed": "#ffdcc3",
+        "surface": "#f8f9ff",
+        "on-secondary-fixed": "#001f25",
+        "inverse-on-surface": "#ebf1ff",
+        "on-secondary-container": "#006b7b",
+        "surface-dim": "#ccdbf4",
+        "primary-fixed": "#dce1ff",
+        "primary-fixed-dim": "#b6c4ff",
+        "outline": "#757682",
+        "inverse-primary": "#b6c4ff",
+        "primary": "#00236f",
+        "surface-container-low": "#eff4ff",
+        "secondary-fixed": "#a7eeff",
+        "error": "#ba1a1a",
+        "surface-container": "#e6eeff",
+        "on-secondary-fixed-variant": "#004e5b",
+        "tertiary-container": "#653400",
+        "error-container": "#ffdad6"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "space-lg": "1rem",
+        "gutter-sm": "0.75rem",
+        "space-xl": "1.5rem",
+        "space-md": "0.75rem",
+        "space-xs": "0.25rem",
+        "margin-sm": "1rem",
+        "margin": "1.5rem",
+        "margin-lg": "2rem",
+        "space-sm": "0.5rem",
+        "gutter-lg": "1.5rem",
+        "gutter": "1rem"
+      },
+      "fontFamily": {
+        "display-lg-mobile": ["Inter"],
+        "headline-md": ["Inter"],
+        "label-mono-lg": ["JetBrains Mono"],
+        "display-lg": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-mono-sm": ["JetBrains Mono"],
+        "headline-sm": ["Inter"],
+        "label-mono-md": ["JetBrains Mono"],
+        "headline-lg": ["Inter"],
+        "label-mono-xs": ["JetBrains Mono"],
+        "body-sm": ["Inter"]
+      },
+      "fontSize": {
+        "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+        "headline-md": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "label-mono-lg": ["14px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "body-lg": ["15px", {"lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "body-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "label-mono-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "headline-sm": ["15px", {"lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600"}],
+        "label-mono-md": ["12px", {"lineHeight": "16px", "letterSpacing": "-0.005em", "fontWeight": "500"}],
+        "headline-lg": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "label-mono-xs": ["10px", {"lineHeight": "12px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+        "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.005em", "fontWeight": "400"}]
+      }
+    }
+  }
+}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VYG5hmPaEbO014YTEZ2Cjb5fZyqZpJrEHoPE6LlF0ZxKYXYNcI51JR2OL26HtfgBrkmhqmCHr4ljfaZeQuHhSFWgKMtTySVQwRisLwx59uhB35R8-uF8q_YSRpb8R5OhV0TTh1y48IXLraQZMSrdtHCOblPktIrEzg6Uk508t0k9s41fnot6_Akk2yq-lyVJkanLxQoHz-QDeAkzyOVw6w0IlV8fc6nPESPQ5JkGn_NVDiBPqis43nX1s"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-tight text-primary font-bold">COCOON</span><span class="font-label-mono-xs text-label-mono-xs bg-surface-container text-on-surface px-space-xs py-0.5 rounded">MIL-SPEC v4.2</span></div><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">MIL-SPEC Thermal Platform</span></div></div><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-low rounded"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant font-medium tracking-wide">DAULAT BEG OLDI SECTOR (-38.2°C @ 5,065m AMSL) • SOLVER ENGINE READY</span></div></div><nav class="hidden lg:flex items-center gap-space-xs shrink-0" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg"><a aria-current="page" class="px-space-sm py-1.5 transition-colors bg-primary-container text-on-primary font-medium rounded-lg" data-path="dashboard" href="#">Dashboard</a><a class="px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="projects" href="#">Projects</a><a class="px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="shelter-configurator" href="#">Shelter Configurator</a><a class="px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="candidate-telemetry" href="#">Candidate Telemetry</a><a class="px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="benchmark-library" href="#">Benchmark Library</a><a class="px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="reports-history" href="#">Reports &amp; History</a></nav><div class="flex items-center gap-space-md shrink-0"><div class="hidden md:flex flex-col items-end"><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">STATION TIME</span><span class="font-label-mono-sm text-label-mono-sm text-on-surface font-semibold">11:42:08 UTC+05:30</span></div><div class="hidden sm:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container text-on-surface rounded"><span class="material-symbols-outlined text-[14px] text-secondary">sync</span><span class="font-label-mono-xs text-label-mono-xs uppercase font-medium">2 RUNS IN SOLVER QUEUE</span></div><button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors rounded-full"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="flex items-center gap-space-sm pl-space-xs"><div class="hidden 2xl:flex flex-col text-right"><span class="font-body-sm text-body-sm text-on-surface font-semibold leading-tight">Lt. Col. Vikramaditya Rathore</span><div class="flex items-center justify-end gap-space-xs"><span class="font-label-mono-xs text-label-mono-xs text-secondary font-medium">LEAD THERMAL ARCHITECT (ADMIN / LEVEL 4 CLEARANCE)</span></div><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">Directorate of High Altitude Defence Infrastructure (DHADI)</span></div><div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-mono-sm text-label-mono-sm font-bold">VR</div></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-56px)]"><div class="flex flex-col w-full">
+<!-- Top Engineering Notification Bar -->
+<section class="w-full bg-surface-container-high px-gutter-lg py-space-xs shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded bg-surface-container-lowest text-primary font-label-mono-xs text-label-mono-xs uppercase tracking-wider font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+        MESH SOLVER: ONLINE
+      </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+        ANSYS MAPDL v24.1 + OpenFOAM-v2312 node cluster active across 64 cores. Convergence residual threshold: <span class="font-label-mono-xs text-label-mono-xs text-on-surface font-medium">1.4e-6</span>.
+      </p>
+</div>
+<div class="flex items-center gap-space-md shrink-0">
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">SOLSTICE SIM WINDOW: <span class="text-on-surface font-semibold">DEC 21 ± 14 DAYS</span></span>
+<div class="h-3 w-px bg-outline-variant"></div>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">SOLVER LOAD: <span class="text-secondary font-semibold">73.8%</span></span>
+</div>
+</section>
+<div class="w-full px-gutter-lg py-space-xl flex flex-col gap-space-xl">
+<!-- Section 1: Welcome Display Banner & Live Telemetry Strip -->
+<section class="flex flex-col gap-space-lg">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+<div class="flex flex-col max-w-4xl">
+<div class="flex items-center gap-space-xs mb-space-xs">
+<span class="px-space-xs py-0.5 rounded bg-surface-container text-primary font-label-mono-xs text-label-mono-xs font-semibold tracking-wider uppercase">SECTOR GRID REF: 35.234° N, 77.892° E</span>
+<span class="text-on-surface-variant font-label-mono-xs text-label-mono-xs">•</span>
+<span class="text-on-surface-variant font-label-mono-xs text-label-mono-xs uppercase">AMSL 5,065 M</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">
+            Operational Simulation Console
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-1">
+            Himalayan Cold-Arid Frontline Infrastructure Synthesis — Active Deployment Zone: Eastern Ladakh Sub-Sector North (Depsang Plains / DBO Sector).
+          </p>
+</div>
+<!-- System Controls -->
+<div class="flex items-center gap-space-sm shrink-0">
+<div class="flex items-center rounded-lg bg-surface-container p-0.5">
+<button class="px-space-sm py-1 rounded font-label-mono-xs text-label-mono-xs text-on-surface bg-surface-container-lowest shadow-sm font-semibold">REAL-TIME CFD</button>
+<button class="px-space-sm py-1 rounded font-label-mono-xs text-label-mono-xs text-on-surface-variant hover:text-on-surface transition-colors">DIURNAL SYNTHESIS</button>
+</div>
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-lowest shadow-sm hover:bg-surface-container-low transition-colors text-on-surface font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
+<span class="">Boundary Layer</span>
+</button>
+</div>
+</div>
+<!-- Live Telemetry Status Strip (4 Cards) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter">
+<!-- Card 1: Ambient Exterior Temp -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary-container"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ambient Exterior Temp</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">AWS Mast 04 • Surface Air</span>
+</div>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-primary-container text-on-primary font-label-mono-xs text-label-mono-xs font-semibold">
+              EXTREME COLD
+            </span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-primary-container tracking-tight">-38.4°C</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary font-semibold">234.75 K</span>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-0.5">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Min Sensor Recorded:</span>
+<span class="text-on-surface font-semibold">-44.1°C</span>
+</div>
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Effective Wind Chill:</span>
+<span class="text-error font-semibold">-51.2°C (38kt gust NW)</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Solar Irradiance -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 right-0 h-1 bg-tertiary-container"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Solar Irradiance (GHI)</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">Pyrheliometer CMP22</span>
+</div>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-tertiary-container text-on-tertiary font-label-mono-xs text-label-mono-xs font-semibold">
+              DNI PEAK
+            </span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-tertiary-container tracking-tight">842</span>
+<span class="font-label-mono-md text-label-mono-md text-tertiary font-semibold">W/m²</span>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-0.5">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Atmospheric Transmittance:</span>
+<span class="text-on-surface font-semibold">0.89 (Thin Stratum)</span>
+</div>
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Albedo Feedback (Snow):</span>
+<span class="text-tertiary font-semibold">+312 W/m² Diffuse</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Ground Permafrost Boundary -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 right-0 h-1 bg-secondary"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ground Permafrost Boundary</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">Borehole Array T-11</span>
+</div>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-secondary text-on-secondary font-label-mono-xs text-label-mono-xs font-semibold">
+              THERMAL SLAB
+            </span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-secondary tracking-tight">-14.2°C</span>
+<span class="font-label-mono-sm text-label-mono-sm text-secondary font-semibold">@ 1.2m depth</span>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-0.5">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Freeze Depth (Active Layer):</span>
+<span class="text-on-surface font-semibold">2.85 m Stable</span>
+</div>
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Bedrock Conductivity (k):</span>
+<span class="text-secondary font-semibold">2.45 W/m·K</span>
+</div>
+</div>
+</div>
+<!-- Card 4: Target Internal Comfort Equilibrium -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 right-0 h-1 bg-surface-tint"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Internal Target Equilibrium</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">MIL-SPEC 810H Spec</span>
+</div>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-surface-tint text-on-primary font-label-mono-xs text-label-mono-xs font-semibold">
+              ASHRAE 55 COLD
+            </span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-on-surface tracking-tight">+19.5°C</span>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface-variant font-medium">± 1.5°C Margin</span>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-0.5">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Relative Humidity Target:</span>
+<span class="text-on-surface font-semibold">35% - 45% Non-condensing</span>
+</div>
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs">
+<span class="text-on-surface-variant">Occupant Metabolic Load:</span>
+<span class="text-on-surface font-semibold">120 W/person (12 pax)</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Primary Action Hub -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+<!-- Hero Action Tile (Navy) -->
+<div class="lg:col-span-6 bg-primary-container text-on-primary rounded-xl p-space-xl shadow-md flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-8 -bottom-8 w-64 h-64 rounded-full bg-surface-tint opacity-20 pointer-events-none blur-2xl"></div>
+<div class="flex flex-col relative z-10">
+<div class="flex items-center justify-between gap-space-sm mb-space-md">
+<span class="px-space-xs py-0.5 rounded bg-on-primary/10 text-on-primary font-label-mono-xs text-label-mono-xs uppercase tracking-wider font-semibold">
+              CORE ITERATION PIPELINE
+            </span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-primary-container">GEN-OPT SOLVER v4.2</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-primary mb-space-sm flex items-center gap-space-sm">
+<span class="">New Shelter Simulation</span>
+<span class="material-symbols-outlined text-[24px] text-on-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</h2>
+<p class="font-body-md text-body-md text-on-primary-container leading-relaxed max-w-xl">
+            Configure geometry, thermal envelope stratification, glazing, and occupancy heat flux for automated generative Pareto optimization. Synthesize aerodynamic wind profiles against high-altitude blizzard loads.
+          </p>
+</div>
+<div class="mt-space-xl pt-space-md border-t border-on-primary/10 flex flex-wrap items-center justify-between gap-space-md relative z-10">
+<div class="flex items-center gap-space-lg">
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-label-mono-xs text-on-primary-container uppercase">Thermal RC Steps</span>
+<span class="font-label-mono-md text-label-mono-md font-semibold text-on-primary">8,760 h Diurnal</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-label-mono-xs text-on-primary-container uppercase">Pareto Bounds</span>
+<span class="font-label-mono-md text-label-mono-md font-semibold text-on-primary">Cost / Fuel / Mass</span>
+</div>
+</div>
+<button class="px-space-lg py-2 rounded-lg bg-surface-container-lowest text-primary font-body-sm text-body-sm font-semibold shadow-sm hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px]">add_box</span>
+<span class="">Initialize Solver Studio</span>
+</button>
+</div>
+</div>
+<!-- Secondary Tile 1: Multiphysics Solvers -->
+<div class="lg:col-span-3 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container text-primary font-label-mono-xs text-label-mono-xs font-semibold">
+              ADMIN / SEC LEVEL 4
+            </span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary font-semibold">v2.8.4 ACTIVE</span>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface mb-space-xs">
+            Advanced RC/FEM Multiphysics Solvers
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Direct interface for coupling fluid convection (Rayleigh-Bénard cells), phase-change paraffin PCM walls, and permafrost heat sinks.
+          </p>
+<div class="bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-1 mb-space-sm font-label-mono-xs text-label-mono-xs">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">FEM Mesh Resolution:</span>
+<span class="text-on-surface font-semibold">0.5mm Boundary</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Solvers Active:</span>
+<span class="text-on-surface font-semibold">CFD + Heat Transfer</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm font-semibold transition-colors flex items-center justify-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-secondary">memory</span>
+<span class="">Open Solver Parameters</span>
+</button>
+</div>
+<!-- Secondary Tile 2: Batch Parametric Sensitivity Matrix -->
+<div class="lg:col-span-3 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-mono-xs text-label-mono-xs font-semibold">
+              STOCHASTIC ENGINE
+            </span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">10,000 ITERATIONS</span>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface mb-space-xs">
+            Batch Parametric Sensitivity Matrix
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Executes Monte Carlo winter solstice passes testing extreme wind shifts, thermal bridge degradation, and window VIP seal micro-failures.
+          </p>
+<div class="bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-1 mb-space-sm font-label-mono-xs text-label-mono-xs">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Worst Case Scenarios:</span>
+<span class="text-error font-semibold">99.7% Resilient</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Sensitivity Vector:</span>
+<span class="text-on-surface font-semibold">VIP Vacuum R-Value</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm font-semibold transition-colors flex items-center justify-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container">hub</span>
+<span class="">Execute Matrix Queue</span>
+</button>
+</div>
+</section>
+<!-- Section 3: Metric Summary Trio -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-stretch">
+<!-- Metric 1: Active Deployments & Runs -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-md border-b border-surface-container">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Active Deployments &amp; Runs</h3>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-label-mono-xs text-label-mono-xs font-semibold">
+              RUN AUDIT
+            </span>
+</div>
+<div class="flex items-baseline gap-space-sm mb-space-md">
+<span class="font-display-lg text-display-lg font-bold text-on-surface">14 Solved</span>
+<span class="font-headline-md text-headline-md text-secondary font-semibold">/ 2 Solving</span>
+</div>
+<!-- Progress and Convergence Breakdown -->
+<div class="space-y-space-md">
+<div>
+<div class="flex justify-between font-label-mono-xs text-label-mono-xs text-on-surface-variant mb-1">
+<span class="">CONVERGENCE HEALTH RATIO</span>
+<span class="text-on-surface font-semibold">87.5% PASS RATE</span>
+</div>
+<div class="w-full h-2 rounded bg-surface-container overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 87.5%"></div>
+<div class="bg-tertiary-container h-full" style="width: 12.5%"></div>
+</div>
+</div>
+<!-- Mini List of Active Queue -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg font-label-mono-xs text-label-mono-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">RUN-8821: Siachen North Base</span>
+</div>
+<span class="text-secondary font-semibold">CONVERGED (0.002)</span>
+</div>
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg font-label-mono-xs text-label-mono-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="font-medium text-on-surface">RUN-8822: Galwan Point 4170</span>
+</div>
+<span class="text-tertiary-container font-semibold">SOLVING ITER 440</span>
+</div>
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg font-label-mono-xs text-label-mono-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="font-medium text-on-surface">RUN-8823: Saser Kangri Post</span>
+</div>
+<span class="text-tertiary-container font-semibold">SOLVING ITER 120</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-space-lg pt-space-sm border-t border-surface-container flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Cluster Allocation</span>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface font-semibold">48/64 Cores Dedicated</span>
+</div>
+</div>
+<!-- Metric 2: Candidate Solution Gallery -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-md border-b border-surface-container">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Top Pareto Candidate</h3>
+<span class="px-2 py-0.5 rounded bg-surface-container text-secondary font-label-mono-xs text-label-mono-xs font-semibold">
+              RANK #1 OPTIMAL
+            </span>
+</div>
+<div class="flex flex-col gap-1 mb-space-md">
+<span class="font-label-mono-md text-label-mono-md font-bold text-primary tracking-tight">HIM-SHELTER-GEN4-V3</span>
+<div class="flex items-center gap-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-on-surface">21.2°C</span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary font-semibold uppercase">STEADY-STATE EQUILIBRIUM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Zero kW auxiliary kerosene burn achieved during direct solar window (10:00 - 15:30 IST) via aerogel envelope &amp; high-mass Trombe floor.
+            </p>
+</div>
+<!-- Thermal Mesh Gradient Visualization Indicator -->
+<div class="bg-surface-container-low rounded-lg p-space-sm mb-space-sm">
+<div class="flex items-center justify-between font-label-mono-xs text-label-mono-xs text-on-surface-variant mb-1">
+<span class="">THERMAL GRADIENT SPECTRUM</span>
+<span class="text-on-surface font-semibold">ΔT = 59.6 K</span>
+</div>
+<div class="h-3 w-full rounded flex overflow-hidden">
+<div class="w-1/5 bg-primary-container" title="Exterior Cold (-38°C)"></div>
+<div class="w-1/5 bg-secondary" title="Slab Perimeter (-8°C)"></div>
+<div class="w-1/5 bg-secondary-container" title="Vestibule (+6°C)"></div>
+<div class="w-1/5 bg-surface-tint" title="Inner Shell (+18°C)"></div>
+<div class="w-1/5 bg-tertiary-container" title="Core Zone (+21.2°C)"></div>
+</div>
+<div class="flex justify-between font-label-mono-xs text-label-mono-xs text-on-surface-variant mt-1">
+<span class="">-38°C (Outer Air)</span>
+<span class="">+21.2°C (Habitat Core)</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm font-label-mono-xs text-label-mono-xs">
+<div class="p-2 bg-surface-container-low rounded">
+<span class="text-on-surface-variant block">U-Value (Composite):</span>
+<span class="text-on-surface font-semibold text-label-mono-sm">0.078 W/m²·K</span>
+</div>
+<div class="p-2 bg-surface-container-low rounded">
+<span class="text-on-surface-variant block">Solar Heat Gain (SHGC):</span>
+<span class="text-tertiary-container font-semibold text-label-mono-sm">0.71 (Glazing)</span>
+</div>
+</div>
+</div>
+<div class="mt-space-lg pt-space-sm border-t border-surface-container flex items-center justify-between">
+<a class="font-body-sm text-body-sm text-primary hover:underline font-semibold flex items-center gap-1" href="#">
+<span class="">View 3D FEA Heat Flux Map</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary font-semibold">MIL-STD CONVERGED</span>
+</div>
+</div>
+<!-- Metric 3: Reference Benchmark Baseline -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-md border-b border-surface-container">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Reference Baseline Delta</h3>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-label-mono-xs text-label-mono-xs font-semibold">
+              LEGACY COMPARISON
+            </span>
+</div>
+<div class="flex items-baseline gap-space-xs mb-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-secondary tracking-tight">-68.4%</span>
+<span class="font-label-mono-md text-label-mono-md text-on-surface font-semibold">Fuel Demand</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+            Direct metric variance against standard 1984 Arctic Quonset Bunkhouse (Single-skin corrugated galvanized iron with 50mm glass-wool insulation).
+          </p>
+<!-- Metric Comparison Barrels -->
+<div class="space-y-space-sm mb-space-md">
+<div class="bg-surface-container-low rounded-lg p-space-sm">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs mb-1">
+<span class="text-on-surface-variant">Legacy 1984 Quonset:</span>
+<span class="text-error font-semibold">48.2 L/day Kerosene</span>
+</div>
+<div class="w-full h-2 rounded bg-surface-container overflow-hidden">
+<div class="bg-error h-full" style="width: 100%"></div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-space-sm">
+<div class="flex justify-between items-center font-label-mono-xs text-label-mono-xs mb-1">
+<span class="text-on-surface-variant">COCOON GEN-4 V3:</span>
+<span class="text-secondary font-semibold">15.2 L/day Kerosene</span>
+</div>
+<div class="w-full h-2 rounded bg-surface-container overflow-hidden">
+<div class="bg-secondary h-full" style="width: 31.6%"></div>
+</div>
+</div>
+</div>
+<!-- Logistics Saving Tag -->
+<div class="p-space-sm rounded-lg bg-surface-container flex items-center justify-between font-label-mono-xs text-label-mono-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container">flight_takeoff</span>
+<span class="text-on-surface font-semibold">Aviation Air-Drop Savings:</span>
+</div>
+<span class="text-tertiary font-bold">12 sorties/month avoided</span>
+</div>
+</div>
+<div class="mt-space-lg pt-space-sm border-t border-surface-container flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Annual Operational Delta</span>
+<span class="font-label-mono-sm text-label-mono-sm text-secondary font-semibold">₹4.24 Cr / 10 Shelters</span>
+</div>
+</div>
+</section>
+<!-- Section 4: Recent Activity & Simulation Runs Table -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Table Header & Filter Toolbar -->
+<div class="p-space-lg border-b border-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest">
+<div class="flex items-center gap-space-md">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Recent Activity &amp; Simulation Runs</h2>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-label-mono-xs text-label-mono-xs font-semibold">
+            16 RUNS CACHED
+          </span>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-[18px] text-on-surface-variant">search</span>
+<input class="h-9 pl-9 pr-3 rounded-lg bg-surface-container-low border-0 text-on-surface font-label-mono-xs text-label-mono-xs placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary w-48 sm:w-64" placeholder="Filter Run ID, site, or tag..." type="text">
+</div>
+<button class="h-9 px-space-md rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm font-medium transition-colors flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+<span class="">Filters</span>
+</button>
+<button class="h-9 px-space-md rounded-lg bg-primary text-on-primary hover:bg-primary/90 font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span class="">Export Batch Log</span>
+</button>
+</div>
+</div>
+<!-- High Density Scientific Data Table -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/70 border-b border-surface-container font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase tracking-wider">
+<th class="py-space-md px-space-lg font-semibold">Run ID</th>
+<th class="py-space-md px-space-md font-semibold">Archetype Architecture</th>
+<th class="py-space-md px-space-md font-semibold">Deployment Site</th>
+<th class="py-space-md px-space-md font-semibold text-right">Ext vs Int ΔT</th>
+<th class="py-space-md px-space-md font-semibold text-right">Solar Gain (SHGC)</th>
+<th class="py-space-md px-space-md font-semibold">Verification Level</th>
+<th class="py-space-md px-space-md font-semibold">Solver Status</th>
+<th class="py-space-md px-space-lg font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
+<!-- Row 1 -->
+<tr class="h-14 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-space-lg py-2 font-label-mono-sm text-label-mono-sm font-bold text-primary whitespace-nowrap">
+                RUN-8821
+              </td>
+<td class="px-space-md py-2 font-medium text-on-surface">
+<div class="flex flex-col">
+<span class="">HIM-SHELTER-GEN4-V3</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">Aerogel Wall + Phase Change Mat</span>
+</div>
+</td>
+<td class="px-space-md py-2 text-on-surface-variant whitespace-nowrap">
+<span class="flex items-center gap-1 font-label-mono-xs text-label-mono-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                  Depsang Y-Junction (DBO)
+                </span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-semibold text-on-surface">
+                +59.6 K <span class="font-label-mono-xs text-label-mono-xs text-secondary font-normal">(-38.4° / +21.2°)</span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-medium text-tertiary-container">
+                0.71 <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(428 W/m²)</span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container font-label-mono-xs text-label-mono-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                  Validated by ANSYS
+                </span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-mono-xs text-label-mono-xs font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Converged
+                </span>
+</td>
+<td class="px-space-lg py-2 text-right whitespace-nowrap">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm font-medium text-on-surface transition-colors" title="Inspect Visual Geometry">
+                    Inspect
+                  </button>
+<button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors rounded-full" title="Download Log">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="h-14 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-space-lg py-2 font-label-mono-sm text-label-mono-sm font-bold text-primary whitespace-nowrap">
+                RUN-8822
+              </td>
+<td class="px-space-md py-2 font-medium text-on-surface">
+<div class="flex flex-col">
+<span class="">EXP-GEO-DOME-H8</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">Double-Curved Hexagonal Pneumatic</span>
+</div>
+</td>
+<td class="px-space-md py-2 text-on-surface-variant whitespace-nowrap">
+<span class="flex items-center gap-1 font-label-mono-xs text-label-mono-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                  Galwan Valley Pt 4170
+                </span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-semibold text-on-surface">
+                +52.1 K <span class="font-label-mono-xs text-label-mono-xs text-secondary font-normal">(-34.1° / +18.0°)</span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-medium text-tertiary-container">
+                0.64 <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(380 W/m²)</span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container font-label-mono-xs text-label-mono-xs font-semibold text-secondary">
+<span class="material-symbols-outlined text-[12px]">filter_vintage</span>
+                  Screened by ML
+                </span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-mono-xs text-label-mono-xs font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
+                  Solving (Iter 440)
+                </span>
+</td>
+<td class="px-space-lg py-2 text-right whitespace-nowrap">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm font-medium text-on-surface transition-colors" title="Inspect Visual Geometry">
+                    Inspect
+                  </button>
+<button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors rounded-full" title="Download Log">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="h-14 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-space-lg py-2 font-label-mono-sm text-label-mono-sm font-bold text-primary whitespace-nowrap">
+                RUN-8820
+              </td>
+<td class="px-space-md py-2 font-medium text-on-surface">
+<div class="flex flex-col">
+<span class="">HYBRID-SLAB-TROMBE-B</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">South Solar Glaze with Basalt Heat Store</span>
+</div>
+</td>
+<td class="px-space-md py-2 text-on-surface-variant whitespace-nowrap">
+<span class="flex items-center gap-1 font-label-mono-xs text-label-mono-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                  Siachen Glacier Ridge IV
+                </span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-semibold text-on-surface">
+                +48.3 K <span class="font-label-mono-xs text-label-mono-xs text-secondary font-normal">(-41.0° / +7.3°)</span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-medium text-tertiary-container">
+                0.82 <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(510 W/m²)</span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container font-label-mono-xs text-label-mono-xs font-semibold text-on-surface">
+<span class="material-symbols-outlined text-[12px]">functions</span>
+                  Calculated by RC
+                </span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-mono-xs text-label-mono-xs font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Converged
+                </span>
+</td>
+<td class="px-space-lg py-2 text-right whitespace-nowrap">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm font-medium text-on-surface transition-colors">
+                    Inspect
+                  </button>
+<button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors rounded-full">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="h-14 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-space-lg py-2 font-label-mono-sm text-label-mono-sm font-bold text-primary whitespace-nowrap">
+                RUN-8819
+              </td>
+<td class="px-space-md py-2 font-medium text-on-surface">
+<div class="flex flex-col">
+<span class="">BASE-QUONSET-1984-REF</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">Arch Corrugated Galvanized Spec</span>
+</div>
+</td>
+<td class="px-space-md py-2 text-on-surface-variant whitespace-nowrap">
+<span class="flex items-center gap-1 font-label-mono-xs text-label-mono-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                  DBO Main Logistics Depot
+                </span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-semibold text-error">
+                +24.0 K <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(-38.4° / -14.4°)</span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-medium text-on-surface-variant">
+                0.22 <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(110 W/m²)</span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container font-label-mono-xs text-label-mono-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                  Validated by ANSYS
+                </span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-outline font-label-mono-xs text-label-mono-xs font-bold uppercase">
+                  Archived (Ref)
+                </span>
+</td>
+<td class="px-space-lg py-2 text-right whitespace-nowrap">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm font-medium text-on-surface transition-colors">
+                    Inspect
+                  </button>
+<button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors rounded-full">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="h-14 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-space-lg py-2 font-label-mono-sm text-label-mono-sm font-bold text-primary whitespace-nowrap">
+                RUN-8818
+              </td>
+<td class="px-space-md py-2 font-medium text-on-surface">
+<div class="flex flex-col">
+<span class="">HIM-TENT-MICRO-3P</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">Deployable Multi-Layer Air-Drop Shelter</span>
+</div>
+</td>
+<td class="px-space-md py-2 text-on-surface-variant whitespace-nowrap">
+<span class="flex items-center gap-1 font-label-mono-xs text-label-mono-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                  Chushul Tactical Observation
+                </span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-semibold text-on-surface">
+                +39.8 K <span class="font-label-mono-xs text-label-mono-xs text-secondary font-normal">(-28.0° / +11.8°)</span>
+</td>
+<td class="px-space-md py-2 text-right whitespace-nowrap font-label-mono-sm text-label-mono-sm font-medium text-tertiary-container">
+                0.48 <span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant">(290 W/m²)</span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container font-label-mono-xs text-label-mono-xs font-semibold text-on-surface">
+<span class="material-symbols-outlined text-[12px]">functions</span>
+                  Calculated by RC
+                </span>
+</td>
+<td class="px-space-md py-2 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-mono-xs text-label-mono-xs font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Converged
+                </span>
+</td>
+<td class="px-space-lg py-2 text-right whitespace-nowrap">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm font-medium text-on-surface transition-colors">
+                    Inspect
+                  </button>
+<button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors rounded-full">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer Pagination -->
+<div class="p-space-md border-t border-surface-container flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-lowest font-label-mono-xs text-label-mono-xs text-on-surface-variant">
+<span class="">SHOWING 5 OF 16 GENERATIVE RUNS</span>
+<div class="flex items-center gap-space-xs"><button class="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container text-on-surface font-semibold disabled:opacity-50">1</button><button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface-variant transition-colors">2</button><button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface-variant transition-colors">3</button><button class="px-2 py-1 rounded hover:bg-surface-container text-on-surface-variant transition-colors">Next</button></div>
+</div>
+</section>
+</div>
+</div></main><footer class="w-full bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full px-gutter-lg py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[16px] text-error">verified_user</span><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase tracking-wider">CLASSIFIED DEFENCE ENGINEERING SYSTEM - RESTRICTED DISTRIBUTION - MIL-STD-810H &amp; ASHRAE 55 COLD CLIMATE SPECIFICATION</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs"><span class="h-1.5 w-1.5 rounded-full bg-secondary"></span><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant font-medium">ANSYS MAPDL v24.1 (ONLINE)</span></div><div class="flex items-center gap-space-xs"><span class="h-1.5 w-1.5 rounded-full bg-secondary"></span><span class="font-label-mono-xs text-label-mono-xs text-on-surface-variant font-medium">MULTI-ZONE RC SOLVER (CONVERGED)</span></div></div></div></footer></body></html>
