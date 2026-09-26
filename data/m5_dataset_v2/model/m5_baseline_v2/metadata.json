@@ -1,0 +1,886 @@
+{
+ "model_version": "m5_baseline_v2",
+ "created_at_unix": 1790395280,
+ "training_seconds": 59.0,
+ "git": {
+  "commit": "cb12cb9d63afa9db7e2dadeb47bced8bc8c81412",
+  "dirty": true
+ },
+ "training_script": "ml/m5_train_v2.py",
+ "library_versions": {
+  "python": "3.14.6",
+  "scikit-learn": "1.9.1",
+  "numpy": "2.5.2",
+  "pandas": "3.0.5",
+  "joblib": "1.6.0"
+ },
+ "dataset": {
+  "version": "m5_dataset_v2",
+  "features_csv_sha256": "98d53d4d6616e547425a301791ed9d75a3c64ad71a76fcee7acd447831d22dfd",
+  "raw_rows_sha256": {
+   "rows_00000.jsonl.gz": "6541d73e57d5c851806f570c3e1ff032d06b8ae3d908b446c6a5427749d518e5",
+   "rows_00001.jsonl.gz": "0e4247d13bd1eca6138f8be0c89793fbf002d8367f5d6db6eb9cf3c8b66b7747",
+   "rows_00002.jsonl.gz": "6bd49a853c10bf21a5e5ba602768e2ebd43fe96b2d3cd4a76c263f18c7e0d9be",
+   "rows_00003.jsonl.gz": "08fd2a5c3076cd8bd658e2b5b2a3cb8137432444e909300c92c0a5c3384c45a0",
+   "rows_00004.jsonl.gz": "0e6ad283a953b41599f84ab20673deebd6b5c6349ee1ba93139c5d3d7ecce354",
+   "rows_00005.jsonl.gz": "fa75b2748607ced3f3b0308b9cb5d249d06025162492962d555eed790450fecf",
+   "rows_00006.jsonl.gz": "ba3e6e99c48cb74a4b7f2f871704324c2169b2ac9bd3aa58d05fee8c94057fbe",
+   "rows_00007.jsonl.gz": "6c5ad75daefe3b2caad645bf4db3ffb38643b1df39cda9d5333549ebca7abfbd",
+   "rows_00008.jsonl.gz": "6298743ee772623e12da9fb0a78f41d0faa420fe157f9f85325b16f81aa00ccd",
+   "rows_00009.jsonl.gz": "2fac0bc5637811ba58d7745cc088f3b7770f78a33072057daf5bcc2b60caf098",
+   "rows_00010.jsonl.gz": "d5d134c05463777ef14d70b41e0c26f6f5c4c149cd75a426aa97f4cfcb275051",
+   "rows_00011.jsonl.gz": "a6b5d966aff1df4c36dc6adb51f510d79ab78dd64c8d8e048e2c7b1265059d3c",
+   "rows_00012.jsonl.gz": "bd08f50daf390eab711482b7f91a9cb27d8585accf9b895cfce96bf6fd51a97b",
+   "rows_00013.jsonl.gz": "27571f8e2880c9d0c741591258c89c00e4d207dee6109a280b781f9c3aa72ae6",
+   "rows_00014.jsonl.gz": "6d7c135a03aabd511ff6f0056fbd02f99ea6ff7bcdb0053fabaeb35182e0a2b2",
+   "rows_00015.jsonl.gz": "7b57117ab1a4c68b96c4dbcb32602f021a11f7e6705e90200b1a9fa49d44fe45",
+   "rows_00016.jsonl.gz": "af8fb5ab9b9c38feedb7ae00d65518bc782ad0a9f092232a839cca82016d8e36",
+   "rows_00017.jsonl.gz": "7eec46c0877ded5592ae07219031566dc239002d7cf2841361fd8a03e49493a8",
+   "rows_00018.jsonl.gz": "2dc84a03b6697117f6652009adfa58440c72b562ab587544e54c6343d5454d9f",
+   "rows_00019.jsonl.gz": "12aefce4e7bf09dc4bf6f14fe53d36b88e641ab828ab9bb390a79327262b0f81",
+   "rows_00020.jsonl.gz": "db3406c7b437bb3f05da37a5391a00d6824d6ef4beecba77155d68367004c0e4",
+   "rows_00021.jsonl.gz": "d3c4b30babb894cb65b48281e3252f22c04981f9c9f88620490b6146553db021",
+   "rows_00022.jsonl.gz": "95cdf5484e6f4a1305ef89a3d5df843eca96e0a881842bba1639ea265b9f4050",
+   "rows_00023.jsonl.gz": "56ae868b511f535cd1ede9784383801f92a52b4b7ba799b42ff4b2a4fc6974f7",
+   "rows_00024.jsonl.gz": "57168d9ff3ae6224a1fc29837ce33ebf2deeef984683a75c96d89fe629dac562",
+   "rows_00025.jsonl.gz": "43ebbebdbc8800f7d567f1798295604c0588f9afb6491c2c2372ef9f7e202487",
+   "rows_00026.jsonl.gz": "b239e2d18ad6bde650f5e13f99c424499355d76dd97367f086f2de88a080e236",
+   "rows_00027.jsonl.gz": "c4ecce0b6cdf4fad16b6ac22fe14cde224256c299193e134a5cba64a7dea21d0",
+   "rows_00028.jsonl.gz": "e1c866f89c0dc70bf158bbdc189e9dd5629b6c9e9babed96af7cab73a6f115de",
+   "rows_00029.jsonl.gz": "5fb39a56787b5f9422ee9b5dad265be086abdf29a6beb65c4c2980f6be9f903d",
+   "rows_00030.jsonl.gz": "e1e32bf360ff1b37a55eb801c19678e8a1b265128737654ce87f57ac5d900c6c",
+   "rows_00031.jsonl.gz": "63ed22b02f214a024e960b7072ca5ed2268e5c1056fcf0b7270b0e6a166d3120",
+   "rows_00032.jsonl.gz": "331ebeb74f6cdebeee732db58a4361f1a3016a65f30152eb2c62308e71a238e2",
+   "rows_00033.jsonl.gz": "42c6f06cdc4f204b21866bb456186de0f31db307abe84bd025c61d4de6c91ad7",
+   "rows_00034.jsonl.gz": "45ab999b76bf3ac5b00bb77795aa7e4651a2d970b2e9e2921d075ff13035fa16",
+   "rows_00035.jsonl.gz": "f308d9f0eb856cf95241764bc30478010f5f5ce63cb5e6f4b02e474820b1241a",
+   "rows_00036.jsonl.gz": "d59fb83e3ef644c6cae25f4ab677a379257e350f6d86f30c57ac0576aa0f391d",
+   "rows_00037.jsonl.gz": "693b443e1433f15559e953dd59598a0ccf14bfd8187f9a6373207801f62867f1",
+   "rows_00038.jsonl.gz": "5e6a8ee327b7b5b47cce33a9b4bd1b7672ff87db759ad08f70b405f26081fe08",
+   "rows_00039.jsonl.gz": "0e372bd966217f3bc7676273419650c7d7003cdc14c3152a3b857a246ed490b1",
+   "rows_00040.jsonl.gz": "7f907b8070aa890ff65bc8f80a719e4200a04e80466a757794caf02b8550044e",
+   "rows_00041.jsonl.gz": "116a2715191a56bbc1764d996cbf5efd4112bc9a1ad5a68cf821e2b5a8e5b7ef",
+   "rows_00042.jsonl.gz": "a0212d6e413f41a62d769d8a13476825250b21427fe8817693cc2adaeb20c01e",
+   "rows_00043.jsonl.gz": "8d2080b414598f89d94662839a02e59a6b567f561a7c13a5fdac9be726a522f0",
+   "rows_00044.jsonl.gz": "e57897948f872c6518fd1afcb24ddc1ef31f0e5678bc9a45d9607cae10fb84a7",
+   "rows_00045.jsonl.gz": "1af3e440ced442470569aa5c6060949c8673809282c275fda9b3db45b95a14e9",
+   "rows_00046.jsonl.gz": "ab929bd8b643c2d29755fc5c9ece2c1e6d268a3b126c8a825ba76bf7eabd91f2",
+   "rows_00047.jsonl.gz": "c2cc54b651007169c30877d683bb1a142256cd08633c8e6f69488069a3a0421c",
+   "rows_00048.jsonl.gz": "fea1cbfb26ebdffd79f42b113f9c9e24c4024fdc77f38128178c0e22685845f5",
+   "rows_00049.jsonl.gz": "cea89e2de1c9f8c424ac624afaff6eb0f0c49bf012ca20ec5f3879633cbe4867",
+   "rows_00050.jsonl.gz": "8fe3983ea88ecae76a64c9284e36c75767e3a77f8f1f81b703f4a5f3a29bc634",
+   "rows_00051.jsonl.gz": "d2b1f196e0966df962aec1668701e9cb3a7e0c164da696557018a45fd4594110",
+   "rows_00052.jsonl.gz": "53fd8b954b47b2958afccb82b7bac04d2e2edc70b4addeefb781352cdcc5af00",
+   "rows_00053.jsonl.gz": "16810f8405d4ea7e7ba98b95d1847aabf59dc19bf9fd3de932a471eeb650107b",
+   "rows_00054.jsonl.gz": "a4aca44df40532101b4f29af617ddccc1f55b1c225fa8f1cadb65c62ce648705",
+   "rows_00055.jsonl.gz": "615890bb5a11b9137f317b904ab54848d8d8f0904ed66a29cb60effcc0ea8fa0",
+   "rows_00056.jsonl.gz": "43ffd021ec4f2d5c1b23f22b36816483fd5dbe437aa702747cf4d196137fdb0f",
+   "rows_00057.jsonl.gz": "0d5a1ae1a95d4c4e7dc4fe408de6e26af6c0ba4c5444a1c6a0efe7d2a6accf4e",
+   "rows_00058.jsonl.gz": "253c6a8cfb8a2f3c9d773f74688f2cad5049aa0ae23c6f24446d6e26ee3aaa3b",
+   "rows_00059.jsonl.gz": "e65d0f59213106db603e4e83594b3d2d23f823fb9092497585c3a9356bf89aa6"
+  },
+  "rows_total": 12000,
+  "rows_ok_used": 6700,
+  "generator_git_commit": "cb12cb9d63afa9db7e2dadeb47bced8bc8c81412",
+  "failure_reasons": {
+   "generation:no valid candidate (layout": 1272,
+   "generation:InfeasibleRequirementsError": 2107,
+   "generation:no valid candidate (composition": 1578,
+   "generation:NoTemplateError": 343
+  }
+ },
+ "engine": {
+  "name": "cocoon_multizone_rc",
+  "version": "1.0.0",
+  "timestep_seconds": 900,
+  "warmup_hours": 48.0,
+  "window_days": 7
+ },
+ "targets": [
+  "heating_energy_kwh",
+  "peak_heating_kw",
+  "min_occupied_temperature_c",
+  "mean_occupied_temperature_c",
+  "max_occupied_temperature_c",
+  "max_zone_imbalance_c",
+  "passive_min_temperature_c",
+  "passive_median_temperature_c"
+ ],
+ "constant_targets_not_learned": [
+  "comfort_hours",
+  "unmet_hours"
+ ],
+ "target_definitions": {
+  "heating_energy_kwh": "ideal-load run, heater power x step summed over the kept steps (after 48 h)",
+  "peak_heating_kw": "ideal-load run, largest total heater power (after 48 h)",
+  "min_occupied_temperature_c": "capacity-limited run with the M6-sized heater, occupied rooms, after 48 h",
+  "mean_occupied_temperature_c": "as above, mean over rooms and time",
+  "max_occupied_temperature_c": "as above, maximum over rooms and time",
+  "comfort_hours": "capacity-limited: hours every occupied room >= setpoint - 0.05 K",
+  "unmet_hours": "capacity-limited: hours any occupied room < setpoint - 0.05 K",
+  "max_zone_imbalance_c": "capacity-limited: largest spread between occupied rooms at one instant",
+  "passive_min_temperature_c": "free-floating, occupied rooms, after 48 h",
+  "passive_median_temperature_c": "free-floating, median over time of the mean occupied-room temperature"
+ },
+ "features": [
+  "n_zones",
+  "n_floors",
+  "n_heated_zones",
+  "airlock_present",
+  "floor_area_m2",
+  "footprint_m2",
+  "volume_m3",
+  "heated_floor_area_m2",
+  "occupants",
+  "occupants_per_m2",
+  "setpoint_c",
+  "wall_area_m2",
+  "roof_area_m2",
+  "ground_floor_area_m2",
+  "internal_area_m2",
+  "window_area_m2",
+  "outdoor_door_area_m2",
+  "wwr",
+  "window_area_north_m2",
+  "window_area_east_m2",
+  "window_area_south_m2",
+  "window_area_west_m2",
+  "u_wall",
+  "u_roof",
+  "u_ground",
+  "u_window",
+  "r_layers_wall",
+  "r_layers_roof",
+  "shgc_x_shading",
+  "ua_outdoor_w_k",
+  "ua_ground_w_k",
+  "ua_total_w_k",
+  "ua_per_volume",
+  "ua_per_floor_area",
+  "solar_absorptivity_outer",
+  "mass_per_floor_area_kg_m2",
+  "heat_capacity_per_floor_area_kj_m2k",
+  "ach_design",
+  "ach_given",
+  "fresh_air_ach",
+  "ach_effective",
+  "door_open_fraction_x_area",
+  "internal_gain_w_per_m2",
+  "t_mean_c",
+  "t_min_c",
+  "t_std_c",
+  "degree_hours_below_setpoint",
+  "delta_t_mean_k",
+  "ghi_mean_w_m2",
+  "wind_mean_m_s",
+  "latitude_deg",
+  "elevation_m"
+ ],
+ "training_ranges": {
+  "n_zones": [
+   1.0,
+   4.0
+  ],
+  "n_floors": [
+   1.0,
+   2.0
+  ],
+  "n_heated_zones": [
+   1.0,
+   2.0
+  ],
+  "airlock_present": [
+   0.0,
+   1.0
+  ],
+  "floor_area_m2": [
+   6.25,
+   184.68
+  ],
+  "footprint_m2": [
+   6.25,
+   119.97
+  ],
+  "volume_m3": [
+   14.374999999999998,
+   528.24
+  ],
+  "heated_floor_area_m2": [
+   6.25,
+   161.19
+  ],
+  "occupants": [
+   4.0,
+   60.0
+  ],
+  "occupants_per_m2": [
+   0.11883541295306,
+   1.1363636363636365
+  ],
+  "setpoint_c": [
+   12.0,
+   20.0
+  ],
+  "wall_area_m2": [
+   16.64,
+   200.52
+  ],
+  "roof_area_m2": [
+   6.25,
+   119.97
+  ],
+  "ground_floor_area_m2": [
+   6.25,
+   119.97
+  ],
+  "internal_area_m2": [
+   0.0,
+   118.26
+  ],
+  "window_area_m2": [
+   2.4,
+   39.36
+  ],
+  "outdoor_door_area_m2": [
+   1.8,
+   1.8
+  ],
+  "wwr": [
+   0.0465116279069767,
+   0.2094017094017093
+  ],
+  "window_area_north_m2": [
+   0.0,
+   10.08
+  ],
+  "window_area_east_m2": [
+   0.0,
+   16.08
+  ],
+  "window_area_south_m2": [
+   0.0,
+   18.0
+  ],
+  "window_area_west_m2": [
+   0.0,
+   16.08
+  ],
+  "u_wall": [
+   0.0851751550624617,
+   3.1250000000000004
+  ],
+  "u_roof": [
+   0.0851751550624618,
+   3.3492822966507183
+  ],
+  "u_ground": [
+   0.121943593271215,
+   1.1472275334608033
+  ],
+  "u_window": [
+   1.7999999999999998,
+   5.800000000000002
+  ],
+  "r_layers_wall": [
+   0.1499999999999999,
+   11.57051282051282
+  ],
+  "r_layers_roof": [
+   0.1285714285714285,
+   11.57051282051282
+  ],
+  "shgc_x_shading": [
+   0.5499999999999999,
+   0.8600000000000001
+  ],
+  "ua_outdoor_w_k": [
+   11.667033012426362,
+   938.7344798359536
+  ],
+  "ua_ground_w_k": [
+   0.8717889108450542,
+   137.5525812619503
+  ],
+  "ua_total_w_k": [
+   12.982325479510324,
+   1036.0365003030226
+  ],
+  "ua_per_volume": [
+   0.1883267290109885,
+   6.506822264097574
+  ],
+  "ua_per_floor_area": [
+   0.4557570123241706,
+   17.11530426515454
+  ],
+  "solar_absorptivity_outer": [
+   0.2999999999999999,
+   0.692781423523473
+  ],
+  "mass_per_floor_area_kg_m2": [
+   73.20703332651809,
+   6305.475
+  ],
+  "heat_capacity_per_floor_area_kj_m2k": [
+   114.67172868534044,
+   5594.316500000002
+  ],
+  "ach_design": [
+   0.35,
+   1.2
+  ],
+  "ach_given": [
+   1.0,
+   1.0
+  ],
+  "fresh_air_ach": [
+   1.0955569080949483,
+   13.3399209486166
+  ],
+  "ach_effective": [
+   1.0955569080949483,
+   13.3399209486166
+  ],
+  "door_open_fraction_x_area": [
+   0.02,
+   0.02
+  ],
+  "internal_gain_w_per_m2": [
+   21.82539682539683,
+   130.76923076923077
+  ],
+  "t_mean_c": [
+   -27.888095238095243,
+   10.20714285714286
+  ],
+  "t_min_c": [
+   -37.7,
+   3.2
+  ],
+  "t_std_c": [
+   2.140121186594502,
+   8.080570746102433
+  ],
+  "degree_hours_below_setpoint": [
+   539.5,
+   8035.299999999999
+  ],
+  "delta_t_mean_k": [
+   1.944642857142856,
+   47.829166666666666
+  ],
+  "ghi_mean_w_m2": [
+   113.29166666666669,
+   315.86309523809524
+  ],
+  "wind_mean_m_s": [
+   0.3351565476190477,
+   3.237270833333333
+  ],
+  "latitude_deg": [
+   33.19,
+   35.42
+  ],
+  "elevation_m": [
+   2676.0,
+   5400.0
+  ]
+ },
+ "target_ranges": {
+  "heating_energy_kwh": [
+   0.0,
+   3677.233635914612
+  ],
+  "peak_heating_kw": [
+   0.0,
+   44.76101224386669
+  ],
+  "min_occupied_temperature_c": [
+   11.973212615054106,
+   58.54953520713762
+  ],
+  "mean_occupied_temperature_c": [
+   11.999999999999991,
+   71.46610674920751
+  ],
+  "max_occupied_temperature_c": [
+   12.0,
+   80.19897801515316
+  ],
+  "max_zone_imbalance_c": [
+   0.0,
+   12.01739633632187
+  ],
+  "passive_min_temperature_c": [
+   -17.847795385596104,
+   58.54953520713762
+  ],
+  "passive_median_temperature_c": [
+   -13.174164671234,
+   72.55094945757935
+  ]
+ },
+ "split": {
+  "method": "GroupShuffleSplit on weather window start across all sites (no calendar weather window shared across splits); shipped models refit on train+validation",
+  "seed": 0,
+  "sizes": {
+   "train": 4630,
+   "validation": 1049,
+   "test": 1021
+  },
+  "site_holdout": {
+   "site": "kargil",
+   "n": 663,
+   "note": "separate fit on all other sites"
+  },
+  "templates": {
+   "command_post": 1992,
+   "airlock_living_equipment": 1276,
+   "airlock_living": 752,
+   "two_floor_compact": 722,
+   "medical_post": 719,
+   "living_sleeping_storage": 620,
+   "single_room": 619
+  }
+ },
+ "hyperparameters": {
+  "gbt_reference": {
+   "learning_rate": 0.06,
+   "max_iter": 300,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 20,
+   "l2_regularization": 1.0,
+   "early_stopping": false
+  },
+  "extra_trees": {
+   "n_estimators": 60,
+   "max_features": 0.5,
+   "min_samples_leaf": 3,
+   "n_jobs": -1
+  },
+  "random_forest": {
+   "n_estimators": 60,
+   "max_features": 0.33,
+   "min_samples_leaf": 3,
+   "n_jobs": -1
+  }
+ },
+ "shipped_family": "gbt_reference",
+ "evaluation_only_families": [
+  "extra_trees",
+  "random_forest"
+ ],
+ "note_baselines": "Extra Trees / Random Forest are scored (PRD 11.5) but not shipped: their files run to hundreds of MB.",
+ "metrics": {
+  "heating_energy_kwh": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9763755541682128,
+     "mae": 28.4580682925001,
+     "label_std": 387.5285770425331
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9742202427921393,
+     "mae": 29.163730616512925,
+     "label_std": 356.21308352146076
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9755715621465222,
+     "mae": 26.194867042174394,
+     "label_std": 294.8510525322991
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9575649095982304,
+     "mae": 38.666344139741305,
+     "label_std": 387.5285770425331
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9500495895860402,
+     "mae": 38.69668972380945,
+     "label_std": 356.21308352146076
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9505018576754419,
+     "mae": 42.75962838118825,
+     "label_std": 387.5285770425331
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9404220849683214,
+     "mae": 42.377003100996156,
+     "label_std": 356.21308352146076
+    }
+   }
+  },
+  "peak_heating_kw": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9808313819430671,
+     "mae": 0.4045794670714675,
+     "label_std": 5.414351829690912
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9811782218628762,
+     "mae": 0.38670695316929315,
+     "label_std": 5.261937125608107
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9817871127505882,
+     "mae": 0.3828108290543676,
+     "label_std": 4.803208932378007
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9730475784452062,
+     "mae": 0.48432000774457884,
+     "label_std": 5.414351829690912
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9710602404277231,
+     "mae": 0.46080472063365857,
+     "label_std": 5.261937125608107
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.968547764996275,
+     "mae": 0.5282599552800706,
+     "label_std": 5.414351829690912
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9651830301200202,
+     "mae": 0.5205884631551302,
+     "label_std": 5.261937125608107
+    }
+   }
+  },
+  "min_occupied_temperature_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.953604291766373,
+     "mae": 0.8459604887102677,
+     "label_std": 6.9587743149506105
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.953892067270581,
+     "mae": 0.942395980858102,
+     "label_std": 7.385004895864953
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9565693238765707,
+     "mae": 0.9304237322180625,
+     "label_std": 7.66124116593466
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9315269857337114,
+     "mae": 1.0107648260501563,
+     "label_std": 6.9587743149506105
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9308866174462472,
+     "mae": 1.081346360339334,
+     "label_std": 7.385004895864953
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9232674439104873,
+     "mae": 1.0975473672385425,
+     "label_std": 6.9587743149506105
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9276942688789183,
+     "mae": 1.1513758057542491,
+     "label_std": 7.385004895864953
+    }
+   }
+  },
+  "mean_occupied_temperature_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9639845843211146,
+     "mae": 1.1115112876407862,
+     "label_std": 9.76174885311392
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9620699385904223,
+     "mae": 1.217555412221233,
+     "label_std": 10.253417562066467
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9655540403741034,
+     "mae": 1.2316949495537413,
+     "label_std": 10.53933902719375
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9412943488486578,
+     "mae": 1.402636692315302,
+     "label_std": 9.76174885311392
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9411619975012204,
+     "mae": 1.4646054972595137,
+     "label_std": 10.253417562066467
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9325943898312921,
+     "mae": 1.5234504466071703,
+     "label_std": 9.76174885311392
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.935841720770178,
+     "mae": 1.5840370702305815,
+     "label_std": 10.253417562066467
+    }
+   }
+  },
+  "max_occupied_temperature_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9607251256520372,
+     "mae": 1.5016451757019427,
+     "label_std": 11.452836828401708
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9612983652950008,
+     "mae": 1.5657061902049485,
+     "label_std": 11.890316450864699
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9634713077040595,
+     "mae": 1.640658962926615,
+     "label_std": 12.16359279829237
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9331893172844956,
+     "mae": 1.9794582692098848,
+     "label_std": 11.452836828401708
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9353194297311859,
+     "mae": 1.9910045850870708,
+     "label_std": 11.890316450864699
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9222956078524218,
+     "mae": 2.141908401501092,
+     "label_std": 11.452836828401708
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9318400905599696,
+     "mae": 2.1029029240730766,
+     "label_std": 11.890316450864699
+    }
+   }
+  },
+  "max_zone_imbalance_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.7336064617642472,
+     "mae": 0.24339444530414636,
+     "label_std": 1.2589535313099727
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.6982693599966276,
+     "mae": 0.25780319625705916,
+     "label_std": 1.36456416467259
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.761575921667256,
+     "mae": 0.234036714430915,
+     "label_std": 1.4390729016619888
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.7537987569753581,
+     "mae": 0.22208883424602924,
+     "label_std": 1.2589535313099727
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.7020810612972181,
+     "mae": 0.23962777375623623,
+     "label_std": 1.36456416467259
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.7369500727578959,
+     "mae": 0.24677528811166574,
+     "label_std": 1.2589535313099727
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.6863329661394517,
+     "mae": 0.259299070093752,
+     "label_std": 1.36456416467259
+    }
+   }
+  },
+  "passive_min_temperature_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9797174009851546,
+     "mae": 1.345864445325772,
+     "label_std": 12.727638741557351
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9788052828564879,
+     "mae": 1.401524430713278,
+     "label_std": 13.205186996682182
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9741707624785602,
+     "mae": 1.4362191115234406,
+     "label_std": 12.107950922774016
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9645658225322126,
+     "mae": 1.8076435725876276,
+     "label_std": 12.727638741557351
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9653802920134495,
+     "mae": 1.8462556919617594,
+     "label_std": 13.205186996682182
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9587746575561595,
+     "mae": 1.9377718868910816,
+     "label_std": 12.727638741557351
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9625011846360483,
+     "mae": 1.9282331986804397,
+     "label_std": 13.205186996682182
+    }
+   }
+  },
+  "passive_median_temperature_c": {
+   "gbt_reference": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9796635247075979,
+     "mae": 1.4979208873096301,
+     "label_std": 14.299977849680687
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.978073282768154,
+     "mae": 1.5526224556976869,
+     "label_std": 14.846717504841013
+    },
+    "site_holdout_kargil": {
+     "n": 663,
+     "r2": 0.9747749832988358,
+     "mae": 1.635299198560896,
+     "label_std": 14.039783667316787
+    }
+   },
+   "extra_trees": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9613846229453552,
+     "mae": 2.0840831559060917,
+     "label_std": 14.299977849680687
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9622595896130844,
+     "mae": 2.0811986722268307,
+     "label_std": 14.846717504841013
+    }
+   },
+   "random_forest": {
+    "validation": {
+     "n": 1049,
+     "r2": 0.9571039453563935,
+     "mae": 2.184205628272269,
+     "label_std": 14.299977849680687
+    },
+    "test": {
+     "n": 1021,
+     "r2": 0.9599614259425561,
+     "mae": 2.1590810679823687,
+     "label_std": 14.846717504841013
+    }
+   }
+  }
+ },
+ "artifacts": {
+  "gbt_reference__heating_energy_kwh.joblib": "8cc25f01f7936618f16627fbf4d34f59fb27c60455235bf36f5866e7d00a1a96",
+  "gbt_reference__max_occupied_temperature_c.joblib": "b6ed8e941f18b1c66fc8b916d4fa5034c3be26bf848d0a5cdeaba605202d0c26",
+  "gbt_reference__max_zone_imbalance_c.joblib": "44c5d591e9a3d3566ce6c19e63b00b8d809327da456f3bfb0e49ba1616d45924",
+  "gbt_reference__mean_occupied_temperature_c.joblib": "b03e98bf5ce601661b53854e26c297a318fd8383de3445cc3b67d067438de7a6",
+  "gbt_reference__min_occupied_temperature_c.joblib": "d3ffffbe626a98b95eaf78719730374ed64361774b9e2d1ef786e11900172868",
+  "gbt_reference__passive_median_temperature_c.joblib": "3e3350c8b17d221c1d703af2eaf80c0ffd97bb5dc078140b4e4936e420fe0611",
+  "gbt_reference__passive_min_temperature_c.joblib": "a640fc520a6a9971e8cc73492d7166caf957a89bdddf9d65202734a8c46e88db",
+  "gbt_reference__peak_heating_kw.joblib": "13b4f9d42fbea18f52bf9438569a83f2d72e9f990d24038de071debeafc9f418"
+ }
+}

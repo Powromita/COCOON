@@ -1,0 +1,254 @@
+{
+ "support_version": "m5_baseline_v1.support.1",
+ "built_by": "ml/m5_build_support.py",
+ "git": {
+  "commit": "cb12cb9d63afa9db7e2dadeb47bced8bc8c81412",
+  "dirty": true
+ },
+ "created_at_unix": 1790353029,
+ "production_model_family": "gbt_reference",
+ "fit_rows": 8039,
+ "material_catalogue": {
+  "mat_aerated_autoclaved_concrete": {
+   "k_w_mk": 0.16,
+   "density_kg_m3": 600.0,
+   "heat_capacity_kj_m3k": 315.0,
+   "specific_heat_j_kgk": 525.0,
+   "solar_absorptivity": 0.55
+  },
+  "mat_barley_straw_loose_pack": {
+   "k_w_mk": 0.065,
+   "density_kg_m3": 110.0,
+   "heat_capacity_kj_m3k": 99.0,
+   "specific_heat_j_kgk": 900.0,
+   "solar_absorptivity": 0.6
+  },
+  "mat_granite_rubble_stone": {
+   "k_w_mk": 2.2,
+   "density_kg_m3": 2600.0,
+   "heat_capacity_kj_m3k": 1040.0,
+   "specific_heat_j_kgk": 400.0,
+   "solar_absorptivity": 0.65
+  },
+  "mat_himalayan_cedar_deodar": {
+   "k_w_mk": 0.13,
+   "density_kg_m3": 560.0,
+   "heat_capacity_kj_m3k": 392.0,
+   "specific_heat_j_kgk": 700.0,
+   "solar_absorptivity": 0.68
+  },
+  "mat_poplar_wood_timber": {
+   "k_w_mk": 0.12,
+   "density_kg_m3": 450.0,
+   "heat_capacity_kj_m3k": 360.0,
+   "specific_heat_j_kgk": 800.0,
+   "solar_absorptivity": 0.65
+  },
+  "mat_puf_rigid_board": {
+   "k_w_mk": 0.024,
+   "density_kg_m3": 35.0,
+   "heat_capacity_kj_m3k": 25.375,
+   "specific_heat_j_kgk": 725.0,
+   "solar_absorptivity": 0.3
+  },
+  "mat_rockwool_slab": {
+   "k_w_mk": 0.037,
+   "density_kg_m3": 80.0,
+   "heat_capacity_kj_m3k": 33.6,
+   "specific_heat_j_kgk": 420.0,
+   "solar_absorptivity": 0.4
+  },
+  "mat_sheep_wool_felt_batts": {
+   "k_w_mk": 0.038,
+   "density_kg_m3": 25.0,
+   "heat_capacity_kj_m3k": 21.25,
+   "specific_heat_j_kgk": 850.0,
+   "solar_absorptivity": 0.5
+  },
+  "mat_stabilized_rammed_earth": {
+   "k_w_mk": 0.95,
+   "density_kg_m3": 1950.0,
+   "heat_capacity_kj_m3k": 877.5,
+   "specific_heat_j_kgk": 450.0,
+   "solar_absorptivity": 0.7
+  },
+  "mat_standard_pcc_concrete": {
+   "k_w_mk": 1.4,
+   "density_kg_m3": 2300.0,
+   "heat_capacity_kj_m3k": 1150.0,
+   "specific_heat_j_kgk": 500.0,
+   "solar_absorptivity": 0.7
+  },
+  "mat_sun_dried_adobe_block": {
+   "k_w_mk": 0.72,
+   "density_kg_m3": 1650.0,
+   "heat_capacity_kj_m3k": 783.75,
+   "specific_heat_j_kgk": 475.0,
+   "solar_absorptivity": 0.75
+  },
+  "mat_willow_twigs_decking": {
+   "k_w_mk": 0.1,
+   "density_kg_m3": 380.0,
+   "heat_capacity_kj_m3k": 285.0,
+   "specific_heat_j_kgk": 750.0,
+   "solar_absorptivity": 0.6
+  },
+  "mat_wood_sawdust_loose": {
+   "k_w_mk": 0.075,
+   "density_kg_m3": 180.0,
+   "heat_capacity_kj_m3k": 126.0,
+   "specific_heat_j_kgk": 700.0,
+   "solar_absorptivity": 0.62
+  },
+  "mat_xps_board": {
+   "k_w_mk": 0.034,
+   "density_kg_m3": 32.0,
+   "heat_capacity_kj_m3k": 22.4,
+   "specific_heat_j_kgk": 700.0,
+   "solar_absorptivity": 0.35
+  }
+ },
+ "material_catalogue_provenance": {
+  "source": "recovered by least squares from m5_dataset_v1 features.csv (the generating snapshot mat_snap_ladakh_csv_v1 is not in the repo)",
+  "max_residuals": {
+   "conductivity": 5.5067062021407764e-14,
+   "density": 1.5279510989785194e-10,
+   "heat_capacity": 7.639755494892597e-11,
+   "absorptivity": 4.6074255521944e-15
+  }
+ },
+ "extractor_check": {
+  "rows": 9401,
+  "max_relative_error": {
+   "n_zones": 0.0,
+   "n_floors": 0.0,
+   "n_heated_zones": 0.0,
+   "airlock_present": 0.0,
+   "floor_area_m2": 2.2066544588822984e-16,
+   "footprint_m2": 2.2066544588822984e-16,
+   "volume_m3": 2.2066544588822984e-16,
+   "heated_floor_area_m2": 2.2066544588822984e-16,
+   "occupants": 0.00011111111111104953,
+   "occupants_per_m2": 2.986857825559852e-05,
+   "setpoint_c": 0.0,
+   "wall_area_m2": 2.219059137289507e-16,
+   "roof_area_m2": 2.0997125761232273e-16,
+   "ground_floor_area_m2": 2.0997125761232273e-16,
+   "internal_area_m2": 2.779901157120893e-16,
+   "window_area_m2": 2.42671699371619e-16,
+   "outdoor_door_area_m2": 0.0,
+   "wwr": 1.3877787807814457e-16,
+   "window_area_north_m2": 2.0559685641206605e-16,
+   "window_area_east_m2": 2.176907891421876e-16,
+   "window_area_south_m2": 2.846725704167069e-16,
+   "window_area_west_m2": 2.176907891421876e-16,
+   "u_wall": 4.0341998747432017e-16,
+   "u_roof": 2.3375241136653296e-16,
+   "u_ground": 2.220446049250313e-16,
+   "u_window": 1.2335811384723957e-16,
+   "r_layers_wall": 4.825792412442364e-16,
+   "r_layers_roof": 4.47146622654538e-16,
+   "shgc_x_shading": 0.0,
+   "ua_outdoor_w_k": 1.0297666342857943e-15,
+   "ua_ground_w_k": 2.455097582293799e-16,
+   "ua_total_w_k": 8.414296873132868e-16,
+   "ua_per_volume": 1.075996102313176e-15,
+   "ua_per_floor_area": 8.60796881850541e-16,
+   "solar_absorptivity_outer": 2.220446049250313e-16,
+   "mass_per_floor_area_kg_m2": 6.148301466512684e-16,
+   "heat_capacity_per_floor_area_kj_m2k": 7.409995736283606e-16,
+   "ach_design": 0.0,
+   "ach_given": 0.0,
+   "fresh_air_ach": 0.00011111111111099784,
+   "ach_effective": 0.00011111111111099784,
+   "door_open_fraction_x_area": 0.0,
+   "internal_gain_w_per_m2": 2.175966073991731e-16,
+   "t_mean_c": 5.668506059628504e-16,
+   "t_min_c": 0.0,
+   "t_std_c": 4.3434301204192166e-16,
+   "degree_hours_below_setpoint": 3.7027020387286904e-16,
+   "delta_t_mean_k": 3.722613306961995e-16,
+   "ghi_mean_w_m2": 1.5767417971495137e-16,
+   "wind_mean_m_s": 4.4364908179272845e-16,
+   "latitude_deg": 0.0,
+   "elevation_m": 0.0
+  }
+ },
+ "categorical_support": {
+  "layout_signatures": [
+   "airlock,command*",
+   "airlock,equipment,living*",
+   "airlock,equipment,living*|sleeping*",
+   "airlock,living*",
+   "airlock,living*|sleeping*",
+   "airlock,medical*",
+   "living*",
+   "multipurpose*"
+  ],
+  "material_ids": [
+   "mat_aerated_autoclaved_concrete",
+   "mat_barley_straw_loose_pack",
+   "mat_granite_rubble_stone",
+   "mat_himalayan_cedar_deodar",
+   "mat_poplar_wood_timber",
+   "mat_puf_rigid_board",
+   "mat_rockwool_slab",
+   "mat_sheep_wool_felt_batts",
+   "mat_stabilized_rammed_earth",
+   "mat_standard_pcc_concrete",
+   "mat_sun_dried_adobe_block",
+   "mat_willow_twigs_decking",
+   "mat_wood_sawdust_loose",
+   "mat_xps_board"
+  ],
+  "surface_kinds": [
+   "ceiling/adjacent_zone",
+   "exterior_wall/outdoors",
+   "floor/adjacent_zone",
+   "floor/ground",
+   "partition/adjacent_zone",
+   "roof/outdoors"
+  ],
+  "opening_kinds": [
+   "door/outdoors",
+   "door/zone",
+   "window/none"
+  ]
+ },
+ "conformal": {
+  "nominal_coverage": 0.8,
+  "method": "split conformal, symmetric: |residual| quantile on validation weather periods, GBT fit on training periods only",
+  "targets": {
+   "heating_energy_kwh": {
+    "half_width": 39.527197407582435,
+    "n_calibration": 1411,
+    "test_coverage_shipped_model": 0.815712187958884,
+    "model_card_offset_not_used": 12.511469445439843
+   },
+   "peak_heating_kw": {
+    "half_width": 0.4430618305169496,
+    "n_calibration": 1411,
+    "test_coverage_shipped_model": 0.8135095447870778,
+    "model_card_offset_not_used": 0.15924005756938087
+   },
+   "passive_min_temperature_c": {
+    "half_width": 1.6653983423192362,
+    "n_calibration": 1411,
+    "test_coverage_shipped_model": 0.8355359765051396,
+    "model_card_offset_not_used": 0.555547039822847
+   },
+   "passive_median_temperature_c": {
+    "half_width": 1.2284021284658717,
+    "n_calibration": 1411,
+    "test_coverage_shipped_model": 0.8259911894273128,
+    "model_card_offset_not_used": 0.39416844218410674
+   },
+   "unmet_hours_ref": {
+    "half_width": 9.92013946263181,
+    "n_calibration": 1411,
+    "test_coverage_shipped_model": 0.7922173274596183,
+    "model_card_offset_not_used": 0.0
+   }
+  }
+ }
+}
