@@ -2,8 +2,8 @@
  "support_version": "m5_baseline_v2.support.1",
  "built_by": "ml/m5_train_v2.py",
  "git": {
-  "commit": "cb12cb9d63afa9db7e2dadeb47bced8bc8c81412",
-  "dirty": true
+  "commit": "15fc80820b491ab44c2e5a9b11ffae9042dd89cf",
+  "dirty": false
  },
  "production_model_family": "gbt_reference",
  "fit_rows": 5679,
@@ -115,44 +115,44 @@
   "method": "split conformal, symmetric: |residual| quantile on validation weather periods, model fit on training periods only",
   "targets": {
    "heating_energy_kwh": {
-    "half_width": 41.39023701457012,
+    "half_width": 41.52932580390407,
+    "n_calibration": 1049,
+    "test_coverage_shipped_model": 0.7933398628795298
+   },
+   "peak_heating_kw": {
+    "half_width": 0.5951736544020769,
+    "n_calibration": 1049,
+    "test_coverage_shipped_model": 0.8050930460333007
+   },
+   "min_occupied_temperature_c": {
+    "half_width": 1.4624819286227009,
+    "n_calibration": 1049,
+    "test_coverage_shipped_model": 0.7776689520078355
+   },
+   "mean_occupied_temperature_c": {
+    "half_width": 1.9188798924036377,
+    "n_calibration": 1049,
+    "test_coverage_shipped_model": 0.7855044074436827
+   },
+   "max_occupied_temperature_c": {
+    "half_width": 2.3827047362187415,
     "n_calibration": 1049,
     "test_coverage_shipped_model": 0.7747306562193927
    },
-   "peak_heating_kw": {
-    "half_width": 0.635699056478501,
-    "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.8168462291870715
-   },
-   "min_occupied_temperature_c": {
-    "half_width": 1.3942972859843756,
-    "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.7649363369245837
-   },
-   "mean_occupied_temperature_c": {
-    "half_width": 1.9286509416741993,
-    "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.7737512242899118
-   },
-   "max_occupied_temperature_c": {
-    "half_width": 2.4494490337146537,
-    "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.7806072477962782
-   },
    "max_zone_imbalance_c": {
-    "half_width": 0.2598923858253934,
+    "half_width": 0.29236968315475287,
     "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.8070519098922625
+    "test_coverage_shipped_model": 0.8109696376101861
    },
    "passive_min_temperature_c": {
-    "half_width": 2.20429921954722,
+    "half_width": 2.1324983853150243,
     "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.8080313418217434
+    "test_coverage_shipped_model": 0.7962781586679726
    },
    "passive_median_temperature_c": {
-    "half_width": 2.364634454714217,
+    "half_width": 2.322977008170235,
     "n_calibration": 1049,
-    "test_coverage_shipped_model": 0.7992164544564153
+    "test_coverage_shipped_model": 0.7904015670910872
    }
   }
  }
