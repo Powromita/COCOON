@@ -1,0 +1,68 @@
+{
+  "schema_version": "4.0",
+  "analysis_id": "econ_analysis_leh_001",
+  "design_revision_id": "rev_airlock_living_r1",
+  "assumption_set_id": "econ_ladakh_expected_v1",
+  "scenario": "expected",
+  "capex": {
+    "materials_inr": 850000.0,
+    "labour_inr": 350000.0,
+    "transport_inr": 220000.0,
+    "equipment_inr": 180000.0,
+    "total_capex_inr": 1600000.0
+  },
+  "annual_cash_flows": [
+    {
+      "year": 1,
+      "fuel_cost_inr": 118750.0,
+      "maintenance_cost_inr": 25000.0,
+      "replacement_cost_inr": 0.0,
+      "logistics_cost_inr": 29687.5,
+      "total_opex_inr": 173437.5,
+      "discounted_opex_inr": 160590.28
+    },
+    {
+      "year": 2,
+      "fuel_cost_inr": 118750.0,
+      "maintenance_cost_inr": 25000.0,
+      "replacement_cost_inr": 0.0,
+      "logistics_cost_inr": 29687.5,
+      "total_opex_inr": 173437.5,
+      "discounted_opex_inr": 148694.70
+    },
+    {
+      "year": 3,
+      "fuel_cost_inr": 118750.0,
+      "maintenance_cost_inr": 25000.0,
+      "replacement_cost_inr": 0.0,
+      "logistics_cost_inr": 29687.5,
+      "total_opex_inr": 173437.5,
+      "discounted_opex_inr": 137680.28
+    },
+    {
+      "year": 4,
+      "fuel_cost_inr": 118750.0,
+      "maintenance_cost_inr": 25000.0,
+      "replacement_cost_inr": 0.0,
+      "logistics_cost_inr": 29687.5,
+      "total_opex_inr": 173437.5,
+      "discounted_opex_inr": 127481.74
+    },
+    {
+      "year": 5,
+      "fuel_cost_inr": 118750.0,
+      "maintenance_cost_inr": 25000.0,
+      "replacement_cost_inr": 45000.0,
+      "logistics_cost_inr": 29687.5,
+      "total_opex_inr": 218437.5,
+      "discounted_opex_inr": 148663.79
+    }
+  ],
+  "lcc_inr": 2323110.79,
+  "npv_vs_baseline_inr": 425000.0,
+  "simple_payback_years": 4.1,
+  "discounted_payback_years": 4.9,
+  "break_even_year": 5,
+  "annual_fuel_litres": 1250.0,
+  "created_at": "2026-09-20T14:45:00+05:30"
+}

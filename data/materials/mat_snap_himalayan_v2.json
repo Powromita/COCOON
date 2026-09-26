@@ -1,0 +1,170 @@
+{
+ "schema_version": "4.0",
+ "snapshot_id": "mat_snap_himalayan_v2",
+ "materials": {
+  "mat_stone": {
+   "id": "mat_stone",
+   "display_name": "Granite / Field Stone",
+   "category": "masonry",
+   "properties": {
+    "thermal_conductivity_w_mk": 2.0,
+    "density_kg_m3": 2300.0,
+    "specific_heat_j_kgk": 880.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.7,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 4500.0
+   },
+   "source_reference": "ASHRAE Handbook of Fundamentals 2021",
+   "effective_date": "2026-01-01T00:00:00+05:30",
+   "min_temperature_c": -50.0,
+   "max_temperature_c": 100.0
+  },
+  "mat_puf": {
+   "id": "mat_puf",
+   "display_name": "Polyurethane Foam Insulation",
+   "category": "insulation",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.024,
+    "density_kg_m3": 35.0,
+    "specific_heat_j_kgk": 1500.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.3,
+    "cost_inr_per_m2": 650.0,
+    "cost_inr_per_m3": 13000.0
+   },
+   "source_reference": "IS 12436: Preformed Rigid Polyurethane Insulation",
+   "effective_date": "2026-01-01T00:00:00+05:30",
+   "min_temperature_c": -60.0,
+   "max_temperature_c": 90.0
+  },
+  "mat_plywood": {
+   "id": "mat_plywood",
+   "display_name": "Marine Grade Structural Plywood",
+   "category": "structural",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.13,
+    "density_kg_m3": 650.0,
+    "specific_heat_j_kgk": 1600.0,
+    "emissivity": 0.85,
+    "solar_absorptivity": 0.6,
+    "cost_inr_per_m2": 850.0,
+    "cost_inr_per_m3": null
+   },
+   "source_reference": "IS 710: Marine Plywood Specification",
+   "effective_date": "2026-01-01T00:00:00+05:30",
+   "min_temperature_c": -50.0,
+   "max_temperature_c": 80.0
+  },
+  "mat_concrete": {
+   "id": "mat_concrete",
+   "display_name": "Dense Concrete (Sub-floor)",
+   "category": "structural",
+   "properties": {
+    "thermal_conductivity_w_mk": 1.4,
+    "density_kg_m3": 2400.0,
+    "specific_heat_j_kgk": 1000.0,
+    "emissivity": 0.92,
+    "solar_absorptivity": 0.65,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 6500.0
+   },
+   "source_reference": "IS 456: Plain and Reinforced Concrete Code",
+   "effective_date": "2026-01-01T00:00:00+05:30",
+   "min_temperature_c": -40.0,
+   "max_temperature_c": 120.0
+  },
+  "mat_adobe": {
+   "id": "mat_adobe",
+   "display_name": "Adobe (Sun-dried Mud Brick)",
+   "category": "traditional_ladakh",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.13,
+    "density_kg_m3": 2210.0,
+    "specific_heat_j_kgk": 1000.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.7,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 1600.0
+   },
+   "source_reference": "Ladakh passive-solar building simulation dataset used in the project reference",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "min_temperature_c": null,
+   "max_temperature_c": null
+  },
+  "mat_rammed_earth": {
+   "id": "mat_rammed_earth",
+   "display_name": "Rammed Earth",
+   "category": "traditional_ladakh",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.8,
+    "density_kg_m3": 1200.0,
+    "specific_heat_j_kgk": 1000.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.7,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 2000.0
+   },
+   "source_reference": "Ladakh passive-solar building simulation dataset used in the project reference",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "min_temperature_c": null,
+   "max_temperature_c": null
+  },
+  "mat_straw_clay": {
+   "id": "mat_straw_clay",
+   "display_name": "Straw-Clay",
+   "category": "passive_solar_ladakh",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.19,
+    "density_kg_m3": 660.0,
+    "specific_heat_j_kgk": 1500.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.7,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 2400.0
+   },
+   "source_reference": "Ladakh passive-solar building simulation dataset used in the project reference",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "min_temperature_c": null,
+   "max_temperature_c": null
+  },
+  "mat_wood_timber": {
+   "id": "mat_wood_timber",
+   "display_name": "Wood / Structural Timber",
+   "category": "traditional_ladakh",
+   "properties": {
+    "thermal_conductivity_w_mk": 0.13,
+    "density_kg_m3": 500.0,
+    "specific_heat_j_kgk": 1500.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.6,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 13000.0
+   },
+   "source_reference": "Ladakh passive-solar building simulation dataset used in the project reference",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "min_temperature_c": null,
+   "max_temperature_c": null
+  },
+  "mat_reinforced_concrete": {
+   "id": "mat_reinforced_concrete",
+   "display_name": "Reinforced Concrete",
+   "category": "modern_engineered",
+   "properties": {
+    "thermal_conductivity_w_mk": 2.3,
+    "density_kg_m3": 2300.0,
+    "specific_heat_j_kgk": 1000.0,
+    "emissivity": 0.9,
+    "solar_absorptivity": 0.65,
+    "cost_inr_per_m2": null,
+    "cost_inr_per_m3": 9500.0
+   },
+   "source_reference": "Ladakh passive-solar building simulation dataset used in the project reference",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "min_temperature_c": null,
+   "max_temperature_c": null
+  }
+ },
+ "checksum_sha256": "6f9a811595d9e42e58fb5f53828b7c5a7e9b9aff892b53e36a83cee5acc6bce0",
+ "created_at": "2026-09-25T00:00:00+05:30"
+}

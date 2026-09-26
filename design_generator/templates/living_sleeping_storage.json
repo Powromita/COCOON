@@ -1,0 +1,19 @@
+{
+  "id": "living_sleeping_storage",
+  "name": "Living, sleeping and storage rooms",
+  "description": "Three separate rooms without an airlock. The living room has the outside door and connects to both other rooms.",
+  "floor_count": 1,
+  "rooms": [
+    {"id": "living", "type": "living", "floor_level": 0, "is_primary_occupied": true,
+     "weight": 0.45, "exterior_access": true, "serves": []},
+    {"id": "sleeping", "type": "sleeping", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.35, "exterior_access": false, "serves": []},
+    {"id": "storage", "type": "storage", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.20, "exterior_access": false, "serves": []}
+  ],
+  "links": [
+    {"a": "living", "b": "sleeping", "kind": "door"},
+    {"a": "living", "b": "storage", "kind": "door"}
+  ],
+  "rules": {"airlock_between_outdoors_and_primary": false}
+}

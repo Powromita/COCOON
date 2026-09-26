@@ -1,0 +1,114 @@
+{
+  "$defs": {
+    "AnsysSolverConfig": {
+      "additionalProperties": false,
+      "description": "Execution parameters for the local or worker PyMAPDL simulation.",
+      "properties": {
+        "element_size_m": {
+          "default": 0.25,
+          "description": "Global element mesh size (m)",
+          "exclusiveMinimum": 0.0,
+          "title": "Element Size M",
+          "type": "number"
+        },
+        "element_type": {
+          "default": "SOLID70",
+          "description": "ANSYS thermal element formulation (e.g. SOLID70, SOLID90)",
+          "title": "Element Type",
+          "type": "string"
+        },
+        "substeps_max": {
+          "default": 20,
+          "description": "Maximum substeps per transient hour",
+          "minimum": 1,
+          "title": "Substeps Max",
+          "type": "integer"
+        },
+        "substeps_min": {
+          "default": 1,
+          "description": "Minimum substeps per transient hour",
+          "minimum": 1,
+          "title": "Substeps Min",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 3600,
+          "description": "Execution timeout limit in seconds",
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "AnsysSolverConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/ansys-job.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: AnsysJobRequest in cocoon_contracts. Submitted job package for independent finite element thermal validation.",
+  "properties": {
+    "design_revision_id": {
+      "description": "Immutable design revision ID (rev_...)",
+      "title": "Design Revision Id",
+      "type": "string"
+    },
+    "imposed_indoor_temp_forbidden": {
+      "default": true,
+      "description": "Integrity guard asserting that RC indoor temperatures are never prescribed as boundary loads",
+      "title": "Imposed Indoor Temp Forbidden",
+      "type": "boolean"
+    },
+    "input_hashes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Hashes of frozen input files forming this package",
+      "title": "Input Hashes",
+      "type": "object"
+    },
+    "job_id": {
+      "description": "Unique ANSYS job identifier starting with 'ans_'",
+      "title": "Job Id",
+      "type": "string"
+    },
+    "priority": {
+      "default": 0,
+      "description": "Scheduling priority tier (0=normal, 1=high)",
+      "title": "Priority",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "solver_config": {
+      "$ref": "#/$defs/AnsysSolverConfig",
+      "description": "Solver meshing and stepping configuration"
+    },
+    "submitted_at": {
+      "description": "Job submission timestamp",
+      "format": "date-time",
+      "title": "Submitted At",
+      "type": "string"
+    },
+    "weather_snapshot_id": {
+      "description": "Immutable weather snapshot ID (wx_...)",
+      "title": "Weather Snapshot Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "job_id",
+    "design_revision_id",
+    "weather_snapshot_id",
+    "solver_config",
+    "input_hashes",
+    "submitted_at"
+  ],
+  "title": "AnsysJobRequest",
+  "type": "object"
+}

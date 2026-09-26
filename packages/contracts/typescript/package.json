@@ -1,0 +1,17 @@
+{
+  "name": "@cocoon/contracts",
+  "version": "4.0.0",
+  "description": "Shared TypeScript data contracts and schema types for the COCOON platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "generate": "node scripts/generate-types.js"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^14.1.0",
+    "typescript": "^5.8.2"
+  },
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cocoon-contracts"
+version = "4.0.0"
+description = "Shared data contracts, validation rules, and schemas for the COCOON thermal shelter platform"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "ByteFiesta Team" }
+]
+dependencies = [
+    "pydantic>=2.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "jsonschema>=4.20.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cocoon_contracts*"]

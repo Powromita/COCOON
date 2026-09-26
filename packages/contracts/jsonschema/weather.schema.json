@@ -1,0 +1,261 @@
+{
+  "$defs": {
+    "GapInterpolationRecord": {
+      "additionalProperties": false,
+      "description": "Audit log of missing weather data interpolated during processing.",
+      "properties": {
+        "end_time": {
+          "format": "date-time",
+          "title": "End Time",
+          "type": "string"
+        },
+        "interpolated_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Interpolated Fields",
+          "type": "array"
+        },
+        "method": {
+          "description": "Interpolation method used (e.g. 'linear', 'clamped_spline')",
+          "title": "Method",
+          "type": "string"
+        },
+        "start_time": {
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_time",
+        "end_time",
+        "interpolated_fields",
+        "method"
+      ],
+      "title": "GapInterpolationRecord",
+      "type": "object"
+    },
+    "HourlyWeatherPoint": {
+      "additionalProperties": false,
+      "description": "Hourly meteorological observation point.",
+      "properties": {
+        "cloud_cover_pct": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Cloud coverage fraction [0..100]",
+          "title": "Cloud Cover Pct"
+        },
+        "dhi_w_m2": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Diffuse horizontal irradiance in W/m\u00b2",
+          "title": "Dhi W M2"
+        },
+        "dni_w_m2": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Direct normal irradiance in W/m\u00b2",
+          "title": "Dni W M2"
+        },
+        "ghi_w_m2": {
+          "description": "Global horizontal irradiance in W/m\u00b2",
+          "minimum": 0.0,
+          "title": "Ghi W M2",
+          "type": "number"
+        },
+        "outdoor_dry_bulb_temperature_c": {
+          "description": "Dry-bulb air temperature in \u00b0C",
+          "maximum": 60.0,
+          "minimum": -70.0,
+          "title": "Outdoor Dry Bulb Temperature C",
+          "type": "number"
+        },
+        "relative_humidity_pct": {
+          "default": 50.0,
+          "description": "Relative humidity percentage [0..100]",
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "title": "Relative Humidity Pct",
+          "type": "number"
+        },
+        "timestamp": {
+          "description": "Observation timestamp with timezone",
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "wind_direction_deg": {
+          "anyOf": [
+            {
+              "maximum": 360.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Wind compass direction [0..360]",
+          "title": "Wind Direction Deg"
+        },
+        "wind_speed_m_s": {
+          "default": 0.0,
+          "description": "Wind speed in m/s",
+          "minimum": 0.0,
+          "title": "Wind Speed M S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "timestamp",
+        "outdoor_dry_bulb_temperature_c",
+        "ghi_w_m2"
+      ],
+      "title": "HourlyWeatherPoint",
+      "type": "object"
+    },
+    "WeatherSourceMetadata": {
+      "additionalProperties": false,
+      "description": "Provenance and acquisition details for meteorological dataset.",
+      "properties": {
+        "elevation_m": {
+          "description": "Site elevation in meters",
+          "maximum": 9000.0,
+          "minimum": -500.0,
+          "title": "Elevation M",
+          "type": "number"
+        },
+        "fetch_date": {
+          "description": "Timestamp when data was fetched or generated",
+          "format": "date-time",
+          "title": "Fetch Date",
+          "type": "string"
+        },
+        "is_cached": {
+          "default": false,
+          "description": "Whether data was loaded from local offline cache",
+          "title": "Is Cached",
+          "type": "boolean"
+        },
+        "latitude_deg": {
+          "description": "Site latitude [-90..90]",
+          "maximum": 90.0,
+          "minimum": -90.0,
+          "title": "Latitude Deg",
+          "type": "number"
+        },
+        "location_name": {
+          "description": "Named geographical site (e.g. 'Leh_Ladakh')",
+          "title": "Location Name",
+          "type": "string"
+        },
+        "longitude_deg": {
+          "description": "Site longitude [-180..180]",
+          "maximum": 180.0,
+          "minimum": -180.0,
+          "title": "Longitude Deg",
+          "type": "number"
+        },
+        "source_name": {
+          "description": "Origin repository (e.g. 'NASA_POWER', 'ERA5', 'IMD', 'cached_file')",
+          "title": "Source Name",
+          "type": "string"
+        },
+        "time_zone": {
+          "description": "IANA timezone identifier",
+          "title": "Time Zone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_name",
+        "location_name",
+        "latitude_deg",
+        "longitude_deg",
+        "elevation_m",
+        "fetch_date",
+        "time_zone"
+      ],
+      "title": "WeatherSourceMetadata",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/weather.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: WeatherSnapshot in cocoon_contracts. Frozen, immutable hourly weather dataset used for thermal simulations.",
+  "properties": {
+    "checksum_sha256": {
+      "description": "Integrity hash for the dataset",
+      "title": "Checksum Sha256",
+      "type": "string"
+    },
+    "hourly_data": {
+      "description": "Sequence of hourly weather points",
+      "items": {
+        "$ref": "#/$defs/HourlyWeatherPoint"
+      },
+      "title": "Hourly Data",
+      "type": "array"
+    },
+    "interpolations": {
+      "description": "Records of any filled data gaps",
+      "items": {
+        "$ref": "#/$defs/GapInterpolationRecord"
+      },
+      "title": "Interpolations",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "description": "Weather snapshot identifier starting with 'wx_'",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/WeatherSourceMetadata",
+      "description": "Origin and location metadata"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "source",
+    "hourly_data",
+    "checksum_sha256"
+  ],
+  "title": "WeatherSnapshot",
+  "type": "object"
+}

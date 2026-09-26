@@ -1,0 +1,879 @@
+{
+  "$defs": {
+    "AssemblyCategory": {
+      "description": "Structural use of an assembly.",
+      "enum": [
+        "wall",
+        "roof",
+        "floor",
+        "ceiling",
+        "partition"
+      ],
+      "title": "AssemblyCategory",
+      "type": "string"
+    },
+    "AssemblyLayer": {
+      "additionalProperties": false,
+      "description": "One material layer within a multi-layer wall, roof, or floor assembly.",
+      "properties": {
+        "material_id": {
+          "description": "Reference material ID (mat_...)",
+          "title": "Material Id",
+          "type": "string"
+        },
+        "thickness_mm": {
+          "description": "Layer thickness in millimeters",
+          "exclusiveMinimum": 0.0,
+          "title": "Thickness Mm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "material_id",
+        "thickness_mm"
+      ],
+      "title": "AssemblyLayer",
+      "type": "object"
+    },
+    "BuildingMetadata": {
+      "additionalProperties": false,
+      "description": "Provenance and generation settings for a BuildingModel candidate.",
+      "properties": {
+        "created_at": {
+          "description": "Timezone-aware creation timestamp",
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "generator_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Layout generator version",
+          "title": "Generator Version"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Random seed used for deterministic reproduction",
+          "title": "Seed"
+        }
+      },
+      "required": [
+        "created_at"
+      ],
+      "title": "BuildingMetadata",
+      "type": "object"
+    },
+    "BuildingSource": {
+      "description": "Origin of the building model definition.",
+      "enum": [
+        "generated",
+        "user_defined",
+        "benchmark",
+        "retrofit"
+      ],
+      "title": "BuildingSource",
+      "type": "string"
+    },
+    "ConstructionAssembly": {
+      "additionalProperties": false,
+      "description": "Ordered stack of material layers forming an opaque construction.",
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/AssemblyCategory",
+          "description": "Structural component type"
+        },
+        "id": {
+          "description": "Unique assembly identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "layers": {
+          "description": "Layers ordered from inner to outer boundary",
+          "items": {
+            "$ref": "#/$defs/AssemblyLayer"
+          },
+          "title": "Layers",
+          "type": "array"
+        },
+        "name": {
+          "description": "Human-readable assembly title",
+          "title": "Name",
+          "type": "string"
+        },
+        "r_inside_film_m2k_w": {
+          "default": 0.13,
+          "description": "Inside surface film resistance (m\u00b2\u00b7K)/W",
+          "minimum": 0.0,
+          "title": "R Inside Film M2K W",
+          "type": "number"
+        },
+        "r_outside_film_m2k_w": {
+          "default": 0.04,
+          "description": "Outside surface film resistance (m\u00b2\u00b7K)/W",
+          "minimum": 0.0,
+          "title": "R Outside Film M2K W",
+          "type": "number"
+        },
+        "u_value_w_m2k": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Calculated overall U-value in W/(m\u00b2\u00b7K)",
+          "title": "U Value W M2K"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "layers"
+      ],
+      "title": "ConstructionAssembly",
+      "type": "object"
+    },
+    "Floor": {
+      "additionalProperties": false,
+      "description": "Horizontal storey grouping zones at a common level.",
+      "properties": {
+        "elevation_m": {
+          "default": 0.0,
+          "description": "Vertical elevation of finished floor above datum (m)",
+          "title": "Elevation M",
+          "type": "number"
+        },
+        "id": {
+          "description": "Floor level identifier (e.g. 'floor_0', 'floor_1')",
+          "title": "Id",
+          "type": "string"
+        },
+        "level": {
+          "description": "Zero-indexed vertical floor index (0 for ground floor)",
+          "title": "Level",
+          "type": "integer"
+        },
+        "zones": {
+          "description": "Thermal zones on this floor",
+          "items": {
+            "$ref": "#/$defs/Zone"
+          },
+          "title": "Zones",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "level",
+        "zones"
+      ],
+      "title": "Floor",
+      "type": "object"
+    },
+    "Opening": {
+      "additionalProperties": false,
+      "description": "Window or door embedded in a parent surface.",
+      "properties": {
+        "area_m2": {
+          "description": "Opening net area in m\u00b2",
+          "exclusiveMinimum": 0.0,
+          "title": "Area M2",
+          "type": "number"
+        },
+        "avg_open_duration_s": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Average duration of each open event (seconds)",
+          "title": "Avg Open Duration S"
+        },
+        "connected_boundary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Adjacent zone or 'outdoors' for doors",
+          "title": "Connected Boundary"
+        },
+        "discharge_coefficient": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Airflow orifice discharge coefficient",
+          "title": "Discharge Coefficient"
+        },
+        "frame_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fraction of area occupied by frame",
+          "title": "Frame Fraction"
+        },
+        "glazing_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference to glazing profile",
+          "title": "Glazing Id"
+        },
+        "id": {
+          "description": "Unique opening identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "is_operable": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Whether opening can be opened for ventilation",
+          "title": "Is Operable"
+        },
+        "open_events_per_hour": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frequency of opening operations per hour",
+          "title": "Open Events Per Hour"
+        },
+        "opening_type": {
+          "$ref": "#/$defs/OpeningType",
+          "description": "Category of opening (window or door)"
+        },
+        "parent_surface_id": {
+          "description": "Owning parent surface ID",
+          "title": "Parent Surface Id",
+          "type": "string"
+        },
+        "shading_factor": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "External shading factor [0..1]",
+          "title": "Shading Factor"
+        },
+        "shgc": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Solar Heat Gain Coefficient (windows)",
+          "title": "Shgc"
+        },
+        "u_value_w_m2k": {
+          "description": "Overall thermal transmittance in W/(m\u00b2\u00b7K)",
+          "exclusiveMinimum": 0.0,
+          "title": "U Value W M2K",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "parent_surface_id",
+        "opening_type",
+        "area_m2",
+        "u_value_w_m2k"
+      ],
+      "title": "Opening",
+      "type": "object"
+    },
+    "OpeningType": {
+      "description": "Type of fenestration or passage penetrated into a surface.",
+      "enum": [
+        "window",
+        "door"
+      ],
+      "title": "OpeningType",
+      "type": "string"
+    },
+    "Schedule": {
+      "additionalProperties": false,
+      "description": "Explicit operational profile for occupancy, equipment, door openings, or setpoints.",
+      "properties": {
+        "hourly_values": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional repeating 24-hour profile normalized to daily hours [0..23]",
+          "title": "Hourly Values"
+        },
+        "id": {
+          "description": "Unique schedule identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Descriptive schedule name",
+          "title": "Name",
+          "type": "string"
+        },
+        "points": {
+          "description": "Explicit timestamp-value pairs",
+          "items": {
+            "$ref": "#/$defs/SchedulePoint"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "type": {
+          "description": "Schedule category (e.g., 'occupancy', 'equipment', 'door', 'hvac')",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unit of measurement for schedule values",
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "title": "Schedule",
+      "type": "object"
+    },
+    "SchedulePoint": {
+      "additionalProperties": false,
+      "description": "A discrete timestamped value in an operational schedule.",
+      "properties": {
+        "timestamp": {
+          "description": "Timezone-aware timestamp for the scheduled value",
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "value": {
+          "description": "Scalar schedule value (e.g. occupants count, W equipment gain, etc.)",
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "timestamp",
+        "value"
+      ],
+      "title": "SchedulePoint",
+      "type": "object"
+    },
+    "Surface": {
+      "additionalProperties": false,
+      "description": "Planar envelope or partition element bounding a thermal zone.",
+      "properties": {
+        "adjacent_surface_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Opposing surface ID if paired",
+          "title": "Adjacent Surface Id"
+        },
+        "adjacent_zone_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Neighboring zone ID if internal partition/floor",
+          "title": "Adjacent Zone Id"
+        },
+        "area_m2": {
+          "description": "Gross surface area in m\u00b2",
+          "exclusiveMinimum": 0.0,
+          "title": "Area M2",
+          "type": "number"
+        },
+        "assembly_id": {
+          "description": "Reference to construction assembly ID",
+          "title": "Assembly Id",
+          "type": "string"
+        },
+        "azimuth_deg": {
+          "description": "Orientation angle (0=North, 90=East, 180=South, 270=West)",
+          "maximum": 360.0,
+          "minimum": 0.0,
+          "title": "Azimuth Deg",
+          "type": "number"
+        },
+        "boundary_type": {
+          "$ref": "#/$defs/SurfaceBoundaryType",
+          "description": "Boundary condition on far side"
+        },
+        "exposed_fraction": {
+          "default": 1.0,
+          "description": "Fraction exposed to ambient weather/sun [0..1]",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Exposed Fraction",
+          "type": "number"
+        },
+        "id": {
+          "description": "Unique surface identifier",
+          "title": "Id",
+          "type": "string"
+        },
+        "owning_zone_id": {
+          "description": "Zone containing this surface",
+          "title": "Owning Zone Id",
+          "type": "string"
+        },
+        "surface_type": {
+          "$ref": "#/$defs/SurfaceType",
+          "description": "Architectural surface category"
+        },
+        "tilt_deg": {
+          "description": "Surface tilt (0=flat roof pointing up, 90=vertical wall, 180=floor pointing down)",
+          "maximum": 180.0,
+          "minimum": 0.0,
+          "title": "Tilt Deg",
+          "type": "number"
+        },
+        "vertices": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Vector3D"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional 3D polygon perimeter vertices",
+          "title": "Vertices"
+        }
+      },
+      "required": [
+        "id",
+        "owning_zone_id",
+        "boundary_type",
+        "surface_type",
+        "area_m2",
+        "azimuth_deg",
+        "tilt_deg",
+        "assembly_id"
+      ],
+      "title": "Surface",
+      "type": "object"
+    },
+    "SurfaceBoundaryType": {
+      "description": "Physical environment bounding the exterior side of a surface.",
+      "enum": [
+        "outdoors",
+        "ground",
+        "adjacent_zone",
+        "adiabatic"
+      ],
+      "title": "SurfaceBoundaryType",
+      "type": "string"
+    },
+    "SurfaceType": {
+      "description": "Geometric and architectural category of an opaque surface.",
+      "enum": [
+        "exterior_wall",
+        "partition",
+        "roof",
+        "floor",
+        "ceiling"
+      ],
+      "title": "SurfaceType",
+      "type": "string"
+    },
+    "Vector3D": {
+      "additionalProperties": false,
+      "description": "3-dimensional Cartesian coordinate or dimension vector in meters.",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "title": "Vector3D",
+      "type": "object"
+    },
+    "Zone": {
+      "additionalProperties": false,
+      "description": "Individual room or thermal space with a single lumped temperature node.",
+      "properties": {
+        "equipment_schedule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference to equipment heat schedule",
+          "title": "Equipment Schedule Id"
+        },
+        "hvac_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional HVAC or heater device reference",
+          "title": "Hvac Id"
+        },
+        "id": {
+          "description": "Unique zone identifier within the building",
+          "title": "Id",
+          "type": "string"
+        },
+        "occupancy_schedule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference to occupancy schedule",
+          "title": "Occupancy Schedule Id"
+        },
+        "origin_m": {
+          "$ref": "#/$defs/Vector3D",
+          "description": "Origin coordinates (local bottom-south-west corner) in meters"
+        },
+        "size_m": {
+          "$ref": "#/$defs/ZoneSize",
+          "description": "Rectangular zone dimensions in meters"
+        },
+        "type": {
+          "description": "Room purpose (e.g. 'airlock', 'living', 'sleeping', 'equipment', 'storage')",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "origin_m",
+        "size_m"
+      ],
+      "title": "Zone",
+      "type": "object"
+    },
+    "ZoneConnection": {
+      "additionalProperties": false,
+      "description": "Thermal link or airflow path connecting two zones.",
+      "properties": {
+        "connection_type": {
+          "$ref": "#/$defs/ZoneConnectionType",
+          "description": "Nature of interaction between zones"
+        },
+        "id": {
+          "description": "Unique connection ID",
+          "title": "Id",
+          "type": "string"
+        },
+        "is_conditioned": {
+          "default": false,
+          "description": "Whether interface allows active or passive airflow",
+          "title": "Is Conditioned",
+          "type": "boolean"
+        },
+        "shared_area_m2": {
+          "default": 0.0,
+          "description": "Contact interface area in m\u00b2",
+          "minimum": 0.0,
+          "title": "Shared Area M2",
+          "type": "number"
+        },
+        "zone_a_id": {
+          "description": "First zone ID",
+          "title": "Zone A Id",
+          "type": "string"
+        },
+        "zone_b_id": {
+          "description": "Second zone ID",
+          "title": "Zone B Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "zone_a_id",
+        "zone_b_id",
+        "connection_type"
+      ],
+      "title": "ZoneConnection",
+      "type": "object"
+    },
+    "ZoneConnectionType": {
+      "description": "Thermal or physical connection between two zones.",
+      "enum": [
+        "door",
+        "partition",
+        "stair",
+        "airflow",
+        "virtual"
+      ],
+      "title": "ZoneConnectionType",
+      "type": "string"
+    },
+    "ZoneSize": {
+      "additionalProperties": false,
+      "description": "Bounding dimensions for a rectangular room/zone in meters.",
+      "properties": {
+        "height_m": {
+          "description": "Floor-to-ceiling vertical height (m)",
+          "exclusiveMinimum": 0.0,
+          "title": "Height M",
+          "type": "number"
+        },
+        "length_m": {
+          "description": "Zone dimension along primary local X-axis (m)",
+          "exclusiveMinimum": 0.0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "width_m": {
+          "description": "Zone dimension along local Y-axis (m)",
+          "exclusiveMinimum": 0.0,
+          "title": "Width M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "length_m",
+        "width_m",
+        "height_m"
+      ],
+      "title": "ZoneSize",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/building.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: BuildingModel in cocoon_contracts. Canonical complete building specification.\nContains floors, zones, boundaries, surfaces, openings, assemblies, and connections.",
+  "properties": {
+    "assemblies": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ConstructionAssembly"
+      },
+      "description": "Referenced construction assemblies by assembly ID (explicit empty map allowed if none)",
+      "title": "Assemblies",
+      "type": "object"
+    },
+    "connections": {
+      "description": "Inter-zone thermal/airflow connections (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/ZoneConnection"
+      },
+      "title": "Connections",
+      "type": "array"
+    },
+    "design_id": {
+      "description": "Design identifier starting with 'des_'",
+      "title": "Design Id",
+      "type": "string"
+    },
+    "floors": {
+      "description": "List of floors with zones",
+      "items": {
+        "$ref": "#/$defs/Floor"
+      },
+      "title": "Floors",
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "#/$defs/BuildingMetadata",
+      "description": "Design generation metadata"
+    },
+    "openings": {
+      "description": "Fenestrations and passages (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/Opening"
+      },
+      "title": "Openings",
+      "type": "array"
+    },
+    "orientation_deg": {
+      "default": 180.0,
+      "description": "Compass orientation of building main south facade [0..360]",
+      "maximum": 360.0,
+      "minimum": 0.0,
+      "title": "Orientation Deg",
+      "type": "number"
+    },
+    "revision_id": {
+      "description": "Immutable revision identifier starting with 'rev_'",
+      "title": "Revision Id",
+      "type": "string"
+    },
+    "schedules": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Schedule"
+      },
+      "description": "Operational schedules embedded or referenced (explicit empty map allowed if none)",
+      "title": "Schedules",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/BuildingSource",
+      "description": "Origin source of this design"
+    },
+    "surfaces": {
+      "description": "Opaque bounding surfaces (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/Surface"
+      },
+      "title": "Surfaces",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "design_id",
+    "revision_id",
+    "source",
+    "floors",
+    "surfaces",
+    "openings",
+    "connections",
+    "assemblies",
+    "schedules",
+    "metadata"
+  ],
+  "title": "BuildingModel",
+  "type": "object"
+}

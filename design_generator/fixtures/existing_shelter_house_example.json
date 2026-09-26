@@ -1,0 +1,26 @@
+{
+  "orientation_deg": 180,
+  "zones": [
+    {"id": "sleeping1", "type": "sleeping", "floor_level": 0, "origin_m": {"x": 0.0, "y": 0.0}, "size_m": {"length_m": 3.6, "width_m": 3.0, "height_m": 2.8}},
+    {"id": "sleeping2", "type": "sleeping", "floor_level": 0, "origin_m": {"x": 3.6, "y": 0.0}, "size_m": {"length_m": 3.6, "width_m": 3.0, "height_m": 2.8}},
+    {"id": "kitchen",   "type": "kitchen",  "floor_level": 0, "origin_m": {"x": 7.2, "y": 0.0}, "size_m": {"length_m": 2.4, "width_m": 3.0, "height_m": 2.8}},
+    {"id": "living",    "type": "living",   "floor_level": 0, "origin_m": {"x": 0.0, "y": 3.0}, "size_m": {"length_m": 9.6, "width_m": 3.0, "height_m": 2.8}, "entrance": true}
+  ],
+  "doors": [["living", "sleeping1"], ["living", "sleeping2"], ["living", "kitchen"]],
+  "windows": [
+    {"zone": "sleeping1", "face": "south", "width_m": 1.2, "height_m": 1.2, "count": 1},
+    {"zone": "sleeping2", "face": "south", "width_m": 1.2, "height_m": 1.2, "count": 1},
+    {"zone": "kitchen",   "face": "south", "width_m": 1.0, "height_m": 1.2, "count": 1},
+    {"zone": "living",    "face": "north", "width_m": 1.4, "height_m": 1.2, "count": 2}
+  ],
+  "glazing": "double",
+  "assemblies": {
+    "wall":  [["mat_stone", 200], ["mat_puf", 100]],
+    "roof":  [["mat_plywood", 100], ["mat_puf", 100]],
+    "floor": [["mat_stone", 150], ["mat_puf", 50]],
+    "partition": [["mat_plywood", 12], ["mat_puf", 50], ["mat_plywood", 12]]
+  },
+  "occupants": {"sleeping1": 2, "sleeping2": 2, "living": 2},
+  "heater_zones": ["living", "sleeping1", "sleeping2"],
+  "air_changes_per_hour": 0.7
+}

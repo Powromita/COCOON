@@ -45,3 +45,18 @@ cleanup-ansys-*.bat
 ansys-pipeline/jobs/
 ansys-pipeline/**/_mapdl_work/
 ansys-pipeline/**/.lock
+
+# M7 economics: persisted analyses, idempotency keys and override audit log (runtime data)
+data/economics_runs/
+data/pipeline_runs/
+data/simulations/
+data/weather_snapshots/
+
+# Runtime solver output - never commit (PRD §2.3)
+runs/
+
+# Large zip archives
+*.zip
+
+# Generated pipeline scratch
+cocoon_pipeline/

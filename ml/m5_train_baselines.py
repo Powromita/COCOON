@@ -124,6 +124,18 @@ def score(est, X, y) -> dict:
             "mae": float(mean_absolute_error(y, p)), "label_std": float(np.std(y))}
 
 
+def split_indices(df: pd.DataFrame):
+    """Primary split: whole weather periods -> 70 / 15 / 15 (train, validation, test)."""
+    groups = df["weather_period"].to_numpy()
+    idx = np.arange(len(df))
+    tr_va, te = next(GroupShuffleSplit(1, test_size=0.15, random_state=SEED).split(idx, groups=groups))
+    tr, va = next(GroupShuffleSplit(1, test_size=0.15 / 0.85, random_state=SEED)
+                  .split(tr_va, groups=groups[tr_va]))
+    tr, va = tr_va[tr], tr_va[va]
+    assert not set(groups[tr]) & set(groups[te]) and not set(groups[va]) & set(groups[te])
+    return tr, va, te
+
+
 def main() -> None:
     t0 = time.time()
     git = git_state()                       # before any artifact is written
@@ -133,16 +145,8 @@ def main() -> None:
 
     df = load()
     Xdf = df[features].astype(float)
-
-    # primary: whole weather periods -> 70 / 15 / 15
-    groups = df["weather_period"].to_numpy()
     X = Xdf.to_numpy()
-    idx = np.arange(len(df))
-    tr_va, te = next(GroupShuffleSplit(1, test_size=0.15, random_state=SEED).split(idx, groups=groups))
-    tr, va = next(GroupShuffleSplit(1, test_size=0.15 / 0.85, random_state=SEED)
-                  .split(tr_va, groups=groups[tr_va]))
-    tr, va = tr_va[tr], tr_va[va]
-    assert not set(groups[tr]) & set(groups[te]) and not set(groups[va]) & set(groups[te])
+    tr, va, te = split_indices(df)
 
     site_ho = (df["site"] == HOLDOUT_SITE).to_numpy()
 

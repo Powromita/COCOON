@@ -1,0 +1,95 @@
+{
+  "schema_version": "4.0",
+  "snapshot_id": "wx_leh_winter_2026",
+  "source": {
+    "source_name": "NASA_POWER",
+    "location_name": "Leh_Ladakh",
+    "latitude_deg": 34.1526,
+    "longitude_deg": 77.5771,
+    "elevation_m": 3500.0,
+    "is_cached": false,
+    "fetch_date": "2026-09-20T12:00:00+05:30",
+    "time_zone": "Asia/Kolkata"
+  },
+  "hourly_data": [
+    {
+      "timestamp": "2026-01-21T00:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -25.0,
+      "ghi_w_m2": 0.0,
+      "dni_w_m2": 0.0,
+      "dhi_w_m2": 0.0,
+      "wind_speed_m_s": 2.1,
+      "wind_direction_deg": 280.0,
+      "relative_humidity_pct": 45.0,
+      "cloud_cover_pct": 10.0
+    },
+    {
+      "timestamp": "2026-01-21T01:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -25.5,
+      "ghi_w_m2": 0.0,
+      "dni_w_m2": 0.0,
+      "dhi_w_m2": 0.0,
+      "wind_speed_m_s": 2.0,
+      "wind_direction_deg": 280.0,
+      "relative_humidity_pct": 46.0,
+      "cloud_cover_pct": 10.0
+    },
+    {
+      "timestamp": "2026-01-21T02:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -26.0,
+      "ghi_w_m2": 0.0,
+      "dni_w_m2": 0.0,
+      "dhi_w_m2": 0.0,
+      "wind_speed_m_s": 1.9,
+      "wind_direction_deg": 285.0,
+      "relative_humidity_pct": 48.0,
+      "cloud_cover_pct": 5.0
+    },
+    {
+      "timestamp": "2026-01-21T09:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -20.0,
+      "ghi_w_m2": 150.0,
+      "dni_w_m2": 250.0,
+      "dhi_w_m2": 60.0,
+      "wind_speed_m_s": 2.5,
+      "wind_direction_deg": 260.0,
+      "relative_humidity_pct": 40.0,
+      "cloud_cover_pct": 0.0
+    },
+    {
+      "timestamp": "2026-01-21T12:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -12.0,
+      "ghi_w_m2": 680.0,
+      "dni_w_m2": 850.0,
+      "dhi_w_m2": 120.0,
+      "wind_speed_m_s": 3.2,
+      "wind_direction_deg": 240.0,
+      "relative_humidity_pct": 32.0,
+      "cloud_cover_pct": 0.0
+    },
+    {
+      "timestamp": "2026-01-21T17:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -18.0,
+      "ghi_w_m2": 45.0,
+      "dni_w_m2": 90.0,
+      "dhi_w_m2": 25.0,
+      "wind_speed_m_s": 2.8,
+      "wind_direction_deg": 270.0,
+      "relative_humidity_pct": 42.0,
+      "cloud_cover_pct": 5.0
+    },
+    {
+      "timestamp": "2026-01-21T23:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -24.0,
+      "ghi_w_m2": 0.0,
+      "dni_w_m2": 0.0,
+      "dhi_w_m2": 0.0,
+      "wind_speed_m_s": 2.0,
+      "wind_direction_deg": 280.0,
+      "relative_humidity_pct": 45.0,
+      "cloud_cover_pct": 10.0
+    }
+  ],
+  "interpolations": [],
+  "checksum_sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+}

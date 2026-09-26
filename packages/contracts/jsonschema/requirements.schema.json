@@ -1,0 +1,289 @@
+{
+  "$defs": {
+    "DesignConstraints": {
+      "additionalProperties": false,
+      "description": "Boundary conditions and limits bounding automated layout generation.",
+      "properties": {
+        "available_material_ids": {
+          "description": "Material IDs permitted for envelope construction",
+          "items": {
+            "type": "string"
+          },
+          "title": "Available Material Ids",
+          "type": "array"
+        },
+        "heater_fuels": {
+          "description": "Allowed heater fuel types (e.g. 'kerosene', 'electricity', 'solar_thermal')",
+          "items": {
+            "type": "string"
+          },
+          "title": "Heater Fuels",
+          "type": "array"
+        },
+        "max_assembly_time_hours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional field assembly time target in hours",
+          "title": "Max Assembly Time Hours"
+        },
+        "maximum_capex_inr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Capital expenditure budget limit in INR",
+          "title": "Maximum Capex Inr"
+        },
+        "maximum_floors": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum allowed floor count (1..5)",
+          "title": "Maximum Floors"
+        },
+        "maximum_footprint_m2": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Upper bound on shelter ground footprint in m\u00b2",
+          "title": "Maximum Footprint M2"
+        },
+        "maximum_mass_kg": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional logistics weight constraint in kg",
+          "title": "Maximum Mass Kg"
+        },
+        "preferred_orientation_deg": {
+          "anyOf": [
+            {
+              "maximum": 360.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Preferred longitudinal azimuth in degrees [0..360]",
+          "title": "Preferred Orientation Deg"
+        }
+      },
+      "title": "DesignConstraints",
+      "type": "object"
+    },
+    "MissionRequirements": {
+      "additionalProperties": false,
+      "description": "Functional occupancy, room type, and thermal comfort requirements.",
+      "properties": {
+        "maximum_unmet_hours": {
+          "default": 12,
+          "description": "Allowable cumulative hours below target threshold",
+          "minimum": 0,
+          "title": "Maximum Unmet Hours",
+          "type": "integer"
+        },
+        "occupancy_schedule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional custom occupancy schedule ID",
+          "title": "Occupancy Schedule Id"
+        },
+        "occupants": {
+          "description": "Nominal occupant count",
+          "minimum": 0,
+          "title": "Occupants",
+          "type": "integer"
+        },
+        "required_rooms": {
+          "description": "List of room/zone types that must be accommodated",
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Rooms",
+          "type": "array"
+        },
+        "target_temperature_c": {
+          "default": 15.0,
+          "description": "Desired indoor target temperature in \u00b0C",
+          "title": "Target Temperature C",
+          "type": "number"
+        },
+        "type": {
+          "description": "Mission category (e.g. 'living', 'sleeping', 'living_sleeping', 'medical', 'command')",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "occupants",
+        "required_rooms"
+      ],
+      "title": "MissionRequirements",
+      "type": "object"
+    },
+    "ProjectMode": {
+      "description": "Operational mode for shelter evaluation and generation.",
+      "enum": [
+        "new_shelter",
+        "existing_shelter",
+        "engineering_optimization",
+        "reference_benchmark"
+      ],
+      "title": "ProjectMode",
+      "type": "string"
+    },
+    "SiteSpecification": {
+      "additionalProperties": false,
+      "description": "Geographic, elevation, and temporal boundary parameters for a site.",
+      "properties": {
+        "analysis_end": {
+          "description": "End timestamp for simulation window",
+          "format": "date-time",
+          "title": "Analysis End",
+          "type": "string"
+        },
+        "analysis_start": {
+          "description": "Start timestamp for simulation window",
+          "format": "date-time",
+          "title": "Analysis Start",
+          "type": "string"
+        },
+        "elevation_m": {
+          "description": "Site elevation in meters above sea level",
+          "maximum": 9000.0,
+          "minimum": -500.0,
+          "title": "Elevation M",
+          "type": "number"
+        },
+        "latitude_deg": {
+          "description": "Latitude in decimal degrees [-90..90]",
+          "maximum": 90.0,
+          "minimum": -90.0,
+          "title": "Latitude Deg",
+          "type": "number"
+        },
+        "longitude_deg": {
+          "description": "Longitude in decimal degrees [-180..180]",
+          "maximum": 180.0,
+          "minimum": -180.0,
+          "title": "Longitude Deg",
+          "type": "number"
+        },
+        "timezone": {
+          "description": "IANA timezone identifier (e.g. 'Asia/Kolkata')",
+          "title": "Timezone",
+          "type": "string"
+        },
+        "weather_source": {
+          "description": "Source identifier (e.g. 'NASA_POWER', 'ERA5', 'cached_file')",
+          "title": "Weather Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "latitude_deg",
+        "longitude_deg",
+        "elevation_m",
+        "timezone",
+        "weather_source",
+        "analysis_start",
+        "analysis_end"
+      ],
+      "title": "SiteSpecification",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/requirements.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: RequirementsContract in cocoon_contracts. Complete requirement payload submitted to generate or evaluate shelter designs.",
+  "properties": {
+    "constraints": {
+      "$ref": "#/$defs/DesignConstraints"
+    },
+    "economic_assumption_set_id": {
+      "description": "Reference ID of versioned economic assumption set (econ_...)",
+      "title": "Economic Assumption Set Id",
+      "type": "string"
+    },
+    "mission": {
+      "$ref": "#/$defs/MissionRequirements"
+    },
+    "mode": {
+      "$ref": "#/$defs/ProjectMode",
+      "description": "Operational project mode"
+    },
+    "project_id": {
+      "description": "Project identifier (must start with 'prj_')",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "site": {
+      "$ref": "#/$defs/SiteSpecification"
+    }
+  },
+  "required": [
+    "schema_version",
+    "project_id",
+    "mode",
+    "site",
+    "mission",
+    "constraints",
+    "economic_assumption_set_id"
+  ],
+  "title": "RequirementsContract",
+  "type": "object"
+}

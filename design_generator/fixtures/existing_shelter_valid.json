@@ -1,0 +1,26 @@
+{
+  "orientation_deg": 180,
+  "zones": [
+    {"id": "airlock",  "type": "airlock",  "floor_level": 0, "origin_m": {"x": 0.0, "y": 0.0}, "size_m": {"length_m": 1.2, "width_m": 4.0, "height_m": 2.8}, "entrance": true},
+    {"id": "living",   "type": "living",   "floor_level": 0, "origin_m": {"x": 1.2, "y": 0.0}, "size_m": {"length_m": 4.8, "width_m": 4.0, "height_m": 2.8}},
+    {"id": "sleeping", "type": "sleeping", "floor_level": 1, "origin_m": {"x": 1.2, "y": 0.0}, "size_m": {"length_m": 4.8, "width_m": 4.0, "height_m": 2.8}}
+  ],
+  "doors": [["airlock", "living"]],
+  "stairs": [{"lower": "living", "upper": "sleeping"}],
+  "windows": [
+    {"zone": "living",   "face": "south", "width_m": 1.2, "height_m": 1.2, "count": 2},
+    {"zone": "sleeping", "face": "south", "width_m": 1.4, "height_m": 1.2, "count": 2},
+    {"zone": "sleeping", "face": "east",  "width_m": 1.0, "height_m": 1.2, "count": 1}
+  ],
+  "glazing": "double",
+  "assemblies": {
+    "wall":       [["mat_stone", 200], ["mat_puf", 100]],
+    "roof":       [["mat_plywood", 100], ["mat_puf", 100]],
+    "floor":      [["mat_stone", 150], ["mat_puf", 50]],
+    "interfloor": [["mat_plywood", 25]],
+    "partition":  [["mat_plywood", 12], ["mat_puf", 50], ["mat_plywood", 12]]
+  },
+  "occupants": {"living": 10, "sleeping": 20},
+  "heater_zones": ["living", "sleeping"],
+  "air_changes_per_hour": 0.7
+}

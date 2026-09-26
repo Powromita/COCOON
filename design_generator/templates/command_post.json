@@ -1,0 +1,19 @@
+{
+  "id": "command_post",
+  "name": "Command post",
+  "description": "Airlock, a command room where staff work, and an equipment room for communications and heating gear.",
+  "floor_count": 1,
+  "rooms": [
+    {"id": "airlock", "type": "airlock", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.12, "exterior_access": true, "serves": []},
+    {"id": "command", "type": "command", "floor_level": 0, "is_primary_occupied": true,
+     "weight": 0.60, "exterior_access": false, "serves": ["living"]},
+    {"id": "equipment", "type": "equipment", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.28, "exterior_access": false, "serves": ["storage"]}
+  ],
+  "links": [
+    {"a": "airlock", "b": "command", "kind": "door"},
+    {"a": "command", "b": "equipment", "kind": "door"}
+  ],
+  "rules": {"airlock_between_outdoors_and_primary": true}
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "4.0",
+  "job_id": "ans_job_airlock_living_001",
+  "design_revision_id": "rev_airlock_living_r1",
+  "status": "COMPLETED",
+  "started_at": "2026-09-20T15:02:00+05:30",
+  "completed_at": "2026-09-20T15:15:30+05:30",
+  "error_reason": null,
+  "solver_summary": {
+    "nodes": 8520,
+    "elements": 6410,
+    "solver_type": "SPARSE",
+    "transient_steps_solved": 24
+  },
+  "metrics": {
+    "mae_c": 0.82,
+    "rmse_c": 1.15,
+    "max_abs_error_c": 2.1,
+    "r_squared": 0.94,
+    "bias_c": -0.25
+  },
+  "artifacts": {
+    "artifacts": {
+      "temperature_series_csv": "results/ans_job_airlock_living_001/temperature_series.csv",
+      "mesh_plot_png": "results/ans_job_airlock_living_001/mesh.png",
+      "contour_step_24_png": "results/ans_job_airlock_living_001/contour_frames/temp_step024.png"
+    },
+    "checksums_sha256": {
+      "temperature_series_csv": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+    }
+  }
+}

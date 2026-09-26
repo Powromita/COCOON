@@ -1,0 +1,75 @@
+{
+  "schema_version": "4.0",
+  "model_id": "viz_model_airlock_living_001",
+  "design_revision_id": "rev_airlock_living_r1",
+  "source": "rc",
+  "boxes": [
+    {
+      "id": "box_airlock",
+      "name": "Zone: airlock",
+      "origin_m": {"x": 0.0, "y": 0.0, "z": 0.0},
+      "size_m": {"x": 1.2, "y": 4.0, "z": 2.8},
+      "material_id": "mat_puf",
+      "floor_level": 0,
+      "zone_id": "airlock"
+    },
+    {
+      "id": "box_living",
+      "name": "Zone: living",
+      "origin_m": {"x": 1.2, "y": 0.0, "z": 0.0},
+      "size_m": {"x": 4.8, "y": 4.0, "z": 2.8},
+      "material_id": "mat_puf",
+      "floor_level": 0,
+      "zone_id": "living"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "vsurf_living_south",
+      "parent_mesh_id": "box_living",
+      "surface_type": "exterior_wall",
+      "boundary_type": "outdoors",
+      "vertices": [
+        {"x": 1.2, "y": 0.0, "z": 0.0},
+        {"x": 6.0, "y": 0.0, "z": 0.0},
+        {"x": 6.0, "y": 0.0, "z": 2.8},
+        {"x": 1.2, "y": 0.0, "z": 2.8}
+      ],
+      "normal": {"x": 0.0, "y": -1.0, "z": 0.0},
+      "is_exterior": true
+    }
+  ],
+  "openings": [
+    {
+      "id": "vopen_living_window",
+      "opening_type": "window",
+      "parent_surface_id": "vsurf_living_south",
+      "position_m": {"x": 3.0, "y": 0.0, "z": 1.0},
+      "size_m": {"x": 1.6, "y": 0.15, "z": 1.5}
+    }
+  ],
+  "temperature_series": [
+    {
+      "zone_id": "airlock",
+      "timestamps": [
+        "2026-01-21T00:00:00+05:30",
+        "2026-01-21T06:00:00+05:30",
+        "2026-01-21T12:00:00+05:30",
+        "2026-01-21T18:00:00+05:30"
+      ],
+      "temperatures_c": [-18.2, -18.8, -12.4, -14.1]
+    },
+    {
+      "zone_id": "living",
+      "timestamps": [
+        "2026-01-21T00:00:00+05:30",
+        "2026-01-21T06:00:00+05:30",
+        "2026-01-21T12:00:00+05:30",
+        "2026-01-21T18:00:00+05:30"
+      ],
+      "temperatures_c": [15.2, 14.8, 17.5, 16.1]
+    }
+  ],
+  "contour_artifacts": [],
+  "generated_at": "2026-09-20T15:30:00+05:30"
+}

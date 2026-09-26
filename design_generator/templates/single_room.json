@@ -1,0 +1,13 @@
+{
+  "id": "single_room",
+  "name": "Single multipurpose room",
+  "description": "One undivided room used for every function. No airlock; the room opens directly to the outdoors.",
+  "floor_count": 1,
+  "rooms": [
+    {"id": "main", "type": "multipurpose", "floor_level": 0, "is_primary_occupied": true,
+     "weight": 1.0, "exterior_access": true,
+     "serves": ["living", "sleeping", "equipment", "storage", "command", "medical"]}
+  ],
+  "links": [],
+  "rules": {"airlock_between_outdoors_and_primary": false}
+}

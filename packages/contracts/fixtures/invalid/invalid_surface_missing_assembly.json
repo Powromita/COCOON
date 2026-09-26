@@ -1,0 +1,50 @@
+{
+  "schema_version": "4.0",
+  "design_id": "des_airlock_living",
+  "revision_id": "rev_initial_baseline",
+  "source": "generated",
+  "orientation_deg": 180.0,
+  "floors": [
+    {
+      "id": "floor_0",
+      "level": 0,
+      "elevation_m": 0.0,
+      "zones": [
+        {
+          "id": "living",
+          "type": "living",
+          "origin_m": {"x": 0.0, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 4.0, "width_m": 4.0, "height_m": 2.8}
+        }
+      ]
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "surf_living_wall",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 11.2,
+      "azimuth_deg": 180.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_ghost_assembly"
+    }
+  ],
+  "openings": [],
+  "connections": [],
+  "assemblies": {
+    "asm_wall_stone": {
+      "id": "asm_wall_stone",
+      "name": "Standard Stone Wall",
+      "category": "wall",
+      "layers": [
+        {"material_id": "mat_stone", "thickness_mm": 200.0}
+      ]
+    }
+  },
+  "schedules": {},
+  "metadata": {
+    "created_at": "2026-01-01T00:00:00+05:30"
+  }
+}

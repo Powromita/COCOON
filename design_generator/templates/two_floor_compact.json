@@ -1,0 +1,25 @@
+{
+  "id": "two_floor_compact",
+  "name": "Compact two-floor shelter",
+  "description": "Ground floor: airlock, living room and equipment room. Upper floor: sleeping and storage, reached by a stair from the living room.",
+  "floor_count": 2,
+  "rooms": [
+    {"id": "airlock", "type": "airlock", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.15, "exterior_access": true, "serves": []},
+    {"id": "living", "type": "living", "floor_level": 0, "is_primary_occupied": true,
+     "weight": 0.60, "exterior_access": false, "serves": []},
+    {"id": "equipment", "type": "equipment", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.25, "exterior_access": false, "serves": []},
+    {"id": "sleeping", "type": "sleeping", "floor_level": 1, "is_primary_occupied": false,
+     "weight": 0.70, "exterior_access": false, "serves": []},
+    {"id": "storage", "type": "storage", "floor_level": 1, "is_primary_occupied": false,
+     "weight": 0.30, "exterior_access": false, "serves": []}
+  ],
+  "links": [
+    {"a": "airlock", "b": "living", "kind": "door"},
+    {"a": "living", "b": "equipment", "kind": "door"},
+    {"a": "living", "b": "sleeping", "kind": "stair"},
+    {"a": "sleeping", "b": "storage", "kind": "door"}
+  ],
+  "rules": {"airlock_between_outdoors_and_primary": true}
+}

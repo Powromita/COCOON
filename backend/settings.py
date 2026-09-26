@@ -61,5 +61,24 @@ ANSYS_JOBS_DIR = Path(os.environ.get("COCOON_ANSYS_JOBS_DIR", ANSYS_PIPELINE_DIR
 ANSYS_CASES_DIR = ANSYS_PIPELINE_DIR / "cases"
 MAX_ANSYS_WORKERS = int(os.environ.get("COCOON_MAX_ANSYS_WORKERS", "1"))
 
+# Module M7 (lifecycle economics)
+#   COCOON_ECONOMIC_ASSUMPTIONS_DIR  versioned assumption sets (default <repo>/data/costs)
+#   COCOON_ECONOMICS_DIR             persisted analyses + audit log (default <repo>/data/economics_runs)
+ECONOMIC_ASSUMPTIONS_DIR = Path(os.environ.get("COCOON_ECONOMIC_ASSUMPTIONS_DIR",
+                                               REPO_ROOT / "data" / "costs"))
+ECONOMICS_DIR = Path(os.environ.get("COCOON_ECONOMICS_DIR", REPO_ROOT / "data" / "economics_runs"))
+ECONOMICS_DEFAULT_MATERIALS = ANSYS_CASES_DIR / "materials_m0_standard.json"
+
+# Integrated pipeline (M2-M7 API): persisted optimisation runs and simulations
+#   COCOON_PIPELINE_RUNS_DIR  default <repo>/data/pipeline_runs
+#   COCOON_MAX_PIPELINE_JOBS  default 2 (concurrent optimisation jobs)
+PIPELINE_RUNS_DIR = Path(os.environ.get("COCOON_PIPELINE_RUNS_DIR", REPO_ROOT / "data" / "pipeline_runs"))
+SIMULATIONS_DIR = Path(os.environ.get("COCOON_SIMULATIONS_DIR", REPO_ROOT / "data" / "simulations"))
+MAX_PIPELINE_JOBS = int(os.environ.get("COCOON_MAX_PIPELINE_JOBS", "2"))
+MAX_GENERATE_COUNT = 500
+
 RUNS_DIR.mkdir(parents=True, exist_ok=True)
 ANSYS_JOBS_DIR.mkdir(parents=True, exist_ok=True)
+ECONOMICS_DIR.mkdir(parents=True, exist_ok=True)
+PIPELINE_RUNS_DIR.mkdir(parents=True, exist_ok=True)
+SIMULATIONS_DIR.mkdir(parents=True, exist_ok=True)

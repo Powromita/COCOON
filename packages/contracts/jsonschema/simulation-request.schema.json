@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "SimulationEngineMode": {
+      "description": "Explicit HVAC and thermal control solver modes mandated by PRD Section 10.12.",
+      "enum": [
+        "free_floating",
+        "ideal_load_conditioned",
+        "capacity_limited_conditioned"
+      ],
+      "title": "SimulationEngineMode",
+      "type": "string"
+    },
+    "SimulationRequestEngineMetadata": {
+      "additionalProperties": false,
+      "description": "Identification and configuration of the numerical simulation engine for requests.",
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/SimulationEngineMode",
+          "description": "Explicit operational HVAC simulation mode required by PRD Section 10.12"
+        },
+        "name": {
+          "description": "Engine name (e.g. 'cocoon_multizone_rc')",
+          "title": "Name",
+          "type": "string"
+        },
+        "timestep_seconds": {
+          "description": "Internal integration timestep in seconds (e.g. 900)",
+          "exclusiveMinimum": 0,
+          "title": "Timestep Seconds",
+          "type": "integer"
+        },
+        "version": {
+          "description": "Engine semantic version (e.g. '1.0.0')",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "mode",
+        "timestep_seconds"
+      ],
+      "title": "SimulationRequestEngineMetadata",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/simulation-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: SimulationRequest in cocoon_contracts. Request payload to execute a multi-zone physics simulation.",
+  "properties": {
+    "design_revision_id": {
+      "description": "Target design revision ID (rev_...)",
+      "title": "Design Revision Id",
+      "type": "string"
+    },
+    "engine": {
+      "$ref": "#/$defs/SimulationRequestEngineMetadata",
+      "description": "Solver engine settings with explicit solver mode"
+    },
+    "ground_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": -10.0,
+      "description": "Assumed ground contact temperature (\u00b0C)",
+      "title": "Ground Temperature C"
+    },
+    "initial_temperature_c": {
+      "default": -25.0,
+      "description": "Uniform initial condition temperature (\u00b0C)",
+      "title": "Initial Temperature C",
+      "type": "number"
+    },
+    "request_id": {
+      "description": "Unique simulation request ID starting with 'sim_'",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "time_window_end": {
+      "description": "Simulation end time",
+      "format": "date-time",
+      "title": "Time Window End",
+      "type": "string"
+    },
+    "time_window_start": {
+      "description": "Simulation start time",
+      "format": "date-time",
+      "title": "Time Window Start",
+      "type": "string"
+    },
+    "weather_snapshot_id": {
+      "description": "Target weather snapshot ID (wx_...)",
+      "title": "Weather Snapshot Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "design_revision_id",
+    "weather_snapshot_id",
+    "engine",
+    "time_window_start",
+    "time_window_end"
+  ],
+  "title": "SimulationRequest",
+  "type": "object"
+}

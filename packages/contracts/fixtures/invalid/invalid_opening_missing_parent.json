@@ -1,0 +1,58 @@
+{
+  "schema_version": "4.0",
+  "design_id": "des_bad_open_001",
+  "revision_id": "rev_bad_open_r1",
+  "source": "generated",
+  "orientation_deg": 180.0,
+  "floors": [
+    {
+      "id": "floor_0",
+      "level": 0,
+      "elevation_m": 0.0,
+      "zones": [
+        {
+          "id": "living",
+          "type": "living",
+          "origin_m": {"x": 0.0, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 4.0, "width_m": 4.0, "height_m": 2.8}
+        }
+      ]
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "surf_wall_1",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 11.2,
+      "azimuth_deg": 180.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall"
+    }
+  ],
+  "openings": [
+    {
+      "id": "open_orphan_window",
+      "parent_surface_id": "surf_non_existent",
+      "opening_type": "window",
+      "area_m2": 1.5,
+      "u_value_w_m2k": 2.0
+    }
+  ],
+  "connections": [],
+  "assemblies": {
+    "asm_wall": {
+      "id": "asm_wall",
+      "name": "Wall Assembly",
+      "category": "wall",
+      "layers": [
+        {"material_id": "mat_stone", "thickness_mm": 200.0}
+      ]
+    }
+  },
+  "schedules": {},
+  "metadata": {
+    "created_at": "2026-09-20T10:00:00+05:30"
+  }
+}

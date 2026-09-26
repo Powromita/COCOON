@@ -1,0 +1,1295 @@
+{
+  "assumption_set_id": "econ_ladakh_expected_v1",
+  "assumptions": [
+    "Economics are priced from each design's capacity-limited run (the sized heater cannot draw more than its capacity, so there is no cold-start burst); the heater plan is returned next to the price. M7 should price equipment from the plan.",
+    "Heaters: one size for all heated rooms, 1.25 x the settled peak (first 48 h ignored), rounded up to a standard size. Runs start at the setpoint."
+  ],
+  "constraints": {
+    "des_36ee7d71f841": {
+      "design_id": "des_36ee7d71f841",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_05c0037f8ee8",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_53b4177cf49f": {
+      "design_id": "des_53b4177cf49f",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_3fb0e82cb341",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_5951c6f961b7": {
+      "design_id": "des_5951c6f961b7",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_5b9957dd7509",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_631c67fff5d2": {
+      "design_id": "des_631c67fff5d2",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_b980c41b4a8c",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_7d5c6f444a78": {
+      "design_id": "des_7d5c6f444a78",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_1ad77de1a42a",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_b26a449a0769": {
+      "design_id": "des_b26a449a0769",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_76dbe09d17f7",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_f15037401829": {
+      "design_id": "des_f15037401829",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_05053374a9fd",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    },
+    "des_f544a19067c0": {
+      "design_id": "des_f544a19067c0",
+      "failed": [],
+      "flags": [],
+      "ok": true,
+      "passed": [
+        "m2_validation",
+        "footprint_within_cap",
+        "floor_count_within_limit",
+        "materials_allowed",
+        "mass_within_limit",
+        "capex_within_budget",
+        "heater_fuel_allowed",
+        "unmet_hours_within_limit"
+      ],
+      "revision_id": "rev_f4e7b1c32d71",
+      "skipped": [
+        {
+          "constraint": "assembly_time_within_limit",
+          "reason": "there is no assembly-time model yet, so this limit cannot be checked"
+        }
+      ],
+      "verified": false
+    }
+  },
+  "development_only": true,
+  "engine": {
+    "name": "standin_lumped_rc",
+    "version": "0.1.0"
+  },
+  "generation": {
+    "attempts": 87,
+    "complete": true,
+    "generated": 8,
+    "max_attempts": 400,
+    "rejection_reasons": {
+      "constraints:envelope_mass_within_limit": 79
+    },
+    "requested": 8
+  },
+  "outcomes": [
+    {
+      "design_id": "des_f544a19067c0",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 3.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1144201.4476602168,
+        "cold_degree_hours": 8.038014698286133e-14,
+        "heating_energy_kwh": 128.37222518800004,
+        "lcc_inr": 1749198.2563864058,
+        "mass_kg": 13690.203,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 7.307678047018462,
+        "passive_min_temperature_c": 4.63540268766858,
+        "peak_heating_kw": 2.4882650133514006,
+        "reliability": 0.7142857142857143,
+        "temperature_swing_c": 1.980074532509306,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_f4e7b1c32d71",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_36ee7d71f841",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 1.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1319087.306110779,
+        "cold_degree_hours": 0.0,
+        "heating_energy_kwh": 0.0,
+        "lcc_inr": 1486944.7046013367,
+        "mass_kg": 10522.75,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 18.868525085648315,
+        "passive_min_temperature_c": 16.98926446082187,
+        "peak_heating_kw": 0.0,
+        "reliability": 0.42857142857142855,
+        "temperature_swing_c": 4.617132123952338,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_05c0037f8ee8",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_53b4177cf49f",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 5.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1118696.012240612,
+        "cold_degree_hours": 5.995204332975845e-14,
+        "heating_energy_kwh": 244.48504503075154,
+        "lcc_inr": 2130842.911796488,
+        "mass_kg": 7365.424000000001,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 2.0652109863949883,
+        "passive_min_temperature_c": -2.1488892014903,
+        "peak_heating_kw": 4.484527686717663,
+        "reliability": 0.14285714285714285,
+        "temperature_swing_c": 1.8225692524777823,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [
+        "lowest_capex"
+      ],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_3fb0e82cb341",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_b26a449a0769",
+      "development_only": true,
+      "dominated_by": [
+        "des_5951c6f961b7"
+      ],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 3.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1231631.2814380531,
+        "cold_degree_hours": 7.37188088351104e-14,
+        "heating_energy_kwh": 189.50180208946546,
+        "lcc_inr": 2046886.212483753,
+        "mass_kg": 10512.796,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 4.387452608800803,
+        "passive_min_temperature_c": 1.172356144970404,
+        "peak_heating_kw": 3.6013301198377565,
+        "reliability": null,
+        "temperature_swing_c": 1.5693654875660314,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "beaten on every objective by des_5951c6f961b7",
+      "recommendation_state": null,
+      "revision_id": "rev_76dbe09d17f7",
+      "stage": "pareto",
+      "status": "dominated"
+    },
+    {
+      "design_id": "des_631c67fff5d2",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 3.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1222573.4856977228,
+        "cold_degree_hours": 5.3290705182007514e-14,
+        "heating_energy_kwh": 114.01312860355797,
+        "lcc_inr": 1774852.251900892,
+        "mass_kg": 13891.743,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 8.090378414020371,
+        "passive_min_temperature_c": 5.465506441985814,
+        "peak_heating_kw": 2.3527113081435673,
+        "reliability": 0.42857142857142855,
+        "temperature_swing_c": 0.9224468831583703,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_b980c41b4a8c",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_f15037401829",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 1.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1264816.3259140982,
+        "cold_degree_hours": 0.0,
+        "heating_energy_kwh": 0.0,
+        "lcc_inr": 1433123.4478191654,
+        "mass_kg": 14391.339,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 17.677634952454127,
+        "passive_min_temperature_c": 16.206438248923074,
+        "peak_heating_kw": 0.0,
+        "reliability": 0.42857142857142855,
+        "temperature_swing_c": 2.7847806653025096,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [
+        "best_overall",
+        "best_thermal",
+        "lowest_lcc"
+      ],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_05053374a9fd",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_5951c6f961b7",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 3.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1214942.6679729603,
+        "cold_degree_hours": 5.3290705182007514e-14,
+        "heating_energy_kwh": 153.23324547696797,
+        "lcc_inr": 1908970.9851081418,
+        "mass_kg": 7673.942,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 4.957710375577715,
+        "passive_min_temperature_c": 2.567913479500053,
+        "peak_heating_kw": 2.908103581080005,
+        "reliability": 0.42857142857142855,
+        "temperature_swing_c": 1.5638523205291293,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_5b9957dd7509",
+      "stage": "ranking",
+      "status": "on_front"
+    },
+    {
+      "design_id": "des_7d5c6f444a78",
+      "development_only": true,
+      "dominated_by": [],
+      "failed_constraints": [],
+      "flags": [],
+      "heater": {
+        "capacity_kw": 2.0,
+        "fuel": "kerosene",
+        "zone_ids": [
+          "living",
+          "sleeping"
+        ]
+      },
+      "objectives": {
+        "capex_inr": 1200970.681285973,
+        "cold_degree_hours": 9.192646643896296e-14,
+        "heating_energy_kwh": 154.7833457998142,
+        "lcc_inr": 1894946.5291772773,
+        "mass_kg": 12713.011,
+        "occupied_comfort_hours": 120.0,
+        "overheating_degree_hours": 0.0,
+        "passive_median_temperature_c": 5.80156765978782,
+        "passive_min_temperature_c": 4.184558890722863,
+        "peak_heating_kw": 2.7453976071644255,
+        "reliability": 0.14285714285714285,
+        "temperature_swing_c": 0.6062766312975665,
+        "unmet_hours": 0.0
+      },
+      "picked_as": [],
+      "reason": "not beaten on every objective",
+      "recommendation_state": null,
+      "revision_id": "rev_1ad77de1a42a",
+      "stage": "ranking",
+      "status": "on_front"
+    }
+  ],
+  "pareto": {
+    "dominated_by": {
+      "des_b26a449a0769": [
+        "des_5951c6f961b7"
+      ]
+    },
+    "excluded": {},
+    "flagged": [],
+    "front": [
+      "des_f544a19067c0",
+      "des_36ee7d71f841",
+      "des_53b4177cf49f",
+      "des_631c67fff5d2",
+      "des_f15037401829",
+      "des_5951c6f961b7",
+      "des_7d5c6f444a78"
+    ],
+    "objectives": [
+      "unmet_hours",
+      "cold_degree_hours",
+      "overheating_degree_hours",
+      "temperature_swing_c",
+      "heating_energy_kwh",
+      "peak_heating_kw",
+      "capex_inr",
+      "lcc_inr",
+      "mass_kg"
+    ],
+    "rank": {
+      "des_36ee7d71f841": 1,
+      "des_53b4177cf49f": 1,
+      "des_5951c6f961b7": 1,
+      "des_631c67fff5d2": 1,
+      "des_7d5c6f444a78": 1,
+      "des_b26a449a0769": 2,
+      "des_f15037401829": 1,
+      "des_f544a19067c0": 1
+    },
+    "steps": {
+      "capex_inr": 0.00020039129387016712,
+      "cold_degree_hours": 9.192646643896297e-23,
+      "heating_energy_kwh": 2.4448504503075154e-07,
+      "lcc_inr": 0.0006977194639773225,
+      "mass_kg": 7.025914999999999e-06,
+      "overheating_degree_hours": 0.0,
+      "peak_heating_kw": 4.484527686717663e-09,
+      "temperature_swing_c": 4.0108554926547716e-09,
+      "unmet_hours": 0.0
+    },
+    "ties": []
+  },
+  "picks": {
+    "eligible": [
+      "des_f544a19067c0",
+      "des_36ee7d71f841",
+      "des_53b4177cf49f",
+      "des_631c67fff5d2",
+      "des_f15037401829",
+      "des_5951c6f961b7",
+      "des_7d5c6f444a78"
+    ],
+    "picks": {
+      "best_overall": {
+        "design_id": "des_f15037401829",
+        "development_only": true,
+        "dropped_objectives": [],
+        "explanation": [
+          {
+            "sentence": "These numbers come from a development stand-in, not from M4; they are not validated results.",
+            "sources": [
+              "objectives.development_only"
+            ]
+          },
+          {
+            "sentence": "0 unmet comfort hours, within the requirement's limit.",
+            "sources": [
+              "objectives.unmet_hours",
+              "objectives.within_unmet_limit"
+            ]
+          },
+          {
+            "sentence": "Lowest heating energy of the 7 eligible designs: 0 kWh (next best 114 kWh).",
+            "sources": [
+              "objectives.heating_energy_kwh"
+            ]
+          },
+          {
+            "sentence": "Lowest peak heating power of the 7 eligible designs: 0 kW (next best 2.35 kW).",
+            "sources": [
+              "objectives.peak_heating_kw"
+            ]
+          },
+          {
+            "sentence": "Lowest lifecycle cost of the 7 eligible designs: 1,433,123 INR (next best 1,486,945 INR).",
+            "sources": [
+              "objectives.lcc_inr"
+            ]
+          },
+          {
+            "sentence": "Stays the best choice in 43% of the perturbation tests.",
+            "sources": [
+              "objectives.reliability"
+            ]
+          },
+          {
+            "sentence": "33% of the window area (4.08 of 12.2 m2) faces south.",
+            "sources": [
+              "quantities.openings.windows_by_orientation"
+            ]
+          },
+          {
+            "sentence": "Largest steady heat-loss path: windows (windows 40%, infiltration 29%, walls 12% of 85.8 W/K; computed from the design's U-values and areas, not from the simulation).",
+            "sources": [
+              "building.assemblies[*].u_value_w_m2k",
+              "building.surfaces[*].area_m2",
+              "building.openings[*]",
+              "extras.air_changes_per_hour"
+            ]
+          },
+          {
+            "sentence": "Envelope mass 14.4 t.",
+            "sources": [
+              "quantities.materials[*].mass_kg"
+            ]
+          },
+          {
+            "sentence": "Capital cost 1,264,816 INR; lifecycle cost 1,433,123 INR over 10 years. Fuel is 0% of operating cost.",
+            "sources": [
+              "economics.capex.total_capex_inr",
+              "economics.lcc_inr",
+              "economics.annual_cash_flows[*].fuel_cost_inr",
+              "economics.annual_cash_flows[*].total_opex_inr"
+            ]
+          }
+        ],
+        "flagged": false,
+        "gap": 0.02552952697781863,
+        "name": "best_overall",
+        "pool_size": 7,
+        "reason": "highest weighted score among 7 eligible design(s)",
+        "runner_up": "des_36ee7d71f841",
+        "runner_up_value": 0.7699500403426742,
+        "status": "selected",
+        "value": 0.7954795673204929,
+        "weights": {
+          "capex_inr": 1.0,
+          "cold_degree_hours": 1.0,
+          "heating_energy_kwh": 2.0,
+          "lcc_inr": 3.0,
+          "mass_kg": 1.0,
+          "overheating_degree_hours": 1.0,
+          "peak_heating_kw": 1.0,
+          "reliability": 2.0,
+          "temperature_swing_c": 1.0,
+          "unmet_hours": 3.0
+        }
+      },
+      "best_thermal": {
+        "design_id": "des_f15037401829",
+        "development_only": true,
+        "dropped_objectives": [],
+        "explanation": [
+          {
+            "sentence": "These numbers come from a development stand-in, not from M4; they are not validated results.",
+            "sources": [
+              "objectives.development_only"
+            ]
+          },
+          {
+            "sentence": "0 unmet comfort hours, within the requirement's limit.",
+            "sources": [
+              "objectives.unmet_hours",
+              "objectives.within_unmet_limit"
+            ]
+          },
+          {
+            "sentence": "Lowest heating energy of the 7 eligible designs: 0 kWh (next best 114 kWh).",
+            "sources": [
+              "objectives.heating_energy_kwh"
+            ]
+          },
+          {
+            "sentence": "Lowest peak heating power of the 7 eligible designs: 0 kW (next best 2.35 kW).",
+            "sources": [
+              "objectives.peak_heating_kw"
+            ]
+          },
+          {
+            "sentence": "33% of the window area (4.08 of 12.2 m2) faces south.",
+            "sources": [
+              "quantities.openings.windows_by_orientation"
+            ]
+          },
+          {
+            "sentence": "Largest steady heat-loss path: windows (windows 40%, infiltration 29%, walls 12% of 85.8 W/K; computed from the design's U-values and areas, not from the simulation).",
+            "sources": [
+              "building.assemblies[*].u_value_w_m2k",
+              "building.surfaces[*].area_m2",
+              "building.openings[*]",
+              "extras.air_changes_per_hour"
+            ]
+          }
+        ],
+        "flagged": false,
+        "gap": 0.04153163973044216,
+        "name": "best_thermal",
+        "pool_size": 7,
+        "reason": "highest weighted score among 7 eligible design(s)",
+        "runner_up": "des_36ee7d71f841",
+        "runner_up_value": 0.9090909090909091,
+        "status": "selected",
+        "value": 0.9506225488213512,
+        "weights": {
+          "cold_degree_hours": 2.0,
+          "heating_energy_kwh": 2.0,
+          "overheating_degree_hours": 2.0,
+          "peak_heating_kw": 1.0,
+          "temperature_swing_c": 1.0,
+          "unmet_hours": 3.0
+        }
+      },
+      "lowest_capex": {
+        "design_id": "des_53b4177cf49f",
+        "development_only": true,
+        "dropped_objectives": [],
+        "explanation": [
+          {
+            "sentence": "These numbers come from a development stand-in, not from M4; they are not validated results.",
+            "sources": [
+              "objectives.development_only"
+            ]
+          },
+          {
+            "sentence": "0 unmet comfort hours, within the requirement's limit.",
+            "sources": [
+              "objectives.unmet_hours",
+              "objectives.within_unmet_limit"
+            ]
+          },
+          {
+            "sentence": "Lowest capital cost of the 7 eligible designs: 1,118,696 INR (next best 1,144,201 INR).",
+            "sources": [
+              "objectives.capex_inr"
+            ]
+          },
+          {
+            "sentence": "Envelope mass 7.4 t.",
+            "sources": [
+              "quantities.materials[*].mass_kg"
+            ]
+          },
+          {
+            "sentence": "Capital cost 1,118,696 INR; lifecycle cost 2,130,843 INR over 10 years. Fuel is 67% of operating cost.",
+            "sources": [
+              "economics.capex.total_capex_inr",
+              "economics.lcc_inr",
+              "economics.annual_cash_flows[*].fuel_cost_inr",
+              "economics.annual_cash_flows[*].total_opex_inr"
+            ]
+          }
+        ],
+        "flagged": false,
+        "gap": 25505.43541960488,
+        "name": "lowest_capex",
+        "pool_size": 7,
+        "reason": "smallest capital cost among 7 eligible design(s)",
+        "runner_up": "des_f544a19067c0",
+        "runner_up_value": 1144201.4476602168,
+        "status": "selected",
+        "value": 1118696.012240612,
+        "weights": {}
+      },
+      "lowest_lcc": {
+        "design_id": "des_f15037401829",
+        "development_only": true,
+        "dropped_objectives": [],
+        "explanation": [
+          {
+            "sentence": "These numbers come from a development stand-in, not from M4; they are not validated results.",
+            "sources": [
+              "objectives.development_only"
+            ]
+          },
+          {
+            "sentence": "0 unmet comfort hours, within the requirement's limit.",
+            "sources": [
+              "objectives.unmet_hours",
+              "objectives.within_unmet_limit"
+            ]
+          },
+          {
+            "sentence": "Lowest lifecycle cost of the 7 eligible designs: 1,433,123 INR (next best 1,486,945 INR).",
+            "sources": [
+              "objectives.lcc_inr"
+            ]
+          },
+          {
+            "sentence": "Envelope mass 14.4 t.",
+            "sources": [
+              "quantities.materials[*].mass_kg"
+            ]
+          },
+          {
+            "sentence": "Capital cost 1,264,816 INR; lifecycle cost 1,433,123 INR over 10 years. Fuel is 0% of operating cost.",
+            "sources": [
+              "economics.capex.total_capex_inr",
+              "economics.lcc_inr",
+              "economics.annual_cash_flows[*].fuel_cost_inr",
+              "economics.annual_cash_flows[*].total_opex_inr"
+            ]
+          }
+        ],
+        "flagged": false,
+        "gap": 53821.25678217132,
+        "name": "lowest_lcc",
+        "pool_size": 7,
+        "reason": "smallest lifecycle cost among 7 eligible design(s)",
+        "runner_up": "des_36ee7d71f841",
+        "runner_up_value": 1486944.7046013367,
+        "status": "selected",
+        "value": 1433123.4478191654,
+        "weights": {}
+      }
+    },
+    "scores": {
+      "des_36ee7d71f841": {
+        "overall": 0.7699500403426742,
+        "thermal": 0.9090909090909091
+      },
+      "des_53b4177cf49f": {
+        "overall": 0.44028599463545537,
+        "thermal": 0.5811274546476188
+      },
+      "des_5951c6f961b7": {
+        "overall": 0.6068333298768351,
+        "thermal": 0.6999854977405
+      },
+      "des_631c67fff5d2": {
+        "overall": 0.6229717697516962,
+        "thermal": 0.7549493400126224
+      },
+      "des_7d5c6f444a78": {
+        "overall": 0.49776272031890817,
+        "thermal": 0.6474188961843743
+      },
+      "des_f15037401829": {
+        "overall": 0.7954795673204929,
+        "thermal": 0.9506225488213512
+      },
+      "des_f544a19067c0": {
+        "overall": 0.6744728356962882,
+        "thermal": 0.6639716808679831
+      }
+    },
+    "warnings": []
+  },
+  "project_id": "prj_leh_winter_001",
+  "reliability": {
+    "base_winner": "des_f15037401829",
+    "cases": [
+      {
+        "changes": {
+          "infiltration": 0.5
+        },
+        "eligible": [
+          "des_36ee7d71f841",
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_7d5c6f444a78",
+          "des_f15037401829",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "infiltration",
+        "name": "infiltration_x0.5",
+        "status": "evaluated",
+        "top": [
+          "des_5951c6f961b7",
+          "des_f544a19067c0",
+          "des_631c67fff5d2"
+        ],
+        "winner": "des_5951c6f961b7",
+        "worst_unmet_hours": 0.0
+      },
+      {
+        "changes": {
+          "infiltration": 1.5
+        },
+        "eligible": [
+          "des_36ee7d71f841",
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_f15037401829",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "infiltration",
+        "name": "infiltration_x1.5",
+        "status": "evaluated",
+        "top": [
+          "des_f15037401829",
+          "des_36ee7d71f841",
+          "des_f544a19067c0"
+        ],
+        "winner": "des_f15037401829",
+        "worst_unmet_hours": 30.5
+      },
+      {
+        "changes": {
+          "infiltration": 2.0
+        },
+        "eligible": [
+          "des_53b4177cf49f"
+        ],
+        "failures": {},
+        "kind": "infiltration",
+        "name": "infiltration_x2",
+        "status": "evaluated",
+        "top": [
+          "des_53b4177cf49f"
+        ],
+        "winner": "des_53b4177cf49f",
+        "worst_unmet_hours": 97.5
+      },
+      {
+        "changes": {
+          "conductivity": 0.9
+        },
+        "eligible": [
+          "des_36ee7d71f841",
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_7d5c6f444a78",
+          "des_f15037401829",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "conductivity",
+        "name": "conductivity_x0.9",
+        "status": "evaluated",
+        "top": [
+          "des_f15037401829",
+          "des_36ee7d71f841",
+          "des_f544a19067c0"
+        ],
+        "winner": "des_f15037401829",
+        "worst_unmet_hours": 0.0
+      },
+      {
+        "changes": {
+          "conductivity": 1.1
+        },
+        "eligible": [
+          "des_36ee7d71f841",
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_7d5c6f444a78",
+          "des_f15037401829",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "conductivity",
+        "name": "conductivity_x1.1",
+        "status": "evaluated",
+        "top": [
+          "des_f15037401829",
+          "des_36ee7d71f841",
+          "des_631c67fff5d2"
+        ],
+        "winner": "des_f15037401829",
+        "worst_unmet_hours": 0.0
+      },
+      {
+        "changes": {
+          "internal_gains": 0.5
+        },
+        "eligible": [
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "internal_gains",
+        "name": "internal_gains_x0.5",
+        "status": "evaluated",
+        "top": [
+          "des_f544a19067c0",
+          "des_631c67fff5d2",
+          "des_5951c6f961b7"
+        ],
+        "winner": "des_f544a19067c0",
+        "worst_unmet_hours": 86.0
+      },
+      {
+        "changes": {
+          "internal_gains": 1.5
+        },
+        "eligible": [
+          "des_36ee7d71f841",
+          "des_53b4177cf49f",
+          "des_5951c6f961b7",
+          "des_631c67fff5d2",
+          "des_7d5c6f444a78",
+          "des_f15037401829",
+          "des_f544a19067c0"
+        ],
+        "failures": {},
+        "kind": "internal_gains",
+        "name": "internal_gains_x1.5",
+        "status": "evaluated",
+        "top": [
+          "des_f544a19067c0",
+          "des_7d5c6f444a78",
+          "des_5951c6f961b7"
+        ],
+        "winner": "des_f544a19067c0",
+        "worst_unmet_hours": 0.0
+      }
+    ],
+    "designs": {
+      "des_36ee7d71f841": {
+        "best_rate": 0.0,
+        "cases": 7,
+        "comfort_rate": 0.7142857142857143,
+        "design_id": "des_36ee7d71f841",
+        "failed_cases": 0,
+        "front_rate": 0.8571428571428571,
+        "reliability": 0.42857142857142855,
+        "top_k_rate": 0.42857142857142855,
+        "worst_unmet_hours": 42.25
+      },
+      "des_53b4177cf49f": {
+        "best_rate": 0.14285714285714285,
+        "cases": 7,
+        "comfort_rate": 1.0,
+        "design_id": "des_53b4177cf49f",
+        "failed_cases": 0,
+        "front_rate": 1.0,
+        "reliability": 0.14285714285714285,
+        "top_k_rate": 0.14285714285714285,
+        "worst_unmet_hours": 0.0
+      },
+      "des_5951c6f961b7": {
+        "best_rate": 0.14285714285714285,
+        "cases": 7,
+        "comfort_rate": 0.8571428571428571,
+        "design_id": "des_5951c6f961b7",
+        "failed_cases": 0,
+        "front_rate": 1.0,
+        "reliability": 0.42857142857142855,
+        "top_k_rate": 0.42857142857142855,
+        "worst_unmet_hours": 43.75
+      },
+      "des_631c67fff5d2": {
+        "best_rate": 0.0,
+        "cases": 7,
+        "comfort_rate": 0.8571428571428571,
+        "design_id": "des_631c67fff5d2",
+        "failed_cases": 0,
+        "front_rate": 0.8571428571428571,
+        "reliability": 0.42857142857142855,
+        "top_k_rate": 0.42857142857142855,
+        "worst_unmet_hours": 17.5
+      },
+      "des_7d5c6f444a78": {
+        "best_rate": 0.0,
+        "cases": 7,
+        "comfort_rate": 0.5714285714285714,
+        "design_id": "des_7d5c6f444a78",
+        "failed_cases": 0,
+        "front_rate": 1.0,
+        "reliability": 0.14285714285714285,
+        "top_k_rate": 0.14285714285714285,
+        "worst_unmet_hours": 97.5
+      },
+      "des_f15037401829": {
+        "best_rate": 0.42857142857142855,
+        "cases": 7,
+        "comfort_rate": 0.7142857142857143,
+        "design_id": "des_f15037401829",
+        "failed_cases": 0,
+        "front_rate": 0.7142857142857143,
+        "reliability": 0.42857142857142855,
+        "top_k_rate": 0.42857142857142855,
+        "worst_unmet_hours": 86.0
+      },
+      "des_f544a19067c0": {
+        "best_rate": 0.2857142857142857,
+        "cases": 7,
+        "comfort_rate": 0.8571428571428571,
+        "design_id": "des_f544a19067c0",
+        "failed_cases": 0,
+        "front_rate": 1.0,
+        "reliability": 0.7142857142857143,
+        "top_k_rate": 0.7142857142857143,
+        "worst_unmet_hours": 17.5
+      }
+    },
+    "development_only": true,
+    "informative": true,
+    "not_tested": [
+      {
+        "kind": "door_usage",
+        "reason": "the evaluator does not declare that it honours 'door_usage' changes, so it is not faked"
+      },
+      {
+        "kind": "weather",
+        "reason": "no alternative weather snapshot was supplied (M6 cannot invent weather)"
+      },
+      {
+        "kind": "fuel_price",
+        "reason": "no alternative assumption set was supplied (M6 cannot edit M7's assumptions)"
+      },
+      {
+        "kind": "discount_rate",
+        "reason": "no alternative assumption set was supplied (M6 cannot edit M7's assumptions)"
+      }
+    ],
+    "runs": 98,
+    "seed": 42,
+    "sensitivity": {
+      "conductivity": {
+        "cases": 2,
+        "winner_changed_in": 0,
+        "worst_unmet_hours": 0.0
+      },
+      "infiltration": {
+        "cases": 3,
+        "winner_changed_in": 2,
+        "worst_unmet_hours": 97.5
+      },
+      "internal_gains": {
+        "cases": 2,
+        "winner_changed_in": 2,
+        "worst_unmet_hours": 86.0
+      }
+    },
+    "top_k": 3,
+    "warnings": []
+  },
+  "runs": {
+    "reliability": 98,
+    "verification": 24
+  },
+  "schema": "PROPOSED cocoon.m6.optimization_result 0 (not an M0 contract)",
+  "screening": {
+    "development_only": false,
+    "dimensions_used": [],
+    "ml_used": false,
+    "model_versions": [],
+    "records": [
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_f544a19067c0",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_36ee7d71f841",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_53b4177cf49f",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_b26a449a0769",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_631c67fff5d2",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_f15037401829",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_5951c6f961b7",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      },
+      {
+        "decision": "send_to_rc",
+        "design_id": "des_7d5c6f444a78",
+        "dominated_by": [],
+        "label_source": "m4",
+        "ml_rank": null,
+        "ml_status": "model_unavailable",
+        "model_version": null,
+        "predicted": null,
+        "reason": "no usable model: no trained model (M5 not connected, or not trained yet); verified directly",
+        "recommendation_state": null,
+        "route": "direct_model_unavailable"
+      }
+    ],
+    "summary": {
+      "candidates": 8,
+      "direct_model_unavailable": 8,
+      "discarded": 0,
+      "excluded": 0,
+      "send_to_rc": 8
+    },
+    "warnings": []
+  },
+  "seed": 42,
+  "summary": {
+    "dominated": 1,
+    "generated": 8,
+    "on_front": 7
+  },
+  "validation": "development stand-in: NOT verified by M4 and NOT validated by ANSYS",
+  "warnings": [
+    "development stand-in results: these designs were NOT verified by the real RC engine and must not be presented as validated"
+  ],
+  "weather_snapshot_id": "wx_leh_dev"
+}

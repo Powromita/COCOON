@@ -1,0 +1,234 @@
+{
+  "id": "econ_ladakh_v1",
+  "aliases": [
+    "econ_ladakh_expected_v1"
+  ],
+  "version": "1.0.0",
+  "name": "Ladakh remote shelter - demonstration assumption set",
+  "currency": "INR",
+  "effective_date": "2026-09-25T00:00:00+05:30",
+  "source": "COCOON demonstration placeholders: material rates from M0 material snapshot mat_snap_himalayan_v1 and data/shelter/shelter_material_logistics.csv; all other rates are engineering estimates. NOT procurement quotes - replace with sourced quotes before any procurement decision.",
+  "owner": "COCOON M7 lifecycle economics (backend/economics owner)",
+  "notes": "Real (inflation-free) INR. Scenario low/high brackets each parameter independently; they are not guaranteed best/worst cases.",
+  "project_lifetime_years": 15,
+  "lcc_horizons_years": [
+    5,
+    10
+  ],
+  "discount_rate_pct": {
+    "low": 6.0,
+    "expected": 8.0,
+    "high": 10.0
+  },
+  "envelope_service_life_years": {
+    "low": 20,
+    "expected": 25,
+    "high": 30
+  },
+  "materials": {
+    "mat_stone": {
+      "unit": "m3",
+      "cost_inr": {
+        "low": 3500,
+        "expected": 4500,
+        "high": 6000
+      },
+      "transported": false,
+      "source": "M0 snapshot cost_inr_per_m3=4500; stone is usually available locally in Ladakh (shelter_material_logistics.csv), so no haulage is charged"
+    },
+    "mat_puf": {
+      "unit": "m3",
+      "cost_inr": {
+        "low": 11000,
+        "expected": 13000,
+        "high": 16000
+      },
+      "transported": true,
+      "source": "M0 snapshot cost_inr_per_m3=13000 (IS 12436 rigid PUF)"
+    },
+    "mat_plywood": {
+      "unit": "m3",
+      "cost_inr": {
+        "low": 60000,
+        "expected": 70800,
+        "high": 85000
+      },
+      "transported": true,
+      "source": "M0 snapshot cost_inr_per_m2=850 for a 12 mm marine sheet => ~70,800 INR/m3"
+    },
+    "mat_concrete": {
+      "unit": "m3",
+      "cost_inr": {
+        "low": 5500,
+        "expected": 6500,
+        "high": 8000
+      },
+      "transported": true,
+      "source": "M0 snapshot cost_inr_per_m3=6500 (cement + aggregate + formwork hauled in)"
+    }
+  },
+  "openings": {
+    "window_inr_per_m2": {
+      "low": 5000,
+      "expected": 6500,
+      "high": 9000
+    },
+    "external_door_inr_per_unit": {
+      "low": 12000,
+      "expected": 18000,
+      "high": 25000
+    },
+    "internal_door_inr_per_unit": {
+      "low": 5000,
+      "expected": 8000,
+      "high": 12000
+    },
+    "staircase_inr_per_unit": {
+      "low": 30000,
+      "expected": 45000,
+      "high": 65000
+    }
+  },
+  "labour": {
+    "construction_inr_per_m2": {
+      "low": 700,
+      "expected": 900,
+      "high": 1300
+    }
+  },
+  "transport": {
+    "mode": "road (truck) via the Srinagar-Leh highway",
+    "distance_km": {
+      "low": 400,
+      "expected": 434,
+      "high": 480
+    },
+    "rate_inr_per_tonne_km": {
+      "low": 8,
+      "expected": 12,
+      "high": 18
+    },
+    "remote_logistics_multiplier": {
+      "low": 1.1,
+      "expected": 1.25,
+      "high": 1.5
+    }
+  },
+  "heater": {
+    "type": "kerosene space heater",
+    "purchase_inr_per_unit": {
+      "low": 8000,
+      "expected": 12000,
+      "high": 18000
+    },
+    "purchase_inr_per_kw": {
+      "low": 1000,
+      "expected": 1500,
+      "high": 2500
+    },
+    "installation_inr_per_unit": {
+      "low": 2000,
+      "expected": 3000,
+      "high": 5000
+    },
+    "unit_mass_kg": {
+      "low": 12,
+      "expected": 15,
+      "high": 20
+    },
+    "efficiency": {
+      "low": 0.65,
+      "expected": 0.75,
+      "high": 0.85
+    },
+    "sizing_margin": {
+      "low": 1.1,
+      "expected": 1.2,
+      "high": 1.3
+    },
+    "service_life_years": {
+      "low": 6,
+      "expected": 8,
+      "high": 10
+    },
+    "replacement_cost_fraction": {
+      "low": 0.9,
+      "expected": 1.0,
+      "high": 1.1
+    }
+  },
+  "fuel": {
+    "fuel_type": "kerosene",
+    "lower_heating_value_kwh_per_litre": {
+      "low": 9.5,
+      "expected": 9.7,
+      "high": 9.9
+    },
+    "lhv_source": "PRD v4 section 13.4 default (~9.7 kWh/L); consistent with ~43 MJ/kg x ~0.80 kg/L. Editable.",
+    "price_inr_per_litre": {
+      "low": 65,
+      "expected": 85,
+      "high": 110
+    },
+    "delivery_premium_inr_per_litre": {
+      "low": 8,
+      "expected": 15,
+      "high": 30
+    },
+    "real_escalation_pct_per_year": {
+      "low": 0.0,
+      "expected": 2.0,
+      "high": 5.0
+    },
+    "density_kg_per_litre": {
+      "low": 0.78,
+      "expected": 0.8,
+      "high": 0.82
+    }
+  },
+  "maintenance": {
+    "fixed_inr_per_year": {
+      "low": 3000,
+      "expected": 5000,
+      "high": 8000
+    },
+    "fraction_of_capex_per_year": {
+      "low": 0.01,
+      "expected": 0.02,
+      "high": 0.03
+    },
+    "real_escalation_pct_per_year": {
+      "low": 0.0,
+      "expected": 0.0,
+      "high": 0.0
+    }
+  },
+  "replacements": [
+    {
+      "name": "door seals and weather-stripping",
+      "interval_years": 5,
+      "cost_inr": {
+        "low": 2000,
+        "expected": 4000,
+        "high": 7000
+      }
+    }
+  ],
+  "operation": {
+    "heating_season_days_per_year": {
+      "low": 180,
+      "expected": 210,
+      "high": 240
+    },
+    "occupied_days_per_year": {
+      "low": 300,
+      "expected": 365,
+      "high": 365
+    },
+    "mission_logistics_inr_per_tonne_fuel": {
+      "low": 0,
+      "expected": 0,
+      "high": 0
+    }
+  }
+}

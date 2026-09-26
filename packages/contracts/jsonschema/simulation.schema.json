@@ -1,0 +1,382 @@
+{
+  "$defs": {
+    "EngineMetadata": {
+      "additionalProperties": false,
+      "description": "Identification and configuration of the numerical simulation engine in results.",
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/SimulationOutputEngineMode",
+          "description": "Operational HVAC simulation mode; accepts specific solver mode or 'conditioned' per PRD \u00a722.1"
+        },
+        "name": {
+          "description": "Engine name (e.g. 'cocoon_multizone_rc')",
+          "title": "Name",
+          "type": "string"
+        },
+        "timestep_seconds": {
+          "description": "Internal integration timestep in seconds (e.g. 900)",
+          "exclusiveMinimum": 0,
+          "title": "Timestep Seconds",
+          "type": "integer"
+        },
+        "version": {
+          "description": "Engine semantic version (e.g. '1.0.0')",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "mode",
+        "timestep_seconds"
+      ],
+      "title": "EngineMetadata",
+      "type": "object"
+    },
+    "RecommendationState": {
+      "description": "Exact recommendation provenance states mandated by PRD Section 22.2.\nMust accurately reflect evidence backing the candidate design.",
+      "enum": [
+        "SCREENED_BY_ML",
+        "VERIFIED_BY_RC",
+        "VALIDATED_BY_ANSYS",
+        "RC_ONLY_ANSYS_NOT_REQUESTED",
+        "RC_ONLY_ANSYS_UNAVAILABLE",
+        "REFERENCE_BENCHMARK"
+      ],
+      "title": "RecommendationState",
+      "type": "string"
+    },
+    "SimulationOutputEngineMode": {
+      "description": "Operational HVAC simulation mode in simulation outputs (PRD Section 22.1).\nAccepts specific solver modes or the broader 'conditioned' label.",
+      "enum": [
+        "free_floating",
+        "ideal_load_conditioned",
+        "capacity_limited_conditioned",
+        "conditioned"
+      ],
+      "title": "SimulationOutputEngineMode",
+      "type": "string"
+    },
+    "SimulationProvenance": {
+      "additionalProperties": false,
+      "description": "Lineage and reproducibility metadata for a simulation result.",
+      "properties": {
+        "code_commit": {
+          "description": "Git commit hash of physics engine",
+          "title": "Code Commit",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Run execution timestamp",
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "material_version": {
+          "description": "Material database version",
+          "title": "Material Version",
+          "type": "string"
+        },
+        "weather_snapshot_id": {
+          "description": "Weather dataset ID (wx_...)",
+          "title": "Weather Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weather_snapshot_id",
+        "material_version",
+        "code_commit",
+        "created_at"
+      ],
+      "title": "SimulationProvenance",
+      "type": "object"
+    },
+    "SimulationStatus": {
+      "description": "Lifecycle status of a thermal simulation run.",
+      "enum": [
+        "pending",
+        "running",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "title": "SimulationStatus",
+      "type": "string"
+    },
+    "SimulationSummary": {
+      "additionalProperties": false,
+      "description": "Building-level aggregated thermal and energy balance metrics.",
+      "properties": {
+        "airlock_benefit_vs_baseline_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Measured heat retention improvement compared to matched unbuffered baseline (%)",
+          "title": "Airlock Benefit Vs Baseline Pct"
+        },
+        "energy_residual_max_pct": {
+          "description": "Worst-case energy balance residual percentage",
+          "title": "Energy Residual Max Pct",
+          "type": "number"
+        },
+        "heating_energy_kwh": {
+          "description": "Total thermal energy required for conditioning (kWh)",
+          "minimum": 0.0,
+          "title": "Heating Energy Kwh",
+          "type": "number"
+        },
+        "occupied_comfort_hours": {
+          "description": "Hours occupied zones remained in thermal comfort",
+          "minimum": 0.0,
+          "title": "Occupied Comfort Hours",
+          "type": "number"
+        },
+        "peak_heating_kw": {
+          "description": "Maximum instantaneous heating demand (kW)",
+          "minimum": 0.0,
+          "title": "Peak Heating Kw",
+          "type": "number"
+        },
+        "unmet_hours": {
+          "description": "Total unmet heating hours across occupied zones",
+          "minimum": 0.0,
+          "title": "Unmet Hours",
+          "type": "number"
+        }
+      },
+      "required": [
+        "heating_energy_kwh",
+        "peak_heating_kw",
+        "occupied_comfort_hours",
+        "unmet_hours",
+        "energy_residual_max_pct"
+      ],
+      "title": "SimulationSummary",
+      "type": "object"
+    },
+    "TimeSeriesPoint": {
+      "additionalProperties": false,
+      "description": "Timestamped snapshot of zone temperatures and thermal heat flows.",
+      "properties": {
+        "ambient_temperature_c": {
+          "description": "Outdoor ambient temperature (\u00b0C)",
+          "title": "Ambient Temperature C",
+          "type": "number"
+        },
+        "energy_residual_w": {
+          "default": 0.0,
+          "description": "Instantaneous energy conservation residual (W)",
+          "title": "Energy Residual W",
+          "type": "number"
+        },
+        "heating_power_w": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "HVAC heating power injected into each zone (W)",
+          "title": "Heating Power W",
+          "type": "object"
+        },
+        "solar_gain_w": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Solar radiant heat gain into each zone (W)",
+          "title": "Solar Gain W",
+          "type": "object"
+        },
+        "timestamp": {
+          "description": "Simulation timestep timestamp",
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "zone_temperatures_c": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Mean air temperature by zone ID (\u00b0C)",
+          "title": "Zone Temperatures C",
+          "type": "object"
+        }
+      },
+      "required": [
+        "timestamp",
+        "zone_temperatures_c",
+        "ambient_temperature_c"
+      ],
+      "title": "TimeSeriesPoint",
+      "type": "object"
+    },
+    "ZoneSummary": {
+      "additionalProperties": false,
+      "description": "Aggregated thermal performance metrics for an individual room/zone.",
+      "properties": {
+        "comfort_hours": {
+          "description": "Cumulative hours within specified comfort envelope",
+          "minimum": 0.0,
+          "title": "Comfort Hours",
+          "type": "number"
+        },
+        "peak_heating_kw": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Peak heating capacity required (kW)",
+          "title": "Peak Heating Kw"
+        },
+        "temperature_max_c": {
+          "description": "Peak predicted temperature (\u00b0C)",
+          "title": "Temperature Max C",
+          "type": "number"
+        },
+        "temperature_mean_c": {
+          "description": "Time-weighted mean temperature (\u00b0C)",
+          "title": "Temperature Mean C",
+          "type": "number"
+        },
+        "temperature_min_c": {
+          "description": "Minimum predicted temperature (\u00b0C)",
+          "title": "Temperature Min C",
+          "type": "number"
+        },
+        "unmet_hours": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Cumulative hours below target setpoint",
+          "title": "Unmet Hours"
+        },
+        "zone_id": {
+          "description": "Zone ID matching BuildingModel",
+          "title": "Zone Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "zone_id",
+        "temperature_min_c",
+        "temperature_mean_c",
+        "temperature_max_c",
+        "comfort_hours"
+      ],
+      "title": "ZoneSummary",
+      "type": "object"
+    }
+  },
+  "$id": "https://cocoon.drdo.in/schemas/v4/simulation.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AUTO-GENERATED: DO NOT EDIT DIRECTLY. Canonical source: SimulationResult in cocoon_contracts. Complete simulation output contract matching PRD Section 22.1.",
+  "properties": {
+    "design_revision_id": {
+      "description": "Design revision evaluated (rev_...)",
+      "title": "Design Revision Id",
+      "type": "string"
+    },
+    "engine": {
+      "$ref": "#/$defs/EngineMetadata",
+      "description": "Solver engine parameters used"
+    },
+    "provenance": {
+      "$ref": "#/$defs/SimulationProvenance",
+      "description": "Execution lineage and audit info"
+    },
+    "recommendation_state": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RecommendationState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Official recommendation truth state"
+    },
+    "schema_version": {
+      "const": "4.0",
+      "description": "Contract schema version, strictly '4.0'",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "simulation_id": {
+      "description": "Simulation identifier starting with 'sim_'",
+      "title": "Simulation Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/SimulationStatus",
+      "description": "Execution outcome status"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SimulationSummary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Building-level performance summary"
+    },
+    "time_series": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/TimeSeriesPoint"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional detailed hourly timeseries",
+      "title": "Time Series"
+    },
+    "zones": {
+      "description": "Per-zone thermal metrics (explicit empty array allowed if none)",
+      "items": {
+        "$ref": "#/$defs/ZoneSummary"
+      },
+      "title": "Zones",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "simulation_id",
+    "design_revision_id",
+    "engine",
+    "status",
+    "zones",
+    "provenance"
+  ],
+  "title": "SimulationResult",
+  "type": "object"
+}

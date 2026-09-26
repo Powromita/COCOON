@@ -1,0 +1,26 @@
+{
+  "schema_version": "4.0",
+  "snapshot_id": "wx_dup_test",
+  "source": {
+    "source_name": "NASA_POWER",
+    "location_name": "Leh",
+    "latitude_deg": 34.1526,
+    "longitude_deg": 77.5771,
+    "elevation_m": 3500.0,
+    "fetch_date": "2026-09-20T12:00:00+05:30",
+    "time_zone": "Asia/Kolkata"
+  },
+  "hourly_data": [
+    {
+      "timestamp": "2026-01-21T00:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -25.0,
+      "ghi_w_m2": 0.0
+    },
+    {
+      "timestamp": "2026-01-21T00:00:00+05:30",
+      "outdoor_dry_bulb_temperature_c": -25.0,
+      "ghi_w_m2": 0.0
+    }
+  ],
+  "checksum_sha256": "fake_checksum"
+}

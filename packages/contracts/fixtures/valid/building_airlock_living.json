@@ -1,0 +1,324 @@
+{
+  "schema_version": "4.0",
+  "design_id": "des_airlock_living_001",
+  "revision_id": "rev_airlock_living_r1",
+  "source": "generated",
+  "orientation_deg": 180.0,
+  "floors": [
+    {
+      "id": "floor_0",
+      "level": 0,
+      "elevation_m": 0.0,
+      "zones": [
+        {
+          "id": "airlock",
+          "type": "airlock",
+          "origin_m": {"x": 0.0, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 1.2, "width_m": 4.0, "height_m": 2.8},
+          "occupancy_schedule_id": null,
+          "equipment_schedule_id": null,
+          "hvac_id": null
+        },
+        {
+          "id": "living",
+          "type": "living",
+          "origin_m": {"x": 1.2, "y": 0.0, "z": 0.0},
+          "size_m": {"length_m": 4.8, "width_m": 4.0, "height_m": 2.8},
+          "occupancy_schedule_id": "continuous_20",
+          "equipment_schedule_id": "living_equipment",
+          "hvac_id": "heater_ground"
+        }
+      ]
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "surf_airlock_west",
+      "owning_zone_id": "airlock",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 11.2,
+      "azimuth_deg": 270.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_airlock_south",
+      "owning_zone_id": "airlock",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 3.36,
+      "azimuth_deg": 180.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_airlock_north",
+      "owning_zone_id": "airlock",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 3.36,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_airlock_floor",
+      "owning_zone_id": "airlock",
+      "boundary_type": "ground",
+      "surface_type": "floor",
+      "area_m2": 4.8,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 180.0,
+      "assembly_id": "asm_floor_slab",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_airlock_roof",
+      "owning_zone_id": "airlock",
+      "boundary_type": "outdoors",
+      "surface_type": "roof",
+      "area_m2": 4.8,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 0.0,
+      "assembly_id": "asm_roof_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_partition_airlock_living",
+      "owning_zone_id": "airlock",
+      "boundary_type": "adjacent_zone",
+      "surface_type": "partition",
+      "area_m2": 11.2,
+      "azimuth_deg": 90.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_partition_timber",
+      "adjacent_zone_id": "living",
+      "adjacent_surface_id": null,
+      "exposed_fraction": 0.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_living_east",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 11.2,
+      "azimuth_deg": 90.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_living_south",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 13.44,
+      "azimuth_deg": 180.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_living_north",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "exterior_wall",
+      "area_m2": 13.44,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 90.0,
+      "assembly_id": "asm_wall_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_living_floor",
+      "owning_zone_id": "living",
+      "boundary_type": "ground",
+      "surface_type": "floor",
+      "area_m2": 19.2,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 180.0,
+      "assembly_id": "asm_floor_slab",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    },
+    {
+      "id": "surf_living_roof",
+      "owning_zone_id": "living",
+      "boundary_type": "outdoors",
+      "surface_type": "roof",
+      "area_m2": 19.2,
+      "azimuth_deg": 0.0,
+      "tilt_deg": 0.0,
+      "assembly_id": "asm_roof_insulated",
+      "adjacent_zone_id": null,
+      "adjacent_surface_id": null,
+      "exposed_fraction": 1.0,
+      "vertices": null
+    }
+  ],
+  "openings": [
+    {
+      "id": "op_airlock_entry_door",
+      "parent_surface_id": "surf_airlock_south",
+      "opening_type": "door",
+      "area_m2": 1.8,
+      "u_value_w_m2k": 2.2,
+      "shgc": null,
+      "glazing_id": null,
+      "frame_fraction": null,
+      "shading_factor": null,
+      "is_operable": true,
+      "connected_boundary": "outdoors",
+      "open_events_per_hour": 4.0,
+      "avg_open_duration_s": 10.0,
+      "discharge_coefficient": 0.65
+    },
+    {
+      "id": "op_partition_door",
+      "parent_surface_id": "surf_partition_airlock_living",
+      "opening_type": "door",
+      "area_m2": 1.8,
+      "u_value_w_m2k": 2.2,
+      "shgc": null,
+      "glazing_id": null,
+      "frame_fraction": null,
+      "shading_factor": null,
+      "is_operable": true,
+      "connected_boundary": "living",
+      "open_events_per_hour": 6.0,
+      "avg_open_duration_s": 8.0,
+      "discharge_coefficient": 0.65
+    },
+    {
+      "id": "op_living_south_window",
+      "parent_surface_id": "surf_living_south",
+      "opening_type": "window",
+      "area_m2": 2.4,
+      "u_value_w_m2k": 1.8,
+      "shgc": 0.62,
+      "glazing_id": "glz_double_low_e",
+      "frame_fraction": 0.15,
+      "shading_factor": 1.0,
+      "is_operable": false,
+      "connected_boundary": null,
+      "open_events_per_hour": null,
+      "avg_open_duration_s": null,
+      "discharge_coefficient": null
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_airlock_living",
+      "zone_a_id": "airlock",
+      "zone_b_id": "living",
+      "connection_type": "partition",
+      "shared_area_m2": 11.2,
+      "is_conditioned": true
+    }
+  ],
+  "assemblies": {
+    "asm_wall_insulated": {
+      "id": "asm_wall_insulated",
+      "name": "Composite Stone Wall with PUF",
+      "category": "wall",
+      "layers": [
+        {"material_id": "mat_puf", "thickness_mm": 50.0},
+        {"material_id": "mat_stone", "thickness_mm": 150.0}
+      ],
+      "r_inside_film_m2k_w": 0.13,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.65
+    },
+    "asm_partition_timber": {
+      "id": "asm_partition_timber",
+      "name": "Insulated Timber Partition",
+      "category": "partition",
+      "layers": [
+        {"material_id": "mat_plywood", "thickness_mm": 12.0},
+        {"material_id": "mat_puf", "thickness_mm": 50.0},
+        {"material_id": "mat_plywood", "thickness_mm": 12.0}
+      ],
+      "r_inside_film_m2k_w": 0.13,
+      "r_outside_film_m2k_w": 0.13,
+      "u_value_w_m2k": 0.72
+    },
+    "asm_roof_insulated": {
+      "id": "asm_roof_insulated",
+      "name": "PUF Insulated Roof",
+      "category": "roof",
+      "layers": [
+        {"material_id": "mat_plywood", "thickness_mm": 80.0},
+        {"material_id": "mat_puf", "thickness_mm": 80.0}
+      ],
+      "r_inside_film_m2k_w": 0.10,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.42
+    },
+    "asm_floor_slab": {
+      "id": "asm_floor_slab",
+      "name": "Insulated Concrete Floor Slab",
+      "category": "floor",
+      "layers": [
+        {"material_id": "mat_concrete", "thickness_mm": 100.0},
+        {"material_id": "mat_puf", "thickness_mm": 50.0}
+      ],
+      "r_inside_film_m2k_w": 0.17,
+      "r_outside_film_m2k_w": 0.04,
+      "u_value_w_m2k": 0.68
+    }
+  },
+  "schedules": {
+    "continuous_20": {
+      "id": "continuous_20",
+      "name": "20 Occupants Continuous",
+      "type": "occupancy",
+      "points": [],
+      "hourly_values": [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0],
+      "unit": "occupants"
+    },
+    "living_equipment": {
+      "id": "living_equipment",
+      "name": "Base Living Electronics & Radio",
+      "type": "equipment",
+      "points": [],
+      "hourly_values": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 250.0, 300.0, 300.0, 300.0, 300.0, 300.0, 300.0, 300.0, 300.0, 300.0, 300.0, 350.0, 400.0, 400.0, 300.0, 200.0, 150.0, 150.0],
+      "unit": "watts"
+    }
+  },
+  "metadata": {
+    "generator_version": "layout_generator_v1",
+    "seed": 42,
+    "created_at": "2026-09-20T10:00:00+05:30"
+  }
+}

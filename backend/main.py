@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import settings
 from .jobs import sweep_old_runs
-from .routes import ansys, reference, run
+from .routes import ansys, economics, pipeline, reference, run
 
 app = FastAPI(title="COCOON API", version="0.1.0")
 
@@ -19,12 +19,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_methods=["GET", "POST"],
-    allow_headers=["content-type"],
+    allow_headers=["content-type", "idempotency-key"],
 )
 
 app.include_router(reference.router)
 app.include_router(run.router)
 app.include_router(ansys.router)
+app.include_router(economics.router)
+app.include_router(pipeline.router)
 
 
 @app.on_event("startup")
@@ -47,5 +49,11 @@ def health() -> dict:
             "jobs_dir": str(settings.ANSYS_JOBS_DIR),
             "max_ansys_workers": settings.MAX_ANSYS_WORKERS,
             "cases_available": settings.ANSYS_CASES_DIR.exists(),
+        },
+        "economics": {
+            "assumption_sets_dir": str(settings.ECONOMIC_ASSUMPTIONS_DIR),
+            "assumption_sets": len(list(settings.ECONOMIC_ASSUMPTIONS_DIR.glob("*.json")))
+            if settings.ECONOMIC_ASSUMPTIONS_DIR.is_dir() else 0,
+            "default_materials": settings.ECONOMICS_DEFAULT_MATERIALS.exists(),
         },
     }

@@ -1,0 +1,19 @@
+{
+  "id": "airlock_living_equipment",
+  "name": "Airlock, living room and equipment room",
+  "description": "Airlock leads to the living room; a separate equipment room is reached from the living room. Sleeping happens in the living room.",
+  "floor_count": 1,
+  "rooms": [
+    {"id": "airlock", "type": "airlock", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.12, "exterior_access": true, "serves": []},
+    {"id": "living", "type": "living", "floor_level": 0, "is_primary_occupied": true,
+     "weight": 0.68, "exterior_access": false, "serves": ["sleeping", "storage"]},
+    {"id": "equipment", "type": "equipment", "floor_level": 0, "is_primary_occupied": false,
+     "weight": 0.20, "exterior_access": false, "serves": ["storage"]}
+  ],
+  "links": [
+    {"a": "airlock", "b": "living", "kind": "door"},
+    {"a": "living", "b": "equipment", "kind": "door"}
+  ],
+  "rules": {"airlock_between_outdoors_and_primary": true}
+}
