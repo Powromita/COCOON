@@ -1,0 +1,65 @@
+{
+ "mat_stone": {
+  "k_w_mk": 2.0,
+  "density_kg_m3": 2300.0,
+  "specific_heat_j_kgk": 880.0,
+  "heat_capacity_kj_m3k": 2024.0,
+  "solar_absorptivity": 0.7
+ },
+ "mat_puf": {
+  "k_w_mk": 0.024,
+  "density_kg_m3": 35.0,
+  "specific_heat_j_kgk": 1500.0,
+  "heat_capacity_kj_m3k": 52.5,
+  "solar_absorptivity": 0.3
+ },
+ "mat_plywood": {
+  "k_w_mk": 0.13,
+  "density_kg_m3": 650.0,
+  "specific_heat_j_kgk": 1600.0,
+  "heat_capacity_kj_m3k": 1040.0,
+  "solar_absorptivity": 0.6
+ },
+ "mat_concrete": {
+  "k_w_mk": 1.4,
+  "density_kg_m3": 2400.0,
+  "specific_heat_j_kgk": 1000.0,
+  "heat_capacity_kj_m3k": 2400.0,
+  "solar_absorptivity": 0.65
+ },
+ "mat_adobe": {
+  "k_w_mk": 0.13,
+  "density_kg_m3": 2210.0,
+  "specific_heat_j_kgk": 1000.0,
+  "heat_capacity_kj_m3k": 2210.0,
+  "solar_absorptivity": 0.7
+ },
+ "mat_rammed_earth": {
+  "k_w_mk": 0.8,
+  "density_kg_m3": 1200.0,
+  "specific_heat_j_kgk": 1000.0,
+  "heat_capacity_kj_m3k": 1200.0,
+  "solar_absorptivity": 0.7
+ },
+ "mat_straw_clay": {
+  "k_w_mk": 0.19,
+  "density_kg_m3": 660.0,
+  "specific_heat_j_kgk": 1500.0,
+  "heat_capacity_kj_m3k": 990.0,
+  "solar_absorptivity": 0.7
+ },
+ "mat_wood_timber": {
+  "k_w_mk": 0.13,
+  "density_kg_m3": 500.0,
+  "specific_heat_j_kgk": 1500.0,
+  "heat_capacity_kj_m3k": 750.0,
+  "solar_absorptivity": 0.6
+ },
+ "mat_reinforced_concrete": {
+  "k_w_mk": 2.3,
+  "density_kg_m3": 2300.0,
+  "specific_heat_j_kgk": 1000.0,
+  "heat_capacity_kj_m3k": 2300.0,
+  "solar_absorptivity": 0.65
+ }
+}

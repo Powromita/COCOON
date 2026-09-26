@@ -1,0 +1,46 @@
+{
+ "dataset_version": "m5_dataset_v2",
+ "generation_seconds": 502.7,
+ "git_commit": "cb12cb9d63afa9db7e2dadeb47bced8bc8c81412",
+ "m4_engine": "cocoon_multizone_rc",
+ "m4_version": "1.0.0",
+ "material_snapshot_id": "mat_snap_himalayan_v2",
+ "material_checksum": "6f9a811595d9e42e58fb5f53828b7c5a7e9b9aff892b53e36a83cee5acc6bce0",
+ "rows": 12000,
+ "rows_ok": 6700,
+ "seed": 11,
+ "shard_size": 200,
+ "sites": [
+  "chushul",
+  "daulat_beg_oldi",
+  "dras",
+  "kargil",
+  "leh",
+  "nubra_diskit",
+  "nyoma",
+  "pangong_tso",
+  "siachen_base_camp",
+  "turtuk"
+ ],
+ "timestep_seconds": 900,
+ "warmup_hours": 48.0,
+ "window_days": 7,
+ "failure_reasons": {
+  "generation:no valid candidate (layout": 1272,
+  "generation:InfeasibleRequirementsError": 2107,
+  "generation:no valid candidate (composition": 1578,
+  "generation:NoTemplateError": 343
+ },
+ "labels": {
+  "heating_energy_kwh": "ideal-load run, heater power x step summed over the kept steps (after 48 h)",
+  "peak_heating_kw": "ideal-load run, largest total heater power (after 48 h)",
+  "min_occupied_temperature_c": "capacity-limited run with the M6-sized heater, occupied rooms, after 48 h",
+  "mean_occupied_temperature_c": "as above, mean over rooms and time",
+  "max_occupied_temperature_c": "as above, maximum over rooms and time",
+  "comfort_hours": "capacity-limited: hours every occupied room >= setpoint - 0.05 K",
+  "unmet_hours": "capacity-limited: hours any occupied room < setpoint - 0.05 K",
+  "max_zone_imbalance_c": "capacity-limited: largest spread between occupied rooms at one instant",
+  "passive_min_temperature_c": "free-floating, occupied rooms, after 48 h",
+  "passive_median_temperature_c": "free-floating, median over time of the mean occupied-room temperature"
+ }
+}
