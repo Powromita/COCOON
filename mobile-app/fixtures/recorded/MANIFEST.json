@@ -1,0 +1,6 @@
+{
+ "recorded_at": "2026-09-26",
+ "backend_commit": "1048a2c (main)",
+ "how": "Recorded from a local run of backend.main:app: POST /api/v1/optimizations with packages/contracts/fixtures/valid/requirements_ladakh_30p.json (count 8, seed 42); GET candidates/pareto/designs; POST /api/v1/simulations per design (ideal_load_conditioned, hourly, analysis window of the requirements); POST /api/v1/economics per design (econ_ladakh_v1). Economics reports are trimmed (quantity take-offs and year detail removed). These are real engine outputs used as DEMO data - not live results. optimization-status-completed.json keeps only weather_snapshot_id, site_used, warnings and run_id of the full 'result' document (candidates and Pareto are served by their own endpoints).",
+ "optimization_id": "opt_de0c3a0eb800"
+}

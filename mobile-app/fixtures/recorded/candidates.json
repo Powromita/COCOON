@@ -1,0 +1,318 @@
+{
+ "optimization_id": "opt_de0c3a0eb800",
+ "recommended_design_id": "des_5951c6f961b7",
+ "validation": {
+  "state": "RC_ONLY_ANSYS_NOT_REQUESTED"
+ },
+ "candidates": [
+  {
+   "design_id": "des_f544a19067c0",
+   "revision_id": "rev_f4e7b1c32d71",
+   "status": "dominated",
+   "stage": "pareto",
+   "reason": "beaten on every objective by des_5951c6f961b7, des_7d5c6f444a78",
+   "picked_as": [],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 426.1990105184257,
+    "temperature_swing_c": 8.078210078069816,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2358846.1331575005,
+    "lcc_inr": 2531394.6373283104,
+    "mass_kg": 13690.203,
+    "reliability": null,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 21.56479713295583,
+    "passive_median_temperature_c": 25.359308678433038
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": [
+    "des_5951c6f961b7",
+    "des_7d5c6f444a78"
+   ]
+  },
+  {
+   "design_id": "des_36ee7d71f841",
+   "revision_id": "rev_05c0037f8ee8",
+   "status": "dominated",
+   "stage": "pareto",
+   "reason": "beaten on every objective by des_53b4177cf49f, des_5951c6f961b7",
+   "picked_as": [],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 1954.6176149291714,
+    "temperature_swing_c": 11.36346755021577,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2119943.0958725,
+    "lcc_inr": 2281718.7712389743,
+    "mass_kg": 10522.75,
+    "reliability": null,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 26.211775885043924,
+    "passive_median_temperature_c": 32.56821252827064
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": [
+    "des_53b4177cf49f",
+    "des_5951c6f961b7"
+   ]
+  },
+  {
+   "design_id": "des_53b4177cf49f",
+   "revision_id": "rev_3fb0e82cb341",
+   "status": "on_front",
+   "stage": "ranking",
+   "reason": "not beaten on every objective",
+   "picked_as": [
+    "lowest_lcc",
+    "lowest_capex"
+   ],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 139.93238193969614,
+    "temperature_swing_c": 10.669916107913735,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 1730757.9196544865,
+    "lcc_inr": 1888569.0241770544,
+    "mass_kg": 7365.424000000001,
+    "reliability": 0.6666666666666666,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 17.40469381332876,
+    "passive_median_temperature_c": 22.41556414960177
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": []
+  },
+  {
+   "design_id": "des_b26a449a0769",
+   "revision_id": "rev_76dbe09d17f7",
+   "status": "on_front",
+   "stage": "ranking",
+   "reason": "not beaten on every objective",
+   "picked_as": [],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 342.29116974756545,
+    "temperature_swing_c": 8.343931586255444,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2151616.0312732626,
+    "lcc_inr": 2317143.6245659254,
+    "mass_kg": 10512.796,
+    "reliability": 0.8888888888888888,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 20.71538383583115,
+    "passive_median_temperature_c": 24.76546533045942
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": []
+  },
+  {
+   "design_id": "des_631c67fff5d2",
+   "revision_id": "rev_b980c41b4a8c",
+   "status": "dominated",
+   "stage": "pareto",
+   "reason": "beaten on every objective by des_7d5c6f444a78",
+   "picked_as": [],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 313.4507863250972,
+    "temperature_swing_c": 6.474875289845823,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2431975.9826849997,
+    "lcc_inr": 2607822.1232458684,
+    "mass_kg": 13891.743,
+    "reliability": null,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 21.33939529288334,
+    "passive_median_temperature_c": 25.113034192085404
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": [
+    "des_7d5c6f444a78"
+   ]
+  },
+  {
+   "design_id": "des_f15037401829",
+   "revision_id": "rev_05053374a9fd",
+   "status": "dominated",
+   "stage": "pareto",
+   "reason": "beaten on every objective by des_f544a19067c0, des_b26a449a0769, des_631c67fff5d2, des_5951c6f961b7, des_7d5c6f444a78",
+   "picked_as": [],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 1217.1038926910342,
+    "temperature_swing_c": 9.455744120597029,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2490473.5593899996,
+    "lcc_inr": 2668957.524846161,
+    "mass_kg": 14391.339,
+    "reliability": null,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 24.07471385170025,
+    "passive_median_temperature_c": 29.495750762163183
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": [
+    "des_f544a19067c0",
+    "des_b26a449a0769",
+    "des_631c67fff5d2",
+    "des_5951c6f961b7",
+    "des_7d5c6f444a78"
+   ]
+  },
+  {
+   "design_id": "des_5951c6f961b7",
+   "revision_id": "rev_5b9957dd7509",
+   "status": "on_front",
+   "stage": "ranking",
+   "reason": "not beaten on every objective",
+   "picked_as": [
+    "best_overall"
+   ],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 350.2405048068368,
+    "temperature_swing_c": 7.075770751317073,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 1779581.241665,
+    "lcc_inr": 1926009.0167763198,
+    "mass_kg": 7673.942,
+    "reliability": 1.0,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 21.293878175152624,
+    "passive_median_temperature_c": 25.015861293518363
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": []
+  },
+  {
+   "design_id": "des_7d5c6f444a78",
+   "revision_id": "rev_1ad77de1a42a",
+   "status": "on_front",
+   "stage": "ranking",
+   "reason": "not beaten on every objective",
+   "picked_as": [
+    "best_thermal"
+   ],
+   "development_only": false,
+   "recommendation_state": "VERIFIED_BY_RC",
+   "heater": {
+    "capacity_kw": 1.0,
+    "fuel": "kerosene",
+    "zone_ids": [
+     "living",
+     "sleeping"
+    ]
+   },
+   "objectives": {
+    "unmet_hours": 0.0,
+    "cold_degree_hours": 0.0,
+    "overheating_degree_hours": 0.1305867553000848,
+    "temperature_swing_c": 5.094528271948725,
+    "heating_energy_kwh": 0.0,
+    "peak_heating_kw": 0.0,
+    "capex_inr": 2286168.7546246196,
+    "lcc_inr": 2459037.08402035,
+    "mass_kg": 12713.011,
+    "reliability": 0.3333333333333333,
+    "occupied_comfort_hours": 120.0,
+    "passive_min_temperature_c": 18.17917127987913,
+    "passive_median_temperature_c": 20.737436730723285
+   },
+   "failed_constraints": [],
+   "flags": [],
+   "dominated_by": []
+  }
+ ]
+}

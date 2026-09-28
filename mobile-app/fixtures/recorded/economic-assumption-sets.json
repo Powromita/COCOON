@@ -1,0 +1,21 @@
+{
+ "assumption_sets": [
+  {
+   "id": "econ_ladakh_v1",
+   "version": "1.0.0",
+   "name": "Ladakh remote shelter - demonstration assumption set",
+   "currency": "INR",
+   "effective_date": "2026-09-25T00:00:00+05:30",
+   "source": "COCOON demonstration placeholders: material rates from M0 material snapshot mat_snap_himalayan_v1 and data/shelter/shelter_material_logistics.csv; all other rates are engineering estimates. NOT procurement quotes - replace with sourced quotes before any procurement decision.",
+   "owner": "COCOON M7 lifecycle economics (backend/economics owner)",
+   "project_lifetime_years": 15,
+   "checksum_sha256": "6ce09a9da6ae6ec45afab25853fb1b7a2d31358fa0061b3cdcaa14bb1373a1e0",
+   "scenario_assumption_set_ids": {
+    "low": "econ_ladakh_v1_low",
+    "expected": "econ_ladakh_v1_expected",
+    "high": "econ_ladakh_v1_high"
+   },
+   "href": "/api/v1/economic-assumption-sets/econ_ladakh_v1?version=1.0.0"
+  }
+ ]
+}

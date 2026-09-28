@@ -1,0 +1,14 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["jest", "node"],
+    "moduleSuffixes": [".native", ""],
+    "paths": {
+      "@/*": ["./*"],
+      "@cocoon/contracts": ["../packages/contracts/typescript/src/index.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "viewer/three-entry.js"]
+}

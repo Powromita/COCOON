@@ -1,0 +1,332 @@
+{
+ "optimization_id": "opt_de0c3a0eb800",
+ "pareto": {
+  "objectives": [
+   "unmet_hours",
+   "cold_degree_hours",
+   "overheating_degree_hours",
+   "temperature_swing_c",
+   "heating_energy_kwh",
+   "peak_heating_kw",
+   "capex_inr",
+   "lcc_inr",
+   "mass_kg"
+  ],
+  "front": [
+   "des_53b4177cf49f",
+   "des_b26a449a0769",
+   "des_5951c6f961b7",
+   "des_7d5c6f444a78"
+  ],
+  "dominated_by": {
+   "des_f544a19067c0": [
+    "des_5951c6f961b7",
+    "des_7d5c6f444a78"
+   ],
+   "des_36ee7d71f841": [
+    "des_53b4177cf49f",
+    "des_5951c6f961b7"
+   ],
+   "des_631c67fff5d2": [
+    "des_7d5c6f444a78"
+   ],
+   "des_f15037401829": [
+    "des_f544a19067c0",
+    "des_b26a449a0769",
+    "des_631c67fff5d2",
+    "des_5951c6f961b7",
+    "des_7d5c6f444a78"
+   ]
+  },
+  "rank": {
+   "des_53b4177cf49f": 1,
+   "des_b26a449a0769": 1,
+   "des_5951c6f961b7": 1,
+   "des_7d5c6f444a78": 1,
+   "des_f544a19067c0": 2,
+   "des_36ee7d71f841": 2,
+   "des_631c67fff5d2": 2,
+   "des_f15037401829": 3
+  },
+  "ties": [],
+  "excluded": {},
+  "flagged": [],
+  "steps": {
+   "unmet_hours": 0.0,
+   "cold_degree_hours": 0.0,
+   "overheating_degree_hours": 1.9544870281738713e-06,
+   "temperature_swing_c": 6.268939278267045e-09,
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "capex_inr": 0.0007597156397355132,
+   "lcc_inr": 0.0007803885006691065,
+   "mass_kg": 7.025914999999999e-06
+  }
+ },
+ "picks": {
+  "picks": {
+   "best_overall": {
+    "name": "best_overall",
+    "status": "selected",
+    "design_id": "des_5951c6f961b7",
+    "reason": "highest weighted score among 4 eligible design(s)",
+    "value": 0.8938847608939364,
+    "runner_up": "des_53b4177cf49f",
+    "runner_up_value": 0.8500432314295691,
+    "gap": 0.04384152946436737,
+    "weights": {
+     "unmet_hours": 3.0,
+     "cold_degree_hours": 1.0,
+     "overheating_degree_hours": 1.0,
+     "temperature_swing_c": 1.0,
+     "heating_energy_kwh": 2.0,
+     "peak_heating_kw": 1.0,
+     "lcc_inr": 3.0,
+     "capex_inr": 1.0,
+     "mass_kg": 1.0,
+     "reliability": 2.0
+    },
+    "dropped_objectives": [],
+    "pool_size": 4,
+    "flagged": false,
+    "development_only": false,
+    "explanation": [
+     {
+      "sentence": "0 unmet comfort hours, within the requirement's limit.",
+      "sources": [
+       "objectives.unmet_hours",
+       "objectives.within_unmet_limit"
+      ]
+     },
+     {
+      "sentence": "Highest reliability score of the 4 eligible designs: 1 0..1 (next best 0.889 0..1).",
+      "sources": [
+       "objectives.reliability"
+      ]
+     },
+     {
+      "sentence": "Stays the best choice in 100% of the perturbation tests.",
+      "sources": [
+       "objectives.reliability"
+      ]
+     },
+     {
+      "sentence": "51% of the window area (8.88 of 17.5 m2) faces south.",
+      "sources": [
+       "quantities.openings.windows_by_orientation"
+      ]
+     },
+     {
+      "sentence": "Largest steady heat-loss path: infiltration (infiltration 47%, windows 26%, walls 10% of 123 W/K; computed from the design's U-values and areas, not from the simulation).",
+      "sources": [
+       "building.assemblies[*].u_value_w_m2k",
+       "building.surfaces[*].area_m2",
+       "building.openings[*]",
+       "extras.air_changes_per_hour"
+      ]
+     },
+     {
+      "sentence": "Envelope mass 7.7 t.",
+      "sources": [
+       "quantities.materials[*].mass_kg"
+      ]
+     },
+     {
+      "sentence": "Capital cost 1,779,581 INR; lifecycle cost 1,926,009 INR over 15 years. Fuel is 0% of operating cost.",
+      "sources": [
+       "economics.capex.total_capex_inr",
+       "economics.lcc_inr",
+       "economics.annual_cash_flows[*].fuel_cost_inr",
+       "economics.annual_cash_flows[*].total_opex_inr"
+      ]
+     }
+    ]
+   },
+   "best_thermal": {
+    "name": "best_thermal",
+    "status": "selected",
+    "design_id": "des_7d5c6f444a78",
+    "reason": "highest weighted score among 4 eligible design(s)",
+    "value": 1.0,
+    "runner_up": "des_53b4177cf49f",
+    "runner_up_value": 0.8364894005223827,
+    "gap": 0.16351059947761726,
+    "weights": {
+     "unmet_hours": 3.0,
+     "cold_degree_hours": 2.0,
+     "overheating_degree_hours": 2.0,
+     "temperature_swing_c": 1.0,
+     "heating_energy_kwh": 2.0,
+     "peak_heating_kw": 1.0
+    },
+    "dropped_objectives": [],
+    "pool_size": 4,
+    "flagged": false,
+    "development_only": false,
+    "explanation": [
+     {
+      "sentence": "0 unmet comfort hours, within the requirement's limit.",
+      "sources": [
+       "objectives.unmet_hours",
+       "objectives.within_unmet_limit"
+      ]
+     },
+     {
+      "sentence": "Lowest overheating degree-hours of the 4 eligible designs: 0.131 K*h (next best 140 K*h).",
+      "sources": [
+       "objectives.overheating_degree_hours"
+      ]
+     },
+     {
+      "sentence": "Lowest temperature swing of the 4 eligible designs: 5.09 K (next best 7.08 K).",
+      "sources": [
+       "objectives.temperature_swing_c"
+      ]
+     },
+     {
+      "sentence": "50% of the window area (7.92 of 15.8 m2) faces south.",
+      "sources": [
+       "quantities.openings.windows_by_orientation"
+      ]
+     },
+     {
+      "sentence": "Largest steady heat-loss path: infiltration (infiltration 38%, floor 26%, windows 21% of 136 W/K; computed from the design's U-values and areas, not from the simulation).",
+      "sources": [
+       "building.assemblies[*].u_value_w_m2k",
+       "building.surfaces[*].area_m2",
+       "building.openings[*]",
+       "extras.air_changes_per_hour"
+      ]
+     }
+    ]
+   },
+   "lowest_lcc": {
+    "name": "lowest_lcc",
+    "status": "selected",
+    "design_id": "des_53b4177cf49f",
+    "reason": "smallest lifecycle cost among 4 eligible design(s)",
+    "value": 1888569.0241770544,
+    "runner_up": "des_5951c6f961b7",
+    "runner_up_value": 1926009.0167763198,
+    "gap": 37439.99259926542,
+    "weights": {},
+    "dropped_objectives": [],
+    "pool_size": 4,
+    "flagged": false,
+    "development_only": false,
+    "explanation": [
+     {
+      "sentence": "0 unmet comfort hours, within the requirement's limit.",
+      "sources": [
+       "objectives.unmet_hours",
+       "objectives.within_unmet_limit"
+      ]
+     },
+     {
+      "sentence": "Lowest lifecycle cost of the 4 eligible designs: 1,888,569 INR (next best 1,926,009 INR).",
+      "sources": [
+       "objectives.lcc_inr"
+      ]
+     },
+     {
+      "sentence": "Lowest capital cost of the 4 eligible designs: 1,730,758 INR (next best 1,779,581 INR).",
+      "sources": [
+       "objectives.capex_inr"
+      ]
+     },
+     {
+      "sentence": "Envelope mass 7.4 t.",
+      "sources": [
+       "quantities.materials[*].mass_kg"
+      ]
+     },
+     {
+      "sentence": "Capital cost 1,730,758 INR; lifecycle cost 1,888,569 INR over 15 years. Fuel is 3% of operating cost.",
+      "sources": [
+       "economics.capex.total_capex_inr",
+       "economics.lcc_inr",
+       "economics.annual_cash_flows[*].fuel_cost_inr",
+       "economics.annual_cash_flows[*].total_opex_inr"
+      ]
+     }
+    ]
+   },
+   "lowest_capex": {
+    "name": "lowest_capex",
+    "status": "selected",
+    "design_id": "des_53b4177cf49f",
+    "reason": "smallest capital cost among 4 eligible design(s)",
+    "value": 1730757.9196544865,
+    "runner_up": "des_5951c6f961b7",
+    "runner_up_value": 1779581.241665,
+    "gap": 48823.32201051363,
+    "weights": {},
+    "dropped_objectives": [],
+    "pool_size": 4,
+    "flagged": false,
+    "development_only": false,
+    "explanation": [
+     {
+      "sentence": "0 unmet comfort hours, within the requirement's limit.",
+      "sources": [
+       "objectives.unmet_hours",
+       "objectives.within_unmet_limit"
+      ]
+     },
+     {
+      "sentence": "Lowest capital cost of the 4 eligible designs: 1,730,758 INR (next best 1,779,581 INR).",
+      "sources": [
+       "objectives.capex_inr"
+      ]
+     },
+     {
+      "sentence": "Lowest lifecycle cost of the 4 eligible designs: 1,888,569 INR (next best 1,926,009 INR).",
+      "sources": [
+       "objectives.lcc_inr"
+      ]
+     },
+     {
+      "sentence": "Envelope mass 7.4 t.",
+      "sources": [
+       "quantities.materials[*].mass_kg"
+      ]
+     },
+     {
+      "sentence": "Capital cost 1,730,758 INR; lifecycle cost 1,888,569 INR over 15 years. Fuel is 3% of operating cost.",
+      "sources": [
+       "economics.capex.total_capex_inr",
+       "economics.lcc_inr",
+       "economics.annual_cash_flows[*].fuel_cost_inr",
+       "economics.annual_cash_flows[*].total_opex_inr"
+      ]
+     }
+    ]
+   }
+  },
+  "scores": {
+   "des_53b4177cf49f": {
+    "overall": 0.8500432314295691,
+    "thermal": 0.8364894005223827
+   },
+   "des_b26a449a0769": {
+    "overall": 0.6566533445420055,
+    "thermal": 0.7693271311430944
+   },
+   "des_5951c6f961b7": {
+    "overall": 0.8938847608939364,
+    "thermal": 0.7858768094597344
+   },
+   "des_7d5c6f444a78": {
+    "overall": 0.5625,
+    "thermal": 1.0
+   }
+  },
+  "eligible": [
+   "des_53b4177cf49f",
+   "des_b26a449a0769",
+   "des_5951c6f961b7",
+   "des_7d5c6f444a78"
+  ],
+  "warnings": []
+ }
+}

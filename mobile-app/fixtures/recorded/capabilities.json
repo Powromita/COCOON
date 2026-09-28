@@ -1,0 +1,35 @@
+{
+ "schema_versions": [
+  "4.0"
+ ],
+ "auth_mode": "disabled",
+ "modules": {
+  "m2_design_generator": true,
+  "m3_weather_sites": [
+   "chushul",
+   "daulat_beg_oldi",
+   "dras",
+   "kargil",
+   "leh",
+   "nubra_diskit",
+   "nyoma",
+   "pangong_tso",
+   "siachen_base_camp",
+   "turtuk"
+  ],
+  "m4_engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0"
+  },
+  "m5_ml_surrogate": "importable (not used by the pipeline until it is valid for this engine)",
+  "m6_optimization": true,
+  "m7_economics": true,
+  "m8_ansys": {
+   "importable": true,
+   "unavailable_reason": null
+  }
+ },
+ "weather": {
+  "source": "cached NASA POWER archives"
+ }
+}

@@ -1,0 +1,538 @@
+{
+ "des_36ee7d71f841": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_9f86feb0bec5",
+  "design_revision_id": "rev_05c0037f8ee8",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 41.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 4.67196867078958e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 10.22824542781709,
+    "temperature_mean_c": 13.014410599860902,
+    "temperature_max_c": 15.266730927228723,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.173052870938573,
+    "temperature_mean_c": 25.672174280609994,
+    "temperature_max_c": 31.641139373960826,
+    "comfort_hours": 45.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.258734218691263,
+    "temperature_mean_c": 25.17476916167152,
+    "temperature_max_c": 28.950490203102415,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.179008354692083,
+    "temperature_mean_c": 25.460727904906427,
+    "temperature_max_c": 30.03267595107105,
+    "comfort_hours": 43.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:31.705525Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_9f86feb0bec5/timeseries"
+ },
+ "des_53b4177cf49f": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_37a9a6312b78",
+  "design_revision_id": "rev_3fb0e82cb341",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 2.6166568138517468,
+   "peak_heating_kw": 0.38092991623636774,
+   "occupied_comfort_hours": 91.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 3.5636402526948423e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 11.530729538227234,
+    "temperature_mean_c": 15.904713663239114,
+    "temperature_max_c": 18.27493030700051,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.09372547021935,
+    "temperature_mean_c": 23.29344867067084,
+    "temperature_max_c": 28.282939409895008,
+    "comfort_hours": 94.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.260615850053005,
+    "temperature_mean_c": 22.166299276109235,
+    "temperature_max_c": 24.746482666648294,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.0,
+    "temperature_mean_c": 22.85286220714279,
+    "temperature_max_c": 29.322779866088307,
+    "comfort_hours": 102.0,
+    "peak_heating_kw": 0.38092991623636774,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:31.817361Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_37a9a6312b78/timeseries"
+ },
+ "des_5951c6f961b7": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_31237ea41c1c",
+  "design_revision_id": "rev_5b9957dd7509",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 47.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 4.497793873619912e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 11.733825877510489,
+    "temperature_mean_c": 17.47732692158012,
+    "temperature_max_c": 20.332548791112092,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.203774808483796,
+    "temperature_mean_c": 25.489896591452965,
+    "temperature_max_c": 30.768748217403317,
+    "comfort_hours": 47.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.22663020304741,
+    "temperature_mean_c": 23.65199670575916,
+    "temperature_max_c": 26.941466846159724,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.111079034995145,
+    "temperature_mean_c": 25.077087870452935,
+    "temperature_max_c": 30.304721466695145,
+    "comfort_hours": 52.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:32.128886Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_31237ea41c1c/timeseries"
+ },
+ "des_631c67fff5d2": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_1b02ee29eb78",
+  "design_revision_id": "rev_b980c41b4a8c",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 61.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 8.426750825676785e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 10.040515778239907,
+    "temperature_mean_c": 12.208045330595562,
+    "temperature_max_c": 14.412925301593472,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.198255127452663,
+    "temperature_mean_c": 24.775210817976017,
+    "temperature_max_c": 29.81103480867386,
+    "comfort_hours": 61.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.213301458058913,
+    "temperature_mean_c": 24.303028757478454,
+    "temperature_max_c": 28.42904674510077,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.079609291177823,
+    "temperature_mean_c": 24.284726845641472,
+    "temperature_max_c": 29.642666715290588,
+    "comfort_hours": 68.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:31.986271Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_1b02ee29eb78/timeseries"
+ },
+ "des_7d5c6f444a78": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_707ed9289ac3",
+  "design_revision_id": "rev_1ad77de1a42a",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.3996323031395623,
+   "peak_heating_kw": 0.07022169180686251,
+   "occupied_comfort_hours": 141.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 4.998133382968047e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 8.202342579380346,
+    "temperature_mean_c": 9.466395667228275,
+    "temperature_max_c": 14.172515079461832,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 14.999999999999913,
+    "temperature_mean_c": 20.59633860437516,
+    "temperature_max_c": 23.74565285381348,
+    "comfort_hours": 168.0,
+    "peak_heating_kw": 0.07022169180686251,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.039750164252325,
+    "temperature_mean_c": 19.068828577636957,
+    "temperature_max_c": 20.808703766057466,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.12123414115907,
+    "temperature_mean_c": 21.68386910109304,
+    "temperature_max_c": 25.554135457325845,
+    "comfort_hours": 141.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:32.190342Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_707ed9289ac3/timeseries"
+ },
+ "des_b26a449a0769": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_2f31b01367b0",
+  "design_revision_id": "rev_76dbe09d17f7",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 56.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 5.503351212820529e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 10.644688959549054,
+    "temperature_mean_c": 12.748266233098832,
+    "temperature_max_c": 14.667164247182514,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.075892178326283,
+    "temperature_mean_c": 24.90710613805073,
+    "temperature_max_c": 30.991145689659106,
+    "comfort_hours": 58.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.202330044982252,
+    "temperature_mean_c": 24.259666637393178,
+    "temperature_max_c": 27.72933107086597,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.013578158291768,
+    "temperature_mean_c": 24.764085251257825,
+    "temperature_max_c": 30.909209791816487,
+    "comfort_hours": 61.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:31.887759Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_2f31b01367b0/timeseries"
+ },
+ "des_f15037401829": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_df47dc461c36",
+  "design_revision_id": "rev_05053374a9fd",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 69.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 6.650164901941424e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 10.82274932942621,
+    "temperature_mean_c": 13.007325121761985,
+    "temperature_max_c": 15.035857386429575,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.141282827895374,
+    "temperature_mean_c": 24.020395086621182,
+    "temperature_max_c": 28.924756918422723,
+    "comfort_hours": 70.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.186839805161522,
+    "temperature_mean_c": 24.61694706834216,
+    "temperature_max_c": 29.019503372615333,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.110718595959693,
+    "temperature_mean_c": 24.242341405983048,
+    "temperature_max_c": 29.312184399566657,
+    "comfort_hours": 69.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:32.058224Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_df47dc461c36/timeseries"
+ },
+ "des_f544a19067c0": {
+  "schema_version": "4.0",
+  "simulation_id": "sim_cdc4c47748a2",
+  "design_revision_id": "rev_f4e7b1c32d71",
+  "engine": {
+   "name": "cocoon_multizone_rc",
+   "version": "1.0.0",
+   "mode": "ideal_load_conditioned",
+   "timestep_seconds": 3600
+  },
+  "status": "completed",
+  "summary": {
+   "heating_energy_kwh": 0.0,
+   "peak_heating_kw": 0.0,
+   "occupied_comfort_hours": 54.0,
+   "unmet_hours": 0.0,
+   "energy_residual_max_pct": 5.335917234276926e-13,
+   "airlock_benefit_vs_baseline_pct": null
+  },
+  "zones": [
+   {
+    "zone_id": "airlock",
+    "temperature_min_c": 10.142666565098875,
+    "temperature_mean_c": 12.359661586738035,
+    "temperature_max_c": 14.391308205673372,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "living",
+    "temperature_min_c": 15.100444941198509,
+    "temperature_mean_c": 25.239088259898022,
+    "temperature_max_c": 31.53037068642881,
+    "comfort_hours": 54.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   },
+   {
+    "zone_id": "equipment",
+    "temperature_min_c": 15.22285444911702,
+    "temperature_mean_c": 24.967950138197992,
+    "temperature_max_c": 29.03242962380622,
+    "comfort_hours": 0.0,
+    "peak_heating_kw": null,
+    "unmet_hours": null
+   },
+   {
+    "zone_id": "sleeping",
+    "temperature_min_c": 15.074390012191454,
+    "temperature_mean_c": 24.85975516774946,
+    "temperature_max_c": 30.508059727637114,
+    "comfort_hours": 56.0,
+    "peak_heating_kw": 0.0,
+    "unmet_hours": 0.0
+   }
+  ],
+  "time_series": null,
+  "provenance": {
+   "weather_snapshot_id": "wx_leh_20260101T00_168h",
+   "material_version": "mat_snap_himalayan_v1",
+   "code_commit": "1048a2c489a75282c4eac218316314b25e63b27d",
+   "created_at": "2026-09-26T15:38:31.591155Z"
+  },
+  "recommendation_state": null,
+  "timeseries_url": "/api/v1/simulations/sim_cdc4c47748a2/timeseries"
+ }
+}
