@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { DEFAULT_DRAFT, stepErrors, type WizardDraft } from "@/lib/configurator/requirements";
+import { DEFAULT_DRAFT, MATERIALS, stepErrors, type WizardDraft } from "@/lib/configurator/requirements";
 
-const STORAGE_KEY = "cocoon.configurator.draft.v4";
+const STORAGE_KEY = "cocoon.configurator.draft.v5";
 
 type Ctx = {
   draft: WizardDraft;
@@ -21,10 +21,17 @@ function load(): WizardDraft | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<WizardDraft>;
     // Merge over defaults so older drafts missing new fields still work.
+    const constraints = { ...DEFAULT_DRAFT.constraints, ...parsed.constraints };
+    // Drop material ids from an older catalog version — they'd otherwise stay selected forever with
+    // no chip left to deselect them from, and silently fail composition on the backend.
+    const validIds = new Set(MATERIALS.map((m) => m.id));
+    const knownSelected = constraints.available_material_ids.filter((m) => validIds.has(m));
+    constraints.available_material_ids = knownSelected.length > 0 ? knownSelected : DEFAULT_DRAFT.constraints.available_material_ids;
     return {
       site: { ...DEFAULT_DRAFT.site, ...parsed.site },
       mission: { ...DEFAULT_DRAFT.mission, ...parsed.mission },
-      constraints: { ...DEFAULT_DRAFT.constraints, ...parsed.constraints },
+      constraints,
+      design: { ...DEFAULT_DRAFT.design, ...parsed.design },
       economic_assumption_set_id: parsed.economic_assumption_set_id ?? DEFAULT_DRAFT.economic_assumption_set_id,
       run: { ...DEFAULT_DRAFT.run, ...parsed.run },
     };

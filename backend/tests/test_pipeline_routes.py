@@ -144,6 +144,28 @@ def test_unfinished_and_unknown_optimizations():
     assert r.status_code == 409 and r.json()["error"]["details"]["status"] == "failed"
 
 
+def test_projects_reflect_the_latest_persisted_simulation():
+    directory = settings.PIPELINE_RUNS_DIR / "opt_bbbbbbbbbbbb"
+    directory.mkdir()
+    (directory / "request.json").write_text(json.dumps({"requirements": {
+        "project_id": "prj_live", "site": {"elevation_m": 3500},
+        "mission": {"type": "new_shelter", "occupants": 12, "target_temperature_c": 18},
+    }}), encoding="utf-8")
+    (directory / "final_report.json").write_text(json.dumps({"design": {
+        "template": "vault", "floors": 1, "assemblies": [{"name": "Insulated wall"}],
+    }}), encoding="utf-8")
+    (directory / "status.json").write_text(json.dumps({
+        "optimization_id": directory.name, "project_id": "prj_live", "status": "completed",
+        "created_at": "2026-09-28T10:00:00Z", "count": 100, "recommended_design_id": "des_best",
+        "validation": {"state": "VALIDATED_BY_ANSYS"},
+    }), encoding="utf-8")
+    result = client.get("/api/v1/projects")
+    assert result.status_code == 200
+    project = result.json()["projects"][0]
+    assert project["project_id"] == "prj_live" and project["candidate_count"] == 100
+    assert project["recommended_design_id"] == "des_best"
+    assert project["validation"]["state"] == "VALIDATED_BY_ANSYS"
+
 def test_optimization_idempotency_key():
     h = {"Idempotency-Key": "k1"}
     body = {"requirements": requirements(), "count": 2, "seed": 3}

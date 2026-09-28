@@ -274,7 +274,8 @@ def _to_m(v: int) -> float:
 
 
 # ----- the generator -------------------------------------------------------
-def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> Layout:
+def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int, *, fixed_length_m: float | None = None,
+                    fixed_width_m: float | None = None, fixed_height_m: float | None = None) -> Layout:
     """One deterministic layout for ``seed``. Raises NoFeasibleLayoutError."""
     plan = plan_rooms(match, spec)
 
@@ -314,15 +315,22 @@ def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> La
         W = max(int(round(math.sqrt(area / aspect))), 1)
         W = max(W, widest_min_dm)                    # a room can never be wider than the footprint's short side
         L = max(int(round(area / W)), W, 1)
+        if fixed_length_m is not None:
+            L = int(round(fixed_length_m * DM))
+        if fixed_width_m is not None:
+            W = int(round(fixed_width_m * DM))
         while L * W < need_dm2 - 1e-6:
             L += 1
         if cap_dm2 is not None and L * W > cap_dm2 + 1e-6:
             reasons["footprint_exceeds_cap"] += 1
             continue
-        if not (FOOTPRINT_ASPECT_RANGE[0] <= L / W <= FOOTPRINT_ASPECT_RANGE[1] + 1e-9):
+        if fixed_length_m is None and fixed_width_m is None and not (FOOTPRINT_ASPECT_RANGE[0] <= L / W <= FOOTPRINT_ASPECT_RANGE[1] + 1e-9):
             reasons["footprint_aspect_out_of_range"] += 1
             continue
-        H = int(rng.integers(lo_h, hi_h + 1))
+        H = int(round(fixed_height_m * DM)) if fixed_height_m is not None else int(rng.integers(lo_h, hi_h + 1))
+        if not lo_h <= H <= hi_h:
+            reasons["height_out_of_range"] += 1
+            continue
 
         # -- rooms on every floor
         rects: dict[str, Rect] = {}

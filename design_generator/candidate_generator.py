@@ -147,6 +147,14 @@ class GenerationOptions:
         default_factory=lambda: {"equipment": 300.0, "command": 250.0, "medical": 400.0, "living": 150.0})
     door: DoorDefaults = DoorDefaults()
     entrance_face_priority: tuple[str, ...] = DEFAULT_ENTRANCE_FACE_PRIORITY
+    # Explicit configurator requirements; None keeps the generator exploratory.
+    fixed_length_m: float | None = None
+    fixed_width_m: float | None = None
+    fixed_height_m: float | None = None
+    window_count: int | None = None
+    window_orientation: str | None = None
+    require_separate_rooms: bool = False
+    force_cardinal_orientation: bool = False
     attempts_per_candidate: int = 50
     max_attempts: int | None = None
 
@@ -439,10 +447,17 @@ def _place_windows(rng, layout: Layout, geo, doors: tuple[DoorPlacement, ...], s
         return False
 
     def pick(candidates: list[_Slot]) -> _Slot:
+        if options.window_orientation:
+            requested = [s for s in candidates if s.bucket == options.window_orientation]
+            if requested:
+                candidates = requested
         wts = np.array([options.orientation_weights.get(c.bucket, 1.0) for c in candidates], dtype=float)
         return candidates[int(rng.choice(len(candidates), p=wts / wts.sum()))]
 
+    max_count = options.window_count
     for zid in dict.fromkeys(s.zone_id for s in slots):                      # one window per occupied zone first
+        if max_count is not None and sum(len(p) for s in slots for p in s.placed) >= max_count:
+            break
         mine = [s for s in slots if s.zone_id == zid]
         while mine:
             chosen = pick(mine)
@@ -452,6 +467,8 @@ def _place_windows(rng, layout: Layout, geo, doors: tuple[DoorPlacement, ...], s
     narrowest = min(w for w, _ in options.window_sizes_m)
     dead: set[int] = set()                                                  # slots that cannot take another window
     for _ in range(200):
+        if max_count is not None and sum(len(p) for s in slots for p in s.placed) >= max_count:
+            break
         if total_area >= target:
             break
         open_slots = [s for s in slots if id(s) not in dead and any(_fits(s, i, narrowest, gap) for i in range(len(s.intervals)))]
@@ -513,12 +530,16 @@ def _build(index: int, seed: int, rng, match: TemplateMatch, spec: GenerationSpe
            snapshot: MaterialSnapshot, options: GenerationOptions, created_at: datetime) -> Candidate:
     template_id = match.template.id
     try:
-        layout = generate_layout(match, spec, int(rng.integers(0, 2**31 - 1)))
+        layout = generate_layout(match, spec, int(rng.integers(0, 2**31 - 1)),
+                                 fixed_length_m=options.fixed_length_m, fixed_width_m=options.fixed_width_m,
+                                 fixed_height_m=options.fixed_height_m)
     except NoFeasibleLayoutError as exc:
         reasons = exc.details.get("reasons", {})
         raise _Reject("layout", exc.code, f"{exc} {dict(reasons)}") from exc
 
     orientation = float(spec.allowed_orientations_deg[int(rng.integers(len(spec.allowed_orientations_deg)))])
+    if options.force_cardinal_orientation:
+        orientation = min((0.0, 90.0, 180.0, 270.0), key=lambda value: abs(((orientation - value + 180) % 360) - 180))
     try:
         geo = resolve_geometry(layout, orientation_deg=orientation)
     except GeometryResolveError as exc:
@@ -603,7 +624,8 @@ def generate_candidates(
     spec = parse_requirements(requirements, sizing=sizing)
     created_at = created_at or datetime.now(timezone.utc)
 
-    matches = [m for m in filter_templates(list(r.room_type for r in spec.rooms), spec.max_floors)
+    matches = [m for m in filter_templates(list(r.room_type for r in spec.rooms), spec.max_floors,
+                                           allow_room_merging=not options.require_separate_rooms)
                if m.template.floor_count in spec.allowed_floor_counts]
     if not matches:
         raise NoTemplateError(

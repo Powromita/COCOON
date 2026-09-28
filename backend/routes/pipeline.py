@@ -37,7 +37,8 @@ from pydantic import BaseModel, Field
 
 from cocoon_contracts import (BuildingModel, ErrorCode, ErrorDetail, ErrorEnvelope, RequirementsContract,
                               SimulationEngineMode, SimulationResult)
-from design_generator import generate_designs, to_error_envelope as m2_envelope
+from design_generator import GenerationOptions, generate_designs, to_error_envelope as m2_envelope
+from design_generator.requirement_parser import parse_requirements
 from economics.provider import DEFAULT_ASSUMPTIONS_DIR
 from m3_data import WeatherError, WeatherStore, extended_snapshot, load_snapshot, standard_snapshot
 from m4_engine import ENGINE_NAME, ENGINE_VERSION, M4Error, M4Evaluator
@@ -237,6 +238,46 @@ def get_timeseries(simulation_id: str):
 
 
 # ----------------------------------------------------------------------------------------------------------
+class RunOptions(BaseModel):
+    hvac_mode: str = Field(default="ideal_load")
+    heater_benchmark: bool = False
+
+
+class DesignOptions(BaseModel):
+    """Explicit geometry/envelope/opening choices from the configurator."""
+    length_m: float | None = Field(default=None, ge=2.0, le=100.0)
+    width_m: float | None = Field(default=None, ge=2.0, le=100.0)
+    height_m: float | None = Field(default=None, ge=2.3, le=3.0)
+    shape: str = Field(default="rectangular", pattern="^rectangular$")
+    wall_thickness_mm: float | None = Field(default=None, ge=100, le=1000)
+    roof_thickness_mm: float | None = Field(default=None, ge=80, le=1000)
+    floor_thickness_mm: float | None = Field(default=None, ge=80, le=1000)
+    window_count: int = Field(default=4, ge=0, le=20)
+    window_width_m: float = Field(default=1.2, ge=0.4, le=3.0)
+    window_height_m: float = Field(default=1.2, ge=0.4, le=3.0)
+    window_orientation: str = Field(default="south", pattern="^(north|east|south|west)$")
+    glazing: str = Field(default="double", pattern="^(single|double|triple|none)$")
+    air_changes_per_hour: float = Field(default=0.8, ge=0.0, le=10.0)
+    initial_temperature_c: float | None = Field(default=None, ge=-40, le=40)
+    require_separate_rooms: bool = True
+
+
+def _generation_options(options: DesignOptions) -> GenerationOptions:
+    assembly = dict(GenerationOptions().assembly_mm)
+    if options.wall_thickness_mm is not None: assembly["wall"] = (options.wall_thickness_mm - 5, options.wall_thickness_mm + 5)
+    if options.roof_thickness_mm is not None: assembly["roof"] = (options.roof_thickness_mm - 5, options.roof_thickness_mm + 5)
+    if options.floor_thickness_mm is not None: assembly["floor"] = (options.floor_thickness_mm - 5, options.floor_thickness_mm + 5)
+    glazing = options.glazing if options.glazing != "none" else "double"
+    return GenerationOptions(
+        fixed_length_m=options.length_m, fixed_width_m=options.width_m, fixed_height_m=options.height_m,
+        window_count=options.window_count, window_orientation=options.window_orientation,
+        window_sizes_m=((options.window_width_m, options.window_height_m),),
+        glazing_weights={glazing: 1.0}, airtightness={"user": (options.air_changes_per_hour, 1.0)},
+        assembly_mm=assembly,
+        require_separate_rooms=options.require_separate_rooms, force_cardinal_orientation=True,
+    )
+
+
 class OptimizationBody(BaseModel):
     requirements: RequirementsContract
     count: int = Field(default=20, ge=1, le=200)
@@ -244,7 +285,44 @@ class OptimizationBody(BaseModel):
     site: str | None = None
     materials_snapshot_id: str | None = None
     validate_with_ansys: bool = False
+    ansys_designs: int = Field(default=1, ge=1, le=2)
+    validation_strategy: str = Field(default="staged", pattern="^(staged|exhaustive)$")
+    shortlist_size: int = Field(default=20, ge=5, le=25)
+    reliability_designs: int = Field(default=5, ge=3, le=5)
+    rc_workers: int = Field(default=4, ge=1, le=8)
     baseline_economics: bool = True
+    run_options: RunOptions = Field(default_factory=RunOptions)
+    design_options: DesignOptions = Field(default_factory=DesignOptions)
+
+
+def _preflight(body: OptimizationBody) -> dict:
+    dimensions = body.design_options
+    cap = body.requirements.constraints.maximum_footprint_m2
+    if dimensions.length_m is not None and dimensions.width_m is not None and cap is not None:
+        area = dimensions.length_m * dimensions.width_m
+        if area > cap + 1e-9:
+            return {"error": ErrorEnvelope(error=ErrorDetail(
+                code=ErrorCode.VALIDATION_ERROR,
+                message=f"fixed geometry needs {area:.1f} m? per floor, but the maximum footprint is {cap:.1f} m?",
+                details={"length_m": dimensions.length_m, "width_m": dimensions.width_m,
+                         "fixed_footprint_m2": area, "maximum_footprint_m2": cap},
+                trace_id=str(uuid.uuid4()), retryable=False)).model_dump(mode="json")}
+    try:
+        spec = parse_requirements(body.requirements)
+    except Exception as exc:
+        return {"error": m2_envelope(exc).model_dump(mode="json")}
+    return {"feasible": True, "required_total_area_m2": spec.required_total_area_m2,
+            "room_area_sum_m2": spec.room_area_sum_m2,
+            "usable_area_by_floor_count_m2": dict(spec.usable_area_by_floor_count_m2),
+            "allowed_floor_counts": list(spec.allowed_floor_counts)}
+
+
+@router.post("/optimizations/preflight")
+def optimization_preflight(body: OptimizationBody):
+    result = _preflight(body)
+    if "error" in result:
+        return JSONResponse(status_code=422, content=result["error"])
+    return result
 
 
 def _run_dir(opt_id: str) -> Path | None:
@@ -270,15 +348,26 @@ def _set_status(d: Path, **fields) -> dict:
 def _job(opt_id: str, body: OptimizationBody) -> None:
     from cocoon_pipeline import PipelineConfig, run_pipeline
     d = _run_dir(opt_id)
-    _set_status(d, status="running", started_at=datetime.now(timezone.utc).isoformat())
+    _set_status(d, status="running", phase="starting", phase_message="Starting optimization",
+                started_at=datetime.now(timezone.utc).isoformat())
+
+    def progress(phase: str, message: str) -> None:
+        _set_status(d, phase=phase, phase_message=message)
+
     try:
         cfg = PipelineConfig(seed=body.seed, count=body.count, site=body.site, materials=_materials(body.materials_snapshot_id),
                              baseline_economics=body.baseline_economics, persist=True, run_id=opt_id,
                              runs_dir=settings.PIPELINE_RUNS_DIR,
                              ansys="submit" if body.validate_with_ansys else "not_requested",
-                             optimization=OptimizationSettings())
+                             ansys_wait=body.validate_with_ansys, ansys_designs=body.ansys_designs,
+                             validation_strategy=body.validation_strategy, shortlist_size=min(body.shortlist_size, body.count),
+                             reliability_designs=min(body.reliability_designs, body.shortlist_size, body.count),
+                             rc_workers=body.rc_workers, progress_callback=progress,
+                             optimization=OptimizationSettings(generation=_generation_options(body.design_options),
+                                                               verification={"initial_temperature_c": body.design_options.initial_temperature_c}
+                                                               if body.design_options.initial_temperature_c is not None else {}))
         result = run_pipeline(body.requirements, cfg)
-        _set_status(d, status="completed", finished_at=datetime.now(timezone.utc).isoformat(),
+        _set_status(d, status="completed", phase="complete", phase_message="Validation completed", finished_at=datetime.now(timezone.utc).isoformat(),
                     recommended_design_id=result.recommended_design_id, validation=result.validation,
                     summary=result.optimization.summary(), timings_s=result.timings_s)
     except Exception as exc:                                        # noqa: BLE001
@@ -292,6 +381,10 @@ def _job(opt_id: str, body: OptimizationBody) -> None:
 @router.post("/optimizations", status_code=201)
 def create_optimization(body: OptimizationBody, response: Response,
                         idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
+    preflight = _preflight(body)
+    if "error" in preflight:
+        response.status_code = 422
+        return preflight["error"]
     body_hash = hashlib.sha256(body.model_dump_json().encode("utf-8")).hexdigest()
     idem = None
     if idempotency_key:
@@ -318,6 +411,97 @@ def create_optimization(body: OptimizationBody, response: Response,
     _pool.submit(_job, opt_id, body)
     return {"optimization_id": opt_id, "status": "queued", "status_url": f"/api/v1/optimizations/{opt_id}"}
 
+
+@router.get("/optimizations")
+def list_optimizations():
+    """Return persisted optimization runs, newest first."""
+    items = []
+    for d in settings.PIPELINE_RUNS_DIR.iterdir():
+        if not d.is_dir() or not _OPT_ID.match(d.name):
+            continue
+        status_path = d / "status.json"
+        if not status_path.is_file():
+            continue
+        try:
+            st = json.loads(_read(status_path))
+        except (OSError, ValueError):
+            continue
+        items.append({
+            "optimization_id": d.name,
+            "project_id": st.get("project_id"),
+            "status": st.get("status", "unknown"),
+            "created_at": st.get("created_at"),
+            "started_at": st.get("started_at"),
+            "finished_at": st.get("finished_at"),
+            "count": st.get("count"),
+            "recommended_design_id": st.get("recommended_design_id"),
+            "validation": st.get("validation"),
+            "summary": st.get("summary"),
+            "has_report": (d / "final_report.json").is_file(),
+        })
+    items.sort(key=lambda item: item.get("created_at") or "", reverse=True)
+    return {"optimizations": items}
+
+def _project_from_run(directory: Path, status: dict) -> dict | None:
+    """Create the UI project view from the durable files for one optimization run."""
+    project_id = status.get("project_id")
+    if not project_id:
+        return None
+    try:
+        request = json.loads(_read(directory / "request.json"))
+    except (OSError, ValueError):
+        request = {}
+    requirements = request.get("requirements", {})
+    site = requirements.get("site", {})
+    mission = requirements.get("mission", {})
+    report = {}
+    report_path = directory / "final_report.json"
+    if report_path.is_file():
+        try:
+            report = json.loads(_read(report_path))
+        except (OSError, ValueError):
+            pass
+    design = report.get("design", {})
+    materials = [assembly.get("name") or assembly.get("id") for assembly in design.get("assemblies", [])]
+    return {
+        "project_id": project_id,
+        "optimization_id": status.get("optimization_id", directory.name),
+        "status": status.get("status", "unknown"),
+        "phase": status.get("phase"),
+        "phase_message": status.get("phase_message"),
+        "created_at": status.get("created_at"),
+        "updated_at": status.get("updated_at"),
+        "finished_at": status.get("finished_at"),
+        "candidate_count": status.get("count"),
+        "recommended_design_id": status.get("recommended_design_id"),
+        "validation": status.get("validation"),
+        "has_report": report_path.is_file(),
+        "site": {key: site.get(key) for key in ("latitude_deg", "longitude_deg", "elevation_m")},
+        "mission": {key: mission.get(key) for key in ("type", "occupants", "target_temperature_c")},
+        "design": {"template": design.get("template"), "floors": design.get("floors"), "materials": materials},
+    }
+
+
+@router.get("/projects")
+def list_projects():
+    """Return the latest persisted optimization for every project."""
+    projects: dict[str, dict] = {}
+    for directory in settings.PIPELINE_RUNS_DIR.iterdir():
+        if not directory.is_dir() or not _OPT_ID.match(directory.name):
+            continue
+        status_path = directory / "status.json"
+        if not status_path.is_file():
+            continue
+        try:
+            project = _project_from_run(directory, json.loads(_read(status_path)))
+        except (OSError, ValueError):
+            continue
+        if project is None:
+            continue
+        previous = projects.get(project["project_id"])
+        if previous is None or (project.get("created_at") or "") > (previous.get("created_at") or ""):
+            projects[project["project_id"]] = project
+    return {"projects": sorted(projects.values(), key=lambda project: project.get("created_at") or "", reverse=True)}
 
 def _status(opt_id: str):
     d = _run_dir(opt_id)
@@ -382,3 +566,50 @@ def get_design(optimization_id: str, design_id: str):
     if not p.is_file():
         return _err(404, ErrorCode.MISSING_REFERENCE, f"design '{design_id}' not found in this optimization")
     return json.loads(p.read_text(encoding="utf-8"))
+
+
+@router.get("/optimizations/{optimization_id}/report")
+def get_report(optimization_id: str):
+    """The recommended design's full final_design_report.json — DRDO Task 1/2/3 objectives, economics
+    (NPV/payback/LCC), materials/assembly breakdown, ANSYS validation state. Written by
+    cocoon_pipeline.finalize.build_final_report; absent until the run completes (cfg.final_report=True)."""
+    d, st = _status(optimization_id)
+    if d is None:
+        return _err(404, ErrorCode.MISSING_REFERENCE, f"unknown optimization '{optimization_id}'")
+    p = d / "final_report.json"
+    if not p.is_file():
+        return _err(409, ErrorCode.VALIDATION_ERROR, f"optimization is {st['status']}, report not ready",
+                    {"status": st["status"]}, retryable=st["status"] in ("queued", "running"))
+    return json.loads(_read(p))
+
+
+_TIMESERIES_NAMES = {"conditioned", "free_floating", "baseline_conditioned"}
+
+
+@router.get("/optimizations/{optimization_id}/timeseries")
+def get_optimization_timeseries(optimization_id: str, which: str = "conditioned"):
+    """Hourly (15-minute) ambient + per-zone temperature/heating/solar series for the recommended design,
+    parsed from cocoon_pipeline.finalize.write_timeseries's CSV. `which` is conditioned (default; sized
+    heater), free_floating (no heater), or baseline_conditioned (uninsulated GS-10-style reference)."""
+    if which not in _TIMESERIES_NAMES:
+        return _err(422, ErrorCode.VALIDATION_ERROR, f"which must be one of {sorted(_TIMESERIES_NAMES)}")
+    d, st = _status(optimization_id)
+    if d is None:
+        return _err(404, ErrorCode.MISSING_REFERENCE, f"unknown optimization '{optimization_id}'")
+    p = d / "recommended" / f"timeseries_{which}.csv"
+    if not p.is_file():
+        return _err(409, ErrorCode.VALIDATION_ERROR, f"optimization is {st['status']}, timeseries not ready",
+                    {"status": st["status"]}, retryable=st["status"] in ("queued", "running"))
+    import csv as _csv
+    import io as _io
+    rows = list(_csv.DictReader(_io.StringIO(_read(p))))
+    zone_ids = sorted({k[:-len("_temp_c")] for k in (rows[0].keys() if rows else []) if k.endswith("_temp_c")})
+    points = []
+    for r in rows:
+        points.append({
+            "timestamp": r["timestamp"], "ambient_c": float(r["ambient_c"]),
+            "zone_temp_c": {z: float(r[f"{z}_temp_c"]) for z in zone_ids},
+            "zone_heating_w": {z: float(r[f"{z}_heating_w"]) for z in zone_ids},
+            "zone_solar_w": {z: float(r[f"{z}_solar_w"]) for z in zone_ids},
+        })
+    return {"which": which, "zone_ids": zone_ids, "points": points}

@@ -22,7 +22,8 @@ from typing import Any
 
 from cocoon_contracts import RequirementsContract, WeatherSnapshot
 
-from cocoon_pipeline.ansys_stage import run_ansys_validation
+from cocoon_pipeline.ansys_stage import STATE_VALIDATED, run_ansys_validation
+from optimization.rc_screening import FastRCPredictor, FastRCScreeningConfig
 from cocoon_pipeline.config import ANSYS_SUBMIT, PipelineConfig
 from cocoon_pipeline.finalize import build_final_report, render_markdown, write_timeseries
 from cocoon_pipeline.persist import write_run
@@ -99,6 +100,31 @@ def _ml_predictor(cfg: PipelineConfig, requirements: RequirementsContract, weath
     return p, {**info, "used": True, "model_version": p.model_version, "reason": "screening only; every finalist is re-simulated by M4"}
 
 
+def _design_signature(building: Any) -> tuple:
+    """Features used to avoid spending a second ANSYS solve on a near-duplicate design."""
+    materials = tuple(sorted({layer.material_id for asm in building.assemblies.values() for layer in asm.layers}))
+    zone_layout = tuple(sorted((z.type, round(z.size_m.length_m, 2), round(z.size_m.width_m, 2))
+                               for floor in building.floors for z in floor.zones))
+    return materials, len(building.floors), zone_layout, round(building.orientation_deg / 15) * 15
+
+
+def _ansys_candidate_ids(opt: Any, recommended: str, count: int) -> list[str]:
+    ids = [recommended]
+    if count == 1:
+        return ids
+    primary_signature = _design_signature(opt.candidate(recommended).building)
+    ordered = []
+    for name in ("lowest_lcc", "best_thermal", "lowest_capex"):
+        design_id = opt.pick(name).design_id
+        if design_id and design_id != recommended and design_id not in ordered:
+            ordered.append(design_id)
+    ordered.extend(d for d in sorted(opt.ranking.eligible, key=lambda x: (-opt.ranking.scores[x]["overall"], x))
+                   if d != recommended and d not in ordered)
+    distinct = [d for d in ordered if _design_signature(opt.candidate(d).building) != primary_signature]
+    if distinct or ordered:
+        ids.append((distinct or ordered)[0])
+    return ids
+
 def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig | None = None) -> PipelineResult:
     from economics.provider import make_economics
     from m3_data import WeatherStore, standard_snapshot
@@ -111,6 +137,11 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
     t0 = time.perf_counter()
     timings: dict[str, float] = {}
 
+    def progress(phase: str, message: str) -> None:
+        if callable(cfg.progress_callback):
+            cfg.progress_callback(phase, message)
+
+    progress("weather", "Preparing the frozen weather snapshot")
     materials = cfg.materials or standard_snapshot()
     store = cfg.weather_store or WeatherStore()
 
@@ -122,11 +153,35 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
     economics = make_economics(materials, requirements)
     settings = cfg.optimization if cfg.optimization is not None else OptimizationSettings()
 
-    predictor, ml_info = _ml_predictor(cfg, requirements, weather)
-    if predictor is not None and settings.screening is None:
-        # M6's default caps the shortlist at 20 designs. That cap is a budget, not a safety rule: measured on 80 designs
-        # it dropped 12 of 18 Pareto-front designs, so the pipeline screens without it (see ml/ACCEPTANCE.md).
-        settings = replace(settings, screening=ScreeningSettings(shortlist_size=None))
+    if cfg.validation_strategy == "staged":
+        points = weather.hourly_data
+        hours = min(cfg.screening_hours, len(points))
+        coldest_i = min(range(0, len(points) - hours + 1),
+                        key=lambda i: sum(p.outdoor_dry_bulb_temperature_c for p in points[i:i + hours]))
+        screening_start = points[coldest_i].timestamp
+        predictor = FastRCPredictor(
+            evaluator, weather.snapshot_id, screening_start, requirements.mission.target_temperature_c,
+            FastRCScreeningConfig(hours=hours, timestep_seconds=cfg.screening_timestep_seconds,
+                                  max_workers=cfg.rc_workers))
+        ml_info = {"mode": "fast_rc", "used": True, "model_version": predictor.model_version,
+                   "reason": f"{hours} h free-floating M4 screening before full RC verification"}
+        settings = replace(
+            settings,
+            screening=ScreeningSettings(
+                dimensions=("min_occupied_temperature_c", "max_occupied_temperature_c", "comfort_hours",
+                            "max_zone_imbalance_c", "mass_kg"),
+                shortlist_size=cfg.shortlist_size,
+                min_shortlist=min(5, cfg.shortlist_size)),
+            verification={**dict(settings.verification), "max_workers": cfg.rc_workers},
+            reliability_max_designs=cfg.reliability_designs,
+            strict_reliability_cap=True,
+        )
+    else:
+        predictor, ml_info = _ml_predictor(cfg, requirements, weather)
+        if predictor is not None and settings.screening is None:
+            # Preserve exhaustive validation: ML may safely discard dominated candidates, but has no hard size cap.
+            settings = replace(settings, screening=ScreeningSettings(shortlist_size=None))
+    progress("rc_validation", "Screening candidates and fully validating the shortlist")
     opt = optimize(requirements, materials, evaluator, economics, weather_snapshot_id=weather.snapshot_id,
                    seed=cfg.seed, count=cfg.count, predictor=predictor, settings=settings)
     if predictor is not None:
@@ -144,15 +199,28 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
         validation = {"state": VALIDATION_NO_DESIGN, "reason": pick.reason}
     elif cfg.ansys == ANSYS_SUBMIT:
         t = time.perf_counter()
-        sub = run_ansys_validation(opt.candidate(recommended).building, weather, materials, hours=cfg.ansys_hours,
-                                   wait=cfg.ansys_wait)
-        timings["ansys_submit_s"] = round(time.perf_counter() - t, 6)
-        validation = dict(sub)
+        ansys_ids = _ansys_candidate_ids(opt, recommended, cfg.ansys_designs)
+
+        validations = []
+        for index, design_id in enumerate(ansys_ids, start=1):
+            progress("ansys_validation", f"Running ANSYS validation {index}/{len(ansys_ids)} for {design_id}")
+            validations.append({
+                "design_id": design_id,
+                **run_ansys_validation(opt.candidate(design_id).building, weather, materials,
+                                       hours=cfg.ansys_hours, wait=cfg.ansys_wait),
+            })
+        timings["ansys_validation_s"] = round(time.perf_counter() - t, 6)
+        primary = validations[0]
+        validation = ({**primary, "candidates": validations, "requested": len(ansys_ids)}
+                      if len(validations) > 1 else primary)
+        validation["state"] = (STATE_VALIDATED if primary.get("state") == STATE_VALIDATED
+                               else primary.get("state", "RC_ONLY_ANSYS_FAILED"))
     else:
         validation = {"state": VALIDATION_NOT_REQUESTED}
 
     report, series = None, {}
     if recommended is not None and cfg.final_report:
+        progress("reporting", "Building the final report and baseline comparison")
         from optimization.rc_verification import VerificationSettings
         vsettings = VerificationSettings.from_requirements(requirements, weather_snapshot_id=weather.snapshot_id,
                                                            **dict(settings.verification))
@@ -163,6 +231,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
         warnings = report["warnings"]
 
     timings["total_s"] = round(time.perf_counter() - t0, 6)
+    progress("complete", "Validation and report generation completed")
     result = PipelineResult(optimization=opt, recommended_design_id=recommended, validation=validation,
                             weather_snapshot_id=weather.snapshot_id, site_used=site_used,
                             timings_s=timings, warnings=tuple(warnings), run_id=cfg.run_id,

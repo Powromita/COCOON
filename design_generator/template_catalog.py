@@ -200,6 +200,7 @@ def filter_templates(
     required_rooms: list[str],
     max_floors: int,
     directory: Path | str | None = None,
+    allow_room_merging: bool = True,
 ) -> list[TemplateMatch]:
     """Templates that can provide every required room within ``max_floors``.
 
@@ -220,7 +221,7 @@ def filter_templates(
             if exact:
                 provided[required] = exact[0].id
                 continue
-            server = [r for r in template.rooms if required in r.serves]
+            server = [r for r in template.rooms if required in r.serves] if allow_room_merging else []
             if server:
                 provided[required] = server[0].id
                 merged[required] = server[0].id

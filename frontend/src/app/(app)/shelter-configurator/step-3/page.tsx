@@ -18,7 +18,9 @@ const GLAZING_TYPES = [
 export default function ConfiguratorStep3Page() {
   const { draft, update, errors } = useWizard();
   const m = draft.mission;
+  const d = draft.design;
   const e = errors.mission;
+  const setDesign = (patch: Partial<typeof d>) => update("design", patch);
   const set = (patch: Partial<typeof m>) => update("mission", patch);
 
   return (
@@ -38,16 +40,16 @@ export default function ConfiguratorStep3Page() {
               {/* Number of Windows & Dimensions */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
                 <Field label="Number of Windows (count)" hint="1 – 8 (up to 20 in full spec)">
-                  <NumberInput id="win_count" defaultValue="4" min={0} max={20} step={1} unit="units" />
+                  <NumberInput id="win_count" value={d.window_count} onChange={(v) => setDesign({ window_count: v })} min={0} max={20} step={1} unit="units" />
                 </Field>
                 <Field label="Window Width (W, m)" hint="e.g. 1.2 m">
-                  <NumberInput id="win_w" defaultValue="1.2" min={0.4} max={3.0} step={0.1} unit="m" />
+                  <NumberInput id="win_w" value={d.window_width_m} onChange={(v) => setDesign({ window_width_m: v })} min={0.4} max={3.0} step={0.1} unit="m" />
                 </Field>
                 <Field label="Window Height (H, m)" hint="e.g. 1.5 m">
-                  <NumberInput id="win_h" defaultValue="1.5" min={0.4} max={3.0} step={0.1} unit="m" />
+                  <NumberInput id="win_h" value={d.window_height_m} onChange={(v) => setDesign({ window_height_m: v })} min={0.4} max={3.0} step={0.1} unit="m" />
                 </Field>
                 <Field label="Window Orientation" hint="Azimuth / solar priority">
-                  <select className="w-full h-9 px-3 bg-surface-container-low border border-line rounded-lg text-xs text-on-surface font-medium" defaultValue="south">
+                  <select className="w-full h-9 px-3 bg-surface-container-low border border-line rounded-lg text-xs text-on-surface font-medium" value={d.window_orientation} onChange={(e) => setDesign({ window_orientation: e.target.value as typeof d.window_orientation })}>
                     <option value="south">south (Azimuth 0°, Tilt 90°)</option>
                     <option value="east">east (Azimuth -90°, Tilt 90°)</option>
                     <option value="west">west (Azimuth +90°, Tilt 90°)</option>
@@ -80,7 +82,8 @@ export default function ConfiguratorStep3Page() {
                   <button
                     key={g.id}
                     type="button"
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-primary-fixed/10 transition-all text-center group"
+                    onClick={() => setDesign({ glazing: g.id as typeof d.glazing, ...(g.id === "none" ? { window_count: "0" } : {}) })}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center group ${d.glazing === g.id ? "border-primary bg-primary-fixed/10" : "border-outline-variant hover:border-primary"}`}
                   >
                     <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors">
                       {g.id === "none" ? "block" : "window"}
@@ -135,13 +138,13 @@ export default function ConfiguratorStep3Page() {
                 </Field>
 
                 <Field label="Initial Indoor Temp (T_initial)" hint="Range: -10°C to +22°C">
-                  <NumberInput id="t_init" defaultValue="5.0" min={-10} max={22} step={0.5} unit="°C" />
+                  <NumberInput id="t_init" value={d.initial_temperature_c} onChange={(v) => setDesign({ initial_temperature_c: v })} min={-10} max={22} step={0.5} unit="°C" />
                 </Field>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 pt-3 border-t border-surface-container">
                 <Field label="Infiltration Rate (ACH)" hint="Air Changes/Hour (0.5 – 2.0 ACH)">
-                  <NumberInput id="ach" defaultValue="0.8" min={0.5} max={2.0} step={0.1} unit="ACH" />
+                  <NumberInput id="ach" value={d.air_changes_per_hour} onChange={(v) => setDesign({ air_changes_per_hour: v })} min={0.5} max={2.0} step={0.1} unit="ACH" />
                 </Field>
 
                 <Field label="Contents Mass (kg)" hint="Bunks, gear, equipment">
@@ -157,8 +160,8 @@ export default function ConfiguratorStep3Page() {
                 <div className="flex items-center gap-2 px-3 py-2 bg-primary-fixed/20 rounded-lg">
                   <span className="material-symbols-outlined text-[16px] text-thermal">thermostat</span>
                   <span className="font-body-sm text-[11px] text-on-surface">
-                    Continuous internal biological heat load: <span className="font-data font-semibold text-thermal">{(Number(m.occupants) * 120).toFixed(0)} W</span>
-                    <span className="text-on-surface-variant"> (@ 120 W/soldier metabolic output)</span>
+                    Continuous internal biological heat load: <span className="font-data font-semibold text-thermal">{(Number(m.occupants) * 75).toFixed(0)} W</span>
+                    <span className="text-on-surface-variant"> (@ the RC engine?s 75 W/person sensible-gain model)</span>
                   </span>
                 </div>
               )}

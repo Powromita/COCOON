@@ -17,7 +17,17 @@ const SHELTER_SHAPES = [
 export default function ConfiguratorStep2Page() {
   const { draft, update, errors } = useWizard();
   const c = draft.constraints;
+  const d = draft.design;
   const e = errors.constraints;
+  const setDesign = (patch: Partial<typeof d>) => update("design", patch);
+  const setGeometry = (patch: Partial<typeof d>) => {
+    const next = { ...d, ...patch };
+    const area = Number(next.length_m) * Number(next.width_m);
+    setDesign(patch);
+    // Fixed dimensions are the per-floor footprint. Never leave the cap below them.
+    if (Number.isFinite(area) && area > Number(c.maximum_footprint_m2))
+      update("constraints", { maximum_footprint_m2: String(Math.ceil(area * 10) / 10) });
+  };
   const set = (patch: Partial<typeof c>) => update("constraints", patch);
 
   const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -46,7 +56,8 @@ export default function ConfiguratorStep2Page() {
                 >
                   <NumberInput
                     id="length"
-                    defaultValue="6.0"
+                    value={d.length_m}
+                    onChange={(v) => setGeometry({ length_m: v })}
                     min={3.5}
                     max={7.0}
                     step={0.1}
@@ -62,7 +73,8 @@ export default function ConfiguratorStep2Page() {
                 >
                   <NumberInput
                     id="width"
-                    defaultValue="4.0"
+                    value={d.width_m}
+                    onChange={(v) => setGeometry({ width_m: v })}
                     min={2.5}
                     max={5.0}
                     step={0.1}
@@ -78,7 +90,8 @@ export default function ConfiguratorStep2Page() {
                 >
                   <NumberInput
                     id="height"
-                    defaultValue="2.8"
+                    value={d.height_m}
+                    onChange={(v) => setDesign({ height_m: v })}
                     min={2.3}
                     max={3.0}
                     step={0.1}
@@ -103,7 +116,7 @@ export default function ConfiguratorStep2Page() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-on-surface-variant">Aspect Ratio (L / W)</span>
-                    <span className="text-sm font-bold text-navy font-data">1.50</span>
+                    <span className="text-sm font-bold text-navy font-data">{(Number(d.length_m) / Number(d.width_m)).toFixed(2)}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-on-surface-variant">Area-to-Volume (A/V Ratio)</span>
@@ -118,7 +131,7 @@ export default function ConfiguratorStep2Page() {
                   contractKey="maximum_footprint_m2"
                   htmlFor="footprint"
                   error={e.maximum_footprint_m2}
-                  hint="Maximum site boundary allocation"
+                  hint="Automatically raised to the fixed length ? width when needed"
                 >
                   <NumberInput
                     id="footprint"
@@ -172,7 +185,9 @@ export default function ConfiguratorStep2Page() {
                   <button
                     key={shape.value}
                     type="button"
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-primary-fixed/10 transition-all text-center group"
+                    disabled={shape.value !== "rectangular"}
+                    title={shape.value === "rectangular" ? "Supported by the current physical generator" : "Not supported by the physical generator yet"}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center group ${shape.value === "rectangular" ? "border-primary bg-primary-fixed/10" : "border-outline-variant opacity-50 cursor-not-allowed"}`}
                   >
                     <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors">
                       {shape.value === "rectangular" ? "crop_square" :
@@ -243,13 +258,13 @@ export default function ConfiguratorStep2Page() {
                 <span className="text-xs font-bold text-navy uppercase tracking-wider">Multi-Layer Assembly Thickness:</span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Field label="Wall Assembly Thickness" hint="Typical range: 250 – 650 mm">
-                    <NumberInput id="wall_thick" defaultValue="350" min={250} max={650} step={10} unit="mm" />
+                    <NumberInput id="wall_thick" value={d.wall_thickness_mm} onChange={(v) => setDesign({ wall_thickness_mm: v })} min={250} max={650} step={10} unit="mm" />
                   </Field>
                   <Field label="Roof Assembly Thickness" hint="Typical range: 180 – 450 mm">
-                    <NumberInput id="roof_thick" defaultValue="280" min={180} max={450} step={10} unit="mm" />
+                    <NumberInput id="roof_thick" value={d.roof_thickness_mm} onChange={(v) => setDesign({ roof_thickness_mm: v })} min={180} max={450} step={10} unit="mm" />
                   </Field>
                   <Field label="Floor / Plinth Thickness" hint="Typical range: 150 – 400 mm">
-                    <NumberInput id="floor_thick" defaultValue="220" min={150} max={400} step={10} unit="mm" />
+                    <NumberInput id="floor_thick" value={d.floor_thickness_mm} onChange={(v) => setDesign({ floor_thickness_mm: v })} min={150} max={400} step={10} unit="mm" />
                   </Field>
                 </div>
               </div>

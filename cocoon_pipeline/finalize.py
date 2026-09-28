@@ -201,6 +201,9 @@ def build_final_report(requirements, cfg, opt, weather, site_used, evaluator, ma
     ranking = opt.ranking.to_dict()
     picks_summary = {n: {"design_id": p["design_id"], "status": p["status"], "reason": p["reason"]} for n, p in ranking["picks"].items()}
     outcome = opt.outcome(win)
+    recommendation_state = ("VALIDATED_BY_ANSYS"
+                            if validation.get("state") == "VALIDATED_BY_ANSYS" and validation.get("design_id") == win
+                            else vc.recommendation_state.value if vc.recommendation_state else None)
 
     report = {
         "report_type": "cocoon_final_design_report", "schema": "PROPOSED cocoon.final_design_report 0 (not an M0 contract)",
@@ -215,7 +218,7 @@ def build_final_report(requirements, cfg, opt, weather, site_used, evaluator, ma
             "ground_temperature_c": vsettings.ground_temperature_c, "timestep_seconds": vsettings.timestep_seconds},
         "input": {"site": requirements.site.model_dump(mode="json"), "mission": requirements.mission.model_dump(mode="json"),
                   "constraints": requirements.constraints.model_dump(mode="json"), "weather_site_used": site_used},
-        "recommendation": {"design_id": win, "recommendation_state": vc.recommendation_state.value if vc.recommendation_state else None,
+        "recommendation": {"design_id": win, "recommendation_state": recommendation_state,
                            "picked_as": list(outcome.picked_as), "why": ranking["picks"]["best_overall"].get("explanation", [])},
         "design": _design_section(cand.building, materials, cand, vc),
         "performance": {"free_floating": _perf(ev.free_floating), "ideal_load": _perf(ev.ideal_load),

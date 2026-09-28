@@ -192,3 +192,45 @@ def test_m4_vs_ansys_comparison_on_an_evidence_job():
         pytest.skip("evidence job folder not present")
     r = compare_m4_with_ansys(Path(jobs[0]))
     assert r["compared"] and r["pooled"]["mae_c"] < 0.6 and "heating and heater control" in r["not_covered"]
+
+
+def test_staged_rc_shortlists_before_full_verification(store):
+    cfg = PipelineConfig(count=10, weather_store=store, final_report=False, validation_strategy="staged",
+                         shortlist_size=5, reliability_designs=3, rc_workers=4, use_ml="off")
+    result = run_pipeline(requirements(), cfg)
+    opt = result.optimization
+    assert opt.screening.summary()["fast_rc_shortlist"] == 5
+    assert opt.screening.summary()["fast_rc_discarded_over_limit"] == 5
+    assert opt.runs["verification"] == 15                         # three full modes x five finalists
+    assert opt.runs["reliability"] == 54                          # nine cases x two modes x three designs
+    assert len(opt.verified) == 5
+    screened = [o for o in opt.outcomes if o.status == "screened_out_by_fast_rc"]
+    assert len(screened) == 5 and all(o.recommendation_state is None and not o.objectives for o in screened)
+
+
+def test_staged_config_rejects_invalid_bounds():
+    with pytest.raises(ValueError, match="shortlist_size"):
+        PipelineConfig(count=10, validation_strategy="staged", shortlist_size=20)
+    with pytest.raises(ValueError, match="reliability_designs"):
+        PipelineConfig(count=20, validation_strategy="staged", shortlist_size=5, reliability_designs=6)
+
+def test_ansys_completion_requires_comparison_acceptance(monkeypatch, tmp_path):
+    from cocoon_pipeline import ansys_stage
+
+    class Weather:
+        hourly_data = list(range(12))
+        def model_copy(self, update):
+            return self
+
+    monkeypatch.setattr(ansys_stage.ansys_hook, "submit", lambda *a, **k: {
+        "state": ansys_stage.ansys_hook.STATE_QUEUED, "job_id": "ans_test", "job_dir": str(tmp_path),
+        "job_status": "COMPLETED", "error_reason": None})
+    monkeypatch.setattr(ansys_stage, "compare_m4_with_ansys", lambda p: {
+        "compared": True, "pooled": {"mae_c": 1.0, "rmse_c": 1.5, "max_abs_c": 3.0}})
+    accepted = ansys_stage.run_ansys_validation(object(), Weather(), object(), hours=8, wait=True)
+    assert accepted["state"] == "VALIDATED_BY_ANSYS" and accepted["accepted"] is True
+
+    monkeypatch.setattr(ansys_stage, "compare_m4_with_ansys", lambda p: {
+        "compared": True, "pooled": {"mae_c": 3.0, "rmse_c": 3.5, "max_abs_c": 6.0}})
+    rejected = ansys_stage.run_ansys_validation(object(), Weather(), object(), hours=8, wait=True)
+    assert rejected["state"] == "RC_ONLY_ANSYS_FAILED" and rejected["accepted"] is False

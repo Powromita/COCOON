@@ -16,6 +16,7 @@ import {
   MISSION_TYPES,
   ROOM_TYPES,
   WEATHER_SOURCES,
+  toDesignOptions,
   toRequirements,
   toRunOptions,
   validateRun,
@@ -24,6 +25,7 @@ import {
 import { T } from "@/lib/i18n";
 import { ROUTES, configuratorStepRoute, type ConfiguratorStep } from "@/lib/routes";
 import { CURRENT_USER, canUseEngineeringMode } from "@/lib/session";
+import { LATEST_OPTIMIZATION_STORAGE_KEY, preflightOptimization, startOptimization, type OptimizationRequest } from "@/lib/api";
 
 const LAST_RUN_KEY = "cocoon.configurator.lastLaunch";
 const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -115,6 +117,7 @@ export default function ConfiguratorStep5Page() {
   const router = useRouter();
   const { draft, update, errors } = useWizard();
   const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState<string | null>(null);
   const engineering = canUseEngineeringMode(CURRENT_USER.role);
   const runErrors = validateRun(draft.run, engineering);
 
@@ -133,16 +136,45 @@ export default function ConfiguratorStep5Page() {
     URL.revokeObjectURL(url);
   }
 
-  function launch() {
+  async function launch() {
     if (!allValid) return;
     setLaunching(true);
+    setLaunchError(null);
     try { localStorage.setItem(LAST_RUN_KEY, json); } catch { /* storage unavailable */ }
-    setTimeout(() => router.push(ROUTES.candidateTelemetry), 800);
+    try {
+      // No project-creation endpoint yet (backend §16.2 is unimplemented) — mint a client-side id so
+      // RequirementsContract.project_id (required, must start with "prj_") validates.
+      const requirements = { ...payload.requirements, project_id: `prj_${Date.now().toString(36)}` };
+      const request: OptimizationRequest = {
+        requirements,
+        count: Number(payload.run_options.candidate_count ?? 100),
+        validate_with_ansys: draft.run.run_ansys,
+        ansys_designs: draft.run.ansys_designs,
+        validation_strategy: "staged",
+        shortlist_size: 20,
+        reliability_designs: 5,
+        rc_workers: 4,
+        baseline_economics: true,
+        design_options: toDesignOptions(draft),
+        run_options: {
+          hvac_mode: payload.run_options.hvac_mode,
+          heater_benchmark: payload.run_options.heater_benchmark,
+        },
+      };
+      await preflightOptimization(request);
+      const res = await startOptimization(request);
+      localStorage.setItem(LATEST_OPTIMIZATION_STORAGE_KEY, res.optimization_id);
+      router.push(`${ROUTES.candidateTelemetry}?opt=${res.optimization_id}`);
+    } catch (err) {
+      setLaunching(false);
+      setLaunchError(err instanceof Error ? err.message : "Could not reach the COCOON backend. Is it running on :8000?");
+    }
   }
 
   const s = draft.site;
   const m = draft.mission;
   const c = draft.constraints;
+  const d = draft.design;
   const floors = FLOOR_OPTIONS.find((f) => f.value === c.maximum_floors)?.label ?? "";
   const hvacLabel = HVAC_MODES.find((h) => h.id === draft.run.hvac_mode)?.label ?? draft.run.hvac_mode;
 
@@ -206,26 +238,26 @@ export default function ConfiguratorStep5Page() {
               </SummaryCard>
 
               <SummaryCard step={2} title="2. Geometry & Spatial Dimensions" icon="architecture" issues={count("constraints")}>
-                <Row label="Dimensions (L × W × H)" icon="square_foot" value={<span className="font-data">6.0m × 4.0m × 2.8m</span>} />
-                <Row label="Floor Area & Volume" icon="deployed_code" value={<span className="font-data">24.0 m² · 67.2 m³ (A/V: 1.19)</span>} />
+                <Row label="Dimensions (L ? W ? H)" icon="square_foot" value={<span className="font-data">{d.length_m}m ? {d.width_m}m ? {d.height_m}m</span>} />
+                <Row label="Floor Area & Volume" icon="deployed_code" value={<span className="font-data">{(Number(d.length_m) * Number(d.width_m)).toFixed(1)} m? ? {(Number(d.length_m) * Number(d.width_m) * Number(d.height_m)).toFixed(1)} m?</span>} />
                 <Row label="Number of Floors" icon="layers" value={<T>{floors}</T>} />
                 <Row label="Capital Budget Limit" icon="payments" value={<span className="font-data">{Number(c.maximum_capex_inr) > 0 ? inr.format(Number(c.maximum_capex_inr)) : "—"}</span>} />
-                <Row label="Envelope Thickness" icon="straighten" value={<span className="font-data">Wall 350mm · Roof 280mm</span>} />
+                <Row label="Envelope Thickness" icon="straighten" value={<span className="font-data">Wall {d.wall_thickness_mm}mm ? Roof {d.roof_thickness_mm}mm ? Floor {d.floor_thickness_mm}mm</span>} />
                 <Row label="Selected Materials" icon="category" value={<span className="text-right"><Labels ids={c.available_material_ids} from={MATERIALS} /></span>} />
               </SummaryCard>
 
               <SummaryCard step={3} title="3. Windows, Doors & Apertures" icon="window" issues={0}>
-                <Row label="Window Count & Size" icon="grid_view" value={<span className="font-data">4 Units · 1.2m × 1.5m</span>} />
-                <Row label="Glazing Area & WWR" icon="aspect_ratio" value={<span className="font-data">7.20 m² · WWR 14.5%</span>} />
-                <Row label="Glazing Quality & Tilt" icon="solar_power" value={<span className="font-data">Triple Argon · South (0°)</span>} />
+                <Row label="Window Count & Size" icon="grid_view" value={<span className="font-data">{d.window_count} units ? {d.window_width_m}m ? {d.window_height_m}m</span>} />
+                <Row label="Glazing Area & WWR" icon="aspect_ratio" value={<span className="font-data">{(Number(d.window_count) * Number(d.window_width_m) * Number(d.window_height_m)).toFixed(2)} m?</span>} />
+                <Row label="Glazing Quality & Tilt" icon="solar_power" value={<span className="font-data">{d.glazing} ? {d.window_orientation}</span>} />
                 <Row label="Entrance Doors & Airlock" icon="door_front" value={<span className="font-data">1 Insulated Door + Vestibule</span>} />
               </SummaryCard>
 
               <SummaryCard step={3} title="4. Internal Loads & Operating Scenario" icon="groups" issues={count("mission")}>
                 <Row label="Mission / Use Type" icon="flag" value={<Labels ids={[m.type]} from={MISSION_TYPES} />} />
                 <Row label="Occupancy & Metabolic Load" icon="person" value={<span className="font-data">{m.occupants} Troops · 120 W/soldier</span>} />
-                <Row label="Initial Temp (T_initial)" icon="thermostat" value={<span className="font-data">+5.0°C</span>} />
-                <Row label="Infiltration Rate (ACH)" icon="air" value={<span className="font-data">0.8 ACH</span>} />
+                <Row label="Initial Temp (T_initial)" icon="thermostat" value={<span className="font-data">{d.initial_temperature_c}?C</span>} />
+                <Row label="Infiltration Rate (ACH)" icon="air" value={<span className="font-data">{d.air_changes_per_hour} ACH</span>} />
                 <Row label="Comfort Target" icon="thermostat_auto" value={<span className="font-data">{m.target_temperature_c}°C (Max {m.maximum_unmet_hours} hr/wk unmet)</span>} />
               </SummaryCard>
 
@@ -234,6 +266,8 @@ export default function ConfiguratorStep5Page() {
                 <Row label="Simulation Mode" icon="settings" value={<T>{hvacLabel}</T>} />
                 <Row label="Lifecycle Price Scenario" icon="payments" value={<Labels ids={[draft.economic_assumption_set_id]} from={ECONOMIC_ASSUMPTION_SETS} />} />
                 {engineering && <Row label="Candidate Count" icon="data_array" value={<span className="font-data">{draft.run.candidate_count}</span>} />}
+                <Row label="Validation Strategy" icon="filter_alt" value={<span>Staged RC · shortlist 20 · reliability 5</span>} />
+                <Row label="ANSYS Validation" icon="verified" value={<span>{draft.run.run_ansys ? (draft.run.ansys_designs === 1 ? "1 finalist" : "2 finalists") : "Disabled"}</span>} />
               </SummaryCard>
 
             </div>
@@ -269,6 +303,12 @@ export default function ConfiguratorStep5Page() {
                   <div className="flex items-start gap-2 p-3 rounded-xl bg-error-container/80 text-on-error-container font-body-sm text-body-sm">
                     <span className="material-symbols-outlined text-[16px] shrink-0">error</span>
                     <T>Complete all steps marked "to fix" before launching.</T>
+                  </div>
+                )}
+                {launchError && (
+                  <div className="flex items-start gap-2 p-3 rounded-xl bg-error-container/80 text-on-error-container font-body-sm text-body-sm">
+                    <span className="material-symbols-outlined text-[16px] shrink-0">error</span>
+                    <span>{launchError}</span>
                   </div>
                 )}
                 <button

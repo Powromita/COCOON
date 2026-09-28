@@ -104,7 +104,9 @@ export default function ConfiguratorStep4Page() {
                       <input
                         type="checkbox"
                         role="switch"
-                        defaultChecked={flag.default}
+                        {...(flag.id === "run_ansys"
+                          ? { checked: draft.run.run_ansys, onChange: (e) => update("run", { run_ansys: e.target.checked }) }
+                          : { defaultChecked: flag.default })}
                         disabled={flag.required}
                         className="peer sr-only"
                       />
@@ -114,6 +116,20 @@ export default function ConfiguratorStep4Page() {
                   </label>
                 ))}
               </div>
+              {draft.run.run_ansys && (
+                <div className="mt-4 p-4 rounded-xl bg-surface-container-low border border-outline-variant">
+                  <Field label="ANSYS finalists" hint="Validate the recommendation only, or one materially different alternative too">
+                    <select
+                      className="w-full h-9 px-3 bg-surface-container-lowest border border-line rounded-lg text-xs text-on-surface font-medium"
+                      value={draft.run.ansys_designs}
+                      onChange={(e) => update("run", { ansys_designs: Number(e.target.value) as 1 | 2 })}
+                    >
+                      <option value={1}>1 — recommended design</option>
+                      <option value={2}>2 — recommendation and distinct alternative</option>
+                    </select>
+                  </Field>
+                </div>
+              )}
             </SectionCard>
 
             {/* Auxiliary Heating Power & Fuel */}
