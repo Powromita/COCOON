@@ -23,6 +23,7 @@ AUTH_MODE is disabled in this build (local development).
 import hashlib
 import json
 import re
+import shutil
 import threading
 import time
 import uuid
@@ -47,7 +48,7 @@ from optimization import OptimizationSettings, to_error_envelope as m6_envelope
 from .. import settings
 
 router = APIRouter(prefix="/api/v1", tags=["pipeline"])
-_OPT_ID = re.compile(r"^opt_[0-9a-f]{12}$")
+_OPT_ID = re.compile(r"^opt_[A-Za-z0-9_-]+$")
 _SIM_ID = re.compile(r"^sim_[0-9a-f]{12}$")
 _DESIGN_ID = re.compile(r"^des_[A-Za-z0-9_]+$")
 _pool = ThreadPoolExecutor(max_workers=settings.MAX_PIPELINE_JOBS, thread_name_prefix="cocoon-opt")
@@ -279,6 +280,8 @@ def _generation_options(options: DesignOptions) -> GenerationOptions:
 
 
 class OptimizationBody(BaseModel):
+    name: str | None = None
+    project_name: str | None = None
     requirements: RequirementsContract
     count: int = Field(default=20, ge=1, le=200)
     seed: int = 42
@@ -303,7 +306,7 @@ def _preflight(body: OptimizationBody) -> dict:
         if area > cap + 1e-9:
             return {"error": ErrorEnvelope(error=ErrorDetail(
                 code=ErrorCode.VALIDATION_ERROR,
-                message=f"fixed geometry needs {area:.1f} m? per floor, but the maximum footprint is {cap:.1f} m?",
+                message=f"fixed geometry needs {area:.1f} m² per floor, but the maximum footprint is {cap:.1f} m²",
                 details={"length_m": dimensions.length_m, "width_m": dimensions.width_m,
                          "fixed_footprint_m2": area, "maximum_footprint_m2": cap},
                 trace_id=str(uuid.uuid4()), retryable=False)).model_dump(mode="json")}
@@ -402,8 +405,9 @@ def create_optimization(body: OptimizationBody, response: Response,
     d = _run_dir(opt_id)
     d.mkdir(parents=True)
     _atomic(d / "request.json", body.model_dump_json(indent=1))
+    custom_name = (body.name or body.project_name or "").strip() or None
     _set_status(d, status="queued", optimization_id=opt_id, created_at=datetime.now(timezone.utc).isoformat(),
-                project_id=body.requirements.project_id, count=body.count, seed=body.seed)
+                project_id=body.requirements.project_id, project_name=custom_name, name=custom_name, count=body.count, seed=body.seed)
     if idem is not None:
         _atomic(idem, json.dumps({"optimization_id": opt_id, "request_sha256": body_hash}))
     with _lock:
@@ -463,8 +467,11 @@ def _project_from_run(directory: Path, status: dict) -> dict | None:
             pass
     design = report.get("design", {})
     materials = [assembly.get("name") or assembly.get("id") for assembly in design.get("assemblies", [])]
+    custom_name = status.get("project_name") or status.get("name") or request.get("project_name") or request.get("name")
     return {
         "project_id": project_id,
+        "name": custom_name,
+        "project_name": custom_name,
         "optimization_id": status.get("optimization_id", directory.name),
         "status": status.get("status", "unknown"),
         "phase": status.get("phase"),
@@ -503,11 +510,148 @@ def list_projects():
             projects[project["project_id"]] = project
     return {"projects": sorted(projects.values(), key=lambda project: project.get("created_at") or "", reverse=True)}
 
+
+def _safe_remove_dir(d: Path) -> bool:
+    """Safely remove a directory on Windows/OneDrive by stripping read-only attributes with retries."""
+    import os
+    import stat
+
+    def _make_writable(path: str | Path):
+        try:
+            os.chmod(path, stat.S_IWRITE | stat.S_IREAD)
+        except Exception:
+            pass
+
+    def _on_error(func, path, exc_info):
+        _make_writable(path)
+        try:
+            func(path)
+        except Exception:
+            pass
+
+    if not d.exists():
+        return True
+
+    for _ in range(4):
+        try:
+            for root, dirs, files in os.walk(d):
+                for dir_name in dirs:
+                    _make_writable(os.path.join(root, dir_name))
+                for file_name in files:
+                    _make_writable(os.path.join(root, file_name))
+            _make_writable(d)
+            shutil.rmtree(d, onexc=_on_error)
+            if not d.exists():
+                return True
+        except Exception:
+            time.sleep(0.08)
+
+    try:
+        shutil.rmtree(d, ignore_errors=True)
+    except Exception:
+        pass
+    return not d.exists()
+
+
+@router.delete("/projects/{project_id}")
+def delete_project(project_id: str):
+    """Delete all persisted optimization runs associated with a project."""
+    matched_dirs: list[Path] = []
+    matched_opt_ids: list[str] = []
+    for directory in settings.PIPELINE_RUNS_DIR.iterdir():
+        if not directory.is_dir() or not _OPT_ID.match(directory.name):
+            continue
+        cur_proj_id = None
+        status_path = directory / "status.json"
+        if status_path.is_file():
+            try:
+                st = json.loads(_read(status_path))
+                cur_proj_id = st.get("project_id")
+            except Exception:
+                pass
+        if not cur_proj_id:
+            req_path = directory / "request.json"
+            if req_path.is_file():
+                try:
+                    req_data = json.loads(_read(req_path))
+                    cur_proj_id = req_data.get("requirements", {}).get("project_id")
+                except Exception:
+                    pass
+        if cur_proj_id == project_id or directory.name == project_id:
+            matched_dirs.append(directory)
+            matched_opt_ids.append(directory.name)
+
+    if not matched_dirs:
+        return _err(404, ErrorCode.MISSING_REFERENCE, f"unknown project '{project_id}'")
+
+    with _lock:
+        for opt_id in matched_opt_ids:
+            _live.discard(opt_id)
+
+    idem_dir = settings.PIPELINE_RUNS_DIR / "_idempotency"
+    if idem_dir.is_dir():
+        for f in idem_dir.glob("*.json"):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                if data.get("optimization_id") in matched_opt_ids:
+                    f.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+    for d in matched_dirs:
+        _safe_remove_dir(d)
+
+    return {"deleted": True, "project_id": project_id, "deleted_runs_count": len(matched_dirs), "deleted_optimizations": matched_opt_ids}
+
+
+class RenameProjectBody(BaseModel):
+    name: str
+
+
+@router.patch("/projects/{project_id}")
+@router.put("/projects/{project_id}/rename")
+def rename_project(project_id: str, body: RenameProjectBody):
+    """Update custom name for a project across all its runs."""
+    new_name = body.name.strip()
+    if not new_name:
+        return _err(422, ErrorCode.VALIDATION_ERROR, "Project name cannot be empty")
+    updated = 0
+    for directory in settings.PIPELINE_RUNS_DIR.iterdir():
+        if not directory.is_dir() or not _OPT_ID.match(directory.name):
+            continue
+        status_path = directory / "status.json"
+        if status_path.is_file():
+            try:
+                st = json.loads(_read(status_path))
+                if st.get("project_id") == project_id or directory.name == project_id:
+                    st["project_name"] = new_name
+                    st["name"] = new_name
+                    _atomic(status_path, json.dumps(st, indent=2))
+                    updated += 1
+            except Exception:
+                pass
+    if updated == 0:
+        return _err(404, ErrorCode.MISSING_REFERENCE, f"Project '{project_id}' not found")
+    return {"success": True, "project_id": project_id, "name": new_name}
+
+
 def _status(opt_id: str):
     d = _run_dir(opt_id)
-    if d is None or not (d / "status.json").is_file():
+    if d is None:
         return None, None
-    st = json.loads(_read(d / "status.json"))
+    status_file = d / "status.json"
+    if status_file.is_file():
+        st = json.loads(_read(status_file))
+    elif (d / "final_report.json").is_file():
+        st = {
+            "optimization_id": opt_id,
+            "status": "completed",
+            "phase": "finished",
+            "count": 1,
+            "recommended_design_id": "des_recommended",
+        }
+    else:
+        return None, None
     with _lock:
         alive = opt_id in _live
     if st.get("status") in ("queued", "running") and not alive:        # the server restarted while it was running
@@ -524,6 +668,29 @@ def get_optimization(optimization_id: str):
     if st["status"] == "completed" and (d / "result.json").is_file():
         return {**st, "result": json.loads(_read(d / "result.json"))}
     return st
+
+
+@router.delete("/optimizations/{optimization_id}")
+def delete_optimization(optimization_id: str):
+    """Delete a persisted optimization run and all its associated artifacts."""
+    d = _run_dir(optimization_id)
+    if d is None or not d.is_dir():
+        return _err(404, ErrorCode.MISSING_REFERENCE, f"unknown optimization '{optimization_id}'")
+    with _lock:
+        _live.discard(optimization_id)
+    idem_dir = settings.PIPELINE_RUNS_DIR / "_idempotency"
+    if idem_dir.is_dir():
+        for f in idem_dir.glob("*.json"):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                if data.get("optimization_id") == optimization_id:
+                    f.unlink(missing_ok=True)
+            except Exception:
+                pass
+    success = _safe_remove_dir(d)
+    if not success and d.exists():
+        return _err(500, ErrorCode.VALIDATION_ERROR, f"failed to delete optimization directory '{optimization_id}'")
+    return {"deleted": True, "optimization_id": optimization_id}
 
 
 def _result(optimization_id: str):

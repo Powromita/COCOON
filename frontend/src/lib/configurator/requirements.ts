@@ -30,6 +30,7 @@ export type WindowSpec = {
 };
 
 export type WizardDraft = {
+  name?: string;
   site: {
     latitude_deg: string;
     longitude_deg: string;
@@ -188,6 +189,7 @@ export function syncWindows(count: number, existing: WindowSpec[] = []): WindowS
 }
 
 export const DEFAULT_DRAFT: WizardDraft = {
+  name: "Ladakh DBO Habitat",
   site: {
     latitude_deg: "34.1526",
     longitude_deg: "77.5771",

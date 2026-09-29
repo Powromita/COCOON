@@ -12,7 +12,7 @@ export default function CandidateNotFound() {
           title="Candidate not found"
           actions={
             <Button href={ROUTES.candidateTelemetry} icon="arrow_back">
-              Back to Candidate Telemetry
+              Back to Simulation Results
             </Button>
           }
         >

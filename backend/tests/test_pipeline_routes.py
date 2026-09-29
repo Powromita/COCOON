@@ -189,3 +189,45 @@ def test_request_validation():
     assert client.post("/api/v1/optimizations", json={"requirements": requirements(), "count": 0}).status_code == 422
     assert client.post("/api/v1/optimizations", json={"count": 3}).status_code == 422
     assert client.post("/api/v1/generate-designs", json={"requirements": requirements(), "count": 100000}).status_code == 422
+
+
+def test_delete_optimization_and_project():
+    # 1. Create a dummy run directory
+    d = settings.PIPELINE_RUNS_DIR / "opt_dddddddddddd"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "status.json").write_text(json.dumps({
+        "optimization_id": "opt_dddddddddddd",
+        "project_id": "prj_delete_test",
+        "status": "completed",
+        "created_at": "2026-09-29T12:00:00Z"
+    }), encoding="utf-8")
+
+    # 2. Test deleting single optimization
+    del_res = client.delete("/api/v1/optimizations/opt_dddddddddddd")
+    assert del_res.status_code == 200
+    assert del_res.json()["deleted"] is True
+    assert not d.exists()
+
+    # 3. Test deleting non-existent optimization
+    assert client.delete("/api/v1/optimizations/opt_dddddddddddd").status_code == 404
+
+    # 4. Create dummy run for project deletion test
+    d2 = settings.PIPELINE_RUNS_DIR / "opt_eeeeeeeeeeee"
+    d2.mkdir(parents=True, exist_ok=True)
+    (d2 / "status.json").write_text(json.dumps({
+        "optimization_id": "opt_eeeeeeeeeeee",
+        "project_id": "prj_batch_delete",
+        "status": "completed",
+        "created_at": "2026-09-29T12:00:00Z"
+    }), encoding="utf-8")
+
+    # 5. Delete project
+    del_prj = client.delete("/api/v1/projects/prj_batch_delete")
+    assert del_prj.status_code == 200
+    assert del_prj.json()["deleted"] is True
+    assert del_prj.json()["deleted_runs_count"] == 1
+    assert not d2.exists()
+
+    # 6. Deleting non-existent project returns 404
+    assert client.delete("/api/v1/projects/prj_batch_delete").status_code == 404
+

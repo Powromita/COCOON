@@ -62,13 +62,14 @@ export type NavItem = {
   href: string;
   /** Path prefix that marks this item active (covers nested routes). */
   match: string;
+  icon: string;
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: ROUTES.dashboard, match: "/dashboard" },
-  { label: "Projects", href: ROUTES.projects, match: "/projects" },
-  { label: "Shelter Configurator", href: ROUTES.shelterConfigurator.step1, match: "/shelter-configurator" },
-  { label: "Candidate Telemetry", href: ROUTES.candidateTelemetry, match: "/candidate-telemetry" },
+  { label: "Dashboard", href: ROUTES.dashboard, match: "/dashboard", icon: "dashboard" },
+  { label: "Projects", href: ROUTES.projects, match: "/projects", icon: "folder_special" },
+  { label: "Shelter Configurator", href: ROUTES.shelterConfigurator.step1, match: "/shelter-configurator", icon: "tune" },
+  { label: "Simulation Results", href: ROUTES.candidateTelemetry, match: "/candidate-telemetry", icon: "monitoring" },
 ];
 
 export function isNavItemActive(item: NavItem, pathname: string): boolean {

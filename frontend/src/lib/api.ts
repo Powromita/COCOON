@@ -62,6 +62,8 @@ export type OptimizationListItem = {
 };
 export type ProjectSummary = {
   project_id: string;
+  name?: string | null;
+  project_name?: string | null;
   optimization_id: string;
   status: "queued" | "running" | "completed" | "failed";
   phase?: string | null;
@@ -113,6 +115,7 @@ export type FinalReport = {
     zones: { id: string; type: string; floor: number; size_m: { length_m: number; width_m: number; height_m: number }; heated: boolean }[];
     assemblies: { id: string; name: string; used_for: string[]; u_value_w_m2k: number; layers_inner_to_outer: { material: string; name: string; thickness_mm: number }[] }[];
     quantities: Record<string, unknown> | null;
+    heater_plan?: { capacity_kw_each: number; fuel?: string | null; zone_ids: string[] } | null;
   };
   performance: {
     conditioned_with_sized_heater: { summary: Record<string, number> };
@@ -129,7 +132,7 @@ export type FinalReport = {
   } | null;
   alternatives: CandidateOutcome[];
   validation: { state: string; [k: string]: unknown };
-  input: { site: Record<string, unknown>; mission: Record<string, unknown> };
+  input: { site: Record<string, unknown>; mission: Record<string, unknown>; constraints?: { heater_fuels?: string[]; [k: string]: unknown } };
   provenance: { weather_snapshot_id: string; setpoint_c: number };
 };
 
@@ -149,6 +152,7 @@ export type RunOptions = {
 };
 
 export type OptimizationRequest = {
+  name?: string;
   requirements: unknown;
   count?: number;
   seed?: number;
@@ -186,6 +190,15 @@ export function listOptimizations(): Promise<{ optimizations: OptimizationListIt
 }
 export function listProjects(): Promise<{ projects: ProjectSummary[] }> {
   return apiFetch("/api/v1/projects");
+}
+export function deleteOptimization(id: string): Promise<{ deleted: boolean; optimization_id: string }> {
+  return apiFetch(`/api/v1/optimizations/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+export function deleteProject(id: string): Promise<{ deleted: boolean; project_id: string; deleted_runs_count: number }> {
+  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+export function renameProject(id: string, name: string): Promise<{ success: boolean; project_id: string; name: string }> {
+  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ name }) });
 }
 export function getOptimization(id: string): Promise<OptimizationStatus> {
   return apiFetch(`/api/v1/optimizations/${id}`);

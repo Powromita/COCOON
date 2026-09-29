@@ -235,15 +235,132 @@ function ZoneLabel({
   );
 }
 
-/** Controls camera position smoothly across modes and reset triggers */
+
+function GroundCompass({
+  position,
+  radius,
+  orientationDeg = 180,
+}: {
+  position: [number, number, number];
+  radius: number;
+  orientationDeg?: number;
+}) {
+  const r = Math.max(radius, 2.2);
+  const needleLen = r * 0.85;
+  const needleWidth = r * 0.16;
+
+  return (
+    <group position={position}>
+      {/* Outer Compass Dial Ring on ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <ringGeometry args={[r * 0.94, r, 48]} />
+        <meshBasicMaterial color="#334155" side={THREE.DoubleSide} transparent opacity={0.65} />
+      </mesh>
+
+      {/* Inner Accent Ring */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]}>
+        <ringGeometry args={[r * 0.5, r * 0.53, 36]} />
+        <meshBasicMaterial color="#64748b" side={THREE.DoubleSide} transparent opacity={0.45} />
+      </mesh>
+
+      {/* Center Pivot Disk */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
+        <circleGeometry args={[r * 0.14, 24]} />
+        <meshBasicMaterial color="#0f172a" side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* North Needle (Red / Crimson, points to -Z True North) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -needleLen / 2]}>
+        <coneGeometry args={[needleWidth, needleLen, 4]} />
+        <meshStandardMaterial color="#ef4444" roughness={0.3} metalness={0.2} />
+      </mesh>
+
+      {/* South Needle (Amber / Gold, points to +Z True South / Solar Glazing) */}
+      <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.02, needleLen / 2]}>
+        <coneGeometry args={[needleWidth * 0.9, needleLen, 4]} />
+        <meshStandardMaterial color="#f59e0b" roughness={0.3} metalness={0.2} />
+      </mesh>
+
+      {/* East-West Crossbars */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[needleLen * 0.42, 0.016, 0]}>
+        <boxGeometry args={[needleLen * 0.75, 0.03, 0.01]} />
+        <meshBasicMaterial color="#94a3b8" />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-needleLen * 0.42, 0.016, 0]}>
+        <boxGeometry args={[needleLen * 0.75, 0.03, 0.01]} />
+        <meshBasicMaterial color="#94a3b8" />
+      </mesh>
+
+      {/* North 'N' Label */}
+      <Text
+        position={[0, 0.05, -r * 1.25]}
+        fontSize={r * 0.3}
+        color="#ef4444"
+        anchorX="center"
+        anchorY="middle"
+        rotation={[-Math.PI / 2, 0, 0]}
+        outlineWidth={0.035}
+        outlineColor="#ffffff"
+      >
+        N
+      </Text>
+
+      {/* South 'S' Label with Solar Annotation */}
+      <Text
+        position={[0, 0.05, r * 1.28]}
+        fontSize={r * 0.24}
+        color="#d97706"
+        anchorX="center"
+        anchorY="middle"
+        rotation={[-Math.PI / 2, 0, 0]}
+        outlineWidth={0.035}
+        outlineColor="#ffffff"
+      >
+        S (SOLAR)
+      </Text>
+
+      {/* East 'E' Label */}
+      <Text
+        position={[r * 1.25, 0.05, 0]}
+        fontSize={r * 0.24}
+        color="#475569"
+        anchorX="center"
+        anchorY="middle"
+        rotation={[-Math.PI / 2, 0, 0]}
+        outlineWidth={0.03}
+        outlineColor="#ffffff"
+      >
+        E
+      </Text>
+
+      {/* West 'W' Label */}
+      <Text
+        position={[-r * 1.25, 0.05, 0]}
+        fontSize={r * 0.24}
+        color="#475569"
+        anchorX="center"
+        anchorY="middle"
+        rotation={[-Math.PI / 2, 0, 0]}
+        outlineWidth={0.03}
+        outlineColor="#ffffff"
+      >
+        W
+      </Text>
+    </group>
+  );
+}
+
+/** Controls camera position smoothly across modes, reset triggers, and 360-degree rotation */
 function CameraController({
   bbox,
   mode,
   resetTrigger,
+  rotationStep,
 }: {
   bbox: { center: [number, number, number]; maxDim: number };
   mode: ViewMode;
   resetTrigger: number;
+  rotationStep: { angle: number; id: number };
 }) {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
@@ -272,6 +389,22 @@ function CameraController({
     }
   }, [bbox, mode, resetTrigger, camera]);
 
+  // Handle manual 360 step rotation triggers
+  useEffect(() => {
+    if (!controlsRef.current || rotationStep.id === 0) return;
+    const [cx, , cz] = bbox.center;
+    const px = camera.position.x - cx;
+    const pz = camera.position.z - cz;
+    const currentAngle = Math.atan2(px, pz);
+    const radius = Math.sqrt(px * px + pz * pz);
+    const newAngle = currentAngle + rotationStep.angle;
+
+    camera.position.x = cx + radius * Math.sin(newAngle);
+    camera.position.z = cz + radius * Math.cos(newAngle);
+    camera.lookAt(bbox.center[0], bbox.center[1], bbox.center[2]);
+    controlsRef.current.update();
+  }, [rotationStep, bbox, camera]);
+
   return (
     <OrbitControls
       ref={controlsRef}
@@ -279,6 +412,11 @@ function CameraController({
       maxPolarAngle={mode === "floorplan" ? Math.PI / 2 - 0.05 : Math.PI / 2 + 0.05}
       minDistance={1}
       maxDistance={bbox.maxDim * 5}
+      autoRotate={false}
+      enableDamping={true}
+      dampingFactor={0.05}
+      minAzimuthAngle={-Infinity}
+      maxAzimuthAngle={Infinity}
       makeDefault
     />
   );
@@ -288,10 +426,12 @@ function Scene({
   building,
   viewMode,
   resetTrigger,
+  rotationStep,
 }: {
   building: BuildingModel;
   viewMode: ViewMode;
   resetTrigger: number;
+  rotationStep: { angle: number; id: number };
 }) {
   const bbox = useMemo(() => {
     let minX = Infinity, maxX = -Infinity;
@@ -368,6 +508,13 @@ function Scene({
         return <OpeningMesh key={o.id} surface={parent} ratio={o.area_m2 / parent.area_m2} kind={o.opening_type} />;
       })}
 
+      {/* 3D Directional Compass on Ground */}
+      <GroundCompass
+        position={[cx - bbox.maxDim * 0.72, 0.02, cz + bbox.maxDim * 0.72]}
+        radius={Math.max(2.4, bbox.maxDim * 0.22)}
+        orientationDeg={building.orientation_deg}
+      />
+
       {/* Zone Annotations */}
       {Array.from(zoneFloorElevation.entries()).map(([zoneId, elevation]) => (
         <ZoneLabel
@@ -379,7 +526,7 @@ function Scene({
         />
       ))}
 
-      <CameraController bbox={bbox} mode={viewMode} resetTrigger={resetTrigger} />
+      <CameraController bbox={bbox} mode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} />
     </>
   );
 }
@@ -387,6 +534,7 @@ function Scene({
 export default function BuildingViewer3D({ building }: { building: BuildingModel }) {
   const [viewMode, setViewMode] = useState<ViewMode>("exterior");
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [rotationStep, setRotationStep] = useState<{ angle: number; id: number }>({ angle: 0, id: 0 });
 
   // Derive all active materials present in this specific building
   const activeMaterials = useMemo(() => {
@@ -455,7 +603,27 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Manual 360 Step Rotation Controls */}
+          <button
+            type="button"
+            onClick={() => setRotationStep((s) => ({ angle: -Math.PI / 4, id: s.id + 1 }))}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-mono-xs text-[11px] font-medium transition-colors"
+            title="Rotate view 45° counter-clockwise"
+          >
+            <span className="material-symbols-outlined text-[15px]">rotate_left</span>
+            Rotate -45°
+          </button>
+          <button
+            type="button"
+            onClick={() => setRotationStep((s) => ({ angle: Math.PI / 4, id: s.id + 1 }))}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-mono-xs text-[11px] font-medium transition-colors"
+            title="Rotate view 45° clockwise"
+          >
+            <span className="material-symbols-outlined text-[15px]">rotate_right</span>
+            Rotate +45°
+          </button>
+
           <button
             type="button"
             onClick={() => setResetTrigger((n) => n + 1)}
@@ -471,7 +639,7 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
       {/* 3D Canvas Area */}
       <div className="relative w-full h-[480px] sm:h-[540px] bg-gradient-to-b from-slate-100 via-sky-50/50 to-slate-200">
         <Canvas shadows camera={{ position: [14, 10, 14], fov: 42 }}>
-          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} />
+          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} />
         </Canvas>
 
         {/* Material Legend Badge Overlay */}
@@ -491,14 +659,40 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
           </div>
         </div>
 
-        {/* View Mode Indicator */}
-        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/50 text-[10px] font-label-mono-xs uppercase tracking-wider text-primary font-bold">
-          {viewMode === "cutaway" ? "Interior Cutaway View" : viewMode === "floorplan" ? "Plan View" : viewMode === "wireframe" ? "Structural Wireframe" : "Exterior Isometric"}
+        {/* Navigational Compass (Top-Right Corner) */}
+        <div className="absolute top-3 right-3 flex flex-col items-center gap-1 z-10 select-none pointer-events-auto">
+          <div
+            className="relative w-14 h-14 rounded-full bg-surface-container-lowest/95 backdrop-blur-md border border-outline-variant shadow-md flex items-center justify-center p-1.5 hover:shadow-lg transition-shadow cursor-default"
+            title={`Orientation: ${building.orientation_deg ?? 180}° (${building.orientation_deg === 180 ? "True South" : building.orientation_deg === 0 ? "True North" : "Azimuth"})`}
+          >
+            <svg className="w-full h-full" viewBox="0 0 100 100">
+              {/* Outer compass degree ticks */}
+              <circle cx="50" cy="50" r="46" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="2 3" />
+              <circle cx="50" cy="50" r="38" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1.2" />
+
+              {/* Cardinal directions */}
+              <text x="50" y="16" fill="#dc2626" fontSize="12" fontWeight="800" textAnchor="middle">N</text>
+              <text x="50" y="93" fill="#d97706" fontSize="11" fontWeight="700" textAnchor="middle">S</text>
+              <text x="92" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">E</text>
+              <text x="8" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">W</text>
+
+              {/* Orientation needle */}
+              <g transform={`rotate(${-(building.orientation_deg ?? 180) + 180}, 50, 50)`}>
+                <polygon points="50,18 45,50 55,50" fill="#dc2626" />
+                <polygon points="50,82 45,50 55,50" fill="#d97706" />
+                <circle cx="50" cy="50" r="3.5" fill="#1e293b" />
+                <circle cx="50" cy="50" r="1.5" fill="#ffffff" />
+              </g>
+            </svg>
+          </div>
+          <span className="font-label-mono-xs text-[10px] font-bold text-on-surface bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-outline-variant/60 shadow-xs">
+            {building.orientation_deg ?? 180}° {building.orientation_deg === 0 ? "N" : building.orientation_deg === 180 ? "S" : ""}
+          </span>
         </div>
 
         {/* Interaction Hint */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/50 text-[11px] font-body-sm text-on-surface-variant shadow-sm pointer-events-none">
-          Left-click + drag to rotate • Scroll to zoom • Right-click to pan
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md border border-outline-variant/60 text-[11px] font-body-sm text-on-surface-variant shadow-sm pointer-events-none">
+          Left-click + drag to rotate 360° • Scroll to zoom • Right-click to pan
         </div>
       </div>
     </div>

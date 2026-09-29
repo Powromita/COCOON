@@ -28,6 +28,7 @@ function load(): WizardDraft | null {
     const knownSelected = constraints.available_material_ids.filter((m) => validIds.has(m));
     constraints.available_material_ids = knownSelected.length > 0 ? knownSelected : DEFAULT_DRAFT.constraints.available_material_ids;
     return {
+      name: parsed.name ?? DEFAULT_DRAFT.name,
       site: { ...DEFAULT_DRAFT.site, ...parsed.site },
       mission: { ...DEFAULT_DRAFT.mission, ...parsed.mission },
       constraints,

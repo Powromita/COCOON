@@ -2,146 +2,54 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NAV_ITEMS, ROUTES, isNavItemActive } from "@/lib/routes";
 import LanguageToggle from "@/components/i18n/LanguageToggle";
 import { T, useT } from "@/lib/i18n";
 
-
-const ACTIVE_LINK =
-  "px-space-sm py-1.5 font-body-sm text-body-sm transition-colors bg-primary-container text-on-primary font-medium rounded-lg";
-const IDLE_LINK =
-  "px-space-sm py-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors";
-
-/** Station clock pinned to IST; rendered client-side only to avoid hydration mismatch. */
-function useStationTime() {
-  const [time, setTime] = useState<string | null>(null);
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Kolkata",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
-    const tick = () => setTime(fmt.format(new Date()));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return time;
-}
-
 export default function AppHeader() {
   const pathname = usePathname();
-  const stationTime = useStationTime();
   const t = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-      <div className="h-16 w-full px-gutter-lg flex items-center justify-between gap-gutter">
-        <div className="flex items-center gap-space-md shrink-0">
-          <Link href={ROUTES.dashboard} className="flex items-center gap-space-sm">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-space-xs">
-                <span className="font-headline-sm text-headline-sm tracking-tight text-primary font-bold"><T>COCOON</T></span>
-                <span className="font-label-mono-xs text-label-mono-xs bg-surface-container text-on-surface px-space-xs py-0.5 rounded-full">
-                  <T>MIL-SPEC</T> <span className="font-data">v4.2</span>
-                </span>
-              </div>
-              <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase">
-                <T>MIL-SPEC Thermal Platform</T>
-              </span>
-            </div>
-          </Link>
-          <div className="hidden min-[1800px]:flex items-center gap-space-xs px-space-md py-2.5 bg-surface-container-low rounded-full">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-line shadow-xs transition-all">
+      <div className="h-16 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        
+        {/* 1. Left: Clean Brand Logo */}
+        <Link
+          href={ROUTES.dashboard}
+          className="flex items-center gap-2.5 group focus:outline-none shrink-0"
+        >
+          <div className="w-9 h-9 rounded-xl bg-navy text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+            <span className="material-symbols-outlined text-[20px] text-cyan-300">shield</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-black tracking-tight text-navy leading-none">
+              COCOON
             </span>
-            <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant font-medium tracking-wide">
-              <T>DAULAT BEG OLDI SECTOR (</T><span className="font-data">-38.2°C</span> @ <span className="font-data">5,065m</span> <T>AMSL) • SOLVER ENGINE READY</T>
+            <span className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider mt-0.5">
+              Thermal Engineering
             </span>
           </div>
-        </div>
+        </Link>
 
-        <nav className="hidden lg:flex items-center gap-space-xs shrink-0" aria-label={t("Primary")}>
-          {NAV_ITEMS.map((item) => {
-            const active = isNavItemActive(item, pathname);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={active ? ACTIVE_LINK : IDLE_LINK}
-              >
-                <T>{item.label}</T>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="flex items-center gap-space-md shrink-0">
-          <div className="hidden md:flex lg:hidden xl:flex flex-col items-end">
-            <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant uppercase"><T>STATION TIME</T></span>
-            <span className="font-data text-label-mono-sm text-on-surface font-semibold" suppressHydrationWarning>
-              {stationTime ?? "--:--:--"} UTC+05:30
-            </span>
-          </div>
-          <Link
-            href={ROUTES.candidateTelemetry}
-            className="hidden sm:flex lg:hidden 2xl:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors hover-lift"
-          >
-            <span className="material-symbols-outlined text-[14px] text-secondary">sync</span>
-            <span className="font-label-mono-xs text-label-mono-xs uppercase font-medium"><span className="font-data">2</span> <T>RUNS IN SOLVER QUEUE</T></span>
-          </Link>
-          <LanguageToggle />
-          <button
-            type="button"
-            aria-label={t("Notifications")}
-            className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors rounded-full"
-          >
-            <span className="material-symbols-outlined text-[20px]">notifications</span>
-          </button>
-          <div className="flex items-center gap-space-md pl-space-sm">
-            <div className="hidden min-[2200px]:flex flex-col text-right">
-              <span className="font-body-sm text-body-sm text-on-surface font-semibold leading-tight">
-                <T>Lt. Col. Vikramaditya Rathore</T>
-              </span>
-              <div className="flex items-center justify-end gap-space-xs">
-                <span className="font-label-mono-xs text-label-mono-xs text-secondary font-medium">
-                  <T>LEAD THERMAL ARCHITECT</T>
-                </span>
-              </div>
-              <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant">
-                <T>Directorate of High Altitude Defence Infrastructure (DHADI)</T>
-              </span>
-            </div>
-            <Link
-              href={ROUTES.login}
-              title={t("Sign out")}
-              className="w-10 h-10 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-mono-md text-label-mono-md font-bold ring-2 ring-surface-container-low hover:ring-primary-fixed transition-shadow"
-            >
-              <T>VR</T>
-            </Link>
-          </div>
-          <button
-            type="button"
-            aria-label={t(mobileOpen ? "Close navigation" : "Open navigation")}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((o) => !o)}
-            className="lg:hidden p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors rounded"
-          >
-            <span className="material-symbols-outlined text-[22px]">{mobileOpen ? "close" : "menu"}</span>
-          </button>
-        </div>
-      </div>
-
-      {mobileOpen && (
+        {/* 2. Center: Sleek Floating Navigation Pill */}
         <nav
-          aria-label={t("Primary mobile")}
-          className="lg:hidden border-t border-line-sub bg-surface-container-lowest px-gutter-lg py-space-sm flex flex-col gap-1 shadow-flyout"
+          className="hidden md:flex items-center gap-1 bg-surface-container-low/90 p-1 rounded-full border border-line shadow-2xs shrink-0"
+          aria-label={t("Primary")}
         >
           {NAV_ITEMS.map((item) => {
             const active = isNavItemActive(item, pathname);
@@ -150,14 +58,137 @@ export default function AppHeader() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                onClick={() => setMobileOpen(false)}
-                className={active ? ACTIVE_LINK : `${IDLE_LINK} rounded-lg hover:bg-surface-container-low`}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  active
+                    ? "bg-navy text-white shadow-xs"
+                    : "text-on-surface-variant hover:text-navy hover:bg-surface-container-lowest"
+                }`}
               >
+                <span
+                  className={`material-symbols-outlined text-[16px] ${
+                    active ? "text-cyan-300" : "text-ink-muted"
+                  }`}
+                >
+                  {item.icon}
+                </span>
                 <T>{item.label}</T>
               </Link>
             );
           })}
         </nav>
+
+        {/* 3. Right: Quick Action, Language & Profile */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          
+          {/* New Simulation CTA */}
+          <Link
+            href={ROUTES.shelterConfigurator.step1}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-navy hover:bg-navy-hover text-white text-xs font-semibold shadow-xs hover-lift transition-all shrink-0"
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span><T>New Design</T></span>
+          </Link>
+
+          {/* Language Toggle */}
+          <LanguageToggle className="shrink-0" />
+
+          {/* User Profile Dropdown */}
+          <div className="relative shrink-0" ref={userMenuRef}>
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-navy/20 transition-all focus:outline-none"
+              title="Lt. Col. Vikramaditya Rathore"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-navy to-[#1e3a8a] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                VR
+              </div>
+            </button>
+
+            {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-surface-container-lowest rounded-2xl border border-line shadow-card p-4 z-50 text-xs flex flex-col gap-3 animate-fade-in">
+                <div className="flex flex-col border-b border-surface-container pb-3">
+                  <span className="font-bold text-navy text-sm">Lt. Col. Vikramaditya</span>
+                  <span className="text-[11px] text-teal font-medium">Lead Thermal Architect</span>
+                  <span className="text-[10px] text-on-surface-variant mt-0.5">
+                    Northern Command Sector
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1.5 text-[11px] text-on-surface-variant">
+                  <div className="flex items-center justify-between">
+                    <span>Clearance:</span>
+                    <span className="font-semibold text-navy font-mono">MIL-SPEC 4.2</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Status:</span>
+                    <span className="font-semibold text-equilibrium font-mono">Active Solver</span>
+                  </div>
+                </div>
+                <div className="border-t border-surface-container pt-2">
+                  <Link
+                    href={ROUTES.login}
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-1.5 text-error hover:underline font-semibold text-xs py-1"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">logout</span>
+                    <T>Sign Out</T>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Hamburger Toggle */}
+          <button
+            type="button"
+            aria-label={t(mobileOpen ? "Close navigation" : "Open navigation")}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((o) => !o)}
+            className="md:hidden p-2 text-on-surface-variant hover:text-navy hover:bg-surface-container transition-colors rounded-xl shrink-0"
+          >
+            <span className="material-symbols-outlined text-[24px]">
+              {mobileOpen ? "close" : "menu"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Navigation */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-line bg-surface-container-lowest/98 backdrop-blur-md px-4 py-4 flex flex-col gap-3 shadow-flyout animate-fade-in">
+          <nav aria-label={t("Primary mobile")} className="flex flex-col gap-1">
+            {NAV_ITEMS.map((item) => {
+              const active = isNavItemActive(item, pathname);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                    active
+                      ? "bg-navy text-white shadow-xs"
+                      : "text-on-surface-variant hover:text-navy hover:bg-surface-container-low"
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[18px] ${active ? "text-cyan-300" : "text-navy"}`}>
+                    {item.icon}
+                  </span>
+                  <T>{item.label}</T>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <Link
+            href={ROUTES.shelterConfigurator.step1}
+            onClick={() => setMobileOpen(false)}
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-navy text-white text-xs font-semibold hover:bg-navy-hover transition-colors shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <T>New Design</T>
+          </Link>
+        </div>
       )}
     </header>
   );
