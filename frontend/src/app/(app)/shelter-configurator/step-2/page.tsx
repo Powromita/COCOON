@@ -3,289 +3,125 @@
 import ConfiguratorStepper from "@/components/configurator/ConfiguratorStepper";
 import WizardFooter from "@/components/configurator/WizardFooter";
 import { useWizard } from "@/components/configurator/WizardProvider";
-import { ChipGroup, Field, NumberInput, RadioCards, SectionCard, Select } from "@/components/configurator/fields";
-import { FLOOR_OPTIONS, HEATER_FUELS, MATERIALS, type HeaterFuel, type MaterialId, type MaxFloors } from "@/lib/configurator/requirements";
+import { ChipGroup, Field, NumberInput, RadioCards, SectionCard } from "@/components/configurator/fields";
+import { MISSION_TYPES, ROOM_TYPES, type MissionType, type RoomType } from "@/lib/configurator/requirements";
 import { T } from "@/lib/i18n";
-
-const SHELTER_SHAPES = [
-  { value: "rectangular", label: "Rectangular", hint: "Standard box — easy to build, efficient floor use" },
-  { value: "dome", label: "Dome / Igloo", hint: "Best snow load resistance, low surface area" },
-  { value: "vaulted", label: "Barrel Vault", hint: "Good aerodynamics in high-wind zones" },
-  { value: "hexagonal", label: "Hexagonal Pod", hint: "Modular — clusters well for multi-unit camps" },
-];
 
 export default function ConfiguratorStep2Page() {
   const { draft, update, errors } = useWizard();
-  const c = draft.constraints;
-  const d = draft.design;
-  const e = errors.constraints;
-  const setDesign = (patch: Partial<typeof d>) => update("design", patch);
-  const setGeometry = (patch: Partial<typeof d>) => {
-    const next = { ...d, ...patch };
-    const area = Number(next.length_m) * Number(next.width_m);
-    setDesign(patch);
-    // Fixed dimensions are the per-floor footprint. Never leave the cap below them.
-    if (Number.isFinite(area) && area > Number(c.maximum_footprint_m2))
-      update("constraints", { maximum_footprint_m2: String(Math.ceil(area * 10) / 10) });
-  };
-  const set = (patch: Partial<typeof c>) => update("constraints", patch);
-
-  const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
-  const capex = Number(c.maximum_capex_inr);
-  const noPreference = c.preferred_orientation_deg === null;
+  const m = draft.mission;
+  const e = errors.mission;
+  const set = (patch: Partial<typeof m>) => update("mission", patch);
 
   return (
     <div className="flex flex-col w-full">
-      <ConfiguratorStepper current={2} title="Shelter Geometry & Spatial Architecture" />
+      <ConfiguratorStepper current={2} title="Mission & Occupancy Requirements" />
 
       <div className="w-full px-gutter-lg mt-6">
         <div className="max-w-[1720px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8 flex flex-col gap-5">
 
-            {/* 1. Geometry & Spatial Dimensions */}
-            <SectionCard title="1. Geometry &amp; Spatial Dimensions" contractKey="constraints" icon="square_foot">
+            {/* Mission Type */}
+            <SectionCard title="Mission Type (type)" contractKey="mission.type" icon="military_tech">
               <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
-                <T>Define primary shelter axes. COCOON computes the thermal volume, aspect ratio, and surface-to-volume ratio in real time.</T>
+                <T>Select the operational mission category for the high-altitude post.</T>
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Field
-                  label="Length (L, East–West)"
-                  contractKey="length_m"
-                  htmlFor="length"
-                  hint="Typical range: 3.5 m – 7.0 m"
-                >
-                  <NumberInput
-                    id="length"
-                    value={d.length_m}
-                    onChange={(v) => setGeometry({ length_m: v })}
-                    min={3.5}
-                    max={7.0}
-                    step={0.1}
-                    unit="m"
-                  />
-                </Field>
-
-                <Field
-                  label="Width (W, North–South)"
-                  contractKey="width_m"
-                  htmlFor="width"
-                  hint="Typical range: 2.5 m – 5.0 m"
-                >
-                  <NumberInput
-                    id="width"
-                    value={d.width_m}
-                    onChange={(v) => setGeometry({ width_m: v })}
-                    min={2.5}
-                    max={5.0}
-                    step={0.1}
-                    unit="m"
-                  />
-                </Field>
-
-                <Field
-                  label="Height (H, Apex Ceiling)"
-                  contractKey="height_m"
-                  htmlFor="height"
-                  hint="Typical range: 2.3 m – 3.0 m"
-                >
-                  <NumberInput
-                    id="height"
-                    value={d.height_m}
-                    onChange={(v) => setDesign({ height_m: v })}
-                    min={2.3}
-                    max={3.0}
-                    step={0.1}
-                    unit="m"
-                  />
-                </Field>
-              </div>
-
-              {/* Derived Spatial Properties Box */}
-              <div className="mt-4 p-4 rounded-xl bg-primary-fixed/20 border border-primary/20 flex flex-col gap-2">
-                <span className="text-[11px] font-bold text-navy uppercase tracking-wider">
-                  <T>Derived Spatial Properties (Physics Engine)</T>
-                </span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant">Floor Area (A = L × W)</span>
-                    <span className="text-sm font-bold text-navy font-data">24.0 m²</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant">Enclosed Volume (V = L × W × H)</span>
-                    <span className="text-sm font-bold text-navy font-data">67.2 m³</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant">Aspect Ratio (L / W)</span>
-                    <span className="text-sm font-bold text-navy font-data">{(Number(d.length_m) / Number(d.width_m)).toFixed(2)}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant">Area-to-Volume (A/V Ratio)</span>
-                    <span className="text-sm font-bold text-teal font-data">1.19 m⁻¹</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                <Field
-                  label="Maximum Ground Footprint"
-                  contractKey="maximum_footprint_m2"
-                  htmlFor="footprint"
-                  error={e.maximum_footprint_m2}
-                  hint="Automatically raised to the fixed length ? width when needed"
-                >
-                  <NumberInput
-                    id="footprint"
-                    value={c.maximum_footprint_m2}
-                    onChange={(v) => set({ maximum_footprint_m2: v })}
-                    min={1}
-                    unit="m²"
-                    invalid={!!e.maximum_footprint_m2}
-                  />
-                </Field>
-                <Field
-                  label="Capital Budget"
-                  contractKey="maximum_capex_inr"
-                  htmlFor="capex"
-                  error={c.maximum_capex_inr.trim() === "" ? undefined : e.maximum_capex_inr}
-                  hint="Max construction budget per unit"
-                >
-                  <NumberInput
-                    id="capex"
-                    value={c.maximum_capex_inr}
-                    onChange={(v) => set({ maximum_capex_inr: v })}
-                    min={1}
-                    step={1000}
-                    unit="INR"
-                    placeholder="2500000"
-                    invalid={c.maximum_capex_inr.trim() !== "" && !!e.maximum_capex_inr}
-                  />
-                  {capex > 0 && <span className="font-data text-[11px] text-on-surface-variant">{inr.format(capex)}</span>}
-                </Field>
-              </div>
-
-              <div className="mt-4">
-                <Field label="Number of Floors / Storeys" contractKey="maximum_floors">
-                  <RadioCards<MaxFloors>
-                    name="maximum_floors"
-                    value={c.maximum_floors}
-                    onChange={(v) => set({ maximum_floors: v })}
-                    options={FLOOR_OPTIONS.map((f) => ({ value: f.value, label: f.label }))}
-                  />
-                </Field>
-              </div>
-            </SectionCard>
-
-            {/* Shelter Shape / Form */}
-            <SectionCard title="Shelter Shape" contractKey="shape" icon="category">
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
-                <T>Choose the geometric form. Each shape has different thermal mass, aerodynamic, and construction implications for cold-arid environments.</T>
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {SHELTER_SHAPES.map((shape) => (
-                  <button
-                    key={shape.value}
-                    type="button"
-                    disabled={shape.value !== "rectangular"}
-                    title={shape.value === "rectangular" ? "Supported by the current physical generator" : "Not supported by the physical generator yet"}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center group ${shape.value === "rectangular" ? "border-primary bg-primary-fixed/10" : "border-outline-variant opacity-50 cursor-not-allowed"}`}
-                  >
-                    <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors">
-                      {shape.value === "rectangular" ? "crop_square" :
-                       shape.value === "dome" ? "sports_soccer" :
-                       shape.value === "vaulted" ? "garage" : "hexagon"}
-                    </span>
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold text-sm">{shape.label}</span>
-                    <span className="font-body-sm text-[11px] text-on-surface-variant leading-tight">{shape.hint}</span>
-                  </button>
-                ))}
-              </div>
-            </SectionCard>
-
-            {/* Facade Orientation */}
-            <SectionCard title="Main Facade Orientation" contractKey="preferred_orientation_deg" icon="explore">
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
-                <T>The direction the main entrance faces affects solar gain and wind exposure. South-facing (180°) maximizes passive solar heating in northern latitudes.</T>
-              </p>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <label className="inline-flex items-center gap-2 font-body-sm text-body-sm text-on-surface cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={noPreference}
-                    onChange={(ev) => set({ preferred_orientation_deg: ev.target.checked ? null : "180" })}
-                    className="w-4 h-4 accent-primary-container"
-                  />
-                  <T>Let the optimizer choose the best orientation</T>
-                </label>
-                {!noPreference && (
-                  <div className="sm:w-48">
-                    <NumberInput
-                      id="orientation"
-                      value={c.preferred_orientation_deg ?? ""}
-                      onChange={(v) => set({ preferred_orientation_deg: v })}
-                      min={0}
-                      max={360}
-                      step={1}
-                      unit="°"
-                      invalid={!!e.preferred_orientation_deg}
-                    />
-                    <p className="text-[11px] text-on-surface-variant mt-1">0° = North · 90° = East · 180° = South · 270° = West</p>
-                  </div>
-                )}
-              </div>
-            </SectionCard>
-
-            {/* Materials Selection & Layer Thickness */}
-            <SectionCard title="Construction Envelope &amp; Multi-Layer Assemblies" contractKey="available_material_ids" icon="layers">
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
-                <T>Select materials and specify layer thicknesses for Walls, Roof, and Floor (from outside to inside). The optimizer builds assemblies and computes thermal transmittance (U-value) and thermal mass (Cp, density).</T>
-              </p>
-              <div className="mb-3">
-                <span className="text-xs font-bold text-navy uppercase tracking-wider block mb-2">Available Structural &amp; Insulation Materials:</span>
-                <ChipGroup<MaterialId>
-                  name="available_material_ids"
-                  options={MATERIALS}
-                  selected={c.available_material_ids}
-                  onChange={(v) => set({ available_material_ids: v })}
-                  invalid={!!e.available_material_ids}
-                />
-              </div>
-              {e.available_material_ids && (
-                <p className="text-error font-body-sm text-body-sm mt-2">{e.available_material_ids}</p>
-              )}
-
-              {/* Layer Thickness Inputs */}
-              <div className="mt-4 pt-4 border-t border-surface-container flex flex-col gap-3">
-                <span className="text-xs font-bold text-navy uppercase tracking-wider">Multi-Layer Assembly Thickness:</span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <Field label="Wall Assembly Thickness" hint="Typical range: 250 – 650 mm">
-                    <NumberInput id="wall_thick" value={d.wall_thickness_mm} onChange={(v) => setDesign({ wall_thickness_mm: v })} min={250} max={650} step={10} unit="mm" />
-                  </Field>
-                  <Field label="Roof Assembly Thickness" hint="Typical range: 180 – 450 mm">
-                    <NumberInput id="roof_thick" value={d.roof_thickness_mm} onChange={(v) => setDesign({ roof_thickness_mm: v })} min={180} max={450} step={10} unit="mm" />
-                  </Field>
-                  <Field label="Floor / Plinth Thickness" hint="Typical range: 150 – 400 mm">
-                    <NumberInput id="floor_thick" value={d.floor_thickness_mm} onChange={(v) => setDesign({ floor_thickness_mm: v })} min={150} max={400} step={10} unit="mm" />
-                  </Field>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* Heating Source */}
-            <SectionCard title="Heating Energy Source" contractKey="heater_fuels" icon="local_fire_department">
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
-                <T>Available fuel determines auxiliary heating options. Kerosene is common in high-altitude posts. Choose "None" for a fully passive (no heater) shelter design.</T>
-              </p>
-              <ChipGroup<HeaterFuel>
-                name="heater_fuels"
-                options={HEATER_FUELS}
-                selected={c.heater_fuels}
-                onChange={(v) => set({ heater_fuels: v })}
-                exclusive="none"
-                invalid={!!e.heater_fuels}
+              <RadioCards<MissionType>
+                name="mission_type"
+                value={m.type}
+                onChange={(v) => set({ type: v })}
+                options={MISSION_TYPES.map((t) => ({ value: t.id, label: t.label, hint: t.hint }))}
               />
-              {e.heater_fuels && (
-                <p className="text-error font-body-sm text-body-sm mt-2">{e.heater_fuels}</p>
-              )}
+            </SectionCard>
+
+            {/* Troop Count / Occupants */}
+            <SectionCard title="Troop Count / Occupancy (occupants)" contractKey="mission.occupants" icon="groups">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                <T>Nominal number of soldiers/personnel accommodated in the shelter.</T>
+              </p>
+              <Field
+                label="Occupants Count (occupants)"
+                contractKey="occupants"
+                htmlFor="occupants"
+                error={e.occupants}
+                hint="Total troops stationed (≥ 0)"
+              >
+                <NumberInput
+                  id="occupants"
+                  value={m.occupants}
+                  onChange={(v) => set({ occupants: v })}
+                  min={0}
+                  max={500}
+                  step={1}
+                  unit="personnel"
+                  invalid={!!e.occupants}
+                />
+              </Field>
+            </SectionCard>
+
+            {/* Required Rooms */}
+            <SectionCard title="Required Rooms (required_rooms)" contractKey="mission.required_rooms" icon="meeting_room">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                <T>Select all functional room and zone subdivisions required within the shelter envelope.</T>
+              </p>
+              <Field
+                label="Functional Rooms"
+                error={e.required_rooms}
+                hint="Select all rooms that must be accommodated"
+              >
+                <ChipGroup<RoomType>
+                  name="required_rooms"
+                  options={ROOM_TYPES}
+                  selected={m.required_rooms}
+                  onChange={(v) => set({ required_rooms: v })}
+                  invalid={!!e.required_rooms}
+                />
+              </Field>
+            </SectionCard>
+
+            {/* Thermal Comfort Target & Limits */}
+            <SectionCard title="Thermal Comfort &amp; Limits" contractKey="mission.target_*" icon="thermostat">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                <T>Indoor thermal setpoint and allowable cold excursion thresholds.</T>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field
+                  label="Target Indoor Temperature (target_temperature_c)"
+                  contractKey="target_temperature_c"
+                  htmlFor="target_temp"
+                  error={e.target_temperature_c}
+                  hint="Desired baseline setpoint (typically 15.0 °C to 21.0 °C)"
+                >
+                  <NumberInput
+                    id="target_temp"
+                    value={m.target_temperature_c}
+                    onChange={(v) => set({ target_temperature_c: v })}
+                    min={5}
+                    max={30}
+                    step={0.5}
+                    unit="°C"
+                    invalid={!!e.target_temperature_c}
+                  />
+                </Field>
+                <Field
+                  label="Maximum Unmet Hours (maximum_unmet_hours)"
+                  contractKey="maximum_unmet_hours"
+                  htmlFor="unmet"
+                  error={e.maximum_unmet_hours}
+                  hint="Allowable cumulative hours below target threshold"
+                >
+                  <NumberInput
+                    id="unmet"
+                    value={m.maximum_unmet_hours}
+                    onChange={(v) => set({ maximum_unmet_hours: v })}
+                    min={0}
+                    max={168}
+                    step={1}
+                    unit="hours"
+                    invalid={!!e.maximum_unmet_hours}
+                  />
+                </Field>
+              </div>
             </SectionCard>
 
           </div>
@@ -294,18 +130,16 @@ export default function ConfiguratorStep2Page() {
           <div className="lg:col-span-4 flex flex-col gap-4">
             <div className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary text-[20px]">architecture</span>
+                <span className="material-symbols-outlined text-secondary text-[20px]">info</span>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                  <T>What gets generated</T>
+                  <T>Phase 02: Operational Profile</T>
                 </h3>
               </div>
               <div className="flex flex-col gap-3">
                 {[
-                  { icon: "grid_view", label: "Room layout & sizing", sub: "Arranged within your footprint limits" },
-                  { icon: "layers", label: "Wall, roof & floor assemblies", sub: "Built from your selected materials" },
-                  { icon: "window", label: "Window placement & glazing", sub: "Optimized per orientation" },
-                  { icon: "door_front", label: "Airlock & entry geometry", sub: "Thermal break at entry points" },
-                  { icon: "air", label: "Airtightness & infiltration rate", sub: "Derived from construction type" },
+                  { icon: "badge", label: "Mission Designation", sub: "Establishes interior spatial workflow and partition rules" },
+                  { icon: "groups", label: "Occupancy Heat Generation", sub: "Engine models ~75W sensible heat per soldier" },
+                  { icon: "thermostat", label: "Thermal Envelope Evaluation", sub: "Tests against target temperature and unmet hour limits" },
                 ].map((item) => (
                   <div key={item.label} className="flex gap-3">
                     <span className="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">{item.icon}</span>
@@ -317,29 +151,8 @@ export default function ConfiguratorStep2Page() {
                 ))}
               </div>
             </div>
-
-            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-thermal text-[20px]">tips_and_updates</span>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                  <T>Ladakh cold-climate tips</T>
-                </h3>
-              </div>
-              <div className="flex flex-col gap-2">
-                {[
-                  "PUF panels give the best insulation per kg — critical for air-drop logistics",
-                  "South-facing (180°) entry maximizes passive solar heating in winter",
-                  "Dome shapes shed snow loads better than flat or pitched roofs",
-                  "Airlock entry is essential below −20°C to prevent cold drafts",
-                ].map((tip, i) => (
-                  <div key={i} className="flex gap-2">
-                    <span className="font-data text-[11px] text-primary font-bold shrink-0 mt-0.5">{i + 1}.</span>
-                    <span className="font-body-sm text-[11px] text-on-surface-variant">{tip}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
+
         </div>
       </div>
 

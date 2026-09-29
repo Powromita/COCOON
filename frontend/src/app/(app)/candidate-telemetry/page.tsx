@@ -43,96 +43,443 @@ function formatLakh(value: number | null | undefined) {
   return `₹${(value / 1e5).toFixed(2)}L`;
 }
 
-function TemperatureChart({ data }: { data: { h: string; inside: number; outside: number }[] }) {
-  const W = 600, H = 220, PAD = 30;
-  if (data.length === 0) return null;
-  const allTemps = data.flatMap((d) => [d.inside, d.outside]);
-  const allMin = Math.floor(Math.min(...allTemps) - 2);
-  const allMax = Math.ceil(Math.max(...allTemps, 24) + 2);
-  const ixs = data.map((_, i) => PAD + (i / Math.max(data.length - 1, 1)) * (W - 2 * PAD));
-  const y = (v: number) => scaleY(v, allMin, allMax, H);
-  const insidePath = data.map((d, i) => `${i === 0 ? "M" : "L"}${ixs[i]},${y(d.inside)}`).join(" ");
-  const outsidePath = data.map((d, i) => `${i === 0 ? "M" : "L"}${ixs[i]},${y(d.outside)}`).join(" ");
-  const insideArea = `${insidePath} L${ixs[ixs.length - 1]},${H - PAD} L${ixs[0]},${H - PAD} Z`;
-  const zeroY = y(0);
-  const gridVals = [allMin, Math.round((allMin + allMax) / 2), allMax, 15, 24].filter((v, i, a) => a.indexOf(v) === i);
+function MetricCard({
+  label,
+  value,
+  unit,
+  subtext,
+  icon,
+  variant = "default",
+}: {
+  label: string;
+  value: string;
+  unit?: string;
+  subtext?: string;
+  icon?: string;
+  variant?: "default" | "primary" | "thermal" | "success" | "warning";
+}) {
+  const colorMap = {
+    default: "text-on-surface",
+    primary: "text-primary",
+    thermal: "text-amber-600",
+    success: "text-emerald-600",
+    warning: "text-amber-700",
+  };
+
+  const bgMap = {
+    default: "bg-surface-container-low/80 border-outline-variant/60",
+    primary: "bg-primary-fixed/15 border-primary/25",
+    thermal: "bg-amber-50 border-amber-200/60",
+    success: "bg-emerald-50 border-emerald-200/60",
+    warning: "bg-amber-50 border-amber-300/60",
+  };
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 180 }}>
-      <line x1={PAD} y1={zeroY} x2={W - PAD} y2={zeroY} stroke="#CBD5E1" strokeDasharray="3,3" strokeWidth={1} />
-      <text x={PAD - 4} y={zeroY + 4} fill="#94A3B8" fontSize={9} textAnchor="end">0°</text>
-      {gridVals.map((v) => (
-        <g key={v}>
-          <line x1={PAD} y1={y(v)} x2={W - PAD} y2={y(v)} stroke="#F1F5F9" strokeWidth={0.5} />
-          <text x={PAD - 4} y={y(v) + 4} fill="#94A3B8" fontSize={8} textAnchor="end">{v}°</text>
-        </g>
-      ))}
-      <rect x={PAD} y={y(24)} width={W - 2 * PAD} height={Math.max(y(15) - y(24), 0)} fill="#D1FAE5" opacity={0.35} />
-      <path d={insideArea} fill="#3B82F6" opacity={0.08} />
-      <path d={outsidePath} fill="none" stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="4,3" />
-      <path d={insidePath} fill="none" stroke="#059669" strokeWidth={2.5} strokeLinejoin="round" />
-      {data.map((d, i) => (i % Math.ceil(data.length / 6) === 0 ? <circle key={i} cx={ixs[i]} cy={y(d.inside)} r={3} fill="#059669" /> : null))}
-      {data.map((d, i) => (i % Math.ceil(data.length / 6) === 0 ? <text key={i} x={ixs[i]} y={H - 2} fill="#94A3B8" fontSize={8} textAnchor="middle">{d.h}</text> : null))}
-    </svg>
+    <div className={`p-4 rounded-xl border ${bgMap[variant]} flex flex-col justify-between min-h-[105px] transition-all hover:shadow-sm`}>
+      <div className="flex items-center justify-between gap-1 mb-2">
+        <span className="font-label-mono-xs text-[10px] uppercase tracking-wider text-on-surface-variant font-semibold truncate">
+          {label}
+        </span>
+        {icon && (
+          <span className={`material-symbols-outlined text-[17px] ${colorMap[variant]} shrink-0 opacity-80`}>
+            {icon}
+          </span>
+        )}
+      </div>
+      <div>
+        <div className="flex items-baseline gap-1">
+          <span className={`font-data text-2xl sm:text-3xl font-extrabold tracking-tight ${colorMap[variant]}`}>
+            {value}
+          </span>
+          {unit && (
+            <span className="font-data text-xs text-on-surface-variant font-semibold">
+              {unit}
+            </span>
+          )}
+        </div>
+        {subtext && (
+          <div className="font-body-sm text-[11px] text-on-surface-variant mt-1 truncate">
+            {subtext}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TemperatureChart({ data }: { data: { h: string; inside: number; outside: number }[] }) {
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const W = 840, H = 260;
+  const PAD_LEFT = 60, PAD_RIGHT = 30, PAD_TOP = 25, PAD_BOTTOM = 40;
+
+  if (data.length === 0) return null;
+
+  const allTemps = data.flatMap((d) => [d.inside, d.outside]);
+  const rawMin = Math.min(...allTemps, 15);
+  const rawMax = Math.max(...allTemps, 24);
+
+  const range = rawMax - rawMin;
+  const step = range <= 30 ? 5 : range <= 65 ? 10 : 15;
+  const minVal = Math.floor(rawMin / step) * step;
+  const maxVal = Math.ceil(rawMax / step) * step;
+
+  const ticks: number[] = [];
+  for (let v = minVal; v <= maxVal; v += step) {
+    ticks.push(v);
+  }
+
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+  const y = (val: number) => PAD_TOP + ((maxVal - val) / (maxVal - minVal || 1)) * chartH;
+  const x = (i: number) => PAD_LEFT + (i / Math.max(data.length - 1, 1)) * chartW;
+
+  const insidePath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.inside).toFixed(1)}`).join(" ");
+  const outsidePath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.outside).toFixed(1)}`).join(" ");
+  const insideArea = `${insidePath} L ${x(data.length - 1).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} L ${x(0).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} Z`;
+
+  const yComfortHigh = y(24);
+  const yComfortLow = y(15);
+  const comfortH = Math.max(yComfortLow - yComfortHigh, 0);
+
+  const zeroY = y(0);
+  const showZero = 0 >= minVal && 0 <= maxVal;
+
+  const activePoint = hoverIdx !== null && hoverIdx >= 0 && hoverIdx < data.length ? data[hoverIdx] : null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-2 py-1 text-xs">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="w-3 h-1 bg-[#0284c7] rounded-full inline-block" />
+            <span className="font-body-sm font-semibold text-on-surface">Inside Heated Zone</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-3 h-0.5 border-t-2 border-dashed border-[#64748b] inline-block" />
+            <span className="font-body-sm text-on-surface-variant font-medium">Outside Ambient</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-3 h-2.5 bg-emerald-100 border border-emerald-300 rounded inline-block" />
+            <span className="font-body-sm text-emerald-800 font-medium">Comfort Range (15°C–24°C)</span>
+          </div>
+        </div>
+
+        {activePoint && (
+          <div className="flex items-center gap-3 px-2.5 py-1 bg-surface-container rounded-lg font-data text-xs border border-outline-variant/60 shadow-sm">
+            <span className="font-semibold text-on-surface">{activePoint.h}</span>
+            <span className="text-[#0284c7] font-bold">Inside: {activePoint.inside.toFixed(1)}°C</span>
+            <span className="text-[#64748b]">Outside: {activePoint.outside.toFixed(1)}°C</span>
+            <span className="text-emerald-700 font-medium">ΔT: +{(activePoint.inside - activePoint.outside).toFixed(1)}°C</span>
+          </div>
+        )}
+      </div>
+
+      <div className="relative w-full overflow-hidden">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="w-full h-auto overflow-visible select-none"
+          onMouseLeave={() => setHoverIdx(null)}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const relX = ((e.clientX - rect.left) / rect.width) * W - PAD_LEFT;
+            const idx = Math.round((relX / chartW) * (data.length - 1));
+            setHoverIdx(Math.max(0, Math.min(data.length - 1, idx)));
+          }}
+        >
+          <defs>
+            <linearGradient id="insideTempGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#0284c7" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          {ticks.map((v) => {
+            const yPos = y(v);
+            return (
+              <g key={v}>
+                <line x1={PAD_LEFT} y1={yPos} x2={W - PAD_RIGHT} y2={yPos} stroke="#e2e8f0" strokeWidth={0.8} />
+                <text x={PAD_LEFT - 10} y={yPos + 4} fill="#64748b" fontSize={11} fontFamily="monospace" textAnchor="end">
+                  {v > 0 ? `+${v}°C` : `${v}°C`}
+                </text>
+              </g>
+            );
+          })}
+
+          {showZero && (
+            <line x1={PAD_LEFT} y1={zeroY} x2={W - PAD_RIGHT} y2={zeroY} stroke="#94a3b8" strokeDasharray="3,3" strokeWidth={1.2} />
+          )}
+
+          <rect
+            x={PAD_LEFT}
+            y={yComfortHigh}
+            width={chartW}
+            height={comfortH}
+            fill="#d1fae5"
+            opacity={0.4}
+          />
+          <line x1={PAD_LEFT} y1={yComfortHigh} x2={W - PAD_RIGHT} y2={yComfortHigh} stroke="#10b981" strokeDasharray="2,2" strokeWidth={0.8} opacity={0.6} />
+          <line x1={PAD_LEFT} y1={yComfortLow} x2={W - PAD_RIGHT} y2={yComfortLow} stroke="#10b981" strokeDasharray="2,2" strokeWidth={0.8} opacity={0.6} />
+
+          <path d={insideArea} fill="url(#insideTempGrad)" />
+          <path d={outsidePath} fill="none" stroke="#64748b" strokeWidth={2} strokeDasharray="5,4" />
+          <path d={insidePath} fill="none" stroke="#0284c7" strokeWidth={3} strokeLinejoin="round" />
+
+          {data.map((d, i) => {
+            const isVisibleTick = i % Math.max(1, Math.floor(data.length / 8)) === 0 || i === data.length - 1;
+            if (!isVisibleTick) return null;
+            return (
+              <g key={i}>
+                <line x1={x(i)} y1={PAD_TOP + chartH} x2={x(i)} y2={PAD_TOP + chartH + 5} stroke="#94a3b8" strokeWidth={1} />
+                <text x={x(i)} y={H - 12} fill="#64748b" fontSize={10} fontFamily="monospace" textAnchor="middle">
+                  {d.h}
+                </text>
+              </g>
+            );
+          })}
+
+          {hoverIdx !== null && activePoint && (
+            <g>
+              <line
+                x1={x(hoverIdx)}
+                y1={PAD_TOP}
+                x2={x(hoverIdx)}
+                y2={PAD_TOP + chartH}
+                stroke="#0284c7"
+                strokeWidth={1.5}
+                strokeDasharray="3,3"
+              />
+              <circle cx={x(hoverIdx)} cy={y(activePoint.outside)} r={4} fill="#64748b" stroke="#ffffff" strokeWidth={2} />
+              <circle cx={x(hoverIdx)} cy={y(activePoint.inside)} r={5} fill="#0284c7" stroke="#ffffff" strokeWidth={2} />
+            </g>
+          )}
+        </svg>
+      </div>
+    </div>
   );
 }
 
 function SolarChart({ data }: { data: number[] }) {
-  const W = 600, H = 160, PAD = 30;
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const W = 840, H = 220;
+  const PAD_LEFT = 60, PAD_RIGHT = 30, PAD_TOP = 25, PAD_BOTTOM = 40;
+
   if (data.length === 0) return null;
-  const maxVal = Math.max(...data, 0.1);
-  const barW = (W - 2 * PAD) / data.length - 4;
+
+  const rawMax = Math.max(...data, 0.5);
+  const step = rawMax <= 4 ? 1 : rawMax <= 10 ? 2 : 5;
+  const maxVal = Math.ceil(rawMax / step) * step;
+
+  const ticks: number[] = [];
+  for (let v = 0; v <= maxVal; v += step) {
+    ticks.push(v);
+  }
+
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+  const barWidth = Math.min(54, (chartW / data.length) * 0.65);
+  const slotWidth = chartW / data.length;
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 140 }}>
-      {[0.25, 0.5, 0.75, 1].map((f) => {
-        const v = maxVal * f;
-        const y = PAD + ((maxVal - v) / maxVal) * (H - 2 * PAD);
-        return (
-          <g key={f}>
-            <line x1={PAD} y1={y} x2={W - PAD} y2={y} stroke="#F1F5F9" strokeWidth={0.7} />
-            <text x={PAD - 4} y={y + 4} fill="#94A3B8" fontSize={8} textAnchor="end">{v.toFixed(1)}</text>
-          </g>
-        );
-      })}
-      {data.map((val, i) => {
-        const x = PAD + i * ((W - 2 * PAD) / data.length) + 2;
-        const barH = (val / maxVal) * (H - 2 * PAD);
-        const y = H - PAD - barH;
-        return <rect key={i} x={x} y={y} width={barW} height={barH} rx={2} fill={val >= maxVal * 0.85 ? "#D97706" : "#3B82F6"} opacity={0.85} />;
-      })}
-      {data.map((_, i) => (
-        <text key={i} x={PAD + i * ((W - 2 * PAD) / data.length) + barW / 2} y={H - 2} fill="#94A3B8" fontSize={8} textAnchor="middle">D{i + 1}</text>
-      ))}
-    </svg>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between px-2 py-1 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded bg-amber-500 inline-block" />
+          <span className="font-body-sm font-semibold text-on-surface">Daily Incident Solar Heat Gain</span>
+        </div>
+        {hoverIdx !== null && data[hoverIdx] !== undefined && (
+          <span className="font-data text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+            Day {hoverIdx + 1}: <strong>{data[hoverIdx].toFixed(2)} kWh</strong>
+          </span>
+        )}
+      </div>
+
+      <div className="relative w-full overflow-hidden">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto overflow-visible select-none">
+          <defs>
+            <linearGradient id="solarGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#d97706" />
+            </linearGradient>
+            <linearGradient id="solarGradHover" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fbbf24" />
+              <stop offset="100%" stopColor="#f59e0b" />
+            </linearGradient>
+          </defs>
+
+          {ticks.map((v) => {
+            const yPos = PAD_TOP + ((maxVal - v) / (maxVal || 1)) * chartH;
+            return (
+              <g key={v}>
+                <line x1={PAD_LEFT} y1={yPos} x2={W - PAD_RIGHT} y2={yPos} stroke="#e2e8f0" strokeWidth={0.8} />
+                <text x={PAD_LEFT - 10} y={yPos + 4} fill="#64748b" fontSize={11} fontFamily="monospace" textAnchor="end">
+                  {v.toFixed(1)} kWh
+                </text>
+              </g>
+            );
+          })}
+
+          {data.map((val, i) => {
+            const barH = (val / (maxVal || 1)) * chartH;
+            const x = PAD_LEFT + i * slotWidth + (slotWidth - barWidth) / 2;
+            const y = PAD_TOP + chartH - barH;
+            const isHover = hoverIdx === i;
+
+            return (
+              <g
+                key={i}
+                className="cursor-pointer transition-opacity"
+                onMouseEnter={() => setHoverIdx(i)}
+                onMouseLeave={() => setHoverIdx(null)}
+              >
+                <rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={Math.max(barH, 2)}
+                  rx={4}
+                  fill={isHover ? "url(#solarGradHover)" : "url(#solarGrad)"}
+                  stroke="#b45309"
+                  strokeWidth={0.5}
+                />
+                <text
+                  x={x + barWidth / 2}
+                  y={Math.max(y - 6, PAD_TOP + 12)}
+                  fill="#92400e"
+                  fontSize={10}
+                  fontFamily="monospace"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  {val.toFixed(1)}
+                </text>
+                <text
+                  x={x + barWidth / 2}
+                  y={H - 12}
+                  fill="#64748b"
+                  fontSize={11}
+                  fontFamily="monospace"
+                  textAnchor="middle"
+                >
+                  Day {i + 1}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </div>
   );
 }
 
 function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
-  const W = 600, H = 160, PAD = 30;
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const W = 840, H = 220;
+  const PAD_LEFT = 65, PAD_RIGHT = 30, PAD_TOP = 25, PAD_BOTTOM = 40;
+
   if (data.length === 0) return null;
-  const maxQ = Math.max(...data.map((d) => d.q), 10);
-  const maxDT = Math.max(...data.map((d) => d.deltaT), 10);
-  const xs = data.map((d) => PAD + (d.deltaT / maxDT) * (W - 2 * PAD));
-  const ys = data.map((d) => H - PAD - (d.q / maxQ) * (H - 2 * PAD));
-  const path = data.map((_, i) => `${i === 0 ? "M" : "L"}${xs[i]},${ys[i]}`).join(" ");
-  const area = `${path} L${xs[xs.length - 1]},${H - PAD} L${xs[0]},${H - PAD} Z`;
+
+  const maxQRaw = Math.max(...data.map((d) => d.q), 100);
+  const maxDTRaw = Math.max(...data.map((d) => d.deltaT), 10);
+
+  const stepQ = maxQRaw <= 1000 ? 200 : maxQRaw <= 3000 ? 500 : 1000;
+  const maxQ = Math.ceil(maxQRaw / stepQ) * stepQ;
+
+  const stepDT = maxDTRaw <= 20 ? 5 : maxDTRaw <= 40 ? 10 : 15;
+  const maxDT = Math.ceil(maxDTRaw / stepDT) * stepDT;
+
+  const ticksQ: number[] = [];
+  for (let v = 0; v <= maxQ; v += stepQ) {
+    ticksQ.push(v);
+  }
+
+  const ticksDT: number[] = [];
+  for (let v = 0; v <= maxDT; v += stepDT) {
+    ticksDT.push(v);
+  }
+
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+  const x = (dt: number) => PAD_LEFT + (dt / (maxDT || 1)) * chartW;
+  const y = (q: number) => PAD_TOP + ((maxQ - q) / (maxQ || 1)) * chartH;
+
+  const points = [...data].sort((a, b) => a.deltaT - b.deltaT);
+  const path = points.map((p, i) => `${i === 0 ? "M" : "L"} ${x(p.deltaT).toFixed(1)},${y(p.q).toFixed(1)}`).join(" ");
+  const area = `${path} L ${x(points[points.length - 1].deltaT).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} L ${x(points[0].deltaT).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} Z`;
+
+  const activePoint = hoverIdx !== null && hoverIdx >= 0 && hoverIdx < points.length ? points[hoverIdx] : null;
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 140 }}>
-      {[0.33, 0.66, 1].map((f) => {
-        const q = maxQ * f;
-        const y = H - PAD - (q / maxQ) * (H - 2 * PAD);
-        return (
-          <g key={f}>
-            <line x1={PAD} y1={y} x2={W - PAD} y2={y} stroke="#F1F5F9" strokeWidth={0.7} />
-            <text x={PAD - 4} y={y + 4} fill="#94A3B8" fontSize={8} textAnchor="end">{Math.round(q)}W</text>
-          </g>
-        );
-      })}
-      <path d={area} fill="#0F7A8C" opacity={0.1} />
-      <path d={path} fill="none" stroke="#0F7A8C" strokeWidth={2.5} strokeLinejoin="round" />
-      {data.map((d, i) => <circle key={i} cx={xs[i]} cy={ys[i]} r={3} fill="#0F7A8C" />)}
-      {data.map((d, i) => <text key={i} x={xs[i]} y={H - 2} fill="#94A3B8" fontSize={8} textAnchor="middle">ΔT={Math.round(d.deltaT)}°</text>)}
-    </svg>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between px-2 py-1 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-1 bg-[#0d9488] rounded-full inline-block" />
+          <span className="font-body-sm font-semibold text-on-surface">Heat Loss vs Temperature Lift (ΔT)</span>
+        </div>
+        {activePoint && (
+          <span className="font-data text-xs text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded border border-teal-200">
+            ΔT = {activePoint.deltaT.toFixed(1)}°C → Heat Loss Rate: <strong>{Math.round(activePoint.q)} W</strong>
+          </span>
+        )}
+      </div>
+
+      <div className="relative w-full overflow-hidden">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="w-full h-auto overflow-visible select-none"
+          onMouseLeave={() => setHoverIdx(null)}
+        >
+          <defs>
+            <linearGradient id="heatFlowGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#0d9488" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#0d9488" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          {ticksQ.map((qVal) => {
+            const yPos = y(qVal);
+            return (
+              <g key={qVal}>
+                <line x1={PAD_LEFT} y1={yPos} x2={W - PAD_RIGHT} y2={yPos} stroke="#e2e8f0" strokeWidth={0.8} />
+                <text x={PAD_LEFT - 10} y={yPos + 4} fill="#64748b" fontSize={11} fontFamily="monospace" textAnchor="end">
+                  {qVal >= 1000 ? `${(qVal / 1000).toFixed(1)} kW` : `${qVal} W`}
+                </text>
+              </g>
+            );
+          })}
+
+          {ticksDT.map((dtVal) => {
+            const xPos = x(dtVal);
+            return (
+              <g key={dtVal}>
+                <line x1={xPos} y1={PAD_TOP} x2={xPos} y2={PAD_TOP + chartH} stroke="#f1f5f9" strokeWidth={0.6} />
+                <text x={xPos} y={H - 12} fill="#64748b" fontSize={10} fontFamily="monospace" textAnchor="middle">
+                  ΔT={dtVal}°
+                </text>
+              </g>
+            );
+          })}
+
+          <path d={area} fill="url(#heatFlowGrad)" />
+          <path d={path} fill="none" stroke="#0d9488" strokeWidth={2.8} strokeLinejoin="round" />
+
+          {points.map((p, i) => (
+            <circle
+              key={i}
+              cx={x(p.deltaT)}
+              cy={y(p.q)}
+              r={hoverIdx === i ? 6 : 4}
+              fill="#0d9488"
+              stroke="#ffffff"
+              strokeWidth={2}
+              className="cursor-pointer transition-all"
+              onMouseEnter={() => setHoverIdx(i)}
+            />
+          ))}
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -207,6 +554,7 @@ function CandidateTelemetryContent() {
   const [report, setReport] = useState<FinalReport | null>(null);
   const [series, setSeries] = useState<TimeseriesResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<Record<string, unknown> | null>(null);
   const [activeTab, setActiveTab] = useState<"results" | "3d" | "solver">("results");
   const [building, setBuilding] = useState<BuildingModel | null>(null);
   const [buildingError, setBuildingError] = useState<string | null>(null);
@@ -217,6 +565,13 @@ function CandidateTelemetryContent() {
   useEffect(() => {
     if (optId) {
       localStorage.setItem(LATEST_OPTIMIZATION_STORAGE_KEY, optId);
+      setStatus(null);
+      setReport(null);
+      setSeries(null);
+      setBuilding(null);
+      setBuildingError(null);
+      setError(null);
+      setErrorDetails(null);
       return;
     }
     let cancelled = false;
@@ -257,7 +612,9 @@ function CandidateTelemetryContent() {
           }
           if (lastError && !cancelled) setError(lastError instanceof Error ? lastError.message : "Pipeline artifacts are not available yet.");
         } else if (st.status === "failed") {
+          setStatus(st);
           setError(st.error?.message ?? "The pipeline run failed.");
+          setErrorDetails((st.error as { details?: Record<string, unknown> } | undefined)?.details ?? null);
         } else {
           timer = setTimeout(tick, 2000);
         }
@@ -271,14 +628,25 @@ function CandidateTelemetryContent() {
 
   // The real geometry M2 solved against (vertex-level walls/roof/floor) — fetched once the
   // recommended design_id is known, independent of the results/timeseries fetch above.
+  const targetDesignId = status?.recommended_design_id ?? report?.recommendation.design_id;
   useEffect(() => {
-    if (!optId || !report?.recommendation.design_id) return;
+    if (!optId || !targetDesignId) return;
     let cancelled = false;
-    getDesign(optId, report.recommendation.design_id)
-      .then((b) => { if (!cancelled) setBuilding(b); })
-      .catch((err) => { if (!cancelled) setBuildingError(err instanceof Error ? err.message : "Could not load the 3D model."); });
+    setBuildingError(null);
+    getDesign(optId, targetDesignId)
+      .then((b) => {
+        if (!cancelled) {
+          setBuilding(b);
+          setBuildingError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setBuildingError(err instanceof Error ? err.message : "Could not load the 3D model.");
+        }
+      });
     return () => { cancelled = true; };
-  }, [optId, report?.recommendation.design_id]);
+  }, [optId, targetDesignId]);
 
   const tempData = useMemo(() => buildTemperatureSeries(series), [series]);
   const solarData = useMemo(() => buildSolarDaily(series), [series]);
@@ -353,14 +721,100 @@ function CandidateTelemetryContent() {
   }
   // ── Backend unreachable / run failed ─────────────────────────────────────
   if (error) {
+    const reasons = (errorDetails?.reasons as Record<string, number>) || {};
+    const hasMassError = "constraints:envelope_mass_within_limit" in reasons;
+    const hasAssemblyError = Object.keys(reasons).some(
+      (r) => r.includes("assembly_composition_failed") || r.includes("no_materials_for_")
+    );
+
     return (
-      <div className="w-full px-gutter-lg py-12 max-w-[900px] mx-auto flex flex-col items-center text-center gap-4">
-        <span className="material-symbols-outlined text-[40px] text-error">error</span>
-        <h1 className="font-headline-md text-headline-md font-bold text-on-surface"><T>Simulation failed</T></h1>
-        <p className="font-body-sm text-body-sm text-error">{error}</p>
-        <Link href={ROUTES.shelterConfigurator.step1} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-body-sm font-semibold hover-lift">
-          <T>Configure a new run</T>
-        </Link>
+      <div className="w-full px-gutter-lg py-12 max-w-[800px] mx-auto flex flex-col items-center text-center gap-5">
+        <div className="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+          <span className="material-symbols-outlined text-[32px]">error</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1 className="font-headline-md text-headline-md font-bold text-on-surface"><T>Simulation Unsuccessful</T></h1>
+          <p className="font-body-sm text-body-sm text-error font-medium">{error}</p>
+        </div>
+
+        {hasMassError ? (
+          <div className="w-full p-4 rounded-xl bg-surface-container-low border border-outline-variant text-left flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-warning font-semibold font-body-sm text-sm">
+              <span className="material-symbols-outlined text-[18px]">scale</span>
+              <T>Diagnostic: Mass Constraint Exceeded</T>
+            </div>
+            <p className="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+              <T>
+                All 1,000 synthesized candidate envelopes exceeded the specified Max Total Weight limit.
+                Because heavy structural materials (stone, concrete, or rammed earth) were chosen for this floor plan,
+                the building mass naturally ranges from 40,000 to 70,000 kg.
+              </T>
+            </p>
+            <div className="pt-2 flex items-center gap-2">
+              <span className="font-label-mono-xs text-[11px] text-primary font-semibold">Recommended Fix:</span>
+              <span className="font-body-sm text-[11px] text-on-surface">
+                Clear or increase the "Max Total Weight" constraint in Step 3, or select lightweight panel materials.
+              </span>
+            </div>
+          </div>
+        ) : hasAssemblyError ? (
+          <div className="w-full p-4 rounded-xl bg-surface-container-low border border-outline-variant text-left flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-warning font-semibold font-body-sm text-sm">
+              <span className="material-symbols-outlined text-[18px]">architecture</span>
+              <T>Diagnostic: Material & Thickness Compatibility</T>
+            </div>
+            <div className="font-body-sm text-xs text-on-surface-variant leading-relaxed flex flex-col gap-1.5">
+              <p>
+                <strong className="text-on-surface">1. Roof & Interior Partition Materials:</strong> In physical construction, roofs and interior room partitions cannot be built from raw stone or rammed earth. They require structural materials such as <strong className="text-primary">Concrete</strong>, <strong className="text-primary">Plywood</strong>, or <strong className="text-primary">Timber</strong>. Ensure at least one of these is checked in Step 3.
+              </p>
+              <p>
+                <strong className="text-on-surface">2. Minimum Wall Thickness:</strong> Stone masonry has a physical minimum thickness of <strong className="text-on-surface">300 mm</strong> (range 300–550 mm). If stone is permitted, set Wall Thickness to at least 300 mm (or 350 mm) in Step 4.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center gap-2">
+              <Link
+                href={ROUTES.shelterConfigurator.step3}
+                className="px-3 py-1.5 rounded-lg bg-primary-fixed/40 border border-primary/30 text-primary font-body-sm text-xs font-semibold hover:bg-primary-fixed/60"
+              >
+                1. Enable Concrete / Plywood in Step 3 →
+              </Link>
+              <Link
+                href={ROUTES.shelterConfigurator.step4}
+                className="px-3 py-1.5 rounded-lg bg-surface-container-highest text-on-surface font-body-sm text-xs font-medium hover:bg-surface-container"
+              >
+                2. Set Wall Thickness ≥ 300 mm in Step 4 →
+              </Link>
+            </div>
+          </div>
+        ) : Object.keys(reasons).length > 0 ? (
+          <div className="w-full p-4 rounded-xl bg-surface-container-low border border-outline-variant text-left flex flex-col gap-2">
+            <span className="font-label-mono-xs text-[11px] text-on-surface-variant uppercase font-semibold">Rejection Breakdown:</span>
+            <ul className="flex flex-col gap-1 text-xs text-on-surface font-data">
+              {Object.entries(reasons).map(([reason, cnt]) => (
+                <li key={reason} className="flex justify-between border-b border-surface-container py-1 last:border-0">
+                  <span>{reason}</span>
+                  <span className="font-bold text-error">{cnt} attempts</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href={ROUTES.shelterConfigurator.step3}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-body-sm font-semibold hover-lift"
+          >
+            <span className="material-symbols-outlined text-[18px]">tune</span>
+            <T>Adjust Materials (Step 3)</T>
+          </Link>
+          <Link
+            href={ROUTES.shelterConfigurator.step4}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container-low font-body-sm font-medium text-on-surface"
+          >
+            <T>Adjust Envelope (Step 4)</T>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -526,62 +980,118 @@ function CandidateTelemetryContent() {
               <p className="font-body-sm text-body-sm text-on-surface-variant">Coldest 24h window in the {days}-day analysis · design {report.recommendation.design_id}</p>
               <div className="bg-surface-container-low rounded-xl p-4"><TemperatureChart data={tempData} /></div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: "Minimum inside temp", value: `${insideMin.toFixed(1)}°C` },
-                  { label: "Mean inside temp", value: `${insideMean.toFixed(1)}°C` },
-                  { label: "Outside minimum", value: `${ambientMin.toFixed(1)}°C` },
-                  { label: "Unmet comfort hours", value: `${obj.unmet_hours.toFixed(0)} h` },
-                ].map((s) => (
-                  <div key={s.label} className="p-3 bg-surface-container-low rounded-xl">
-                    <div className="font-data text-base font-bold text-equilibrium">{s.value}</div>
-                    <div className="font-body-sm text-[10px] text-on-surface-variant mt-0.5">{s.label}</div>
-                  </div>
-                ))}
+                <MetricCard
+                  label="Minimum Inside Temp"
+                  value={insideMin.toFixed(1)}
+                  unit="°C"
+                  subtext="Coldest point in 24h"
+                  icon="thermostat"
+                  variant="primary"
+                />
+                <MetricCard
+                  label="Mean Inside Temp"
+                  value={insideMean.toFixed(1)}
+                  unit="°C"
+                  subtext="Average interior temperature"
+                  icon="thermometer"
+                  variant="default"
+                />
+                <MetricCard
+                  label="Outside Minimum"
+                  value={ambientMin.toFixed(1)}
+                  unit="°C"
+                  subtext="Extreme outdoor cold"
+                  icon="ac_unit"
+                  variant="default"
+                />
+                <MetricCard
+                  label="Unmet Comfort Hours"
+                  value={obj.unmet_hours.toFixed(0)}
+                  unit="h"
+                  subtext={obj.unmet_hours === 0 ? "100% comfort compliance" : "Cumulative sub-setpoint"}
+                  icon={obj.unmet_hours === 0 ? "verified" : "warning"}
+                  variant={obj.unmet_hours === 0 ? "success" : "warning"}
+                />
               </div>
             </section>
 
             {/* Task 2 */}
             <section className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold bg-thermal/20 text-thermal uppercase">Task 2</span>
+                <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold bg-amber-100 text-amber-800 uppercase">Task 2</span>
                 <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Solar Thermal Energy Generated</T></h2>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">Daily solar gain through glazing · {days}-day window</p>
               <div className="bg-surface-container-low rounded-xl p-4"><SolarChart data={solarData} /></div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: "Average daily solar gain", value: `${(solarData.reduce((a, b) => a + b, 0) / Math.max(solarData.length, 1)).toFixed(2)} kWh/day` },
-                  { label: "Peak solar day", value: `${Math.max(...solarData, 0).toFixed(2)} kWh` },
-                  { label: "Total over window", value: `${solarData.reduce((a, b) => a + b, 0).toFixed(1)} kWh` },
-                ].map((s) => (
-                  <div key={s.label} className="p-3 bg-surface-container-low rounded-xl">
-                    <div className="font-data text-base font-bold text-thermal">{s.value}</div>
-                    <div className="font-body-sm text-[10px] text-on-surface-variant mt-0.5">{s.label}</div>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <MetricCard
+                  label="Average Daily Solar Gain"
+                  value={(solarData.reduce((a, b) => a + b, 0) / Math.max(solarData.length, 1)).toFixed(2)}
+                  unit="kWh/day"
+                  subtext="Passive solar harvest"
+                  icon="wb_sunny"
+                  variant="thermal"
+                />
+                <MetricCard
+                  label="Peak Solar Day"
+                  value={Math.max(...solarData, 0).toFixed(2)}
+                  unit="kWh"
+                  subtext="Max diurnal radiation"
+                  icon="solar_power"
+                  variant="thermal"
+                />
+                <MetricCard
+                  label="Total Over Window"
+                  value={solarData.reduce((a, b) => a + b, 0).toFixed(1)}
+                  unit="kWh"
+                  subtext={`${days}-day aggregate harvest`}
+                  icon="bolt"
+                  variant="thermal"
+                />
               </div>
             </section>
 
             {/* Task 3 */}
             <section className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold uppercase" style={{ backgroundColor: "#CFFAFE", color: "#0F7A8C" }}>Task 3</span>
+                <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold uppercase bg-teal-100 text-teal-800">Task 3</span>
                 <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Heat Flow vs. Ambient Temperature Difference</T></h2>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">Sized-heater power vs. inside−outside ΔT (proxy for envelope heat loss)</p>
               <div className="bg-surface-container-low rounded-xl p-4"><HeatFlowChart data={heatFlowData} /></div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: "Peak heating power", value: `${(cond.peak_heating_kw ?? 0).toFixed(2)} kW` },
-                  { label: "Total heating energy", value: `${cond.heating_energy_kwh.toFixed(1)} kWh` },
-                  { label: "Wall U-value", value: wallAssembly ? `${wallAssembly.u_value_w_m2k.toFixed(3)} W/m²K` : "—" },
-                  { label: "Temperature swing", value: `${obj.temperature_swing_c.toFixed(1)}°C` },
-                ].map((s) => (
-                  <div key={s.label} className="p-3 bg-surface-container-low rounded-xl">
-                    <div className="font-data text-base font-bold" style={{ color: "#0F7A8C" }}>{s.value}</div>
-                    <div className="font-body-sm text-[10px] text-on-surface-variant mt-0.5">{s.label}</div>
-                  </div>
-                ))}
+                <MetricCard
+                  label="Peak Heating Power"
+                  value={(cond.peak_heating_kw ?? 0).toFixed(2)}
+                  unit="kW"
+                  subtext="Worst-case sizing load"
+                  icon="mode_heat"
+                  variant="primary"
+                />
+                <MetricCard
+                  label="Total Heating Energy"
+                  value={cond.heating_energy_kwh.toFixed(1)}
+                  unit="kWh"
+                  subtext={`Cumulative over ${days} days`}
+                  icon="power"
+                  variant="default"
+                />
+                <MetricCard
+                  label="Wall U-Value"
+                  value={wallAssembly ? wallAssembly.u_value_w_m2k.toFixed(3) : "—"}
+                  unit="W/m²K"
+                  subtext="Thermal transmittance"
+                  icon="layers"
+                  variant="default"
+                />
+                <MetricCard
+                  label="Temperature Swing"
+                  value={obj.temperature_swing_c.toFixed(1)}
+                  unit="°C"
+                  subtext="Diurnal thermal stability"
+                  icon="waves"
+                  variant="default"
+                />
               </div>
             </section>
 
@@ -592,19 +1102,43 @@ function CandidateTelemetryContent() {
                   <span className="material-symbols-outlined text-primary text-[22px]">payments</span>
                   <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Lifecycle Economics (M7)</T></h2>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { label: "Total Capex", value: `₹${(econScenario.capex.total_capex_inr / 1e5).toFixed(2)}L` },
-                    { label: "Lifecycle Cost", value: `₹${(econScenario.lcc_inr / 1e5).toFixed(2)}L` },
-                    { label: "NPV vs. Baseline", value: formatLakh(econScenario.npv_vs_baseline_inr) },
-                    { label: "Simple Payback", value: formatYears(econScenario.simple_payback_years) },
-                    { label: "Annual Fuel", value: `${econScenario.annual_fuel_litres.toFixed(0)} L` },
-                  ].map((s) => (
-                    <div key={s.label} className="p-3 bg-surface-container-low rounded-xl">
-                      <div className="font-data text-base font-bold text-navy">{s.value}</div>
-                      <div className="font-body-sm text-[10px] text-on-surface-variant mt-0.5">{s.label}</div>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  <MetricCard
+                    label="Total Capex"
+                    value={`₹${(econScenario.capex.total_capex_inr / 1e5).toFixed(2)}L`}
+                    subtext="Initial fabrication & assembly"
+                    icon="receipt_long"
+                    variant="primary"
+                  />
+                  <MetricCard
+                    label="Lifecycle Cost (LCC)"
+                    value={`₹${(econScenario.lcc_inr / 1e5).toFixed(2)}L`}
+                    subtext="20-year net present cost"
+                    icon="account_balance"
+                    variant="default"
+                  />
+                  <MetricCard
+                    label="NPV vs. Baseline"
+                    value={formatLakh(econScenario.npv_vs_baseline_inr)}
+                    subtext="Net economic advantage"
+                    icon="trending_up"
+                    variant="success"
+                  />
+                  <MetricCard
+                    label="Simple Payback"
+                    value={formatYears(econScenario.simple_payback_years)}
+                    subtext="Capital recovery period"
+                    icon="schedule"
+                    variant="default"
+                  />
+                  <MetricCard
+                    label="Annual Fuel"
+                    value={`${econScenario.annual_fuel_litres.toFixed(0)}`}
+                    unit="L"
+                    subtext="Projected kerosene demand"
+                    icon="oil_barrel"
+                    variant="default"
+                  />
                 </div>
                 <p className="font-body-sm text-[11px] text-on-surface-variant">Assumption set: expected-case prices · currency {report.economics!.currency}</p>
               </section>

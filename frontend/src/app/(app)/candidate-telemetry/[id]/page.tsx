@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, redirect } from "next/navigation";
 import { useState } from "react";
 import { getCandidate } from "@/lib/mock-data";
 import { ROUTES } from "@/lib/routes";
@@ -16,8 +16,14 @@ function formatSimTime(value: number) {
 
 export default function CandidateDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const decodedId = decodeURIComponent(id || "");
+
+  if (decodedId.startsWith("opt_")) {
+    redirect(`/candidate-telemetry?opt=${encodeURIComponent(decodedId)}`);
+  }
+
   const t = useT();
-  const match = getCandidate(decodeURIComponent(id));
+  const match = getCandidate(decodedId);
   const [simTime, setSimTime] = useState(12.5);
 
   if (!match) notFound();

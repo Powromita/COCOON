@@ -95,14 +95,27 @@ export function DateInput({ id, value, onChange, invalid, min }: { id: string; v
 
 type Option<V> = { value: V; label: string; hint?: string };
 
-export function Select<V extends string>({ id, value, onChange, options }: { id: string; value: V; onChange: (v: V) => void; options: Option<V>[] }) {
+export function Select<V extends string>({
+  id,
+  value,
+  onChange,
+  options,
+  invalid,
+}: {
+  id: string;
+  value: V;
+  onChange: (v: V) => void;
+  options: Option<V>[];
+  invalid?: boolean;
+}) {
   return (
     <div className="relative flex items-center">
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value as V)}
-        className={`${INPUT} appearance-none pr-9 font-body-sm text-body-sm focus:ring-primary-container/30`}
+        className={`${INPUT} appearance-none pr-9 font-body-sm text-body-sm ${invalid ? "ring-2 ring-error/40 border-error" : "focus:ring-primary-container/30"
+          }`}
       >
         {options.map((o) => (
           <OptionLabel key={o.value} value={o.value} label={o.label} />
@@ -148,11 +161,10 @@ export function ChipGroup<V extends string>({
         return (
           <label
             key={o.id}
-            className={`inline-flex items-center gap-1.5 h-8 pl-2 pr-3 rounded-full border cursor-pointer select-none transition-colors font-body-sm text-body-sm ${
-              on
+            className={`inline-flex items-center gap-1.5 h-8 pl-2 pr-3 rounded-full border cursor-pointer select-none transition-colors font-body-sm text-body-sm ${on
                 ? "bg-primary-container text-on-primary border-transparent"
                 : "bg-surface-container-lowest text-on-surface border-outline-variant hover:bg-surface-container-low"
-            }`}
+              }`}
           >
             <input type="checkbox" className="sr-only peer" checked={on} onChange={() => toggle(o.id)} />
             <span className="material-symbols-outlined text-[16px] peer-focus-visible:outline peer-focus-visible:outline-2">
@@ -187,9 +199,8 @@ export function RadioCards<V extends string | number | null>({
         return (
           <label
             key={String(o.value)}
-            className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
-              on ? "border-primary-container bg-primary-fixed/40" : "border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low"
-            }`}
+            className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${on ? "border-primary-container bg-primary-fixed/40" : "border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low"
+              }`}
           >
             <input type="radio" name={name} checked={on} onChange={() => onChange(o.value)} className="mt-0.5 w-4 h-4 accent-primary-container" />
             <span className="flex flex-col">

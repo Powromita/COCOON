@@ -153,6 +153,7 @@ export type OptimizationRequest = {
   count?: number;
   seed?: number;
   site?: string | null;
+  materials_snapshot_id?: string | null;
   validate_with_ansys?: boolean;
   ansys_designs?: 1 | 2;
   validation_strategy?: "staged" | "exhaustive";

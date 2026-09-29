@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { DEFAULT_DRAFT, MATERIALS, stepErrors, type WizardDraft } from "@/lib/configurator/requirements";
 
-const STORAGE_KEY = "cocoon.configurator.draft.v5";
+const STORAGE_KEY = "cocoon.configurator.draft.v6";
 
 type Ctx = {
   draft: WizardDraft;
