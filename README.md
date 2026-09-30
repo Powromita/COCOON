@@ -182,6 +182,10 @@ Stage 11 | web_results.py         | Assemble the final results.json consumed by 
 
 ---
 
+## Mobile App
+
+The React Native app and fresh-clone Android setup are documented in [`mobile-app/README.md`](mobile-app/README.md). It requires the COCOON backend running locally; backend Python dependencies are listed in `requirements-mobile.txt`.
+
 ## Frontend Web App
 
 **Location:** `Frontend/cocoon-frontend/`

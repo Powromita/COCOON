@@ -4,32 +4,87 @@ React Native client for the COCOON thermal shelter design platform. The app acce
 
 The app does not substitute sample outputs for a user's requirements. A design run requires a reachable COCOON backend with the M2 candidate generator, M4 RC solver, M6 ranking and M7 economics pipeline enabled.
 
-## Run the app
+## Fresh-clone Android setup
 
-1. Start the COCOON backend from the repository root:
+The app and backend both run locally. Keep the backend running while using the app.
 
-   ```bash
-   PYTHONPATH=.:packages/contracts/python python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
-   ```
+### Prerequisites
 
-2. In `mobile-app/.env.local`, set the backend address. For the Android emulator:
+- Git
+- Python 3.10 or newer
+- Node.js 20 or newer and npm
+- Android Studio with the Android SDK and an Android emulator, or a USB-connected Android device with USB debugging enabled
 
-   ```env
-   EXPO_PUBLIC_API_URL=http://10.0.2.2:8000
-   ```
+For iOS, use macOS with Xcode and replace the Android commands below with `npm run ios`.
 
-   For a physical device, use the computer's LAN address instead. The device and computer must be on a network that permits access between them.
+### 1. Clone the mobile branch
 
-3. Start Expo:
+```bash
+git clone --branch feature/mobile-app --single-branch https://github.com/Powromita/COCOON.git
+cd COCOON
+```
 
-   ```bash
-   npm install
-   npx expo start
-   ```
+### 2. Install and start the backend
 
-   Press `a` to launch an Android emulator or scan the QR code from a development build.
+Create a virtual environment and install the mobile backend dependencies from the repository root:
+
+```bash
+python -m venv .venv
+```
+
+Activate it, then install requirements and start the API:
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
+```bash
+# macOS / Linux
+source .venv/bin/activate
+```
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements-mobile.txt
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+Leave this terminal running. Confirm the API is up at `http://localhost:8000/api/health`.
+
+### 3. Configure the app's backend URL
+
+Create `mobile-app/.env.local` by copying `mobile-app/.env.example`, then set `EXPO_PUBLIC_API_URL` for the device you are using:
+
+| Device | Backend URL |
+|---|---|
+| Android emulator | `http://10.0.2.2:8000` |
+| iOS simulator | `http://localhost:8000` |
+| Physical phone | `http://<computer-LAN-IP>:8000` |
+
+For a physical phone, allow inbound connections to port 8000 in the computer's firewall and ensure both devices are on a network that allows them to communicate. Do not use `localhost` on a phone; it refers to the phone itself.
+
+### 4. Install and launch the app
+
+In a second terminal:
+
+```bash
+cd mobile-app
+npm ci
+npm run android
+```
+
+The first Android launch builds and installs the native development app; it can take several minutes. Start an emulator first, or connect and authorize a physical Android device. On later runs, use `npm start` and press `a` to launch the Android app.
+
+### Troubleshooting
+
+- If the app cannot reach the API, check `mobile-app/.env.local`, the `/api/health` URL from the computer, the device's network connection, and firewall access to port 8000.
+- If using a physical Android device, the configured API URL must use the computer's LAN IP address, not `10.0.2.2` or `localhost`.
+- The app performs real calculations through the backend; successful installation alone does not provide results while the backend is stopped or unreachable.
 
 ## Verification commands
+
+Run from `mobile-app/`:
 
 ```bash
 npm run typecheck
