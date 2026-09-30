@@ -16,7 +16,7 @@ Loads are hourly-constant: tables hold hour k's value over (t_k, t_k+1],
 exactly how the RC engine holds weather over a step, so the result at
 t_k+1 is compared with the RC state after step k.
 """
-
+import os
 import json
 import time
 from pathlib import Path
@@ -180,7 +180,7 @@ class Reducer:
 # run
 # ---------------------------------------------------------------------------
 
-def run(job_dir, on_stage=None, export_images=True, n_proc=4):
+def run(job_dir, on_stage=None, export_images=True, n_proc=int(os.environ.get("MAPDL_NUM_CORES", "1"))):
     """Solve the package in job_dir. Writes result files into job_dir and
     returns a dict for the worker. on_stage(status, detail) reports
     PREPARING / MESHING / SOLVING / EXPORTING."""
@@ -218,9 +218,9 @@ def run(job_dir, on_stage=None, export_images=True, n_proc=4):
     report("MESHING", f"{info['n_nodes']} nodes / {info['n_elems']} SOLID70 elements")
     t0 = time.time()
     try:
-        mapdl = launch_mapdl(exec_file=exe, run_location=str(work), override=True,
-                             cleanup_on_exit=True, start_timeout=240,
-                             additional_switches=f"-m 3000 -db 1024 -np {n_proc}")
+               mapdl = launch_mapdl(exec_file=exe, run_location=str(work), override=True,
+                             cleanup_on_exit=True, start_timeout=240, nproc=n_proc,
+                             additional_switches="-m 3000 -db 1024")
     except Exception as exc:                                   # noqa: BLE001
         raise AnsysUnavailable(f"MAPDL failed to launch: {exc}") from exc
 

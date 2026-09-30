@@ -3,7 +3,9 @@
  * Base URL comes from NEXT_PUBLIC_API_BASE (see frontend/.env.local); defaults to local dev.
  */
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
 export const LATEST_OPTIMIZATION_STORAGE_KEY = "cocoon.optimizations.latest";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -13,7 +15,8 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    const message = body?.error?.message ?? `Request to ${path} failed (${res.status})`;
+    const message =
+      body?.error?.message ?? `Request to ${path} failed (${res.status})`;
     throw new Error(message);
   }
   return body as T;
@@ -75,14 +78,31 @@ export type ProjectSummary = {
   recommended_design_id?: string | null;
   validation?: { state?: string; [k: string]: unknown } | null;
   has_report: boolean;
-  site: { latitude_deg?: number | null; longitude_deg?: number | null; elevation_m?: number | null };
-  mission: { type?: string | null; occupants?: number | null; target_temperature_c?: number | null };
-  design: { template?: string | null; floors?: number | null; materials: string[] };
+  site: {
+    latitude_deg?: number | null;
+    longitude_deg?: number | null;
+    elevation_m?: number | null;
+  };
+  mission: {
+    type?: string | null;
+    occupants?: number | null;
+    target_temperature_c?: number | null;
+  };
+  design: {
+    template?: string | null;
+    floors?: number | null;
+    materials: string[];
+  };
 };
 export type CandidateOutcome = {
   design_id: string;
   revision_id: string;
-  status: "selected" | "on_front" | "dominated" | "rejected" | "screened_out_by_fast_rc";
+  status:
+    | "selected"
+    | "on_front"
+    | "dominated"
+    | "rejected"
+    | "screened_out_by_fast_rc";
   picked_as: string[];
   recommendation_state: string;
   objectives: {
@@ -103,7 +123,12 @@ export type CandidateOutcome = {
 };
 
 export type FinalReport = {
-  recommendation: { design_id: string; recommendation_state: string; picked_as: string[]; why: { sentence: string }[] };
+  recommendation: {
+    design_id: string;
+    recommendation_state: string;
+    picked_as: string[];
+    why: { sentence: string }[];
+  };
   design: {
     design_id: string;
     orientation_deg: number;
@@ -112,10 +137,30 @@ export type FinalReport = {
     airtightness_class: string;
     air_changes_per_hour: number;
     floors: number;
-    zones: { id: string; type: string; floor: number; size_m: { length_m: number; width_m: number; height_m: number }; heated: boolean }[];
-    assemblies: { id: string; name: string; used_for: string[]; u_value_w_m2k: number; layers_inner_to_outer: { material: string; name: string; thickness_mm: number }[] }[];
+    zones: {
+      id: string;
+      type: string;
+      floor: number;
+      size_m: { length_m: number; width_m: number; height_m: number };
+      heated: boolean;
+    }[];
+    assemblies: {
+      id: string;
+      name: string;
+      used_for: string[];
+      u_value_w_m2k: number;
+      layers_inner_to_outer: {
+        material: string;
+        name: string;
+        thickness_mm: number;
+      }[];
+    }[];
     quantities: Record<string, unknown> | null;
-    heater_plan?: { capacity_kw_each: number; fuel?: string | null; zone_ids: string[] } | null;
+    heater_plan?: {
+      capacity_kw_each: number;
+      fuel?: string | null;
+      zone_ids: string[];
+    } | null;
   };
   performance: {
     conditioned_with_sized_heater: { summary: Record<string, number> };
@@ -124,15 +169,32 @@ export type FinalReport = {
   };
   economics: {
     currency: string;
-    scenarios: Record<string, {
-      capex: { materials_inr: number; labour_inr: number; transport_inr: number; equipment_inr: number; total_capex_inr: number };
-      lcc_inr: number; annual_fuel_litres: number; npv_vs_baseline_inr: number | null;
-      simple_payback_years: number | null; discounted_payback_years: number | null; break_even_year: number | null;
-    }>;
+    scenarios: Record<
+      string,
+      {
+        capex: {
+          materials_inr: number;
+          labour_inr: number;
+          transport_inr: number;
+          equipment_inr: number;
+          total_capex_inr: number;
+        };
+        lcc_inr: number;
+        annual_fuel_litres: number;
+        npv_vs_baseline_inr: number | null;
+        simple_payback_years: number | null;
+        discounted_payback_years: number | null;
+        break_even_year: number | null;
+      }
+    >;
   } | null;
   alternatives: CandidateOutcome[];
   validation: { state: string; [k: string]: unknown };
-  input: { site: Record<string, unknown>; mission: Record<string, unknown>; constraints?: { heater_fuels?: string[]; [k: string]: unknown } };
+  input: {
+    site: Record<string, unknown>;
+    mission: Record<string, unknown>;
+    constraints?: { heater_fuels?: string[]; [k: string]: unknown };
+  };
   provenance: { weather_snapshot_id: string; setpoint_c: number };
 };
 
@@ -144,7 +206,11 @@ export type TimeseriesPoint = {
   zone_solar_w: Record<string, number>;
 };
 
-export type TimeseriesResponse = { which: string; zone_ids: string[]; points: TimeseriesPoint[] };
+export type TimeseriesResponse = {
+  which: string;
+  zone_ids: string[];
+  points: TimeseriesPoint[];
+};
 
 export type RunOptions = {
   hvac_mode: "free_floating" | "ideal_load" | "capacity_limited";
@@ -177,28 +243,56 @@ export type PreflightResult = {
   allowed_floor_counts: number[];
 };
 
-export async function preflightOptimization(body: OptimizationRequest): Promise<PreflightResult> {
-  return apiFetch("/api/v1/optimizations/preflight", { method: "POST", body: JSON.stringify(body) });
+export async function preflightOptimization(
+  body: OptimizationRequest,
+): Promise<PreflightResult> {
+  return apiFetch("/api/v1/optimizations/preflight", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
-export function startOptimization(body: OptimizationRequest): Promise<{ optimization_id: string; status: string; status_url: string }> {
-  return apiFetch("/api/v1/optimizations", { method: "POST", body: JSON.stringify(body) });
+export function startOptimization(
+  body: OptimizationRequest,
+): Promise<{ optimization_id: string; status: string; status_url: string }> {
+  return apiFetch("/api/v1/optimizations", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
-export function listOptimizations(): Promise<{ optimizations: OptimizationListItem[] }> {
+export function listOptimizations(): Promise<{
+  optimizations: OptimizationListItem[];
+}> {
   return apiFetch("/api/v1/optimizations");
 }
 export function listProjects(): Promise<{ projects: ProjectSummary[] }> {
   return apiFetch("/api/v1/projects");
 }
-export function deleteOptimization(id: string): Promise<{ deleted: boolean; optimization_id: string }> {
-  return apiFetch(`/api/v1/optimizations/${encodeURIComponent(id)}`, { method: "DELETE" });
+export function deleteOptimization(
+  id: string,
+): Promise<{ deleted: boolean; optimization_id: string }> {
+  return apiFetch(`/api/v1/optimizations/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
-export function deleteProject(id: string): Promise<{ deleted: boolean; project_id: string; deleted_runs_count: number }> {
-  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, { method: "DELETE" });
+export function deleteProject(id: string): Promise<{
+  deleted: boolean;
+  project_id: string;
+  deleted_runs_count: number;
+}> {
+  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
-export function renameProject(id: string, name: string): Promise<{ success: boolean; project_id: string; name: string }> {
-  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ name }) });
+export function renameProject(
+  id: string,
+  name: string,
+): Promise<{ success: boolean; project_id: string; name: string }> {
+  return apiFetch(`/api/v1/projects/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name }),
+  });
 }
 export function getOptimization(id: string): Promise<OptimizationStatus> {
   return apiFetch(`/api/v1/optimizations/${id}`);
@@ -208,7 +302,13 @@ export function getReport(id: string): Promise<FinalReport> {
   return apiFetch(`/api/v1/optimizations/${id}/report`);
 }
 
-export function getTimeseries(id: string, which: "conditioned" | "free_floating" | "baseline_conditioned" = "conditioned"): Promise<TimeseriesResponse> {
+export function getTimeseries(
+  id: string,
+  which:
+    | "conditioned"
+    | "free_floating"
+    | "baseline_conditioned" = "conditioned",
+): Promise<TimeseriesResponse> {
   return apiFetch(`/api/v1/optimizations/${id}/timeseries?which=${which}`);
 }
 
@@ -269,6 +369,11 @@ export type BuildingModel = {
   assemblies: Record<string, BuildingAssembly>;
 };
 
-export function getDesign(optimizationId: string, designId: string): Promise<BuildingModel> {
-  return apiFetch(`/api/v1/optimizations/${optimizationId}/designs/${designId}`);
+export function getDesign(
+  optimizationId: string,
+  designId: string,
+): Promise<BuildingModel> {
+  return apiFetch(
+    `/api/v1/optimizations/${optimizationId}/designs/${designId}`,
+  );
 }
