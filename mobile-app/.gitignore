@@ -42,3 +42,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# The repo root ignores "results/" (pipeline output). The app has source folders
+# with that name (app/results, components/results) that must be tracked.
+!results/

@@ -2,7 +2,6 @@ import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { Text, View, type ColorValue } from "react-native";
 
-import { JobMonitorErrorBanner, OfflineBanner } from "../../components/common/StatusBanners";
 import { AppHeader } from "../../components/layout/AppHeader";
 import { useT } from "../../i18n";
 import { useTheme } from "../../theme";
@@ -27,8 +26,6 @@ export default function TabsLayout() {
     <Tabs
       screenLayout={({ children }) => (
         <View style={{ flex: 1 }}>
-          <OfflineBanner />
-          <JobMonitorErrorBanner />
           {children}
         </View>
       )}

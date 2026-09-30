@@ -13,7 +13,6 @@ import { OUTCOME_STATUS_LABELS } from "../../../adapters/candidates";
 import { formatObjectiveByKey } from "../../../components/candidates/objectiveFormat";
 import { EmptyState } from "../../../components/common/EmptyState";
 import { QueryView } from "../../../components/common/QueryView";
-import { FixtureBanner } from "../../../components/common/StatusBanners";
 import { useCandidates, useDesign } from "../../../hooks/useCocoon";
 import { useAppStore } from "../../../store/app.store";
 import { useTheme } from "../../../theme";
@@ -117,7 +116,6 @@ export default function CompareScreen() {
     <>
       <Stack.Screen options={{ title: "Compare designs" }} />
       <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: spacing.lg }}>
-        <FixtureBanner />
         <QueryView query={candidates} loadingLabel="Loading candidates…">
           {({ data }) => {
             const outcomes = compareIds

@@ -1,23 +1,17 @@
 /**
  * Central place that reads build-time environment configuration.
  *
- * EXPO_PUBLIC_DATA_PROVIDER picks the provider behind every service
- * interface (see services/registry.ts):
- *   "fixture" — recorded backend responses + M0 sample fixtures (default)
- *   "api"     — the FastAPI backend at EXPO_PUBLIC_API_URL
- * The legacy value "mock" is accepted as a synonym for "fixture".
+ * All user-facing services use the COCOON API provider. The API address is
+ * configurable per development device or deployment environment.
  *
  * EXPO_PUBLIC_* variables are inlined into the JS bundle at build time, so
  * nothing secret may ever be put in one.
  */
 
-export type DataProvider = "fixture" | "api";
-export type AppEnvironment = "development" | "staging" | "production";
+import { Platform } from "react-native";
 
-function readDataProvider(): DataProvider {
-  const raw = process.env.EXPO_PUBLIC_DATA_PROVIDER;
-  return raw === "api" ? "api" : "fixture";
-}
+export type DataProvider = "api" | "fixture";
+export type AppEnvironment = "development" | "staging" | "production";
 
 function readAppEnv(): AppEnvironment {
   const raw = process.env.EXPO_PUBLIC_APP_ENV;
@@ -27,7 +21,8 @@ function readAppEnv(): AppEnvironment {
 /** Trailing slashes are stripped so paths can always be appended as "/api/...". */
 function readApiUrl(): string | undefined {
   const raw = process.env.EXPO_PUBLIC_API_URL?.trim();
-  return raw ? raw.replace(/\/+$/, "") : undefined;
+  const fallback = Platform.OS === "android" ? "http://10.0.2.2:8000" : "http://localhost:8000";
+  return (raw || fallback).replace(/\/+$/, "");
 }
 
 function readTimeoutMs(): number {
@@ -35,8 +30,10 @@ function readTimeoutMs(): number {
   return Number.isFinite(n) && n > 0 ? n : 30_000;
 }
 
-export const DATA_PROVIDER: DataProvider = readDataProvider();
-export const IS_FIXTURE_MODE = DATA_PROVIDER === "fixture";
+// User-facing builds always use real service responses. Recorded fixtures remain
+// available to tests through direct service construction, never as app data.
+export const DATA_PROVIDER: DataProvider = "api";
+export const IS_FIXTURE_MODE = false;
 export const APP_ENV: AppEnvironment = readAppEnv();
 export const API_URL: string | undefined = readApiUrl();
 export const API_TIMEOUT_MS: number = readTimeoutMs();

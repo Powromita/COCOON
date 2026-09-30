@@ -1,14 +1,11 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text } from "react-native";
 
 import { PrimaryButton } from "../../components/common/PrimaryButton";
-import { SecondaryButton } from "../../components/common/SecondaryButton";
 import { SectionHeader } from "../../components/common/SectionHeader";
-import { FixtureBanner } from "../../components/common/StatusBanners";
 import { RunCard } from "../../components/history/RunCard";
 import { ProjectListRow } from "../../components/projects/ProjectListRow";
-import { SystemStatusCard } from "../../components/status/SystemStatusCard";
 import { useRunHistory } from "../../hooks/useCocoon";
 import { useProjectsList } from "../../hooks/useProjects";
 import { useT } from "../../i18n";
@@ -31,7 +28,6 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxxl }}>
-      <FixtureBanner />
       <Text style={[typography.title, { color: colors.primary, marginBottom: spacing.xs }]}>
         Predict. Compare. Validate. Recommend.
       </Text>
@@ -58,11 +54,6 @@ export default function HomeScreen() {
         runs.map((r) => <RunCard key={r.optimizationId} run={r} />)
       )}
 
-      <SectionHeader title={t("COCOON system status")} />
-      <SystemStatusCard compact />
-      <View style={{ marginBottom: spacing.xl }}>
-        <SecondaryButton label="Full status" onPress={() => router.push("/(tabs)/settings")} />
-      </View>
     </ScrollView>
   );
 }

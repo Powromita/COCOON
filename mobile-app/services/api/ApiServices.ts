@@ -12,7 +12,7 @@
  *   /api/v1/visualizations/{rev}      → geometry-derived 3D view, labelled as such
  *   /api/v1/auth/*                    → "Authentication service unavailable"
  */
-import type { AnsysValidationResult, BuildingModel, Project, RequirementsContract, SimulationResult } from "@cocoon/contracts";
+import type { AnsysValidationResult, BuildingModel, MaterialRecord, Project, RequirementsContract, SimulationResult } from "@cocoon/contracts";
 
 
 import { buildingToVisualizationModel } from "../../adapters/visualization";
@@ -98,6 +98,7 @@ export class ApiGenerationService implements GenerationService {
   async startGeneration(input: StartGenerationInput): Promise<{ jobId: string }> {
     const body = {
       requirements: input.requirements,
+      site: input.site,
       count: input.count,
       seed: input.seed,
       materials_snapshot_id: input.materialsSnapshotId ?? null,
@@ -239,8 +240,7 @@ export class ApiMaterialsService implements MaterialsService {
         snapshotId: s.snapshot_id,
         checksum: s.checksum_sha256,
         materialIds: [...s.materials].sort(),
-        // The endpoint lists ids only; properties are not invented here.
-        materials: null,
+        materials: s.material_records ? Object.values(s.material_records) as MaterialRecord[] : null,
       })),
     };
   }

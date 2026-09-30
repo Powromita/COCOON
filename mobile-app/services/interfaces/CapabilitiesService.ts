@@ -46,6 +46,7 @@ export interface CapabilitiesSnapshot {
   schemaVersions: string[];
   /** Cached weather archives the backend can freeze snapshots from (M3). */
   weatherSites: string[];
+  weatherSiteDetails: import("../../types/backend").WeatherSite[];
   entries: CapabilityEntry[];
 }
 

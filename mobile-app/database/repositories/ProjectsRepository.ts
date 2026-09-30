@@ -64,10 +64,8 @@ export function displayStatusFor(row: ProjectRow, isCorrupt: boolean): ProjectDi
 }
 
 function locationLabel(req: DraftRequirements | undefined): string | null {
-  const s = req?.site;
-  if (typeof s?.latitude_deg !== "number" || typeof s.longitude_deg !== "number") return null;
-  const elev = typeof s.elevation_m === "number" ? ` · ${Math.round(s.elevation_m)} m` : "";
-  return `${s.latitude_deg.toFixed(3)}°, ${s.longitude_deg.toFixed(3)}°${elev}`;
+  if (typeof req?.location_name === "string" && req.location_name.trim().length > 0) return req.location_name;
+  return null;
 }
 
 function buildRecord(row: ProjectRow): ProjectRecord {

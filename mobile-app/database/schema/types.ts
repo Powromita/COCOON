@@ -17,6 +17,9 @@ export interface DraftGenerationOptions {
 
 /** Draft of an M0 RequirementsContract — the groups mirror the contract exactly. */
 export interface DraftRequirements {
+  /** UI location chosen from a real backend weather archive; not part of M0. */
+  location_name?: string;
+  weather_archive_site?: string;
   site?: Partial<SiteSpecification>;
   mission?: Partial<MissionRequirements>;
   constraints?: Partial<DesignConstraints>;

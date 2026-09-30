@@ -93,6 +93,7 @@ export class FixtureCapabilitiesService implements CapabilitiesService {
       authMode: null,
       schemaVersions: recorded.schema_versions,
       weatherSites: m.m3_weather_sites ?? [],
+      weatherSiteDetails: [],
       entries,
     };
   }

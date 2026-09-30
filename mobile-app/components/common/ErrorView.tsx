@@ -40,7 +40,10 @@ export function ErrorView({ error, onRetry, title, compact }: ErrorViewProps) {
       ]}
     >
       <View style={{ marginBottom: spacing.xs }}>
-        <Tag label={e.category} tone={e.category === "NOT AVAILABLE" ? "neutral" : e.category === "NETWORK ERROR" ? "warning" : "danger"} />
+        <Tag
+          label={e.category === "NETWORK ERROR" ? "Connection issue" : e.category === "NOT AVAILABLE" ? "Service response" : "Needs attention"}
+          tone={e.category === "NOT AVAILABLE" ? "neutral" : e.category === "NETWORK ERROR" ? "warning" : "danger"}
+        />
       </View>
       <Text style={[typography.subtitle, { color: colors.textPrimary }]}>{title ?? e.title}</Text>
       <Text style={[typography.body, { color: colors.textSecondary, marginTop: spacing.xs }]}>{e.message}</Text>

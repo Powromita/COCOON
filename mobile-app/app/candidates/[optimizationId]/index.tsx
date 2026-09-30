@@ -13,7 +13,7 @@ import { PrimaryButton } from "../../../components/common/PrimaryButton";
 import { QueryView } from "../../../components/common/QueryView";
 import { SecondaryButton } from "../../../components/common/SecondaryButton";
 import { SelectField } from "../../../components/common/SelectField";
-import { FixtureBanner, SourceNote } from "../../../components/common/StatusBanners";
+import { SourceNote } from "../../../components/common/StatusBanners";
 import { useCandidates } from "../../../hooks/useCocoon";
 import { useProjectRecord, useSelectDesign } from "../../../hooks/useProjects";
 import { MAX_COMPARE, useAppStore } from "../../../store/app.store";
@@ -52,7 +52,6 @@ export default function CandidatesScreen() {
                 contentContainerStyle={{ padding: spacing.lg, paddingBottom: 120 }}
                 ListHeaderComponent={
                   <View>
-                    <FixtureBanner />
                     <SourceNote source={source} fetchedAt={fetchedAt} />
                     <Text style={[typography.body, { color: colors.textPrimary }]}>
                       {data.candidates.length} designs · validation: {validationStateLabel(data.validation?.state)}

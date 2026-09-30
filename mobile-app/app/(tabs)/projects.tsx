@@ -1,15 +1,8 @@
-/**
- * Projects — three origins, never mixed:
- *   LOCAL  — saved on this device (SQLite), editable, the working set.
- *   REMOTE — from the backend's project service (API mode). main has no
- *            project endpoint, so this section says so instead of looking empty.
- *   DEMO   — demo mode only: the M0 package's sample project, read-only.
- */
+/** Locally saved requirements drafts, with calculation results linked to backend runs. */
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, FlatList, Platform, RefreshControl, Text, View } from "react-native";
 
-import { projectToListItem } from "../../adapters/project";
 import { EmptyState } from "../../components/common/EmptyState";
 import { ErrorView } from "../../components/common/ErrorView";
 import { InfoBanner } from "../../components/common/InfoBanner";
@@ -17,14 +10,10 @@ import { LoadingState } from "../../components/common/LoadingState";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { SectionHeader } from "../../components/common/SectionHeader";
 import { ProjectListRow } from "../../components/projects/ProjectListRow";
-import { IS_FIXTURE_MODE } from "../../constants/env";
 import type { ProjectListItem } from "../../database/schema/types";
-import { useServiceProjects } from "../../hooks/useCocoon";
-import { useCreateDraft, useDeleteProject, useProjectsList, useRestoreProject } from "../../hooks/useProjects";
+import { useDeleteProject, useProjectsList, useRestoreProject } from "../../hooks/useProjects";
 import { useT } from "../../i18n";
 import { useTheme } from "../../theme";
-import { isAppErrorKind } from "../../utils/errors";
-import { sampleRequirementsDraft } from "../../validation/templates";
 
 function UndoSnackbar({ name, onUndo }: { name: string; onUndo: () => void }) {
   const { colors, radii, spacing, typography } = useTheme();
@@ -49,60 +38,6 @@ function UndoSnackbar({ name, onUndo }: { name: string; onUndo: () => void }) {
       <Text accessibilityRole="button" onPress={onUndo} style={[typography.bodyStrong, { color: colors.textInverse, padding: spacing.sm }]}>
         UNDO
       </Text>
-    </View>
-  );
-}
-
-function ServiceProjectsSection() {
-  const { colors, spacing, typography } = useTheme();
-  const t = useT();
-  const router = useRouter();
-  const projects = useServiceProjects(IS_FIXTURE_MODE);
-  const createDraft = useCreateDraft();
-  const origin = "DEMO";
-
-  const useTemplate = () =>
-    Alert.alert("Demo project", "Demo projects are read-only. Start a new local project pre-filled with this sample?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Use as template",
-        onPress: async () => {
-          const created = await createDraft.mutateAsync({ name: "Leh sample (from demo)", requirements: sampleRequirementsDraft() });
-          router.push({ pathname: "/project/[id]/edit", params: { id: created.id, step: "0" } });
-        },
-      },
-    ]);
-
-  if (!IS_FIXTURE_MODE) {
-    return (
-      <View style={{ marginTop: spacing.lg }}>
-        <SectionHeader title="REMOTE · COCOON backend" caption="Server project storage is not available on this backend." />
-        <InfoBanner title="Remote projects unavailable" message="The connected COCOON backend has no project-listing endpoint. Projects created in this app are saved locally on this device." />
-      </View>
-    );
-  }
-
-  return (
-    <View style={{ marginTop: spacing.lg }}>
-      <SectionHeader
-        title={`${t(origin)} · ${IS_FIXTURE_MODE ? "sample data" : "COCOON backend"}`}
-        caption="Read-only example from the M0 contracts package."
-      />
-      {projects.isError ? (
-        isAppErrorKind(projects.error, "not_supported") ? (
-          <InfoBanner title="Demo project unavailable" message="The recorded sample project could not be loaded. You can still create a local project." />
-        ) : (
-          <ErrorView compact error={projects.error} onRetry={() => void projects.refetch()} />
-        )
-      ) : !projects.data ? (
-        <Text style={[typography.caption, { color: colors.textSecondary }]}>Loading…</Text>
-      ) : projects.data.data.length === 0 ? (
-        <Text style={[typography.caption, { color: colors.textSecondary }]}>No projects on the backend.</Text>
-      ) : (
-        projects.data.data.map((p) => (
-          <ProjectListRow key={p.project_id} item={projectToListItem(p)} origin={origin} onPress={useTemplate} />
-        ))
-      )}
     </View>
   );
 }
@@ -166,7 +101,6 @@ export default function ProjectsScreen() {
             </View>
           }
           ListEmptyComponent={<EmptyState title="No local projects yet" message="Create a project to describe a shelter and generate designs." />}
-          ListFooterComponent={<ServiceProjectsSection />}
           renderItem={({ item }) => (
             <ProjectListRow
               item={item}

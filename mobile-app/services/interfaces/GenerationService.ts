@@ -4,6 +4,8 @@ import type { OptimizationJobStatus, SiteUsed } from "../../types/backend";
 
 export interface StartGenerationInput {
   requirements: RequirementsContract;
+  /** Selected cached weather archive, passed through to the backend optimizer. */
+  site?: string;
   /** Number of candidate designs to generate (backend accepts 1..200). */
   count: number;
   seed: number;
@@ -29,7 +31,7 @@ export interface GenerationJob {
   weatherSnapshotId?: string;
   siteUsed?: SiteUsed;
   warnings?: string[];
-  error?: { code?: string; message: string; retryable?: boolean };
+  error?: { code?: string; message: string; retryable?: boolean; details?: Record<string, unknown> };
 }
 
 /**

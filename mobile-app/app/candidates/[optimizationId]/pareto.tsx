@@ -19,7 +19,6 @@ import { LoadingState } from "../../../components/common/LoadingState";
 import { SecondaryButton } from "../../../components/common/SecondaryButton";
 import { SectionHeader } from "../../../components/common/SectionHeader";
 import { SelectField } from "../../../components/common/SelectField";
-import { FixtureBanner } from "../../../components/common/StatusBanners";
 import { Tag } from "../../../components/common/Tag";
 import { useCandidates, usePareto } from "../../../hooks/useCocoon";
 import { useAppStore } from "../../../store/app.store";
@@ -89,7 +88,6 @@ export default function ParetoScreen() {
     <>
       <Stack.Screen options={{ title: "Trade-offs" }} />
       <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: spacing.lg }}>
-        <FixtureBanner />
         <SelectField label="Horizontal axis" options={axisOptions} value={xk} onChange={setXKey} />
         <SelectField label="Vertical axis" options={axisOptions} value={yk} onChange={setYKey} />
         {xk && yk ? (

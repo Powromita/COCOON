@@ -3,9 +3,10 @@
  * RequirementsContract (see validation/steps.ts for the mapping), bound to
  * the wizard's single React Hook Form.
  */
-import React, { useEffect, useState } from "react";
-import { Controller, useWatch } from "react-hook-form";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Controller, useWatch, type UseFormSetValue } from "react-hook-form";
+import DateTimePicker, { DateTimePickerAndroid, type DateTimePickerChangeEvent } from "@react-native-community/datetimepicker";
+import { Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useAssumptionSets, useCapabilities, useMaterialCatalog } from "../../../hooks/useCocoon";
 import { useTheme } from "../../../theme";
@@ -14,23 +15,22 @@ import { formatNumber, humanize } from "../../../utils/format";
 import {
   HEATER_FUELS,
   MISSION_TYPES,
-  presetOffset,
   ROOM_TYPES,
-  TIMEZONE_PRESETS,
   WEATHER_SOURCES,
 } from "../../../validation/options";
+import type { WeatherSite } from "../../../types/backend";
 import { AppCard } from "../../common/AppCard";
 import { ErrorView } from "../../common/ErrorView";
-import { InfoBanner } from "../../common/InfoBanner";
 import { KeyValueRow } from "../../common/KeyValueRow";
 import { SectionHeader } from "../../common/SectionHeader";
 import { SelectField } from "../../common/SelectField";
 import { Tag } from "../../common/Tag";
 import { TextField } from "../../common/TextField";
-import { FormChoice, FormMultiChoice, FormNumber, FormText, type DraftControl } from "../../forms/FormFields";
+import { FormChoice, FormMultiChoice, FormNumber, type DraftControl } from "../../forms/FormFields";
 
 interface StepProps {
   control: DraftControl;
+  setValue?: UseFormSetValue<import("../../../database/schema/types").DraftRequirements>;
 }
 
 function Note({ children }: { children: React.ReactNode }) {
@@ -41,45 +41,69 @@ function Note({ children }: { children: React.ReactNode }) {
 // ---------------------------------------------------------------------------
 // 1. Location — site.latitude_deg / longitude_deg / elevation_m / timezone
 // ---------------------------------------------------------------------------
-export function LocationStep({ control }: StepProps) {
+export function LocationStep({ control, setValue }: StepProps) {
   const caps = useCapabilities();
-  const sites = caps.data?.weatherSites ?? [];
+  const sites = caps.data?.weatherSiteDetails ?? [];
+  const [search, setSearch] = useState("");
+  const selectedSite = useWatch({ control, name: "weather_archive_site" });
+  const filteredSites = sites.filter((site) => site.display_name.toLowerCase().includes(search.trim().toLowerCase()));
   return (
     <>
-      <FormNumber control={control} name="site.latitude_deg" label="Latitude" unit="°" required allowNegative helperText="Decimal degrees, −90 to 90 (north positive)." />
-      <FormNumber control={control} name="site.longitude_deg" label="Longitude" unit="°" required allowNegative helperText="Decimal degrees, −180 to 180 (east positive)." />
-      <FormNumber control={control} name="site.elevation_m" label="Elevation" unit="m" required allowNegative helperText="Height above sea level." />
       <Controller
         control={control}
-        name="site.timezone"
+        name="location_name"
         render={({ field, fieldState }) => (
           <>
             <TextField
-              label="Timezone (IANA)"
+              label="Location"
               required
-              autoCapitalize="none"
-              value={typeof field.value === "string" ? field.value : ""}
-              onChangeText={(t) => field.onChange(t === "" ? undefined : t)}
-              placeholder="e.g. Asia/Kolkata"
+              value={typeof field.value === "string" ? field.value : search}
+              onChangeText={(text) => {
+                setSearch(text);
+                field.onChange(text);
+                setValue?.("weather_archive_site", undefined);
+              }}
+              placeholder="Search a weather archive location"
+              helperText="Choose a location with archived weather data. Coordinates are filled in automatically."
               error={fieldState.error?.message}
             />
-            <View style={styles.chipRow}>
-              {TIMEZONE_PRESETS.map((p) => (
-                <Chip key={p.timezone} label={p.timezone} selected={field.value === p.timezone} onPress={() => field.onChange(p.timezone)} />
-              ))}
-            </View>
+            {!selectedSite && filteredSites.length > 0 ? (
+              <View style={styles.chipRow}>
+                {filteredSites.map((site) => (
+                  <Chip
+                    key={site.site_id}
+                    label={site.display_name}
+                    onPress={() => {
+                      field.onChange(site.display_name);
+                      setSearch(site.display_name);
+                      setValue?.("weather_archive_site", site.site_id, { shouldValidate: true });
+                      setValue?.("site.latitude_deg", site.latitude_deg, { shouldValidate: true });
+                      setValue?.("site.longitude_deg", site.longitude_deg, { shouldValidate: true });
+                      setValue?.("site.elevation_m", site.elevation_m, { shouldValidate: true });
+                      setValue?.("site.timezone", "Asia/Kolkata", { shouldValidate: true });
+                      setValue?.("site.weather_source", "NASA_POWER", { shouldValidate: true });
+                    }}
+                  />
+                ))}
+              </View>
+            ) : null}
+            {selectedSite && sites.find((site) => site.site_id === selectedSite) ? (
+              <LocationSummary site={sites.find((site) => site.site_id === selectedSite)!} />
+            ) : null}
           </>
         )}
       />
-      <InfoBanner
-        title="Weather data"
-        message={
-          sites.length > 0
-            ? `The backend evaluates designs with weather from its nearest cached archive (${sites.map(humanize).join(", ")}) and reports which site and distance it used.`
-            : "Weather is selected by the backend from its cached archives. The list of archives is not available right now."
-        }
-      />
+      <FormNumber control={control} name="site.elevation_m" label="Elevation" unit="m" required allowNegative helperText="Height above sea level." />
     </>
+  );
+}
+
+function LocationSummary({ site }: { site: WeatherSite }) {
+  const { colors, typography } = useTheme();
+  return (
+    <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: 12 }]}>
+      Coordinates assigned from the {site.display_name} weather archive.
+    </Text>
   );
 }
 
@@ -87,7 +111,6 @@ export function LocationStep({ control }: StepProps) {
 // 2. Weather — site.analysis_start / analysis_end / weather_source
 // ---------------------------------------------------------------------------
 const ISO_RE = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}):\d{2}(?:\.\d+)?([+-]\d{2}:\d{2}|Z)$/;
-const LOCAL_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 function splitIso(value: unknown): { local: string; offset?: string } {
   if (typeof value !== "string") return { local: "" };
@@ -126,51 +149,86 @@ function DateTimeInput({
   onChange: (v: string | undefined) => void;
   error?: string;
 }) {
-  const [text, setText] = useState(splitIso(value).local);
-  // Re-compose the stored timestamp when the UTC offset changes.
-  useEffect(() => {
-    if (LOCAL_RE.test(text)) onChange(`${text.replace(" ", "T")}:00${offset}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [offset]);
+  const { colors, radii, spacing, typography } = useTheme();
+  const [pickerMode, setPickerMode] = useState<"date" | "time" | null>(null);
+  const [pendingDate, setPendingDate] = useState<Date | null>(null);
+  const parsed = typeof value === "string" ? new Date(value) : new Date();
+  const currentDate = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  const pickedValue = splitIso(value).local;
+
+  const savePicked = (date: Date) => {
+    const [hoursPart, minutesPart] = offset.replace("−", "-").split(":");
+    const offsetMinutes = Math.sign(Number(hoursPart)) * (Math.abs(Number(hoursPart)) * 60 + Number(minutesPart));
+    const local = new Date(date.getTime() + offsetMinutes * 60_000).toISOString().slice(0, 16).replace("T", " ");
+    onChange(`${local.replace(" ", "T")}:00${offset}`);
+  };
+
+  const openPicker = (mode: "date" | "time") => {
+    if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        value: currentDate,
+        mode,
+        display: mode === "date" ? "calendar" : "clock",
+        timeZoneName: "Asia/Kolkata",
+        is24Hour: true,
+        onValueChange: (_event: DateTimePickerChangeEvent, date: Date) => savePicked(date),
+      });
+    } else {
+      setPickerMode(mode);
+      setPendingDate(currentDate);
+    }
+  };
+
   return (
-    <TextField
-      label={`${label} (YYYY-MM-DD HH:MM)`}
-      required
-      value={text}
-      onChangeText={(t) => {
-        setText(t);
-        if (t === "") onChange(undefined);
-        // A well-formed local time is stored as a full, timezone-aware ISO timestamp (M0 requires it);
-        // anything else is stored as typed so validation can flag it.
-        else onChange(LOCAL_RE.test(t) ? `${t.replace(" ", "T")}:00${offset}` : t);
-      }}
-      placeholder="2026-01-01 00:00"
-      error={error}
-    />
+    <View style={{ marginBottom: spacing.md }}>
+      <Text style={[typography.label, { color: colors.textPrimary, marginBottom: spacing.xs }]}>{label} *</Text>
+      <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.xs }]}>India Standard Time (UTC+05:30)</Text>
+      <View style={{ flexDirection: "row", gap: spacing.sm }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Choose ${label.toLowerCase()} date`} onPress={() => openPicker("date")} style={[styles.dateButton, { flex: 1, borderColor: colors.border, borderRadius: radii.sm, padding: spacing.md }]}>
+          <Text style={[typography.caption, { color: colors.textSecondary }]}>DATE</Text>
+          <Text style={[typography.bodyStrong, { color: colors.textPrimary, marginTop: 4 }]}>{pickedValue ? pickedValue.slice(0, 10) : "Choose date"}</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Choose ${label.toLowerCase()} time`} onPress={() => openPicker("time")} style={[styles.dateButton, { flex: 1, borderColor: colors.border, borderRadius: radii.sm, padding: spacing.md }]}>
+          <Text style={[typography.caption, { color: colors.textSecondary }]}>TIME</Text>
+          <Text style={[typography.bodyStrong, { color: colors.textPrimary, marginTop: 4 }]}>{pickedValue ? pickedValue.slice(11, 16) : "Choose time"}</Text>
+        </Pressable>
+      </View>
+      {error ? <Text style={[typography.caption, { color: colors.danger, marginTop: spacing.xs }]}>{error}</Text> : null}
+      {Platform.OS === "ios" && pickerMode && pendingDate ? (
+        <Modal transparent animationType="slide" onRequestClose={() => setPickerMode(null)}>
+          <View style={styles.pickerScrim}>
+            <View style={[styles.pickerSheet, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radii.md, padding: spacing.md }]}>
+              <View style={styles.pickerActions}>
+                <Pressable accessibilityRole="button" onPress={() => setPickerMode(null)}><Text style={[typography.body, { color: colors.textSecondary }]}>Cancel</Text></Pressable>
+                <Text style={[typography.bodyStrong, { color: colors.textPrimary }]}>{pickerMode === "date" ? "Select date" : "Select time"}</Text>
+                <Pressable accessibilityRole="button" onPress={() => { savePicked(pendingDate); setPickerMode(null); }}><Text style={[typography.bodyStrong, { color: colors.accent }]}>Done</Text></Pressable>
+              </View>
+              <DateTimePicker
+                value={pendingDate}
+                mode={pickerMode}
+                display={pickerMode === "date" ? "inline" : "spinner"}
+                timeZoneOffsetInMinutes={330}
+                onValueChange={(_event, date) => setPendingDate(date)}
+                themeVariant="light"
+              />
+            </View>
+          </View>
+        </Modal>
+      ) : null}
+    </View>
   );
 }
 
 export function WeatherStep({ control }: StepProps) {
-  const timezone = useWatch({ control, name: "site.timezone" });
   const start = useWatch({ control, name: "site.analysis_start" });
-  const [offset, setOffset] = useState<string>(splitIso(start).offset ?? presetOffset(timezone) ?? "+00:00");
+  const [offset] = useState<string>(splitIso(start).offset ?? "+05:30");
   const { colors, spacing, typography } = useTheme();
 
   return (
     <>
       <FormChoice control={control} name="site.weather_source" label="Weather source" required options={WEATHER_SOURCES} />
       <Note>The analysis window is the period each candidate design is simulated over.</Note>
-      <TextField
-        label="UTC offset for these times"
-        value={offset}
-        onChangeText={(t) => /^[+-]?\d{0,2}:?\d{0,2}$/.test(t) && setOffset(t)}
-        helperText={
-          presetOffset(timezone)
-            ? `${timezone} is ${presetOffset(timezone)}.`
-            : "Enter the offset of the site's timezone, e.g. +05:30."
-        }
-        error={/^[+-]\d{2}:\d{2}$/.test(offset) ? undefined : "Use the form +05:30 or -04:00."}
-      />
+      <Note>Analysis dates use India Standard Time (UTC+05:30).</Note>
       <DateTimeField control={control} name="site.analysis_start" label="Analysis start" offset={offset} />
       <DateTimeField control={control} name="site.analysis_end" label="Analysis end" offset={offset} />
       <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.md }]}>
@@ -186,11 +244,7 @@ export function WeatherStep({ control }: StepProps) {
 export function MissionStep({ control }: StepProps) {
   return (
     <>
-      <AppCard>
-        <KeyValueRow label="Project mode" value="New shelter" last />
-      </AppCard>
       <FormChoice control={control} name="mission.type" label="Shelter purpose" required options={MISSION_TYPES} />
-      <Note>Existing-shelter assessment and engineering mode are not available in the mobile app yet.</Note>
     </>
   );
 }
@@ -199,19 +253,7 @@ export function MissionStep({ control }: StepProps) {
 // 4. Occupancy — mission.occupants / occupancy_schedule_id
 // ---------------------------------------------------------------------------
 export function OccupancyStep({ control }: StepProps) {
-  return (
-    <>
-      <FormNumber control={control} name="mission.occupants" label="Number of occupants" unit="persons" integer required />
-      <FormText
-        control={control}
-        name="mission.occupancy_schedule_id"
-        label="Occupancy schedule id (optional)"
-        autoCapitalize="none"
-        placeholder="e.g. continuous_30"
-        helperText="Only if the backend has a named schedule for this mission. Leave empty for the default."
-      />
-    </>
-  );
+  return <FormNumber control={control} name="mission.occupants" label="Number of occupants" unit="persons" integer required />;
 }
 
 // ---------------------------------------------------------------------------
@@ -292,16 +334,16 @@ export function RoomsStep({ control }: StepProps) {
 export function FootprintStep({ control }: StepProps) {
   return (
     <>
-      <FormNumber control={control} name="constraints.maximum_footprint_m2" label="Maximum footprint" unit="m²" nullable helperText="Upper bound on ground area. Leave empty for no limit." />
+      <FormNumber control={control} name="constraints.maximum_footprint_m2" label="Maximum footprint" unit="m²" required helperText="Maximum ground area, up to 5,000 m²." />
       <Controller
         control={control}
         name="constraints.maximum_floors"
         render={({ field, fieldState }) => (
           <SelectField
             label="Maximum floors"
-            options={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }))}
-            value={typeof field.value === "number" ? String(field.value) : undefined}
-            onChange={(v) => field.onChange(field.value === Number(v) ? null : Number(v))}
+            options={[{ value: "1", label: "1 floor" }, { value: "2", label: "Up to 2 floors" }, { value: "system", label: "System decides" }]}
+            value={typeof field.value === "number" ? String(field.value) : field.value === null ? "system" : undefined}
+            onChange={(v) => field.onChange(v === "system" ? null : Number(v))}
             error={fieldState.error?.message}
           />
         )}
@@ -317,30 +359,14 @@ export function FootprintStep({ control }: StepProps) {
 export function MaterialsStep({ control }: StepProps) {
   const { colors, spacing, typography } = useTheme();
   const catalog = useMaterialCatalog();
-  const chosenSnapshot = useWatch({ control, name: "generation_options.materials_snapshot_id" });
-
   if (catalog.isError) return <ErrorView error={catalog.error} onRetry={() => void catalog.refetch()} />;
   if (!catalog.data) return <Note>Loading material data…</Note>;
 
   const { defaultSnapshotId, snapshots } = catalog.data.data;
-  const activeId = chosenSnapshot ?? defaultSnapshotId;
-  const snapshot = snapshots.find((s) => s.snapshotId === activeId) ?? snapshots[0];
+  const snapshot = snapshots.find((s) => s.snapshotId === defaultSnapshotId) ?? snapshots[0];
 
   return (
     <>
-      <Controller
-        control={control}
-        name="generation_options.materials_snapshot_id"
-        render={({ field }) => (
-          <SelectField
-            label="Material data set"
-            options={snapshots.map((s) => ({ value: s.snapshotId, label: s.snapshotId === defaultSnapshotId ? `${s.snapshotId} (default)` : s.snapshotId }))}
-            value={activeId}
-            onChange={(v) => field.onChange(v === defaultSnapshotId ? undefined : v)}
-          />
-        )}
-      />
-      {snapshot ? <KeyValueRow label="Checksum (SHA-256)" value={snapshot.checksum.slice(0, 16) + "…"} mono last /> : null}
       <Controller
         control={control}
         name="constraints.available_material_ids"
@@ -354,6 +380,7 @@ export function MaterialsStep({ control }: StepProps) {
                 title="Permitted materials"
                 caption={selected.length === 0 ? "None selected — the generator may use any material in the set." : `${selected.length} selected`}
               />
+              <Note>For a buildable design, include at least one structural material for the walls or floor. Insulation such as PUF works alongside a structural material.</Note>
               {snapshot?.materials === null ? (
                 <Note>This backend lists material ids only; thermal properties are not exposed by GET /api/v1/materials.</Note>
               ) : null}
@@ -364,10 +391,18 @@ export function MaterialsStep({ control }: StepProps) {
                   <AppCard key={id} onPress={() => toggle(id)} emphasis={on ? "accent" : "none"} accessibilityLabel={`${rec?.display_name ?? id}, ${on ? "selected" : "not selected"}`}>
                     <View style={styles.roomRow}>
                       <Text style={[typography.bodyStrong, { color: colors.textPrimary, flex: 1 }]}>{rec?.display_name ?? id}</Text>
-                      <Tag label={on ? "Selected" : "Not selected"} tone={on ? "ready" : "neutral"} />
+                      <Tag
+                        label={rec?.category === "masonry" || rec?.category === "structural"
+                          ? `Structural${on ? " · selected" : ""}`
+                          : `${humanize(rec?.category ?? "Material")}${on ? " · selected" : ""}`}
+                        tone={rec?.category === "masonry" || rec?.category === "structural" ? "ready" : on ? "accent" : "neutral"}
+                      />
                     </View>
                     {rec ? (
                       <View style={{ marginTop: spacing.xs }}>
+                        <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.xs }]}>
+                          Conductivity describes how readily heat passes through the material; density and specific heat describe how much heat it can store.
+                        </Text>
                         <KeyValueRow label="Category" value={humanize(rec.category)} />
                         <KeyValueRow label="Thermal conductivity" value={`${formatNumber(rec.properties.thermal_conductivity_w_mk, 3)} W/(m·K)`} />
                         <KeyValueRow label="Density" value={`${formatNumber(rec.properties.density_kg_m3, 0)} kg/m³`} />
@@ -411,8 +446,6 @@ export function BudgetStep({ control }: StepProps) {
   return (
     <>
       <FormNumber control={control} name="constraints.maximum_capex_inr" label="Maximum CAPEX" unit="₹" nullable helperText="Capital cost limit. Leave empty for no limit." />
-      <FormNumber control={control} name="constraints.maximum_mass_kg" label="Maximum shipped mass" unit="kg" nullable />
-      <FormNumber control={control} name="constraints.max_assembly_time_hours" label="Maximum assembly time" unit="h" nullable />
       <FormMultiChoice control={control} name="constraints.heater_fuels" label="Allowed heater fuels" options={HEATER_FUELS} />
       <Controller
         control={control}
@@ -441,6 +474,23 @@ export function BudgetStep({ control }: StepProps) {
       />
     </>
   );
+}
+
+/** Five concise screens group all supported analysis inputs by user intent. */
+export function SiteWeatherStep({ control, setValue }: StepProps) {
+  return <><LocationStep control={control} setValue={setValue} /><SectionHeader title="Analysis period" /><WeatherStep control={control} /></>;
+}
+
+export function ShelterDesignStep({ control }: StepProps) {
+  return <><FootprintStep control={control} /><SectionHeader title="Materials and heating" /><MaterialsStep control={control} /><BudgetStep control={control} /></>;
+}
+
+export function MissionOccupancyStep({ control }: StepProps) {
+  return <><MissionStep control={control} /><OccupancyStep control={control} /><SectionHeader title="Required rooms" /><RoomsStep control={control} /><SectionHeader title="Comfort target" /><ComfortStep control={control} /></>;
+}
+
+export function OptimizationStep({ control }: StepProps) {
+  return <FormNumber control={control} name="generation_options.count" label="Candidate designs" unit="designs" integer helperText="The backend evaluates each generated candidate with the RC thermal model. Choose 1–200 designs." placeholder="24" />;
 }
 
 // ---------------------------------------------------------------------------
@@ -488,6 +538,10 @@ function IconButton({ label, a11y, onPress, disabled }: { label: string; a11y: s
 const styles = StyleSheet.create({
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },
   chip: { borderWidth: 1.5, minHeight: 40, justifyContent: "center" },
+  dateButton: { borderWidth: 1, minHeight: 70, justifyContent: "center" },
+  pickerScrim: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.35)" },
+  pickerSheet: { borderWidth: 1, paddingBottom: 24 },
+  pickerActions: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 8, paddingVertical: 12 },
   roomRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   icon: { width: minTouchTarget, height: minTouchTarget, alignItems: "center", justifyContent: "center" },
 });

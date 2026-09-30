@@ -31,18 +31,17 @@ export const ROOM_TYPES: Option[] = [
 
 /** Mission categories named in the M0 MissionRequirements.type description. */
 export const MISSION_TYPES: Option[] = [
-  { value: "living", label: "Living" },
-  { value: "sleeping", label: "Sleeping" },
-  { value: "living_sleeping", label: "Living + sleeping" },
+  { value: "living_sleeping", label: "Living & sleeping" },
   { value: "medical", label: "Medical" },
   { value: "command", label: "Command" },
+  { value: "storage", label: "Storage" },
+  { value: "equipment", label: "Equipment" },
+  { value: "mixed", label: "Mixed use" },
 ];
 
 /** Weather source identifiers named in the M0 SiteSpecification.weather_source description. */
 export const WEATHER_SOURCES: Option[] = [
   { value: "NASA_POWER", label: "NASA POWER" },
-  { value: "ERA5", label: "ERA5" },
-  { value: "cached_file", label: "Cached file" },
 ];
 
 /** Heater fuels named in the M0 DesignConstraints.heater_fuels description. */

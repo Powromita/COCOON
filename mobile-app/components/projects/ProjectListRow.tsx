@@ -27,9 +27,7 @@ export function ProjectListRow({ item, onPress, onLongPress, origin = "LOCAL", c
   const t = useT();
   const validation =
     item.runStatus === "completed"
-      ? item.dataProvider === "fixture"
-        ? "RC engine (demo run)"
-        : "RC engine · ANSYS not requested"
+      ? "RC simulation complete"
       : item.runStatus === "failed"
         ? "Pipeline failed"
         : item.runStatus

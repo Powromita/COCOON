@@ -8,7 +8,6 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 
 import { RootErrorFallback } from "../components/common/RootErrorFallback";
-import { JobMonitorErrorBanner, OfflineBanner } from "../components/common/StatusBanners";
 import { useJobMonitor } from "../hooks/useJobMonitor";
 import { AppProviders } from "../providers/AppProviders";
 import { useTheme } from "../theme";
@@ -34,19 +33,6 @@ function RootStack() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar style="dark" />
       <Stack
-        // The Offline banner sits inside each screen, below its header. The splash and the tab
-        // container are skipped: the splash has its own status UI and each tab adds the banner itself.
-        screenLayout={({ route, children }) =>
-          route.name === "index" || route.name === "(tabs)" ? (
-            children
-          ) : (
-            <View style={{ flex: 1 }}>
-              <OfflineBanner />
-              <JobMonitorErrorBanner />
-              {children}
-            </View>
-          )
-        }
         screenOptions={{
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.textPrimary,

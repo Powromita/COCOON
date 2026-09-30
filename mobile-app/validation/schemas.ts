@@ -9,10 +9,9 @@
  * - completeSchema: the fields the contract requires, plus the same range
  *   checks. A project must pass it before designs can be generated.
  *
- * Bounds are only those stated by the contract or true by definition
- * (latitude ±90°, 1–5 floors, 0–360°, positive areas and costs). No
- * engineering judgement is encoded — the backend decides feasibility, and
- * its 422 messages are shown to the user verbatim.
+ * Bounds follow the contract; a small M2 compatibility rule also prevents
+ * material sets that cannot form a structural wall assembly. The backend
+ * remains authoritative for full design feasibility.
  */
 import type { RequirementsContract } from "@cocoon/contracts";
 import { z } from "zod";
@@ -30,7 +29,7 @@ const positive = (label: string) => finite(label).positive({ error: `${label} mu
 
 const isoWithOffset = z.iso.datetime({
   offset: true,
-  error: "Use a full date and time with a UTC offset, e.g. 2026-01-01T00:00:00+05:30.",
+  error: "Enter a full date and time with its UTC offset, for example YYYY-MM-DDTHH:mm:ss+05:30.",
 });
 
 const ianaTimezone = z
@@ -59,31 +58,31 @@ const mission = {
   type: z.string().trim().min(1, { error: "Choose a mission type." }),
   occupants: finite("Occupants").int({ error: "Occupants must be a whole number." }).min(1, {
     error: "At least one occupant is required.",
-  }),
+  }).max(500, { error: "Occupancy cannot exceed 500 people." }),
   occupancy_schedule_id: z.string().trim().nullable(),
   required_rooms: z
     .array(z.enum(ROOM_VALUES as [string, ...string[]], { error: "Unknown room type." }))
     .refine((rooms) => new Set(rooms).size === rooms.length, { error: "Each room type can be listed only once." }),
-  target_temperature_c: finite("Target temperature"),
-  maximum_unmet_hours: finite("Unmet hours").min(0, { error: "Unmet hours cannot be negative." }),
+  target_temperature_c: finite("Target temperature").min(5).max(30, { error: "Target temperature must be between 5°C and 30°C." }),
+  maximum_unmet_hours: finite("Unmet hours").min(0).max(168, { error: "Maximum unmet hours cannot exceed 168." }),
 };
 
 const constraints = {
-  maximum_footprint_m2: positive("Footprint").nullable(),
+  maximum_footprint_m2: positive("Footprint").max(5000, { error: "Footprint must not exceed 5,000 m²." }),
   maximum_floors: finite("Floors")
     .int({ error: "Floors must be a whole number." })
     .min(1, { error: "Floors must be between 1 and 5." })
-    .max(5, { error: "Floors must be between 1 and 5." })
+    .max(2, { error: "Choose one or up to two floors." })
     .nullable(),
   preferred_orientation_deg: finite("Orientation")
     .min(0, { error: "Orientation must be between 0° and 360°." })
     .max(360, { error: "Orientation must be between 0° and 360°." })
     .nullable(),
-  available_material_ids: z.array(materialId),
+  available_material_ids: z.array(materialId).min(1, { error: "Choose at least one material." }),
   maximum_capex_inr: positive("CAPEX budget").nullable(),
-  heater_fuels: z.array(z.string().min(1)),
-  maximum_mass_kg: positive("Mass limit").nullable(),
-  max_assembly_time_hours: positive("Assembly time").nullable(),
+  heater_fuels: z.array(z.string().min(1)).min(1, { error: "Choose at least one heating fuel." }),
+  maximum_mass_kg: positive("Mass limit").nullable().optional(),
+  max_assembly_time_hours: positive("Assembly time").nullable().optional(),
 };
 
 const generationOptions = z
@@ -120,6 +119,8 @@ export const draftSchema = z.object({
 
 // --- Layer 2: complete schema (gate for "Generate designs") ----------------
 export const completeSchema = z.object({
+  location_name: z.string().trim().min(1, { error: "Choose a location." }),
+  weather_archive_site: z.string().trim().min(1, { error: "Choose a weather archive location." }),
   site: z.object(site).superRefine(windowOrder),
   mission: z.object({
     ...mission,
@@ -128,7 +129,19 @@ export const completeSchema = z.object({
     target_temperature_c: mission.target_temperature_c.optional(),
     maximum_unmet_hours: mission.maximum_unmet_hours.optional(),
   }),
-  constraints: z.object(optionalAll(constraints)).default({}),
+  constraints: z.object(optionalAll(constraints)).superRefine((value, ctx) => {
+    const selected = value.available_material_ids;
+    if (!selected?.length) return; // The field's own validator reports an empty selection.
+    // In the standard M2 set these are the materials that can form a structural assembly.
+    // Insulation (for example PUF) can supplement one but cannot form a wall by itself.
+    if (!selected.some((id) => ["mat_stone", "mat_plywood", "mat_concrete"].includes(id))) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["available_material_ids"],
+        message: "Choose a structural material (stone, plywood, or concrete). Insulation can be added alongside it.",
+      });
+    }
+  }).default({}),
   economic_assumption_set_id: z.string().trim().min(1, { error: "Choose an economic assumption set." }),
   generation_options: generationOptions,
 });
@@ -151,31 +164,33 @@ export type FieldErrors = FieldError[];
 
 /** Field path → wizard step + human label. Every contract field the wizard edits is listed. */
 export const FIELD_META: Record<string, { step: WizardStepId; label: string }> = {
-  "site.latitude_deg": { step: "location", label: "Latitude" },
-  "site.longitude_deg": { step: "location", label: "Longitude" },
-  "site.elevation_m": { step: "location", label: "Elevation" },
-  "site.timezone": { step: "location", label: "Timezone" },
-  "site.weather_source": { step: "weather", label: "Weather source" },
-  "site.analysis_start": { step: "weather", label: "Analysis start" },
-  "site.analysis_end": { step: "weather", label: "Analysis end" },
+  location_name: { step: "site", label: "Location" },
+  weather_archive_site: { step: "site", label: "Weather archive location" },
+  "site.latitude_deg": { step: "site", label: "Location coordinates" },
+  "site.longitude_deg": { step: "site", label: "Location coordinates" },
+  "site.elevation_m": { step: "site", label: "Elevation" },
+  "site.timezone": { step: "site", label: "Timezone" },
+  "site.weather_source": { step: "site", label: "Weather source" },
+  "site.analysis_start": { step: "site", label: "Analysis start" },
+  "site.analysis_end": { step: "site", label: "Analysis end" },
   "mission.type": { step: "mission", label: "Mission type" },
-  "mission.occupants": { step: "occupancy", label: "Occupants" },
-  "mission.occupancy_schedule_id": { step: "occupancy", label: "Occupancy schedule" },
-  "mission.required_rooms": { step: "rooms", label: "Rooms" },
-  "constraints.maximum_footprint_m2": { step: "footprint", label: "Maximum footprint" },
-  "constraints.maximum_floors": { step: "footprint", label: "Maximum floors" },
-  "constraints.preferred_orientation_deg": { step: "footprint", label: "Preferred orientation" },
-  "constraints.available_material_ids": { step: "materials", label: "Materials" },
-  "generation_options.materials_snapshot_id": { step: "materials", label: "Material set" },
-  "generation_options.count": { step: "review", label: "Design count" },
-  "generation_options.seed": { step: "review", label: "Seed" },
-  "mission.target_temperature_c": { step: "comfort", label: "Target temperature" },
-  "mission.maximum_unmet_hours": { step: "comfort", label: "Maximum unmet hours" },
-  "constraints.maximum_capex_inr": { step: "budget", label: "Maximum CAPEX" },
-  "constraints.heater_fuels": { step: "budget", label: "Heater fuels" },
-  "constraints.maximum_mass_kg": { step: "budget", label: "Maximum mass" },
-  "constraints.max_assembly_time_hours": { step: "budget", label: "Maximum assembly time" },
-  economic_assumption_set_id: { step: "budget", label: "Economic assumption set" },
+  "mission.occupants": { step: "mission", label: "Occupants" },
+  "mission.occupancy_schedule_id": { step: "mission", label: "Occupancy schedule" },
+  "mission.required_rooms": { step: "mission", label: "Rooms" },
+  "constraints.maximum_footprint_m2": { step: "design", label: "Maximum footprint" },
+  "constraints.maximum_floors": { step: "design", label: "Maximum floors" },
+  "constraints.preferred_orientation_deg": { step: "design", label: "Preferred orientation" },
+  "constraints.available_material_ids": { step: "design", label: "Materials" },
+  "generation_options.materials_snapshot_id": { step: "design", label: "Material set" },
+  "generation_options.count": { step: "optimize", label: "Design count" },
+  "generation_options.seed": { step: "optimize", label: "Seed" },
+  "mission.target_temperature_c": { step: "mission", label: "Target temperature" },
+  "mission.maximum_unmet_hours": { step: "mission", label: "Maximum unmet hours" },
+  "constraints.maximum_capex_inr": { step: "design", label: "Maximum CAPEX" },
+  "constraints.heater_fuels": { step: "design", label: "Heater fuels" },
+  "constraints.maximum_mass_kg": { step: "design", label: "Maximum mass" },
+  "constraints.max_assembly_time_hours": { step: "design", label: "Maximum assembly time" },
+  economic_assumption_set_id: { step: "optimize", label: "Economic assumption set" },
 };
 
 function valueAt(obj: unknown, path: PropertyKey[]): unknown {
@@ -238,8 +253,12 @@ export function buildRequirementsContract(draft: DraftRequirements, projectId: s
   const parsed = completeSchema.safeParse(full);
   if (!parsed.success) return err(toFieldErrors(full, parsed.error.issues));
   const d = parsed.data;
+  const allowedConstraintKeys = [
+    "maximum_footprint_m2", "maximum_floors", "preferred_orientation_deg",
+    "available_material_ids", "maximum_capex_inr", "heater_fuels",
+  ];
   const constraints = Object.fromEntries(
-    Object.entries(d.constraints).filter(([, v]) => v !== undefined)
+    Object.entries(d.constraints).filter(([key, value]) => allowedConstraintKeys.includes(key) && value !== undefined)
   ) as unknown as RequirementsContract["constraints"];
   const mission = Object.fromEntries(
     Object.entries(d.mission).filter(([, v]) => v !== undefined)
@@ -249,7 +268,7 @@ export function buildRequirementsContract(draft: DraftRequirements, projectId: s
     project_id: projectId,
     mode: "new_shelter",
     site: d.site,
-    mission,
+    mission: { ...mission, occupancy_schedule_id: `continuous_${d.mission.occupants}` },
     constraints,
     economic_assumption_set_id: d.economic_assumption_set_id,
   });

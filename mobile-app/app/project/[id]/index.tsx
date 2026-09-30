@@ -57,23 +57,18 @@ export default function ProjectHubScreen() {
         </View>
 
         {readOnly ? (
-          <AppCard emphasis="demo">
+          <AppCard>
             <Text style={[typography.body, { color: colors.textPrimary }]}>
-              This project was saved before the app moved to the M0 requirements contract. It can be viewed but not edited or
-              submitted. Create a new project to continue.
+              This saved project uses an older format. Create a new project to run a design calculation.
             </Text>
           </AppCard>
         ) : null}
 
-        <SectionHeader title="Requirements" caption={missing.length > 0 ? `${missing.length} item(s) still needed` : "Complete"} />
+        <SectionHeader title="Requirements" caption={missing.length > 0 ? `${missing.length} item${missing.length === 1 ? "" : "s"} to complete` : "Ready"} />
         <AppCard>
           <KeyValueRow
             label="Location"
-            value={
-              typeof site?.latitude_deg === "number" && typeof site.longitude_deg === "number"
-                ? `${site.latitude_deg.toFixed(4)}°, ${site.longitude_deg.toFixed(4)}°${typeof site.elevation_m === "number" ? ` · ${site.elevation_m} m` : ""}`
-                : undefined
-            }
+            value={requirements?.location_name ?? (typeof site?.elevation_m === "number" ? `${Math.round(site.elevation_m)} m elevation` : undefined)}
           />
           <KeyValueRow label="Purpose" value={mission?.type ? humanize(mission.type) : undefined} />
           <KeyValueRow label="Occupants" value={typeof mission?.occupants === "number" ? String(mission.occupants) : undefined} />
@@ -102,7 +97,7 @@ export default function ProjectHubScreen() {
         ) : (
           <AppCard>
             <View style={{ flexDirection: "row", gap: spacing.sm, marginBottom: spacing.xs, flexWrap: "wrap" }}>
-              {row.data_provider === "fixture" ? <Tag label="Demo run" tone="demo" /> : <Tag label="Backend run" tone="accent" />}
+              <Tag label={humanize(row.run_status ?? "Design run")} tone={row.run_status === "completed" ? "ready" : "neutral"} />
             </View>
             <KeyValueRow label="Job" value={row.run_job_id} mono />
             <KeyValueRow label="Last known status" value={row.run_status ? humanize(row.run_status) : undefined} />

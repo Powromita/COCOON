@@ -95,10 +95,6 @@ export function AuthForm<T extends FieldValues>({ title, intro, schema, fields, 
           </Link>
         ))}
       </View>
-      <Text style={[typography.caption, { color: colors.textSecondary, marginTop: spacing.lg }]}>
-        COCOON is not connected to any defence identity system. Credentials are never stored on the device; an access token would be kept
-        only in secure storage, and only after a real sign-in.
-      </Text>
     </ScrollView>
   );
 }

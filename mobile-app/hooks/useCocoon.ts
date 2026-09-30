@@ -109,7 +109,8 @@ export function useStartGeneration(projectId: string | undefined) {
       const idempotencyKey = `gen:${record.row.id}:${record.row.updated_at}:${record.row.run_job_id ?? "first"}`;
       const { jobId } = await generationService.startGeneration({
         requirements: contract.data,
-        count: opts.count ?? 20,
+        site: draft.weather_archive_site,
+        count: opts.count ?? 24,
         seed: opts.seed ?? 42,
         materialsSnapshotId: opts.materials_snapshot_id,
         idempotencyKey,

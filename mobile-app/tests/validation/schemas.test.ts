@@ -30,6 +30,26 @@ describe("the M0 sample requirements", () => {
   });
 });
 
+describe("materials needed by M2", () => {
+  it("rejects an insulation-only selection with a useful correction", () => {
+    const errors = validateStep("design", withPatch((d) => {
+      d.constraints!.available_material_ids = ["mat_puf"];
+    }));
+    expect(errors).toEqual([expect.objectContaining({
+      field: "constraints.available_material_ids",
+      kind: "invalid",
+      message: expect.stringContaining("Choose a structural material"),
+    })]);
+  });
+
+  it("allows insulation when a structural material is also selected", () => {
+    const draft = withPatch((d) => {
+      d.constraints!.available_material_ids = ["mat_puf", "mat_stone"];
+    });
+    expect(validateStep("design", draft)).toEqual([]);
+  });
+});
+
 describe("missing location", () => {
   it("reports each missing site field as 'missing' on the location step, which does not block navigation", () => {
     const draft = withPatch((d) => {

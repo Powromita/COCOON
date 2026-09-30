@@ -55,7 +55,7 @@ export function toGenerationJob(resp: OptimizationStatusResponse): GenerationJob
     siteUsed: resp.result?.site_used,
     warnings: resp.result?.warnings,
     error: resp.error
-      ? { code: resp.error.code, message: resp.error.message, retryable: resp.error.retryable }
+      ? { code: resp.error.code, message: resp.error.message, retryable: resp.error.retryable, details: resp.error.details }
       : undefined,
   };
 }
@@ -148,6 +148,7 @@ export function capabilitiesFromBackend(caps: BackendCapabilities, localStorage:
     authMode: typeof caps.auth_mode === "string" ? caps.auth_mode : null,
     schemaVersions: caps.schema_versions ?? [],
     weatherSites: sites,
+    weatherSiteDetails: caps.weather_site_details ?? [],
     entries,
   };
 }

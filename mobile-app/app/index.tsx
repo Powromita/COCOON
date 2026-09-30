@@ -13,8 +13,8 @@ import { ErrorView } from "../components/common/ErrorView";
 import { PrimaryButton } from "../components/common/PrimaryButton";
 import { ScreenContainer } from "../components/common/ScreenContainer";
 import { SecondaryButton } from "../components/common/SecondaryButton";
-import { Tag, type TagTone } from "../components/common/Tag";
-import { API_URL, APP_ENV, DATA_PROVIDER, IS_FIXTURE_MODE } from "../constants/env";
+import { Tag } from "../components/common/Tag";
+import { API_URL, IS_FIXTURE_MODE } from "../constants/env";
 import { getDb } from "../database";
 import { useCapabilities } from "../hooks/useCocoon";
 import { useAppStore } from "../store/app.store";
@@ -23,22 +23,20 @@ import { isAppErrorKind } from "../utils/errors";
 
 type StartupState = "loading" | "ready" | "offline" | "backend_unavailable" | "not_configured" | "auth_required" | "storage_error";
 
-const STATE_COPY: Record<StartupState, { label: string; tone: TagTone; message: string }> = {
-  loading: { label: "Loading", tone: "neutral", message: "Checking the app and the COCOON backend…" },
-  ready: { label: "Ready", tone: "ready", message: "All checks passed." },
-  offline: { label: "Offline", tone: "warning", message: "No connection. Saved projects and cached results are available." },
+const STATE_COPY: Record<StartupState, { label: string; message: string }> = {
+  loading: { label: "Opening COCOON", message: "Preparing your workspace…" },
+  ready: { label: "Ready", message: "Your workspace is ready." },
+  offline: { label: "Try again", message: "We couldn’t load the design service. Check your connection, then try again." },
   backend_unavailable: {
-    label: "Backend unavailable",
-    tone: "danger",
-    message: "The COCOON server could not be reached. Saved projects and cached results are still available.",
+    label: "Try again",
+    message: "We couldn’t load the design service. Please try again in a moment.",
   },
   not_configured: {
-    label: "Backend not configured",
-    tone: "danger",
-    message: "This build uses the API provider but EXPO_PUBLIC_API_URL is not set.",
+    label: "Setup required",
+    message: "COCOON needs a design service address before it can calculate results.",
   },
-  auth_required: { label: "Authentication required", tone: "warning", message: "Sign in to use the COCOON backend." },
-  storage_error: { label: "Storage unavailable", tone: "danger", message: "Local storage could not be opened." },
+  auth_required: { label: "Sign in", message: "Sign in to continue to your workspace." },
+  storage_error: { label: "Try again", message: "We couldn’t open your saved workspace." },
 };
 
 export default function StartupScreen() {
@@ -87,25 +85,19 @@ export default function StartupScreen() {
       <View style={[styles.status, { borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.lg }]} accessibilityLiveRegion="polite">
         <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
           {state === "loading" ? <ActivityIndicator color={colors.accent} /> : null}
-          <Tag label={copy.label} tone={copy.tone} />
+          <Tag label={copy.label} tone={state === "loading" ? "neutral" : state === "ready" ? "ready" : "warning"} />
         </View>
         <Text style={[typography.body, { color: colors.textPrimary, marginTop: spacing.sm }]}>{copy.message}</Text>
-        <Text style={[typography.caption, { color: colors.textSecondary, marginTop: spacing.sm }]}>
-          {IS_FIXTURE_MODE ? "Data: demo fixtures (no backend)" : `Backend: ${API_URL ?? "not set"}`} · {APP_ENV}
-        </Text>
       </View>
 
       {db.isError ? <ErrorView error={db.error} onRetry={() => void db.refetch()} /> : null}
-      {caps.isError && state === "backend_unavailable" ? <ErrorView compact error={caps.error} /> : null}
-
       {state === "offline" || state === "backend_unavailable" || state === "not_configured" ? (
         <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
           {state !== "not_configured" ? <PrimaryButton label="Retry" onPress={() => void caps.refetch()} /> : null}
-          <SecondaryButton label="Continue with saved data" onPress={() => router.replace("/(tabs)")} />
+          <SecondaryButton label="Open saved projects" onPress={() => router.replace("/(tabs)/projects")} />
         </View>
       ) : null}
 
-      <Text style={[typography.caption, { color: colors.textSecondary, marginTop: spacing.xl }]}>Provider: {DATA_PROVIDER}</Text>
     </ScreenContainer>
   );
 }

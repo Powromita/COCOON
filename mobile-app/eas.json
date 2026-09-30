@@ -9,7 +9,7 @@
       "android": { "buildType": "apk" },
       "env": {
         "EXPO_PUBLIC_APP_ENV": "development",
-        "EXPO_PUBLIC_DATA_PROVIDER": "fixture"
+        "EXPO_PUBLIC_DATA_PROVIDER": "api"
       }
     },
     "staging": {

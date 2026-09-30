@@ -13,6 +13,7 @@ import type {
   AnsysJobStatus,
   EconomicAnalysisResult,
   ErrorDetail,
+  MaterialRecord,
   RecommendationState,
   TimeSeriesPoint,
 } from "@cocoon/contracts";
@@ -23,6 +24,7 @@ import type {
 export interface BackendCapabilities {
   schema_versions: string[];
   auth_mode: string;
+  weather_site_details?: WeatherSite[];
   modules: {
     m2_design_generator?: boolean;
     m3_weather_sites?: string[];
@@ -35,6 +37,15 @@ export interface BackendCapabilities {
     [key: string]: unknown;
   };
   weather?: { source?: string };
+}
+
+/** A named archive location whose coordinates are supplied by the backend. */
+export interface WeatherSite {
+  site_id: string;
+  display_name: string;
+  latitude_deg: number;
+  longitude_deg: number;
+  elevation_m: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -270,7 +281,7 @@ export interface EconomicsReport {
 // GET /api/v1/materials
 // ---------------------------------------------------------------------------
 export interface MaterialsListResponse {
-  snapshots: { snapshot_id: string; materials: string[]; checksum_sha256: string }[];
+  snapshots: { snapshot_id: string; materials: string[]; material_records?: Record<string, MaterialRecord>; checksum_sha256: string }[];
   default: string;
 }
 

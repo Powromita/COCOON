@@ -15,7 +15,6 @@ import { LoadingState } from "../../components/common/LoadingState";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { SecondaryButton } from "../../components/common/SecondaryButton";
 import { SectionHeader } from "../../components/common/SectionHeader";
-import { FixtureBanner } from "../../components/common/StatusBanners";
 import { Tag } from "../../components/common/Tag";
 import { useGenerationJob } from "../../hooks/useCocoon";
 import { useRecordRunStatus } from "../../hooks/useProjects";
@@ -63,6 +62,24 @@ function StatusTimeline({ job }: { job: GenerationJob }) {
   );
 }
 
+function failureGuidance(job: GenerationJob): string[] {
+  const raw = job.error?.details?.reasons;
+  const reasons = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};
+  const guidance: string[] = [];
+  const wallCount = reasons["composition:no_materials_for_wall"];
+  const layoutCount = reasons["layout:NO_FEASIBLE_LAYOUT"];
+  if (typeof wallCount === "number" && wallCount > 0) {
+    guidance.push(`The selected materials could not form a structural wall (${wallCount} attempts). Include stone, plywood, or concrete; insulation such as PUF can be added alongside it.`);
+  }
+  if (typeof layoutCount === "number" && layoutCount > 0) {
+    guidance.push(`The requested room layout could not be placed (${layoutCount} attempts). Try one floor, keep only the rooms you need, and use a practical footprint limit.`);
+  }
+  if (guidance.length === 0 && job.error?.code === "VALIDATION_ERROR") {
+    guidance.push("Review the permitted materials and include at least one structural option, such as stone, plywood, or concrete. Insulation such as PUF can be selected with it.");
+  }
+  return guidance;
+}
+
 export default function GenerationScreen() {
   const { jobId, projectId } = useLocalSearchParams<{ jobId: string; projectId?: string }>();
   const router = useRouter();
@@ -102,7 +119,6 @@ export default function GenerationScreen() {
     <>
       <Stack.Screen options={{ title: "Design generation" }} />
       <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: spacing.lg }}>
-        <FixtureBanner detail="Demo mode: this replays a recorded backend run of the M0 sample requirements (Leh, 30 occupants). It is not a run of your inputs." />
         <KeyValueRow label="Job" value={jobId} mono last />
 
         {job.isError && !data ? <ErrorView error={job.error} onRetry={() => void job.refetch()} /> : null}
@@ -117,6 +133,9 @@ export default function GenerationScreen() {
                   <KeyValueRow label="Reason" value={data.error?.message ?? "Not reported"} />
                   <KeyValueRow label="Error code" value={data.error?.code ?? "Not reported"} mono last />
                 </AppCard>
+                {failureGuidance(data).map((hint) => (
+                  <Text key={hint} style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.sm }]}>{hint}</Text>
+                ))}
                 <View style={{ gap: spacing.sm }}>
                   {projectId ? (
                     <PrimaryButton

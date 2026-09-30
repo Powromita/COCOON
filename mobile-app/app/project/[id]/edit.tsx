@@ -17,20 +17,14 @@ import { LoadingState } from "../../../components/common/LoadingState";
 import { PrimaryButton } from "../../../components/common/PrimaryButton";
 import { ScreenContainer } from "../../../components/common/ScreenContainer";
 import { SecondaryButton } from "../../../components/common/SecondaryButton";
-import { FixtureBanner } from "../../../components/common/StatusBanners";
 import { ReviewStep } from "../../../components/projects/wizard/ReviewStep";
 import { StepShell } from "../../../components/projects/wizard/StepShell";
 import type { StepState } from "../../../components/projects/wizard/WizardStepper";
 import {
-  BudgetStep,
-  ComfortStep,
-  FootprintStep,
-  LocationStep,
-  MaterialsStep,
-  MissionStep,
-  OccupancyStep,
-  RoomsStep,
-  WeatherStep,
+  MissionOccupancyStep,
+  OptimizationStep,
+  ShelterDesignStep,
+  SiteWeatherStep,
 } from "../../../components/projects/wizard/Steps";
 import { IS_FIXTURE_MODE } from "../../../constants/env";
 import type { DraftRequirements, ProjectRecord } from "../../../database/schema/types";
@@ -195,24 +189,14 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
 
   const stepBody = (() => {
     switch (current.id) {
-      case "location":
-        return <LocationStep control={control} />;
-      case "weather":
-        return <WeatherStep control={control} />;
+      case "site":
+        return <SiteWeatherStep control={control} setValue={form.setValue} />;
+      case "design":
+        return <ShelterDesignStep control={control} />;
       case "mission":
-        return <MissionStep control={control} />;
-      case "occupancy":
-        return <OccupancyStep control={control} />;
-      case "rooms":
-        return <RoomsStep control={control} />;
-      case "footprint":
-        return <FootprintStep control={control} />;
-      case "materials":
-        return <MaterialsStep control={control} />;
-      case "comfort":
-        return <ComfortStep control={control} />;
-      case "budget":
-        return <BudgetStep control={control} />;
+        return <MissionOccupancyStep control={control} />;
+      case "optimize":
+        return <OptimizationStep control={control} />;
       default:
         return null;
     }
@@ -227,17 +211,12 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
         <Stack.Screen options={{ title: record.row.name }} />
         <StepShell
           stepIndex={stepIndex}
-          title="Review"
-          description="Check the requirements, then send them to the backend to generate candidate designs."
+          title="Review & generate"
+          description="Review your inputs, then run the COCOON RC optimization to generate and rank candidate designs."
           saveStatus={autosave.status}
           lastSavedAt={autosave.lastSavedAt}
           stepStates={stepStates}
-          banner={
-            <>
-              {banner}
-              <FixtureBanner detail="Demo mode: generation returns a recorded backend run for the M0 sample requirements (Leh, 30 occupants), not these inputs." />
-            </>
-          }
+          banner={banner}
           footer={
             <View style={{ gap: spacing.sm }}>
               {shownErrors.length > 0 ? (
@@ -247,7 +226,7 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
               ) : null}
               {offlineApi ? (
                 <Text style={[typography.caption, { color: colors.textSecondary }]}>
-                  You’re offline. Your draft is saved; designs can be generated once you’re connected.
+                  Connect to a network to run the RC calculation. Your draft has been saved.
                 </Text>
               ) : null}
               {submitError ? <ErrorView error={submitError} title="Design generation could not start" /> : null}
@@ -275,7 +254,6 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
           }
         >
           <ReviewStep
-            control={control}
             draft={values}
             errors={shownErrors}
             onEditStep={(s: WizardStepId) => void goToStep(stepIndexOf(s))}
