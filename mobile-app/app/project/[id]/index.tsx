@@ -4,10 +4,11 @@
  * the next step, so no result is ever more than two taps away.
  */
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { AppCard } from "../../../components/common/AppCard";
+import { DangerButton } from "../../../components/common/DangerButton";
 import { ErrorView } from "../../../components/common/ErrorView";
 import { KeyValueRow } from "../../../components/common/KeyValueRow";
 import { LoadingState } from "../../../components/common/LoadingState";
@@ -16,7 +17,8 @@ import { SecondaryButton } from "../../../components/common/SecondaryButton";
 import { SectionHeader } from "../../../components/common/SectionHeader";
 import { Tag } from "../../../components/common/Tag";
 import { ProjectStatusBadge } from "../../../components/projects/ProjectStatusBadge";
-import { useProjectRecord } from "../../../hooks/useProjects";
+import { RenameProjectModal } from "../../../components/projects/RenameProjectModal";
+import { useDeleteProject, useProjectRecord } from "../../../hooks/useProjects";
 import { useTheme } from "../../../theme";
 import { formatLocalDateTime, humanize } from "../../../utils/format";
 import { validateAll } from "../../../validation/schemas";
@@ -27,6 +29,8 @@ export default function ProjectHubScreen() {
   const router = useRouter();
   const { colors, spacing, typography } = useTheme();
   const record = useProjectRecord(id);
+  const deleteProject = useDeleteProject();
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
 
   if (record.isError) {
     return (
@@ -45,6 +49,28 @@ export default function ProjectHubScreen() {
 
   const openWizard = (step: number) => router.push({ pathname: "/project/[id]/edit", params: { id: row.id, step: String(step) } });
 
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Shelter Design",
+      `Are you sure you want to delete "${row.name}" (${row.id})? This will remove all saved requirements and generated candidates.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteProject.mutateAsync(row.id);
+              router.replace("/(tabs)/projects");
+            } catch (err) {
+              Alert.alert("Could not delete", String(err));
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <>
       <Stack.Screen options={{ title: row.name }} />
@@ -53,6 +79,13 @@ export default function ProjectHubScreen() {
           <Text style={[typography.title, { color: colors.textPrimary, flex: 1 }]} accessibilityRole="header">
             {row.name}
           </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setIsRenameOpen(true)}
+            style={{ paddingHorizontal: spacing.sm, paddingVertical: spacing.xs }}
+          >
+            <Text style={[typography.caption, { color: colors.primary, fontWeight: "600" }]}>✏️ Rename</Text>
+          </Pressable>
           <ProjectStatusBadge status={displayStatus} />
         </View>
 
@@ -132,7 +165,25 @@ export default function ProjectHubScreen() {
             </View>
           </AppCard>
         )}
+
+        <SectionHeader title="Project actions" caption="Manage or delete this shelter project." />
+        <View style={{ marginTop: spacing.xs, marginBottom: spacing.xxl }}>
+          <DangerButton
+            label="🗑️ Delete Shelter Project"
+            onPress={handleDelete}
+            disabled={deleteProject.isPending}
+          />
+        </View>
       </ScrollView>
+
+      {isRenameOpen ? (
+        <RenameProjectModal
+          visible={isRenameOpen}
+          projectId={row.id}
+          initialName={row.name}
+          onClose={() => setIsRenameOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

@@ -149,9 +149,9 @@ export class ApiClient {
       console.log(`[api] ${method} ${path} → ${response.status} (${Date.now() - started} ms)`);
     }
 
-    const text = await response.text();
+    const text = (await response.text()) ?? "";
     let parsed: unknown = undefined;
-    if (text.length > 0) {
+    if (typeof text === "string" && text.length > 0) {
       try {
         parsed = JSON.parse(text);
       } catch {

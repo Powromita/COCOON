@@ -70,6 +70,7 @@ def nearest_site(store: Any, latitude_deg: float, longitude_deg: float) -> tuple
 
 def _freeze_weather(requirements: RequirementsContract, cfg: PipelineConfig, store: Any) -> tuple[WeatherSnapshot, dict[str, Any]]:
     from m3_data import SITES
+    from m3_data.weather_store import resolve_site
     if cfg.weather_snapshot_id:
         snap = store.get(cfg.weather_snapshot_id)
         return snap, {"site": None, "distance_km": None, "chosen": "given", "snapshot_id": snap.snapshot_id,
@@ -80,9 +81,11 @@ def _freeze_weather(requirements: RequirementsContract, cfg: PipelineConfig, sto
     else:
         site, distance = nearest_site(store, site_req.latitude_deg, site_req.longitude_deg)
         chosen = "nearest_cached_site"
+    # Resolve any legacy mobile preset ID (e.g. "ladakh_dbo") to the canonical key before SITES lookup.
+    canonical_site = resolve_site(site)
     snap = store.build(site, site_req.analysis_start.replace(tzinfo=None), site_req.analysis_end.replace(tzinfo=None))
-    return snap, {"site": site, "distance_km": distance, "chosen": chosen, "snapshot_id": snap.snapshot_id,
-                  "location_name": SITES[site]["name"], "is_cached": snap.source.is_cached}
+    return snap, {"site": canonical_site, "distance_km": distance, "chosen": chosen, "snapshot_id": snap.snapshot_id,
+                  "location_name": SITES[canonical_site]["name"], "is_cached": snap.source.is_cached}
 
 
 def _ml_predictor(cfg: PipelineConfig, requirements: RequirementsContract, weather: WeatherSnapshot):
@@ -100,7 +103,8 @@ def _ml_predictor(cfg: PipelineConfig, requirements: RequirementsContract, weath
 
 
 def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig | None = None) -> PipelineResult:
-    from economics.provider import make_economics
+    # Economics disabled for now — pass None so optimize() ranks on thermal metrics only.
+    # from economics.provider import make_economics
     from m3_data import WeatherStore, standard_snapshot
     from m4_engine import M4Evaluator
     from optimization import OptimizationSettings, ScreeningSettings, optimize
@@ -119,7 +123,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
     timings["weather_s"] = round(time.perf_counter() - t, 6)
 
     evaluator = M4Evaluator(materials, store)
-    economics = make_economics(materials, requirements)
+    economics = None  # economics disabled — no assumption sets needed
     settings = cfg.optimization if cfg.optimization is not None else OptimizationSettings()
 
     predictor, ml_info = _ml_predictor(cfg, requirements, weather)

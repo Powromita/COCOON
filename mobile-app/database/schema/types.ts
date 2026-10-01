@@ -13,16 +13,37 @@ export interface DraftGenerationOptions {
   /** Number of candidate designs requested from the backend. */
   count?: number;
   seed?: number;
+  /** Include the standard baseline comparison in lifecycle economics. */
+  baseline_economics?: boolean;
+  validate_with_ansys?: boolean;
+}
+
+export interface DraftEnvelope {
+  length_m?: number;
+  width_m?: number;
+  height_m?: number;
+  wall_thickness_mm?: number;
+  roof_thickness_mm?: number;
+  floor_thickness_mm?: number;
+  window_count?: number;
+  window_width_m?: number;
+  window_height_m?: number;
+  window_orientation?: string;
+  glazing_spec?: string;
+  air_changes_per_hour?: number;
 }
 
 /** Draft of an M0 RequirementsContract — the groups mirror the contract exactly. */
 export interface DraftRequirements {
+  /** Custom shelter name entered in Step 1. */
+  project_name?: string;
   /** UI location chosen from a real backend weather archive; not part of M0. */
   location_name?: string;
   weather_archive_site?: string;
   site?: Partial<SiteSpecification>;
   mission?: Partial<MissionRequirements>;
   constraints?: Partial<DesignConstraints>;
+  envelope?: DraftEnvelope;
   economic_assumption_set_id?: string;
   generation_options?: DraftGenerationOptions;
 }

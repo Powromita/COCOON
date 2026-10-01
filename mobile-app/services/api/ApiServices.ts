@@ -102,6 +102,8 @@ export class ApiGenerationService implements GenerationService {
       count: input.count,
       seed: input.seed,
       materials_snapshot_id: input.materialsSnapshotId ?? null,
+      validate_with_ansys: false,
+      baseline_economics: input.baselineEconomics ?? true,
     };
     const res = await this.api.post<OptimizationCreateResponse>(`${V1}/optimizations`, body, {
       idempotencyKey: input.idempotencyKey,

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { ProjectListItem } from "../../database/schema/types";
 import { useT } from "../../i18n";
@@ -16,14 +16,16 @@ interface ProjectListRowProps {
   item: ProjectListItem;
   onPress: () => void;
   onLongPress?: () => void;
+  onDelete?: () => void;
+  onRename?: () => void;
   /** Where the project lives — always shown, never mixed silently. */
   origin?: ProjectOrigin;
   compact?: boolean;
 }
 
 /** Technical project card: ID, name, location, occupants, area, materials, status, last updated, validation. */
-export function ProjectListRow({ item, onPress, onLongPress, origin = "LOCAL", compact }: ProjectListRowProps) {
-  const { colors, spacing, typography } = useTheme();
+export function ProjectListRow({ item, onPress, onLongPress, onDelete, onRename, origin = "LOCAL", compact }: ProjectListRowProps) {
+  const { colors, radii, spacing, typography } = useTheme();
   const t = useT();
   const validation =
     item.runStatus === "completed"
@@ -38,11 +40,34 @@ export function ProjectListRow({ item, onPress, onLongPress, origin = "LOCAL", c
     <AppCard
       onPress={onPress}
       onLongPress={onLongPress}
-      accessibilityLabel={`${origin} project ${item.name}. ${item.locationLabel ?? "Location not set"}.${onLongPress ? " Long-press to delete." : ""}`}
+      accessibilityLabel={`${origin} project ${item.name}. ${item.locationLabel ?? "Location not set"}.${onDelete ? " Tap delete to remove." : ""}`}
     >
       <View style={styles.top}>
         <Tag label={t(origin)} tone={origin === "DEMO" ? "demo" : origin === "REMOTE" ? "info" : "neutral"} />
-        <ProjectStatusBadge status={item.displayStatus} />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <ProjectStatusBadge status={item.displayStatus} />
+          {onDelete ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Delete project ${item.name}`}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                onDelete();
+              }}
+              style={({ pressed }) => [
+                styles.deleteBtn,
+                {
+                  borderColor: colors.danger,
+                  backgroundColor: colors.dangerBg,
+                  borderRadius: radii.sm,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <Text style={[typography.caption, { color: colors.danger, fontWeight: "700" }]}>🗑️ Delete</Text>
+            </Pressable>
+          ) : null}
+        </View>
       </View>
       <Text style={[typography.subtitle, { color: colors.textPrimary, marginTop: spacing.xs }]} numberOfLines={2}>
         {item.name}
@@ -70,4 +95,12 @@ export function ProjectListRow({ item, onPress, onLongPress, origin = "LOCAL", c
 
 const styles = StyleSheet.create({
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  deleteBtn: {
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    minHeight: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

@@ -51,14 +51,14 @@ describe("materials needed by M2", () => {
 });
 
 describe("missing location", () => {
-  it("reports each missing site field as 'missing' on the location step, which does not block navigation", () => {
+  it("reports each missing site field as 'missing' on the location step, which blocks navigation until filled", () => {
     const draft = withPatch((d) => {
       d.site = { ...d.site, latitude_deg: undefined, longitude_deg: undefined };
     });
     const errors = validateStep("location", draft);
     expect(errors.map((e) => e.field).sort()).toEqual(["site.latitude_deg", "site.longitude_deg"]);
     expect(errors.every((e) => e.kind === "missing")).toBe(true);
-    expect(hasBlockingErrors(errors)).toBe(false);
+    expect(hasBlockingErrors(errors)).toBe(true);
   });
 
   it("an empty draft cannot become a contract", () => {

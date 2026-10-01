@@ -25,12 +25,11 @@ beforeEach(() => {
 describe("new project", () => {
   it("creates a project and opens the requirements wizard at Location", async () => {
     const router = renderRouter(APP_DIR, { initialUrl: "/project/new" });
-    fireEvent.changeText(await screen.findByLabelText("Project name, required"), "Forward post");
-    fireEvent.press(screen.getByText("Create and continue"));
+    fireEvent.press(await screen.findByText("Enter requirements"));
 
     await waitFor(() => expect(router.getPathname()).toMatch(/^\/project\/prj_[0-9a-f]+\/edit$/));
-    expect(await screen.findByText("STEP 1 OF 10")).toBeTruthy();
-    expect(screen.getByText("Location")).toBeTruthy();
+    expect(await screen.findByText("STEP 1 OF 6")).toBeTruthy();
+    expect(screen.getByText("1. Location & Weather")).toBeTruthy();
   });
 });
 
@@ -39,12 +38,12 @@ describe("resume draft", () => {
     const repo = await getProjectsRepository();
     const created = await repo.createDraft("Half done");
     if (!created.ok) throw new Error(created.error);
-    await repo.saveDraft(created.data.id, { site: { latitude_deg: 34.1 } }, 4);
+    await repo.saveDraft(created.data.id, { site: { latitude_deg: 34.1 } }, 1);
 
     renderRouter(APP_DIR, { initialUrl: `/project/${created.data.id}` });
-    fireEvent.press(await screen.findByText("Continue requirements (Rooms)"));
-    expect(await screen.findByText("STEP 5 OF 10")).toBeTruthy();
-    expect(screen.getByText("Spaces the layout must include.")).toBeTruthy();
+    fireEvent.press(await screen.findByText("Continue requirements (2. Mission & Rooms)"));
+    expect(await screen.findByText("STEP 2 OF 6")).toBeTruthy();
+    expect(screen.getByText("Mission profile, troop occupancy, thermal targets & required room checklist.")).toBeTruthy();
   });
 
   it("keeps entered values when moving back a step", async () => {
@@ -52,13 +51,13 @@ describe("resume draft", () => {
     const created = await repo.createDraft("Nav", sampleRequirementsDraft());
     if (!created.ok) throw new Error(created.error);
 
-    renderRouter(APP_DIR, { initialUrl: `/project/${created.data.id}/edit?step=3` });
-    const occupants = await screen.findByLabelText("Number of occupants in persons, required");
+    renderRouter(APP_DIR, { initialUrl: `/project/${created.data.id}/edit?step=1` });
+    const occupants = await screen.findByLabelText("Troop Count in soldiers, required");
     fireEvent.changeText(occupants, "12");
     fireEvent.press(screen.getByText("Next"));
-    expect(await screen.findByText("STEP 5 OF 10")).toBeTruthy();
+    expect(await screen.findByText("STEP 3 OF 6")).toBeTruthy();
     fireEvent.press(screen.getByText("Back"));
-    expect((await screen.findByLabelText("Number of occupants in persons, required")).props.value).toBe("12");
+    expect((await screen.findByLabelText("Troop Count in soldiers, required")).props.value).toBe("12");
   });
 });
 

@@ -113,6 +113,8 @@ export function useStartGeneration(projectId: string | undefined) {
         count: opts.count ?? 24,
         seed: opts.seed ?? 42,
         materialsSnapshotId: opts.materials_snapshot_id,
+        validateWithAnsys: opts.validate_with_ansys ?? false,
+        baselineEconomics: opts.baseline_economics ?? true,
         idempotencyKey,
       });
 

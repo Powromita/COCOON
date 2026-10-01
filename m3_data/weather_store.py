@@ -46,6 +46,20 @@ SITES: dict[str, dict] = {
     "siachen_base_camp": {"name": "Siachen_Base_Camp", "lat": 35.4200, "lon": 77.1000, "elev": 5400.0},
 }
 
+# Legacy mobile-app preset IDs -> canonical backend site keys.
+# Resolving these means existing saved projects still work without any data migration.
+SITE_ALIASES: dict[str, str] = {
+    "ladakh_dbo": "daulat_beg_oldi",
+    "siachen_base": "siachen_base_camp",
+    "leh_post": "leh",
+    "drass_sector": "dras",
+}
+
+
+def resolve_site(site: str) -> str:
+    """Resolve a legacy mobile preset ID to its canonical backend site key."""
+    return SITE_ALIASES.get(site, site)
+
 _COLUMNS = {
     "temperature_C": "outdoor_dry_bulb_temperature_c", "solar_radiation_W_m2": "ghi_w_m2", "dni_W_m2": "dni_w_m2",
     "diffuse_radiation_W_m2": "dhi_w_m2", "wind_speed_m_s": "wind_speed_m_s", "wind_direction_deg": "wind_direction_deg",
@@ -81,17 +95,19 @@ class WeatherStore:
         return sorted(p.name.replace("_weather_archive.csv", "") for p in self.cache_dir.glob("*_weather_archive.csv"))
 
     def _frame(self, site: str) -> pd.DataFrame:
-        if site not in self._frames:
-            path = self.cache_dir / f"{site}_weather_archive.csv"
+        canonical = resolve_site(site)
+        if canonical not in self._frames:
+            path = self.cache_dir / f"{canonical}_weather_archive.csv"
             if not path.is_file():
-                raise WeatherError("WEATHER_SITE_UNKNOWN", f"no cached archive for site '{site}' (have {self.sites()})")
-            self._frames[site] = pd.read_csv(path, parse_dates=["timestamp"])
-        return self._frames[site]
+                raise WeatherError("WEATHER_SITE_UNKNOWN", f"no cached archive for site '{canonical}' (have {self.sites()})")
+            self._frames[canonical] = pd.read_csv(path, parse_dates=["timestamp"])
+        return self._frames[canonical]
 
     # ---- snapshots -----------------------------------------------------------------------------------------------
     def build(self, site: str, start: datetime | pd.Timestamp, end: datetime | pd.Timestamp, *,
               snapshot_id: str | None = None, persist: bool = True) -> WeatherSnapshot:
         """Snapshot of [start, end) (hourly). `start`/`end` may be naive (archive local time) or aware."""
+        site = resolve_site(site)  # transparently handle legacy mobile preset IDs
         meta = SITES.get(site)
         if meta is None:
             raise WeatherError("WEATHER_SITE_UNKNOWN", f"site '{site}' has no coordinates in SITES")

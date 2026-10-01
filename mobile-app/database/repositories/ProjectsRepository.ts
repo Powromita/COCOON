@@ -65,6 +65,10 @@ export function displayStatusFor(row: ProjectRow, isCorrupt: boolean): ProjectDi
 
 function locationLabel(req: DraftRequirements | undefined): string | null {
   if (typeof req?.location_name === "string" && req.location_name.trim().length > 0) return req.location_name;
+  const site = req?.site;
+  if (typeof site?.latitude_deg === "number" && typeof site?.longitude_deg === "number") {
+    return `${site.latitude_deg.toFixed(3)}°, ${site.longitude_deg.toFixed(3)}°`;
+  }
   return null;
 }
 

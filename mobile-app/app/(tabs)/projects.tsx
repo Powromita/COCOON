@@ -1,7 +1,7 @@
 /** Locally saved requirements drafts, with calculation results linked to backend runs. */
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, FlatList, Platform, RefreshControl, Text, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Alert, FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { EmptyState } from "../../components/common/EmptyState";
 import { ErrorView } from "../../components/common/ErrorView";
@@ -9,7 +9,9 @@ import { InfoBanner } from "../../components/common/InfoBanner";
 import { LoadingState } from "../../components/common/LoadingState";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { SectionHeader } from "../../components/common/SectionHeader";
+import { TextField } from "../../components/common/TextField";
 import { ProjectListRow } from "../../components/projects/ProjectListRow";
+import { RenameProjectModal } from "../../components/projects/RenameProjectModal";
 import type { ProjectListItem } from "../../database/schema/types";
 import { useDeleteProject, useProjectsList, useRestoreProject } from "../../hooks/useProjects";
 import { useT } from "../../i18n";
@@ -44,17 +46,31 @@ function UndoSnackbar({ name, onUndo }: { name: string; onUndo: () => void }) {
 
 export default function ProjectsScreen() {
   const router = useRouter();
-  const { colors, spacing } = useTheme();
+  const { colors, spacing, typography } = useTheme();
   const t = useT();
   const { data, isLoading, isError, error, refetch, isRefetching } = useProjectsList();
   const deleteProject = useDeleteProject();
   const restoreProject = useRestoreProject();
+  const [searchQuery, setSearchQuery] = useState("");
   const [undoTarget, setUndoTarget] = useState<{ id: string; name: string } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
     if (undoTimer.current) clearTimeout(undoTimer.current);
   }, []);
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return data;
+    return data.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.locationLabel && p.locationLabel.toLowerCase().includes(q)) ||
+        p.id.toLowerCase().includes(q)
+    );
+  }, [data, searchQuery]);
 
   if (Platform.OS === "web") {
     return (
@@ -65,7 +81,7 @@ export default function ProjectsScreen() {
   }
 
   const confirmDelete = (item: ProjectListItem) => {
-    Alert.alert("Delete project?", `“${item.name}” and its saved draft will be removed from this device.`, [
+    Alert.alert("Delete Shelter Project", `Are you sure you want to delete "${item.name}"? This action cannot be undone.`, [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
@@ -80,6 +96,21 @@ export default function ProjectsScreen() {
     ]);
   };
 
+  const manageProject = (item: ProjectListItem) => {
+    Alert.alert("Manage project", `“${item.name}”`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Rename",
+        onPress: () => setRenameTarget({ id: item.id, name: item.name }),
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => confirmDelete(item),
+      },
+    ]);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {isLoading ? <LoadingState label="Loading projects…" /> : null}
@@ -90,27 +121,61 @@ export default function ProjectsScreen() {
       ) : null}
       {data ? (
         <FlatList
-          data={data}
+          data={filteredData}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg, paddingBottom: 96 }}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
           ListHeaderComponent={
-            <View>
-              <PrimaryButton label={t("New project")} onPress={() => router.push("/project/new")} />
-              <SectionHeader title={`${t("LOCAL")} · this device`} caption="Long-press a project to delete it." />
+            <View style={{ marginBottom: spacing.md }}>
+              <PrimaryButton label={t("New shelter project")} onPress={() => router.push("/project/new")} />
+              <View style={{ marginTop: spacing.md }}>
+                <TextField
+                  label="Search Projects"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Filter by name, sector location, or ID…"
+                  helperText={searchQuery ? `Showing ${filteredData.length} of ${data.length} projects` : undefined}
+                />
+              </View>
+              <SectionHeader
+                title={`${t("SAVED SHELTERS")} (${filteredData.length})`}
+                caption="Tap card to open. Tap delete or long-press to manage."
+              />
             </View>
           }
-          ListEmptyComponent={<EmptyState title="No local projects yet" message="Create a project to describe a shelter and generate designs." />}
-          renderItem={({ item }) => (
-            <ProjectListRow
-              item={item}
-              origin="LOCAL"
-              onPress={() => router.push({ pathname: "/project/[id]", params: { id: item.id } })}
-              onLongPress={() => confirmDelete(item)}
+          ListEmptyComponent={
+            <EmptyState
+              title={searchQuery ? "No matching projects" : "No local projects yet"}
+              message={
+                searchQuery
+                  ? "Try searching with a different shelter name or sector location."
+                  : "Create a project to describe a shelter and generate designs."
+              }
             />
+          }
+          renderItem={({ item }) => (
+            <View style={{ marginBottom: spacing.xs }}>
+              <ProjectListRow
+                item={item}
+                origin="LOCAL"
+                onPress={() => router.push({ pathname: "/project/[id]", params: { id: item.id } })}
+                onLongPress={() => manageProject(item)}
+                onDelete={() => confirmDelete(item)}
+              />
+            </View>
           )}
         />
       ) : null}
+
+      {renameTarget ? (
+        <RenameProjectModal
+          visible={Boolean(renameTarget)}
+          projectId={renameTarget.id}
+          initialName={renameTarget.name}
+          onClose={() => setRenameTarget(null)}
+        />
+      ) : null}
+
       {undoTarget ? (
         <UndoSnackbar
           name={undoTarget.name}

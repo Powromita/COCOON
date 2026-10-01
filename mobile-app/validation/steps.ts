@@ -10,11 +10,13 @@
  */
 export type WizardStepId =
   | "site"
-  | "design"
   | "mission"
+  | "constraints"
+  | "envelope"
   | "optimize"
   | "review"
-  // Backwards-compatible validation groups for previously saved drafts/tests.
+  // Backwards-compatible aliases
+  | "design"
   | "location"
   | "weather"
   | "occupancy"
@@ -31,11 +33,42 @@ export interface WizardStepDef {
 }
 
 export const WIZARD_STEPS: WizardStepDef[] = [
-  { id: "site", index: 0, title: "Location & weather", description: "Choose an archive location and analysis period." },
-  { id: "design", index: 1, title: "Design constraints", description: "Set footprint, floors, materials, orientation and budget." },
-  { id: "mission", index: 2, title: "Mission & occupancy", description: "Describe the shelter use, occupants, rooms and comfort target." },
-  { id: "optimize", index: 3, title: "Optimization", description: "Choose lifecycle assumptions and candidate count." },
-  { id: "review", index: 4, title: "Review & generate", description: "Check requirements before running the RC optimization." },
+  {
+    id: "site",
+    index: 0,
+    title: "1. Location & Weather",
+    description: "Deployment coordinates, weather archive window & shelter identification.",
+  },
+  {
+    id: "mission",
+    index: 1,
+    title: "2. Mission & Rooms",
+    description: "Mission profile, troop occupancy, thermal targets & required room checklist.",
+  },
+  {
+    id: "constraints",
+    index: 2,
+    title: "3. Site & Materials",
+    description: "Site footprint, floors, allowable material catalog & heating fuel sources.",
+  },
+  {
+    id: "envelope",
+    index: 3,
+    title: "4. Architectural Envelope",
+    description: "Building dimensions, wall/roof/floor thickness, glazing & infiltration.",
+  },
+  {
+    id: "optimize",
+    index: 4,
+    title: "5. Solver & Optimization",
+    description: "Candidate pool count, economic scenario & baseline comparison.",
+  },
+  {
+    id: "review",
+    index: 5,
+    title: "Review & Generate",
+    description: "Verify all mission parameters before running the COCOON generative engine.",
+  },
 ];
 
 export const REVIEW_STEP_INDEX = WIZARD_STEPS.length - 1;
@@ -50,5 +83,8 @@ export function stepAt(index: number): WizardStepDef {
 }
 
 export function stepIndexOf(id: WizardStepId): number {
-  return WIZARD_STEPS.findIndex((s) => s.id === id);
+  if (id === "design") return 2; // maps to constraints
+  const idx = WIZARD_STEPS.findIndex((s) => s.id === id);
+  return idx >= 0 ? idx : 0;
 }
+

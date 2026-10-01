@@ -4,7 +4,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { DraftRequirements } from "../../../database/schema/types";
 import { useTheme } from "../../../theme";
 import { formatInr, formatWithUnit, NOT_AVAILABLE } from "../../../utils/format";
-import { HEATER_FUELS, MISSION_TYPES, optionLabel, ROOM_TYPES, WEATHER_SOURCES } from "../../../validation/options";
+import {
+  GLAZING_SPECS,
+  HEATER_FUELS,
+  MISSION_TYPES,
+  optionLabel,
+  ROOM_TYPES,
+  STANDARD_MATERIALS,
+  WEATHER_SOURCES,
+} from "../../../validation/options";
 import type { FieldErrors } from "../../../validation/schemas";
 import type { WizardStepId } from "../../../validation/steps";
 import { AppCard } from "../../common/AppCard";
@@ -26,42 +34,68 @@ function sections(d: DraftRequirements): Section[] {
   const s = d.site ?? {};
   const m = d.mission ?? {};
   const c = d.constraints ?? {};
+  const env = d.envelope ?? {};
+
   return [
     {
       step: "site",
-      title: "Location & weather",
+      title: "1. Location & Weather",
       rows: [
+        ["Shelter name", show(d.project_name) ?? "Custom shelter"],
         ["Location", show(d.location_name)],
-        ["Elevation", num(s.elevation_m, "m", 0)],
-        ["Source", optionLabel(WEATHER_SOURCES, s.weather_source)],
+        ["Coordinates", s.latitude_deg !== undefined && s.longitude_deg !== undefined ? `${s.latitude_deg.toFixed(2)}°N, ${s.longitude_deg.toFixed(2)}°E` : undefined],
+        ["Elevation", num(s.elevation_m, "m AMSL", 0)],
+        ["Timezone", show(s.timezone)],
+        ["Weather archive", optionLabel(WEATHER_SOURCES, s.weather_source)],
         ["Analysis start", show(s.analysis_start)],
         ["Analysis end", show(s.analysis_end)],
       ],
     },
     {
-      step: "design",
-      title: "Design constraints",
+      step: "mission",
+      title: "2. Mission & Rooms",
       rows: [
-        ["Maximum footprint", limit(c.maximum_footprint_m2, "m²") ?? "No limit"],
-        ["Maximum floors", typeof c.maximum_floors === "number" ? String(c.maximum_floors) : "System decides"],
-        ["Preferred orientation", num(c.preferred_orientation_deg, "°", 0) ?? "System decides"],
-        ["Permitted materials", c.available_material_ids?.map((id) => id.replace(/^mat_/, "").replaceAll("_", " ")).join(", ") ?? "Any in the default set"],
-        ["Maximum CAPEX", typeof c.maximum_capex_inr === "number" ? formatInr(c.maximum_capex_inr) : "No limit"],
-        ["Heater fuels", c.heater_fuels?.map((f) => optionLabel(HEATER_FUELS, f)).join(", ") ?? "No fuel selected"],
+        ["Mission profile", optionLabel(MISSION_TYPES, m.type)],
+        ["Troop occupants", num(m.occupants, "soldiers", 0)],
+        ["Target indoor temp", num(m.target_temperature_c, "°C")],
+        ["Max unmet hours", num(m.maximum_unmet_hours, "h", 0)],
+        ["Required rooms", m.required_rooms?.map((r) => optionLabel(ROOM_TYPES, r)).join(", ")],
       ],
     },
     {
-      step: "mission",
-      title: "Mission & comfort",
+      step: "constraints",
+      title: "3. Site Limits & Materials",
       rows: [
-        ["Purpose", optionLabel(MISSION_TYPES, m.type)],
-        ["Occupants", num(m.occupants, "persons", 0)],
-        ["Required rooms", m.required_rooms?.map((r) => optionLabel(ROOM_TYPES, r)).join(", ")],
-        ["Target temperature", num(m.target_temperature_c, "°C")],
-        ["Maximum unmet hours", num(m.maximum_unmet_hours, "h")],
+        ["Maximum footprint", limit(c.maximum_footprint_m2, "m²") ?? "No limit"],
+        ["Maximum floors", typeof c.maximum_floors === "number" ? `${c.maximum_floors} floor${c.maximum_floors > 1 ? "s" : ""}` : "1 floor"],
+        ["Budget cap (INR)", typeof c.maximum_capex_inr === "number" ? formatInr(c.maximum_capex_inr) : "No limit"],
+        ["Max structural mass", limit(c.maximum_mass_kg, "kg") ?? "No limit"],
+        ["Max assembly time", limit(c.max_assembly_time_hours, "h") ?? "No limit"],
+        ["Permitted materials", c.available_material_ids?.map((id) => optionLabel(STANDARD_MATERIALS, id) ?? id.replace(/^mat_/, "").replaceAll("_", " ")).join(", ") ?? "Default catalog"],
+        ["Heating fuel sources", c.heater_fuels?.map((f) => optionLabel(HEATER_FUELS, f)).join(", ") ?? "Kerosene"],
       ],
     },
-    { step: "optimize", title: "Optimization & economics", rows: [["Candidate designs", num(d.generation_options?.count, "designs", 0) ?? "24"], ["Lifecycle assumptions", show(d.economic_assumption_set_id)]] },
+    {
+      step: "envelope",
+      title: "4. Architectural Envelope",
+      rows: [
+        ["Dimensions (L × W × H)", env.length_m && env.width_m && env.height_m ? `${env.length_m}m × ${env.width_m}m × ${env.height_m}m` : undefined],
+        ["Wall thickness", num(env.wall_thickness_mm, "mm", 0)],
+        ["Roof thickness", num(env.roof_thickness_mm, "mm", 0)],
+        ["Floor thickness", num(env.floor_thickness_mm, "mm", 0)],
+        ["Window apertures", env.window_count !== undefined ? `${env.window_count} window${env.window_count === 1 ? "" : "s"} (${env.window_width_m ?? 1.2}m × ${env.window_height_m ?? 1.2}m)` : undefined],
+        ["Window orientation", show(env.window_orientation)],
+        ["Glazing spec", optionLabel(GLAZING_SPECS, env.glazing_spec)],
+        ["Airtightness", num(env.air_changes_per_hour, "ACH", 1)],
+      ],
+    },
+    {
+      step: "optimize",
+      title: "5. Solver & Optimization",
+      rows: [
+        ["Candidate pool count", num(d.generation_options?.count, "candidates", 0) ?? "24"],
+      ],
+    },
   ];
 }
 
@@ -73,10 +107,13 @@ interface ReviewStepProps {
 
 export function ReviewStep({ draft, errors, onEditStep }: ReviewStepProps) {
   const { colors, spacing, typography } = useTheme();
+
   return (
     <>
       {sections(draft).map((section) => {
-        const sectionErrors = errors.filter((e) => e.step === section.step);
+        const sectionErrors = errors.filter(
+          (e) => e.step === section.step || (section.step === "constraints" && e.step === "design")
+        );
         return (
           <AppCard key={section.step} emphasis={sectionErrors.length > 0 ? "demo" : "none"}>
             <View style={styles.header}>
@@ -90,7 +127,7 @@ export function ReviewStep({ draft, errors, onEditStep }: ReviewStepProps) {
                 hitSlop={8}
                 style={styles.edit}
               >
-                <Text style={[typography.caption, { color: colors.accent, fontWeight: "600" }]}>Edit</Text>
+                <Text style={[typography.caption, { color: colors.primary, fontWeight: "600" }]}>Edit</Text>
               </Pressable>
             </View>
             {section.rows.map(([label, value], i) => (
@@ -105,12 +142,8 @@ export function ReviewStep({ draft, errors, onEditStep }: ReviewStepProps) {
         );
       })}
 
-      {errors.filter((e) => e.step === "optimize").map((e) => (
-        <Text key={e.field} style={[typography.caption, { color: colors.danger }]}>{e.label}: {e.message}</Text>
-      ))}
-      <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.md }]}>
-        Generating sends these requirements to the COCOON backend, which generates, simulates, prices and ranks the
-        candidates. Nothing is calculated on this device.
+      <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.md, marginTop: spacing.xs }]}>
+        Generating executes the COCOON generative engine to synthesize geometries, calculate RC thermal dynamics, and rank candidates by Pareto efficiency.
       </Text>
     </>
   );

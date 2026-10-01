@@ -10,6 +10,8 @@ export interface StartGenerationInput {
   count: number;
   seed: number;
   materialsSnapshotId?: string;
+  validateWithAnsys?: boolean;
+  baselineEconomics?: boolean;
   /** Sent as Idempotency-Key so a retried submission never starts a second job. */
   idempotencyKey: string;
 }
