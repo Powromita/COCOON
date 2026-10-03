@@ -27,6 +27,11 @@ Downloads/
 .env
 .env.local
 .env*.local
+frontend/.env
+backend/.env
+supabase/.env
+supabase/.temp/
+supabase/.branches/
 
 # ML models
 *.joblib

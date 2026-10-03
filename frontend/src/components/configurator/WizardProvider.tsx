@@ -27,7 +27,7 @@ function load(): WizardDraft | null {
     const validIds = new Set(MATERIALS.map((m) => m.id));
     const knownSelected = constraints.available_material_ids.filter((m) => validIds.has(m));
     constraints.available_material_ids = knownSelected.length > 0 ? knownSelected : DEFAULT_DRAFT.constraints.available_material_ids;
-    return {
+    const merged = {
       site: { ...DEFAULT_DRAFT.site, ...parsed.site },
       mission: { ...DEFAULT_DRAFT.mission, ...parsed.mission },
       constraints,
@@ -35,6 +35,9 @@ function load(): WizardDraft | null {
       economic_assumption_set_id: parsed.economic_assumption_set_id ?? DEFAULT_DRAFT.economic_assumption_set_id,
       run: { ...DEFAULT_DRAFT.run, ...parsed.run },
     };
+    return Object.values(stepErrors(merged)).some((errors) => Object.keys(errors).length > 0)
+      ? DEFAULT_DRAFT
+      : merged;
   } catch {
     return null;
   }

@@ -1,5 +1,5 @@
-"""
-backend/tests/test_pipeline_routes.py — the integrated /api/v1 surface (capabilities, weather, generation,
+﻿"""
+backend/tests/test_pipeline_routes.py â€” the integrated /api/v1 surface (capabilities, weather, generation,
 simulation, and the asynchronous optimisation job).
 """
 
@@ -43,7 +43,7 @@ def wait(opt_id, seconds=180):
 
 def test_capabilities_report_real_module_status():
     c = client.get("/api/v1/capabilities").json()
-    assert c["schema_versions"] == ["4.0"] and c["auth_mode"] == "disabled"
+    assert c["schema_versions"] == ["4.0"] and c["auth_mode"] == "supabase_jwt"
     assert c["modules"]["m4_engine"]["name"] == "cocoon_multizone_rc"
     assert "leh" in c["modules"]["m3_weather_sites"] and c["modules"]["m2_design_generator"] is True
 

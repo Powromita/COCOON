@@ -1,16 +1,17 @@
-"""
-backend/main.py — the COCOON API service.
+﻿"""
+backend/main.py â€” the COCOON API service.
 
     uvicorn backend.main:app --reload --port 8000
 
 Run from the repo root so `python run_pipeline.py ...` resolves.
 """
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import settings
 from .jobs import sweep_old_runs
+from .auth import require_user
 from .routes import ansys, economics, pipeline, reference, run
 
 app = FastAPI(title="COCOON API", version="0.1.0")
@@ -18,15 +19,16 @@ app = FastAPI(title="COCOON API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_methods=["GET", "POST"],
-    allow_headers=["content-type", "idempotency-key"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
+    allow_headers=["authorization", "content-type", "idempotency-key"],
 )
 
-app.include_router(reference.router)
-app.include_router(run.router)
-app.include_router(ansys.router)
-app.include_router(economics.router)
-app.include_router(pipeline.router)
+protected = [Depends(require_user)]
+app.include_router(reference.router, dependencies=protected)
+app.include_router(run.router, dependencies=protected)
+app.include_router(ansys.router, dependencies=protected)
+app.include_router(economics.router, dependencies=protected)
+app.include_router(pipeline.router, dependencies=protected)
 
 
 @app.on_event("startup")

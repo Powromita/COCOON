@@ -31,7 +31,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
-from fastapi import APIRouter, Header, Response
+from fastapi import APIRouter, Depends, Header, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -45,6 +45,8 @@ from m4_engine import ENGINE_NAME, ENGINE_VERSION, M4Error, M4Evaluator
 from optimization import OptimizationSettings, to_error_envelope as m6_envelope
 
 from .. import settings
+from ..auth import AuthenticatedUser, require_user
+from ..project_store import create_run, ensure_project, owns_run
 
 router = APIRouter(prefix="/api/v1", tags=["pipeline"])
 _OPT_ID = re.compile(r"^opt_[0-9a-f]{12}$")
@@ -55,6 +57,11 @@ _live: set[str] = set()
 _lock = threading.Lock()
 
 
+def require_owned_run(optimization_id: str, user: AuthenticatedUser = Depends(require_user)) -> AuthenticatedUser:
+    if not owns_run(user.id, optimization_id):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Optimization not found")
+    return user
 def _err(status: int, code: ErrorCode, message: str, details: dict | None = None, retryable: bool = False) -> JSONResponse:
     env = ErrorEnvelope(error=ErrorDetail(code=code, message=message, details=details or {}, trace_id=str(uuid.uuid4()),
                                           retryable=retryable))
@@ -105,7 +112,7 @@ def capabilities():
     except Exception as exc:                                        # noqa: BLE001
         ml = f"unavailable: {type(exc).__name__}"
     return {
-        "schema_versions": ["4.0"], "auth_mode": "disabled",
+        "schema_versions": ["4.0"], "auth_mode": "supabase_jwt",
         "modules": {
             "m2_design_generator": True, "m3_weather_sites": _store().sites(),
             "m4_engine": {"name": ENGINE_NAME, "version": ENGINE_VERSION},
@@ -379,7 +386,7 @@ def _job(opt_id: str, body: OptimizationBody) -> None:
 
 
 @router.post("/optimizations", status_code=201)
-def create_optimization(body: OptimizationBody, response: Response,
+def create_optimization(body: OptimizationBody, response: Response, user: AuthenticatedUser = Depends(require_user),
                         idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
     preflight = _preflight(body)
     if "error" in preflight:
@@ -399,6 +406,8 @@ def create_optimization(body: OptimizationBody, response: Response,
             return {"optimization_id": seen["optimization_id"], "status_url": f"/api/v1/optimizations/{seen['optimization_id']}",
                     "replayed": True}
     opt_id = "opt_" + uuid.uuid4().hex[:12]
+    project_uuid = ensure_project(user.id, body.requirements.project_id, body.requirements.model_dump(mode="json"))
+    create_run(user.id, project_uuid, opt_id, body.model_dump(mode="json"), body.count, body.seed)
     d = _run_dir(opt_id)
     d.mkdir(parents=True)
     _atomic(d / "request.json", body.model_dump_json(indent=1))
@@ -413,7 +422,7 @@ def create_optimization(body: OptimizationBody, response: Response,
 
 
 @router.get("/optimizations")
-def list_optimizations():
+def list_optimizations(user: AuthenticatedUser = Depends(require_user)):
     """Return persisted optimization runs, newest first."""
     items = []
     for d in settings.PIPELINE_RUNS_DIR.iterdir():
@@ -425,6 +434,8 @@ def list_optimizations():
         try:
             st = json.loads(_read(status_path))
         except (OSError, ValueError):
+            continue
+        if not owns_run(user.id, d.name):
             continue
         items.append({
             "optimization_id": d.name,
@@ -483,7 +494,7 @@ def _project_from_run(directory: Path, status: dict) -> dict | None:
 
 
 @router.get("/projects")
-def list_projects():
+def list_projects(user: AuthenticatedUser = Depends(require_user)):
     """Return the latest persisted optimization for every project."""
     projects: dict[str, dict] = {}
     for directory in settings.PIPELINE_RUNS_DIR.iterdir():
@@ -491,6 +502,8 @@ def list_projects():
             continue
         status_path = directory / "status.json"
         if not status_path.is_file():
+            continue
+        if not owns_run(user.id, directory.name):
             continue
         try:
             project = _project_from_run(directory, json.loads(_read(status_path)))
@@ -517,7 +530,7 @@ def _status(opt_id: str):
 
 
 @router.get("/optimizations/{optimization_id}")
-def get_optimization(optimization_id: str):
+def get_optimization(optimization_id: str, _: AuthenticatedUser = Depends(require_owned_run)):
     d, st = _status(optimization_id)
     if d is None:
         return _err(404, ErrorCode.MISSING_REFERENCE, f"unknown optimization '{optimization_id}'")
@@ -537,7 +550,7 @@ def _result(optimization_id: str):
 
 
 @router.get("/optimizations/{optimization_id}/candidates")
-def get_candidates(optimization_id: str):
+def get_candidates(optimization_id: str, _: AuthenticatedUser = Depends(require_owned_run)):
     d, res = _result(optimization_id)
     if d is None:
         return res
@@ -546,7 +559,7 @@ def get_candidates(optimization_id: str):
 
 
 @router.get("/optimizations/{optimization_id}/pareto")
-def get_pareto(optimization_id: str):
+def get_pareto(optimization_id: str, _: AuthenticatedUser = Depends(require_owned_run)):
     d, res = _result(optimization_id)
     if d is None:
         return res
@@ -554,7 +567,7 @@ def get_pareto(optimization_id: str):
 
 
 @router.get("/optimizations/{optimization_id}/designs/{design_id}")
-def get_design(optimization_id: str, design_id: str):
+def get_design(optimization_id: str, design_id: str, _: AuthenticatedUser = Depends(require_owned_run)):
     d, st = _status(optimization_id)
     if d is None or not _DESIGN_ID.match(design_id):
         return _err(404, ErrorCode.MISSING_REFERENCE, "unknown optimization or design")
@@ -569,7 +582,7 @@ def get_design(optimization_id: str, design_id: str):
 
 
 @router.get("/optimizations/{optimization_id}/report")
-def get_report(optimization_id: str):
+def get_report(optimization_id: str, _: AuthenticatedUser = Depends(require_owned_run)):
     """The recommended design's full final_design_report.json — DRDO Task 1/2/3 objectives, economics
     (NPV/payback/LCC), materials/assembly breakdown, ANSYS validation state. Written by
     cocoon_pipeline.finalize.build_final_report; absent until the run completes (cfg.final_report=True)."""
@@ -587,7 +600,7 @@ _TIMESERIES_NAMES = {"conditioned", "free_floating", "baseline_conditioned"}
 
 
 @router.get("/optimizations/{optimization_id}/timeseries")
-def get_optimization_timeseries(optimization_id: str, which: str = "conditioned"):
+def get_optimization_timeseries(optimization_id: str, which: str = "conditioned", _: AuthenticatedUser = Depends(require_owned_run)):
     """Hourly (15-minute) ambient + per-zone temperature/heating/solar series for the recommended design,
     parsed from cocoon_pipeline.finalize.write_timeseries's CSV. `which` is conditioned (default; sized
     heater), free_floating (no heater), or baseline_conditioned (uninsulated GS-10-style reference)."""

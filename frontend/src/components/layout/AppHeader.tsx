@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { NAV_ITEMS, ROUTES, isNavItemActive } from "@/lib/routes";
 import LanguageToggle from "@/components/i18n/LanguageToggle";
 import { T, useT } from "@/lib/i18n";
+import SignOutButton from "@/components/auth/SignOutButton";
 
 
 const ACTIVE_LINK =
@@ -32,7 +33,7 @@ function useStationTime() {
   return time;
 }
 
-export default function AppHeader() {
+export default function AppHeader({ userName, userEmail }: { userName: string; userEmail: string }) {
   const pathname = usePathname();
   const stationTime = useStationTime();
   const t = useT();
@@ -61,7 +62,7 @@ export default function AppHeader() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
             </span>
             <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant font-medium tracking-wide">
-              <T>DAULAT BEG OLDI SECTOR (</T><span className="font-data">-38.2°C</span> @ <span className="font-data">5,065m</span> <T>AMSL) • SOLVER ENGINE READY</T>
+              <T>DAULAT BEG OLDI SECTOR (</T><span className="font-data">-38.2Â°C</span> @ <span className="font-data">5,065m</span> <T>AMSL) â€¢ SOLVER ENGINE READY</T>
             </span>
           </div>
         </div>
@@ -107,7 +108,7 @@ export default function AppHeader() {
           <div className="flex items-center gap-space-md pl-space-sm">
             <div className="hidden min-[2200px]:flex flex-col text-right">
               <span className="font-body-sm text-body-sm text-on-surface font-semibold leading-tight">
-                <T>Lt. Col. Vikramaditya Rathore</T>
+                {userName}
               </span>
               <div className="flex items-center justify-end gap-space-xs">
                 <span className="font-label-mono-xs text-label-mono-xs text-secondary font-medium">
@@ -115,16 +116,10 @@ export default function AppHeader() {
                 </span>
               </div>
               <span className="font-label-mono-xs text-label-mono-xs text-on-surface-variant">
-                <T>Directorate of High Altitude Defence Infrastructure (DHADI)</T>
+                {userEmail}
               </span>
             </div>
-            <Link
-              href={ROUTES.login}
-              title={t("Sign out")}
-              className="w-10 h-10 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-mono-md text-label-mono-md font-bold ring-2 ring-surface-container-low hover:ring-primary-fixed transition-shadow"
-            >
-              <T>VR</T>
-            </Link>
+            <SignOutButton initials={userName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "U"} />
           </div>
           <button
             type="button"

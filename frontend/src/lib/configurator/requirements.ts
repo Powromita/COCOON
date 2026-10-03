@@ -230,7 +230,7 @@ export const DEFAULT_DRAFT: WizardDraft = {
   economic_assumption_set_id: "econ_ladakh_expected_v1",
   run: {
     candidate_count: "20",
-    run_ansys: false,
+    run_ansys: true,
   },
 };
 

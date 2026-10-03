@@ -15,9 +15,11 @@ Env overrides (all optional):
 
 import os
 import sys
+from dotenv import load_dotenv
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 RUNS_DIR = Path(os.environ.get("COCOON_RUNS_DIR", REPO_ROOT / "runs"))
 PIPELINE_SCRIPT = REPO_ROOT / "run_pipeline.py"
@@ -31,6 +33,19 @@ CORS_ORIGINS = os.environ.get(
     "COCOON_CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 ).split(",")
+
+# Supabase Auth. Browser tokens are verified against the project JWKS.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+SUPABASE_SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY", "")
+SUPABASE_JWKS_URL = os.environ.get(
+    "SUPABASE_JWKS_URL",
+    f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json" if SUPABASE_URL else "",
+)
+SUPABASE_JWT_ISSUER = os.environ.get(
+    "SUPABASE_JWT_ISSUER",
+    f"{SUPABASE_URL}/auth/v1" if SUPABASE_URL else "",
+)
+SUPABASE_JWT_AUDIENCE = os.environ.get("SUPABASE_JWT_AUDIENCE", "authenticated")
 
 # reference data files
 DATA_DIR = REPO_ROOT / "thermal-calculator" / "data"

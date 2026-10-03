@@ -1,0 +1,2 @@
+-- Phase 1 intentionally has no application seed data.
+-- Future development fixtures must be synthetic and contain no mission data.
