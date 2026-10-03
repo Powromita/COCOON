@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Badge from "@/components/ui/Badge";
-import { listProjects, type ProjectSummary } from "@/lib/api";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
+import RenameProjectModal from "@/components/ui/RenameProjectModal";
+import { listProjects, deleteProject, renameProject, type ProjectSummary } from "@/lib/api";
 import { ROUTES } from "@/lib/routes";
 import { T } from "@/lib/i18n";
 
@@ -14,8 +16,12 @@ function formatDate(value?: string | null) {
 }
 
 function projectName(project: ProjectSummary) {
+  if (project.name && project.name.trim()) return project.name.trim();
+  if (project.project_name && project.project_name.trim()) return project.project_name.trim();
+  const elev = project.site.elevation_m;
+  const loc = elev ? `${elev.toLocaleString()}m AMSL Post` : "Ladakh Post";
   const mission = project.mission.type?.replaceAll("_", " ") ?? "Shelter";
-  return `${mission.replace(/\b\w/g, (letter) => letter.toUpperCase())} Simulation`;
+  return `${loc} – ${mission.replace(/\b\w/g, (letter) => letter.toUpperCase())}`;
 }
 
 function validationLabel(project: ProjectSummary) {
@@ -38,6 +44,13 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [projectToDelete, setProjectToDelete] = useState<ProjectSummary | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [projectToRename, setProjectToRename] = useState<ProjectSummary | null>(null);
+  const [renameLoading, setRenameLoading] = useState(false);
+  const [renameError, setRenameError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,12 +61,55 @@ export default function ProjectsPage() {
     return () => { cancelled = true; };
   }, []);
 
+  async function handleDeleteProject() {
+    if (!projectToDelete) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      await deleteProject(projectToDelete.project_id);
+      setProjects((prev) => prev.filter((p) => p.project_id !== projectToDelete.project_id));
+      setToastMessage(`Project "${projectName(projectToDelete)}" deleted successfully.`);
+      setTimeout(() => setToastMessage(null), 4000);
+      setProjectToDelete(null);
+      setDeleteError(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete project");
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  async function handleRenameProject(newName: string) {
+    if (!projectToRename) return;
+    setRenameLoading(true);
+    setRenameError(null);
+    try {
+      await renameProject(projectToRename.project_id, newName);
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.project_id === projectToRename.project_id
+            ? { ...p, name: newName, project_name: newName }
+            : p
+        )
+      );
+      setToastMessage(`Project renamed to "${newName}".`);
+      setTimeout(() => setToastMessage(null), 4000);
+      setProjectToRename(null);
+      setRenameError(null);
+    } catch (err) {
+      setRenameError(err instanceof Error ? err.message : "Failed to rename project");
+    } finally {
+      setRenameLoading(false);
+    }
+  }
+
   const filteredProjects = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return projects;
     return projects.filter((project) => [
       project.project_id,
       projectName(project),
+      project.name,
       project.design.template,
       project.recommended_design_id,
     ].filter(Boolean).join(" ").toLowerCase().includes(query));
@@ -64,6 +120,15 @@ export default function ProjectsPage() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-6 max-w-[1600px] mx-auto flex flex-col gap-6">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-navy text-white px-4 py-3 rounded-xl shadow-lg border border-primary-fixed/30 flex items-center gap-2 text-xs font-semibold animate-fade-in">
+          <span className="material-symbols-outlined text-[18px] text-equilibrium">check_circle</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header Section */}
       <section className="bg-surface-container-lowest rounded-2xl border border-line p-5 sm:p-6 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -71,39 +136,52 @@ export default function ProjectsPage() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight"><T>Shelter Projects</T></h1>
             <Badge tone="teal">{projects.length} Active Projects</Badge>
           </div>
-          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">Each card is linked to its latest persisted simulation result.</p>
+          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+            Persisted simulation projects, design deliverables, and ANSYS FEA validation records.
+          </p>
         </div>
-        <Link href={ROUTES.shelterConfigurator.step1} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-hover transition-colors shadow-sm self-start sm:self-auto">
+        <Link href={ROUTES.shelterConfigurator.step1} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-hover transition-colors shadow-sm self-start sm:self-auto hover-lift">
           <span className="material-symbols-outlined text-[18px]">add_circle</span><T>New Shelter Project</T>
         </Link>
       </section>
 
+      {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Metric label="Total Projects" value={projects.length} detail="Persisted simulation projects" tone="text-navy" />
         <Metric label="ANSYS Validated" value={validated} detail="Final RC-to-ANSYS checks passed" tone="text-equilibrium" />
         <Metric label="Solving in Progress" value={running} detail="Queued or actively running" tone="text-thermal" />
       </div>
 
+      {/* Search Bar */}
       <div className="bg-surface-container-lowest p-4 rounded-xl border border-line shadow-card">
         <div className="relative max-w-md">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted text-[18px]">search</span>
-          <input type="text" placeholder="Search by project, structure, or design ID..." value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} className="w-full pl-9 pr-4 py-2 bg-surface-container-low border border-line rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary" />
+          <input
+            type="text"
+            placeholder="Search by project, structure, or design ID..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-surface-container-low border border-line rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary"
+          />
         </div>
       </div>
 
       {loading && <p className="text-sm text-on-surface-variant">Loading saved projects…</p>}
       {error && <p className="text-sm text-thermal">{error}</p>}
       {!loading && !error && filteredProjects.length === 0 && (
-        <section className="bg-surface-container-lowest rounded-2xl border border-line p-8 text-center text-sm text-on-surface-variant">No saved projects yet. Start a simulation to create one.</section>
+        <section className="bg-surface-container-lowest rounded-2xl border border-line p-8 text-center text-sm text-on-surface-variant">
+          No saved projects yet. Start a simulation to create one.
+        </section>
       )}
 
+      {/* Project Cards List */}
       <div className="flex flex-col gap-4">
         {filteredProjects.map((project) => {
           const resultUrl = `${ROUTES.candidateTelemetry}?opt=${encodeURIComponent(project.optimization_id)}`;
           const site = project.site.elevation_m == null ? "Site details unavailable" : `${project.site.elevation_m.toLocaleString()} m AMSL`;
           const materials = project.design.materials.length ? project.design.materials.join(" + ") : "Awaiting final design";
           return (
-            <section key={project.project_id} className="bg-surface-container-lowest rounded-2xl border border-line p-5 sm:p-6 shadow-card flex flex-col gap-4">
+            <section key={project.project_id} className="bg-surface-container-lowest rounded-2xl border border-line p-5 sm:p-6 shadow-card flex flex-col gap-4 transition-all">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-surface-container pb-4">
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -115,9 +193,35 @@ export default function ProjectsPage() {
                   <h2 className="text-lg sm:text-xl font-bold text-navy mt-0.5">{projectName(project)}</h2>
                   <p className="text-xs text-on-surface-variant">{site} · {project.candidate_count ?? "—"} candidates · latest run {project.optimization_id}</p>
                 </div>
-                <Link href={resultUrl} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-hover transition-colors shadow-xs self-start">
-                  <span className="material-symbols-outlined text-[16px]">analytics</span><T>View Simulation Results</T>
-                </Link>
+                
+                {/* Actions: Rename, Delete, and View Simulation Results */}
+                <div className="flex items-center gap-2 self-start lg:self-center">
+                  <button
+                    type="button"
+                    onClick={() => setProjectToRename(project)}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-navy text-xs font-semibold border border-line transition-colors shadow-2xs hover-lift"
+                    title="Rename shelter"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">edit</span>
+                    <T>Rename</T>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProjectToDelete(project)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-error-container/25 text-on-surface-variant hover:text-error text-xs font-semibold border border-line hover:border-error/40 transition-colors shadow-2xs hover-lift"
+                    title="Delete project"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                    <T>Delete</T>
+                  </button>
+                  <Link
+                    href={resultUrl}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-hover transition-colors shadow-xs hover-lift"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">analytics</span>
+                    <T>View Simulation Results</T>
+                  </Link>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -130,14 +234,56 @@ export default function ProjectsPage() {
           );
         })}
       </div>
+
+      {/* Rename Modal */}
+      <RenameProjectModal
+        isOpen={Boolean(projectToRename)}
+        currentName={projectToRename ? projectName(projectToRename) : ""}
+        projectId={projectToRename?.project_id ?? ""}
+        errorMessage={renameError}
+        loading={renameLoading}
+        onSave={handleRenameProject}
+        onCancel={() => {
+          setProjectToRename(null);
+          setRenameError(null);
+        }}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={Boolean(projectToDelete)}
+        title="Delete Project"
+        itemName={projectToDelete ? `${projectName(projectToDelete)} (${projectToDelete.project_id})` : undefined}
+        itemType="project"
+        errorMessage={deleteError}
+        loading={deleteLoading}
+        onConfirm={handleDeleteProject}
+        onCancel={() => {
+          setProjectToDelete(null);
+          setDeleteError(null);
+        }}
+      />
     </div>
   );
 }
 
 function Metric({ label, value, detail, tone }: { label: string; value: number; detail: string; tone: string }) {
-  return <div className="bg-surface-container-lowest p-4 rounded-xl border border-line shadow-card"><span className="text-[10px] uppercase font-bold text-on-surface-variant">{label}</span><span className={`block text-2xl font-bold font-data mt-1 ${tone}`}>{value}</span><span className="text-[11px] text-on-surface-variant mt-1 block">{detail}</span></div>;
+  return (
+    <div className="bg-surface-container-lowest p-4 rounded-xl border border-line shadow-card">
+      <span className="text-[10px] uppercase font-bold text-on-surface-variant">{label}</span>
+      <span className={`block text-2xl font-bold font-data mt-1 ${tone}`}>{value}</span>
+      <span className="text-[11px] text-on-surface-variant mt-1 block">{detail}</span>
+    </div>
+  );
 }
 
 function Detail({ label, value, mono = false, highlight = false }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
-  return <div className="p-3 bg-surface-container-low rounded-xl border border-line"><span className="text-[10px] uppercase font-bold text-on-surface-variant">{label}</span><p className={`text-xs font-semibold mt-0.5 truncate ${mono ? "font-data" : ""} ${highlight ? "text-equilibrium" : "text-navy"}`} title={value}>{value}</p></div>;
+  return (
+    <div className="p-3 bg-surface-container-low rounded-xl border border-line">
+      <span className="text-[10px] uppercase font-bold text-on-surface-variant">{label}</span>
+      <p className={`text-xs font-semibold mt-0.5 truncate ${mono ? "font-data" : ""} ${highlight ? "text-equilibrium" : "text-navy"}`} title={value}>
+        {value}
+      </p>
+    </div>
+  );
 }

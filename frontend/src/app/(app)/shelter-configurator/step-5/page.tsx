@@ -111,6 +111,7 @@ export default function ConfiguratorStep5Page() {
       );
 
       const request: OptimizationRequest = {
+        name: draft.name?.trim() || undefined,
         requirements,
         count: Math.max(1, Math.min(200, Number(draft.run.candidate_count || 20))),
         validate_with_ansys: draft.run.run_ansys,

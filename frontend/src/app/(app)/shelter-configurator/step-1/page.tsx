@@ -49,13 +49,18 @@ export default function ConfiguratorStep1Page() {
                 <button
                   key={p.label}
                   type="button"
-                  onClick={() => set({
-                    latitude_deg: p.lat,
-                    longitude_deg: p.lon,
-                    elevation_m: p.elev,
-                    analysis_start: p.start,
-                    analysis_end: p.end,
-                  })}
+                  onClick={() => {
+                    set({
+                      latitude_deg: p.lat,
+                      longitude_deg: p.lon,
+                      elevation_m: p.elev,
+                      analysis_start: p.start,
+                      analysis_end: p.end,
+                    });
+                    if (!draft.name || draft.name.includes("Habitat") || draft.name.includes("Shelter") || draft.name.includes("–")) {
+                      update("name", `${p.label} Shelter`);
+                    }
+                  }}
                   className="px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-primary-container hover:border-primary hover:text-on-primary font-body-sm text-body-sm font-medium transition-colors hover-lift"
                 >
                   <T>{p.label}</T>
@@ -66,6 +71,30 @@ export default function ConfiguratorStep1Page() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-8 flex flex-col gap-5">
+
+              {/* Project & Shelter Identification */}
+              <SectionCard title="Project &amp; Shelter Identification" contractKey="project" icon="badge">
+                <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                  <T>Give this shelter configuration a custom name to identify it in project lists, dashboards, and export reports.</T>
+                </p>
+                <div>
+                  <Field
+                    label="Shelter / Project Name"
+                    contractKey="name"
+                    htmlFor="project_name"
+                    hint="Custom name for this shelter design (e.g. Siachen High-Altitude Post, DBO 24-Troop Shelter)"
+                  >
+                    <input
+                      id="project_name"
+                      type="text"
+                      value={draft.name ?? ""}
+                      onChange={(e) => update("name", e.target.value)}
+                      placeholder="e.g. Siachen High-Altitude Post, DBO 24-Troop Barracks"
+                      className="w-full h-10 px-3.5 rounded-xl border border-line bg-surface-container-lowest text-sm text-on-surface outline-none transition-all focus:border-navy focus:ring-2 focus:ring-navy/10 font-medium"
+                    />
+                  </Field>
+                </div>
+              </SectionCard>
 
               {/* Geographic Coordinates & Elevation */}
               <SectionCard title="Geographic Coordinates &amp; Elevation" contractKey="site" icon="location_on">

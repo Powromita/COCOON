@@ -19,8 +19,8 @@ app = FastAPI(title="COCOON API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    allow_headers=["authorization", "content-type", "idempotency-key"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 protected = [Depends(require_user)]
