@@ -1,0 +1,239 @@
+{
+ "catalog_version": "cat_e0112240c1d2",
+ "preliminary": true,
+ "note": "Preliminary check: rooms, floors, footprint and materials match a template. Room proportions, door and stair placement, glazing and the mass limit are only checked when candidates are generated.",
+ "materials_snapshot_id": "mat_snap_himalayan_v1",
+ "ok": true,
+ "stage_reached": "physical",
+ "input_errors": [],
+ "conflicts": [],
+ "warnings": [
+  {
+   "layer": "materials",
+   "code": "MATERIAL_NOT_IN_SNAPSHOT",
+   "message": "mat_steel_panel is not in material set mat_snap_himalayan_v1 and will not be used.",
+   "field": "constraints.available_material_ids",
+   "details": {
+    "material_ids": [
+     "mat_steel_panel"
+    ]
+   }
+  },
+  {
+   "layer": "physical",
+   "code": "MASS_CHECKED_AT_GENERATION",
+   "message": "The 15000 kg envelope mass limit is checked only on generated candidates; a tight limit can reject many of them.",
+   "field": "constraints.maximum_mass_kg",
+   "details": {}
+  }
+ ],
+ "alternatives": [],
+ "templates": [
+  {
+   "template_id": "airlock_living",
+   "name": "Airlock plus living room",
+   "version": "tpl_fa6389237e97",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {
+    "airlock": "airlock",
+    "living": "living",
+    "sleeping": "living",
+    "equipment": "living"
+   },
+   "shared": {
+    "sleeping": "living",
+    "equipment": "living"
+   },
+   "issues": [
+    {
+     "layer": "physical",
+     "code": "FOOTPRINT_TOO_SMALL",
+     "message": "Airlock plus living room on 1 floor(s) needs 77.0 m\u00b2 of rooms and circulation, but only 48.0 m\u00b2 is usable with a 48 m\u00b2 footprint.",
+     "field": "constraints.maximum_footprint_m2",
+     "details": {
+      "required_total_area_m2": 77.0,
+      "usable_area_m2": 48.0,
+      "min_footprint_m2": 77.0
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "airlock_living_equipment",
+   "name": "Airlock, living room and equipment room",
+   "version": "tpl_7d911046099d",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {
+    "airlock": "airlock",
+    "living": "living",
+    "sleeping": "living",
+    "equipment": "equipment"
+   },
+   "shared": {
+    "sleeping": "living"
+   },
+   "issues": [
+    {
+     "layer": "physical",
+     "code": "FOOTPRINT_TOO_SMALL",
+     "message": "Airlock, living room and equipment room on 1 floor(s) needs 77.0 m\u00b2 of rooms and circulation, but only 48.0 m\u00b2 is usable with a 48 m\u00b2 footprint.",
+     "field": "constraints.maximum_footprint_m2",
+     "details": {
+      "required_total_area_m2": 77.0,
+      "usable_area_m2": 48.0,
+      "min_footprint_m2": 77.0
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "command_post",
+   "name": "Command post",
+   "version": "tpl_01d1cf65e56c",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Command post has no room for: sleeping.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "sleeping"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "living_sleeping_storage",
+   "name": "Living, sleeping and storage rooms",
+   "version": "tpl_7190a0dc9038",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Living, sleeping and storage rooms has no room for: airlock, equipment.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "airlock",
+       "equipment"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "medical_post",
+   "name": "Medical post",
+   "version": "tpl_9923e157db37",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Medical post has no room for: living, equipment.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "living",
+       "equipment"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "single_room",
+   "name": "Single multipurpose room",
+   "version": "tpl_5fbb7d5be874",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Single multipurpose room has no room for: airlock.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "airlock"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "two_floor_compact",
+   "name": "Compact two-floor shelter",
+   "version": "tpl_aa5b1627bbaf",
+   "floor_count": 2,
+   "compatible": true,
+   "provided_by": {
+    "airlock": "airlock",
+    "living": "living",
+    "sleeping": "sleeping",
+    "equipment": "equipment"
+   },
+   "shared": {},
+   "issues": []
+  }
+ ],
+ "compatible_template_ids": [
+  "two_floor_compact"
+ ],
+ "selected_template_ids": [
+  "two_floor_compact"
+ ],
+ "spec": {
+  "occupants": 30,
+  "rooms": [
+   {
+    "type": "airlock",
+    "min_area_m2": 3.0,
+    "min_dimension_m": 1.2
+   },
+   {
+    "type": "living",
+    "min_area_m2": 24.0,
+    "min_dimension_m": 2.5
+   },
+   {
+    "type": "sleeping",
+    "min_area_m2": 36.0,
+    "min_dimension_m": 2.4
+   },
+   {
+    "type": "equipment",
+    "min_area_m2": 7.0,
+    "min_dimension_m": 1.5
+   }
+  ],
+  "room_area_sum_m2": 70.0,
+  "required_total_area_m2": 77.0,
+  "footprint_cap_m2": 48.0,
+  "max_floors": 2,
+  "allowed_floor_counts": [
+   2
+  ],
+  "usable_area_by_floor_count_m2": {
+   "1": 48.0,
+   "2": 90.0
+  }
+ }
+}

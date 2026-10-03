@@ -85,6 +85,185 @@ export interface OptimizationStatusResponse {
   error?: Pick<ErrorDetail, "code" | "message"> & Partial<ErrorDetail>;
   /** The full M6 result document — only present once completed. */
   result?: { weather_snapshot_id?: string; site_used?: SiteUsed; warnings?: string[]; [key: string]: unknown };
+  /** Position in the pipeline, derived by the backend from status + recorded stages (never a percentage). */
+  phase?: JobPhase;
+  /** Real stage transitions recorded by the backend's pipeline observer. */
+  stages?: JobStage[];
+  template_catalog_version?: string;
+  template_ids?: string[];
+  template_selection?: "automatic" | "manual";
+  generation?: GenerationSummary;
+  /** Live M8 status for the recommended revision, when ANSYS was requested. */
+  ansys?: { job_id: string; status?: string; design_revision_id?: string; error_reason?: string | null };
+  retry_of?: string;
+  retried_as?: string;
+}
+
+export type JobPhase =
+  | "queued"
+  | "generating"
+  | "simulation"
+  | "optimization"
+  | "ansys_validation"
+  | "finalizing"
+  | "running"
+  | "completed"
+  | "partially_completed"
+  | "failed";
+
+export type JobStageStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "skipped"
+  | "not_requested"
+  | "queued"
+  | "unavailable";
+
+export interface JobStage {
+  id: "compatibility" | "weather" | "generation" | "simulation" | "economics" | "optimization" | "ansys" | "report" | string;
+  label: string;
+  status: JobStageStatus;
+  started_at?: string;
+  finished_at?: string;
+}
+
+/** M2's own tally for one generation run (optimization.GenerationSummary). */
+export interface GenerationSummary {
+  requested: number;
+  generated: number;
+  attempts: number;
+  max_attempts: number;
+  complete: boolean;
+  rejection_reasons: Record<string, number>;
+}
+
+/** What one candidate was generated from (backend provenance.json). */
+export interface CandidateProvenance {
+  design_id: string;
+  revision_id: string;
+  template_id: string;
+  template_version: string | null;
+  catalog_version: string;
+  generator_version: string;
+  seed: number;
+  parameters: Record<string, unknown>;
+  m2_validation: { ok: boolean; passed: string[]; skipped: string[] };
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/v1/templates — the M2 template catalogue (design_generator/catalog.py)
+// ---------------------------------------------------------------------------
+export interface TemplateRoom {
+  id: string;
+  type: string;
+  floor_level: number;
+  is_primary_occupied: boolean;
+  exterior_access: boolean;
+  serves: string[];
+}
+
+export interface CatalogTemplate {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  active: boolean;
+  floor_count: number;
+  airlock_required: boolean;
+  dedicated_functions: string[];
+  shared_functions: Record<string, string[]>;
+  supported_functions: string[];
+  rooms: TemplateRoom[];
+  links: { a: string; b: string; kind: "door" | "stair" | "partition" }[];
+}
+
+export interface CatalogRoomType {
+  type: string;
+  min_area_fixed_m2: number;
+  min_area_per_person_m2: number;
+  min_dimension_m: number;
+  dedicated_in: string[];
+  shared_in: string[];
+}
+
+export interface CatalogMaterial {
+  id: string;
+  display_name: string;
+  category: string;
+  role: "structural" | "insulation" | null;
+  elements: string[];
+}
+
+export interface TemplateCatalog {
+  catalog_version: string;
+  generator_version: string;
+  templates: CatalogTemplate[];
+  room_types: CatalogRoomType[];
+  floors: { template_floor_counts: number[]; contract_max_floors: number };
+  sizing: { circulation_factor: number; stair_allowance_m2: number; ceiling_height_range_m: number[]; assumptions_note: string };
+  materials: Record<string, CatalogMaterial[]>;
+  required_structural_elements: string[];
+  notes: string[];
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/v1/design-compatibility
+// ---------------------------------------------------------------------------
+export type RoomArrangement = "dedicated" | "shared";
+
+export interface CompatibilityIssue {
+  layer: "input" | "functional" | "physical" | "materials" | "arrangement" | "selection";
+  code: string;
+  message: string;
+  field: string | null;
+  details: Record<string, unknown>;
+}
+
+export interface TemplateCompatibility {
+  template_id: string;
+  name: string;
+  version: string;
+  floor_count: number;
+  compatible: boolean;
+  provided_by: Record<string, string>;
+  shared: Record<string, string>;
+  issues: CompatibilityIssue[];
+}
+
+export interface CompatibilityAlternative {
+  template_id: string;
+  name: string;
+  /** Dotted requirement path -> suggested value (each one re-checked by the backend's parser). */
+  change: Record<string, number>;
+  message: string;
+}
+
+export interface CompatibilityResult {
+  catalog_version: string;
+  preliminary: true;
+  note: string;
+  materials_snapshot_id: string;
+  ok: boolean;
+  stage_reached: "input" | "functional" | "physical";
+  input_errors: CompatibilityIssue[];
+  conflicts: CompatibilityIssue[];
+  warnings: CompatibilityIssue[];
+  alternatives: CompatibilityAlternative[];
+  templates: TemplateCompatibility[];
+  compatible_template_ids: string[];
+  selected_template_ids: string[];
+  spec: {
+    occupants: number;
+    rooms: { type: string; min_area_m2: number; min_dimension_m: number }[];
+    room_area_sum_m2: number;
+    required_total_area_m2: number;
+    footprint_cap_m2: number | null;
+    max_floors: number;
+    allowed_floor_counts: number[];
+    usable_area_by_floor_count_m2: Record<string, number | null>;
+  } | null;
 }
 
 export interface SiteUsed {
@@ -141,7 +320,9 @@ export interface CandidatesResponse {
   optimization_id: string;
   recommended_design_id: string | null;
   validation: ValidationStateDoc;
-  candidates: DesignOutcome[];
+  /** M2's generation tally (older backends omit it). */
+  generation?: GenerationSummary;
+  candidates: (DesignOutcome & { provenance?: CandidateProvenance | null })[];
 }
 
 // ---------------------------------------------------------------------------

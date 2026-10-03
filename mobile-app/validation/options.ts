@@ -10,9 +10,10 @@ export interface Option<T extends string = string> {
 }
 
 /**
- * Room types the M2 layout generator has sizing rules for
- * (design_generator/requirement_parser.py DEFAULT_SIZING on main). M2
- * rejects any other type and any type listed twice.
+ * Display labels and descriptions for M2 room types. This is wording only:
+ * which room types exist, and which can be combined, shared or kept separate,
+ * comes from the live template catalogue (GET /api/v1/templates). A type the
+ * catalogue adds later is shown with a humanized label.
  */
 export const ROOM_TYPES: Option[] = [
   {

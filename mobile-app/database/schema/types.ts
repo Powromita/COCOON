@@ -13,6 +13,10 @@ export interface DraftGenerationOptions {
   /** Number of candidate designs requested from the backend. */
   count?: number;
   seed?: number;
+  /** A template the user picked on the review step; null/absent = automatic (every compatible template). */
+  template_id?: string | null;
+  /** Per room type: must it have its own room, or share one? Absent = either. Checked by the backend catalogue. */
+  room_arrangement?: Record<string, "dedicated" | "shared">;
 }
 
 /** Draft of an M0 RequirementsContract — the groups mirror the contract exactly. */

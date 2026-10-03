@@ -3,7 +3,11 @@
  * between steps never loses input; every change is autosaved to SQLite
  * (debounced, and flushed on step change, backgrounding and Android back).
  * "Generate designs" validates the draft into an M0 RequirementsContract
- * and submits it to the backend.
+ * and submits it to the backend. The draft is checked against the live M2
+ * template catalogue as it changes (debounced); generating is only offered
+ * once the backend reports a compatible template, and the backend checks
+ * again before it queues anything. A refused or failed submission never
+ * clears the form.
  */
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -12,6 +16,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { BackHandler, StyleSheet, Text, View } from "react-native";
 
 import { ErrorView } from "../../../components/common/ErrorView";
+import { FailureNotice } from "../../../components/generation/FailureNotice";
+import { CompatibilityPanel } from "../../../components/projects/wizard/CompatibilityPanel";
 import { InfoBanner } from "../../../components/common/InfoBanner";
 import { LoadingState } from "../../../components/common/LoadingState";
 import { PrimaryButton } from "../../../components/common/PrimaryButton";
@@ -28,11 +34,19 @@ import {
 } from "../../../components/projects/wizard/Steps";
 import { IS_FIXTURE_MODE } from "../../../constants/env";
 import type { DraftRequirements, ProjectRecord } from "../../../database/schema/types";
-import { useStartGeneration } from "../../../hooks/useCocoon";
+import { useCompatibility, useStartGeneration } from "../../../hooks/useCocoon";
 import { useDraftAutosave, useMarkReady, useProjectRecord, useRevertToDraft } from "../../../hooks/useProjects";
 import { useAppStore } from "../../../store/app.store";
 import { useTheme } from "../../../theme";
-import { draftSchema, hasBlockingErrors, validateAll, validateStep, type FieldErrors } from "../../../validation/schemas";
+import { AppError } from "../../../utils/errors";
+import {
+  draftSchema,
+  hasBlockingErrors,
+  previewRequirements,
+  validateAll,
+  validateStep,
+  type FieldErrors,
+} from "../../../validation/schemas";
 import { clampStepIndex, REVIEW_STEP_INDEX, stepAt, stepIndexOf, WIZARD_STEPS, type WizardStepId } from "../../../validation/steps";
 
 export default function ProjectEditScreen() {
@@ -140,6 +154,29 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
   );
 
   const current = stepAt(stepIndex);
+  const offlineApi = !IS_FIXTURE_MODE && isOnline === false;
+  const compatInput = useMemo(
+    () => ({
+      requirements: previewRequirements(values, projectId),
+      templateId: values.generation_options?.template_id ?? null,
+      roomArrangement: values.generation_options?.room_arrangement ?? {},
+      materialsSnapshotId: values.generation_options?.materials_snapshot_id,
+    }),
+    [values, projectId]
+  );
+  // Checked on the steps where it can change and on review; never while offline (an old answer must not pass for a new one).
+  const compatibility = useCompatibility(
+    compatInput,
+    !readOnly && !offlineApi && (current.id === "mission" || current.id === "design" || current.id === "review")
+  );
+  const applyChange = (change: Record<string, number>) => {
+    for (const [path, value] of Object.entries(change)) {
+      form.setValue(path as never, value as never, { shouldValidate: true, shouldDirty: true });
+    }
+  };
+  const selectTemplate = (templateId: string | null) =>
+    form.setValue("generation_options.template_id", templateId, { shouldValidate: true, shouldDirty: true });
+
   const stepErrors = useMemo(() => (current.id === "review" ? [] : validateStep(current.id, values)), [current.id, values]);
   const blocking = hasBlockingErrors(stepErrors);
   const allErrors = useMemo(() => validateAll(values), [values]);
@@ -204,8 +241,9 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
 
   if (current.id === "review") {
     const shownErrors = submitErrors.length > 0 ? submitErrors : allErrors;
-    const offlineApi = !IS_FIXTURE_MODE && isOnline === false;
     const busy = markReady.isPending || startGeneration.isPending;
+    const compatible = compatibility.data?.ok === true && !compatibility.pending;
+    const categorised = submitError instanceof AppError && typeof submitError.details?.category === "string";
     return (
       <>
         <Stack.Screen options={{ title: record.row.name }} />
@@ -229,11 +267,34 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
                   Connect to a network to run the RC calculation. Your draft has been saved.
                 </Text>
               ) : null}
-              {submitError ? <ErrorView error={submitError} title="Design generation could not start" /> : null}
+              {submitError && categorised ? (
+                <FailureNotice
+                  error={{
+                    message: (submitError as AppError).backendMessage ?? (submitError as AppError).message,
+                    code: (submitError as AppError).code,
+                    retryable: (submitError as AppError).retryable,
+                    details: (submitError as AppError).details,
+                    traceId: (submitError as AppError).traceId,
+                  }}
+                  onEdit={(ex) => {
+                    setSubmitError(null);
+                    if (ex.step && ex.step !== "review") void goToStep(stepIndexOf(ex.step));
+                  }}
+                  onRetry={() => void onGenerate()}
+                  retrying={busy}
+                />
+              ) : submitError ? (
+                <ErrorView error={submitError} title="Design generation could not start" onRetry={() => void onGenerate()} />
+              ) : null}
+              {!compatible && shownErrors.length === 0 && !offlineApi ? (
+                <Text style={[typography.caption, { color: colors.textSecondary }]}>
+                  {compatibility.pending ? "Checking your requirements against the shelter templates…" : "Generating is available once a compatible template is found."}
+                </Text>
+              ) : null}
               <PrimaryButton
                 label={busy ? "Submitting…" : "Generate designs"}
                 onPress={() => void onGenerate()}
-                disabled={readOnly || busy || shownErrors.length > 0 || offlineApi}
+                disabled={readOnly || busy || shownErrors.length > 0 || offlineApi || !compatible}
               />
               <View style={styles.row}>
                 <View style={styles.half}>
@@ -253,6 +314,17 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
             </View>
           }
         >
+          <CompatibilityPanel
+            result={compatibility.data}
+            error={compatibility.error}
+            checking={compatibility.pending}
+            offline={offlineApi}
+            selectedTemplateId={values.generation_options?.template_id ?? null}
+            onSelectTemplate={selectTemplate}
+            onRetry={() => void compatibility.refetch()}
+            onEditStep={(s: WizardStepId) => void goToStep(stepIndexOf(s))}
+            onApplyChange={applyChange}
+          />
           <ReviewStep
             draft={values}
             errors={shownErrors}
@@ -285,9 +357,23 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
         {blocking ? (
           <Text style={[typography.caption, { color: colors.danger }]}>Fix the highlighted values to continue.</Text>
         ) : null}
+        {(current.id === "mission" || current.id === "design") && compatibility.data ? (
+          <Text accessibilityLiveRegion="polite" style={[typography.caption, { color: colors.textSecondary }]}>
+            {compatibilitySummary(compatibility.data)}
+            {compatibility.pending ? " (re-checking…)" : ""}
+          </Text>
+        ) : null}
       </StepShell>
     </>
   );
+}
+
+/** One line for the mission/design steps; the full explanation is on the review step. */
+function compatibilitySummary(result: import("../../../types/backend").CompatibilityResult): string {
+  const n = result.compatible_template_ids.length;
+  if (n > 0) return `${n} shelter template${n === 1 ? "" : "s"} can hold these rooms so far.`;
+  const conflict = result.conflicts.find((c) => c.layer !== "input") ?? result.conflicts[0];
+  return conflict ? `Not compatible yet: ${conflict.message}` : "No template can hold these rooms yet — see Review for details.";
 }
 
 const styles = StyleSheet.create({

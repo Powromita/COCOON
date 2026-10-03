@@ -34,6 +34,7 @@ import type { MaterialCatalog, MaterialsService } from "../interfaces/MaterialsS
 import type { AuthAvailability, AuthService, SignInResult } from "../interfaces/AuthService";
 import type { OptimizationHistoryService, RunList, RunReport } from "../interfaces/OptimizationHistoryService";
 import type { ProjectService } from "../interfaces/ProjectService";
+import type { TemplateService } from "../interfaces/TemplateService";
 import type { DesignSimulationRequest, SimulationService } from "../interfaces/SimulationService";
 import type { VisualizationResult, VisualizationRequest, VisualizationService } from "../interfaces/VisualizationService";
 import { checkLocalStorage, toGenerationJob } from "../shared/mappers";
@@ -133,6 +134,25 @@ export class FixtureGenerationService implements GenerationService {
   async getSubmittedRequirements(jobId: string): Promise<RequirementsContract | null> {
     requireRecordedRun(jobId);
     return fx.getSampleRequirements();
+  }
+
+  async retryGeneration(_jobId: string): Promise<{ jobId: string; notes: string[] }> {
+    throw new AppError({ kind: "not_supported", message: "Retrying a run needs the COCOON backend; recorded runs cannot be re-run." });
+  }
+}
+
+/**
+ * There is no recorded template catalogue: the catalogue and every compatibility
+ * decision must come from a live M2, so the fixture provider says so instead of
+ * inventing one.
+ */
+export class FixtureTemplateService implements TemplateService {
+  async getCatalog(): Promise<never> {
+    throw new AppError({ kind: "not_supported", message: "The M2 template catalogue is only available from the COCOON backend." });
+  }
+
+  async checkCompatibility(): Promise<never> {
+    throw new AppError({ kind: "not_supported", message: "Compatibility checks are only available from the COCOON backend." });
   }
 }
 

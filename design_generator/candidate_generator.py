@@ -149,6 +149,9 @@ class GenerationOptions:
     entrance_face_priority: tuple[str, ...] = DEFAULT_ENTRANCE_FACE_PRIORITY
     attempts_per_candidate: int = 50
     max_attempts: int | None = None
+    # Restrict generation to these template ids (None = every template that fits). Set by a caller that has already
+    # chosen templates through design_generator.catalog.check_compatibility; an id that does not fit is an error.
+    template_ids: tuple[str, ...] | None = None
 
 
 # ----- errors and outputs ------------------------------------------------------
@@ -258,7 +261,12 @@ def _role(category: str) -> str | None:
 
 
 def _material_pool(spec: GenerationSpec, snapshot: MaterialSnapshot, options: GenerationOptions) -> dict:
-    allowed = set(spec.allowed_material_ids) if spec.allowed_material_ids else set(snapshot.materials)
+    return material_pool(spec.allowed_material_ids, snapshot, options)
+
+
+def material_pool(allowed_material_ids, snapshot: MaterialSnapshot, options: GenerationOptions) -> dict:
+    """{"structural"|"insulation": {element: [(material_id, (min_mm, max_mm))]}} - what assemblies may be built from."""
+    allowed = set(allowed_material_ids) if allowed_material_ids else set(snapshot.materials)
     pool: dict[str, dict[str, list]] = {"structural": {}, "insulation": {}}
     known = {m for (_, m) in options.thickness_mm}          # materials with their own rows keep them (no category fallback)
     for element in _ELEMENT_CATEGORY:
@@ -586,6 +594,30 @@ def _build(index: int, seed: int, rng, match: TemplateMatch, spec: GenerationSpe
 
 
 # ----- public entry -----------------------------------------------------------------
+def fitting_templates(spec: GenerationSpec, template_ids=None) -> list[TemplateMatch]:
+    """Templates that provide every required room in an allowed floor count, optionally limited to ``template_ids``.
+
+    The one rule both generation and the compatibility check (design_generator.catalog) use. Raises NoTemplateError.
+    """
+    rooms = [r.room_type for r in spec.rooms]
+    matches = [m for m in filter_templates(rooms, spec.max_floors) if m.template.floor_count in spec.allowed_floor_counts]
+    if not matches:
+        raise NoTemplateError(
+            f"no template provides rooms {rooms} in {list(spec.allowed_floor_counts)} floor(s)",
+            {"allowed_floor_counts": list(spec.allowed_floor_counts)})
+    if template_ids is not None:
+        wanted = list(dict.fromkeys(template_ids))
+        fitting = {m.template.id for m in matches}
+        rejected = [t for t in wanted if t not in fitting]
+        if not wanted or rejected:
+            raise NoTemplateError(
+                f"template(s) {rejected or wanted} cannot provide rooms {rooms} in {list(spec.allowed_floor_counts)} floor(s)",
+                {"requested_template_ids": wanted, "not_fitting": rejected, "fitting_template_ids": sorted(fitting),
+                 "allowed_floor_counts": list(spec.allowed_floor_counts)})
+        matches = [m for m in matches if m.template.id in wanted]
+    return matches
+
+
 def generate_candidates(
     requirements: RequirementsContract | dict,
     material_snapshot: MaterialSnapshot | dict,
@@ -603,12 +635,7 @@ def generate_candidates(
     spec = parse_requirements(requirements, sizing=sizing)
     created_at = created_at or datetime.now(timezone.utc)
 
-    matches = [m for m in filter_templates(list(r.room_type for r in spec.rooms), spec.max_floors)
-               if m.template.floor_count in spec.allowed_floor_counts]
-    if not matches:
-        raise NoTemplateError(
-            f"no template provides rooms {[r.room_type for r in spec.rooms]} in "
-            f"{list(spec.allowed_floor_counts)} floor(s)", {"allowed_floor_counts": list(spec.allowed_floor_counts)})
+    matches = fitting_templates(spec, options.template_ids)
     pool = _material_pool(spec, snapshot, options)
 
     limit = options.max_attempts or count * options.attempts_per_candidate

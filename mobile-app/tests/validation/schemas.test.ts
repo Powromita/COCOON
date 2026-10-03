@@ -31,15 +31,13 @@ describe("the M0 sample requirements", () => {
 });
 
 describe("materials needed by M2", () => {
-  it("rejects an insulation-only selection with a useful correction", () => {
+  it("leaves the structural-material rule to the backend's M2 material roles (no hardcoded list here)", () => {
+    // An insulation-only set is reported by POST /api/v1/design-compatibility as NO_STRUCTURAL_MATERIAL
+    // (design_generator/tests/test_catalog.py), using the generator's own material pool.
     const errors = validateStep("design", withPatch((d) => {
       d.constraints!.available_material_ids = ["mat_puf"];
     }));
-    expect(errors).toEqual([expect.objectContaining({
-      field: "constraints.available_material_ids",
-      kind: "invalid",
-      message: expect.stringContaining("Choose a structural material"),
-    })]);
+    expect(errors.filter((e) => e.field === "constraints.available_material_ids")).toEqual([]);
   });
 
   it("allows insulation when a structural material is also selected", () => {

@@ -99,6 +99,11 @@ def _ml_predictor(cfg: PipelineConfig, requirements: RequirementsContract, weath
     return p, {**info, "used": True, "model_version": p.model_version, "reason": "screening only; every finalist is re-simulated by M4"}
 
 
+def _progress(cfg: PipelineConfig, stage: str) -> None:
+    if cfg.progress is not None:
+        cfg.progress(stage)
+
+
 def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig | None = None) -> PipelineResult:
     from economics.provider import make_economics
     from m3_data import WeatherStore, standard_snapshot
@@ -117,6 +122,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
     t = time.perf_counter()
     weather, site_used = _freeze_weather(requirements, cfg, store)
     timings["weather_s"] = round(time.perf_counter() - t, 6)
+    _progress(cfg, "weather")
 
     evaluator = M4Evaluator(materials, store)
     economics = make_economics(materials, requirements)
@@ -128,7 +134,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
         # it dropped 12 of 18 Pareto-front designs, so the pipeline screens without it (see ml/ACCEPTANCE.md).
         settings = replace(settings, screening=ScreeningSettings(shortlist_size=None))
     opt = optimize(requirements, materials, evaluator, economics, weather_snapshot_id=weather.snapshot_id,
-                   seed=cfg.seed, count=cfg.count, predictor=predictor, settings=settings)
+                   seed=cfg.seed, count=cfg.count, predictor=predictor, settings=settings, progress=cfg.progress)
     if predictor is not None:
         ml_info["screening"] = opt.screening.summary()
     timings.update({f"m6_{k}": v for k, v in opt.timings_s.items()})
@@ -148,6 +154,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
                                    wait=cfg.ansys_wait)
         timings["ansys_submit_s"] = round(time.perf_counter() - t, 6)
         validation = dict(sub)
+        _progress(cfg, "ansys")
     else:
         validation = {"state": VALIDATION_NOT_REQUESTED}
 
@@ -161,6 +168,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
                                             warnings, validation, ml_info)
         timings["final_report_s"] = round(time.perf_counter() - t, 6)
         warnings = report["warnings"]
+        _progress(cfg, "final_report")
 
     timings["total_s"] = round(time.perf_counter() - t0, 6)
     result = PipelineResult(optimization=opt, recommended_design_id=recommended, validation=validation,

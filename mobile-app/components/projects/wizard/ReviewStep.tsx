@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { DraftRequirements } from "../../../database/schema/types";
 import { useTheme } from "../../../theme";
-import { formatInr, formatWithUnit, NOT_AVAILABLE } from "../../../utils/format";
+import { formatInr, formatWithUnit, humanize, NOT_AVAILABLE } from "../../../utils/format";
 import { HEATER_FUELS, MISSION_TYPES, optionLabel, ROOM_TYPES, WEATHER_SOURCES } from "../../../validation/options";
 import type { FieldErrors } from "../../../validation/schemas";
 import type { WizardStepId } from "../../../validation/steps";
@@ -21,6 +21,12 @@ const num = (v: number | null | undefined, unit: string, decimals = 1) =>
   typeof v === "number" ? formatWithUnit(v, unit, decimals) : undefined;
 const limit = (v: number | null | undefined, unit: string, decimals = 0) =>
   v === null ? "No limit" : num(v, unit, decimals);
+
+function arrangementText(map: Record<string, "dedicated" | "shared"> | undefined): string {
+  const entries = Object.entries(map ?? {});
+  if (entries.length === 0) return "Any supported arrangement";
+  return entries.map(([type, a]) => `${optionLabel(ROOM_TYPES, type)}: ${a === "dedicated" ? "own room" : "shared"}`).join(", ");
+}
 
 function sections(d: DraftRequirements): Section[] {
   const s = d.site ?? {};
@@ -57,11 +63,12 @@ function sections(d: DraftRequirements): Section[] {
         ["Purpose", optionLabel(MISSION_TYPES, m.type)],
         ["Occupants", num(m.occupants, "persons", 0)],
         ["Required rooms", m.required_rooms?.map((r) => optionLabel(ROOM_TYPES, r)).join(", ")],
+        ["Room arrangement", arrangementText(d.generation_options?.room_arrangement)],
         ["Target temperature", num(m.target_temperature_c, "°C")],
         ["Maximum unmet hours", num(m.maximum_unmet_hours, "h")],
       ],
     },
-    { step: "optimize", title: "Optimization & economics", rows: [["Candidate designs", num(d.generation_options?.count, "designs", 0) ?? "24"], ["Lifecycle assumptions", show(d.economic_assumption_set_id)]] },
+    { step: "optimize", title: "Optimization & economics", rows: [["Candidate designs", num(d.generation_options?.count, "designs", 0) ?? "24"], ["Shelter template", d.generation_options?.template_id ? humanize(d.generation_options.template_id) : "Automatic"], ["Lifecycle assumptions", show(d.economic_assumption_set_id)]] },
   ];
 }
 

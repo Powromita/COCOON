@@ -20,6 +20,7 @@ import {
   ApiOptimizationHistoryService,
   ApiProjectService,
   ApiSimulationService,
+  ApiTemplateService,
   ApiVisualizationService,
 } from "./api/ApiServices";
 import { ApiClient } from "./api/client";
@@ -34,6 +35,7 @@ import {
   FixtureOptimizationHistoryService,
   FixtureProjectService,
   FixtureSimulationService,
+  FixtureTemplateService,
   FixtureVisualizationService,
 } from "./fixture/FixtureServices";
 import type { AnsysService } from "./interfaces/AnsysService";
@@ -46,6 +48,7 @@ import type { AuthService } from "./interfaces/AuthService";
 import type { OptimizationHistoryService } from "./interfaces/OptimizationHistoryService";
 import type { ProjectService } from "./interfaces/ProjectService";
 import type { SimulationService } from "./interfaces/SimulationService";
+import type { TemplateService } from "./interfaces/TemplateService";
 import type { VisualizationService } from "./interfaces/VisualizationService";
 
 export const apiClient = new ApiClient(API_URL, readAccessToken);
@@ -79,3 +82,4 @@ export const historyService: OptimizationHistoryService = useApi
   : new FixtureOptimizationHistoryService();
 export const projectService: ProjectService = useApi ? new ApiProjectService(apiClient) : new FixtureProjectService();
 export const authService: AuthService = useApi ? new ApiAuthService(apiClient, capabilitiesService) : new FixtureAuthService();
+export const templateService: TemplateService = useApi ? new ApiTemplateService(apiClient) : new FixtureTemplateService();

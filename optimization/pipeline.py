@@ -35,7 +35,7 @@ import time
 import uuid
 from dataclasses import dataclass, field, replace
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from pydantic import ValidationError
 
@@ -272,12 +272,15 @@ def optimize(
     predictor: Predictor | None = None,
     created_at: datetime | None = None,
     settings: OptimizationSettings | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> OptimizationResult:
     """Generate ``count`` designs for the requirements, verify the promising ones with the RC engine and name the best.
 
     Raises OptimizationError for a plan that cannot run (bad settings, no design generated, run budget), the M2 errors for
     requirements that cannot be met, and EvaluatorUnavailableError when M4 cannot be reached. Everything that goes wrong for
     one design is recorded on that design instead (``result.outcomes``). Deterministic for a deterministic evaluator.
+    ``progress`` (optional, observe-only) is called with each stage name as that stage finishes ("generation",
+    "constraints", "screening", "verification", "economics", "objectives", "pareto", "reliability").
     """
     settings = settings or OptimizationSettings()
     timings: dict[str, float] = {}
@@ -286,6 +289,8 @@ def optimize(
     def lap(name: str, since: float) -> float:
         now = time.perf_counter()
         timings[name] = round(now - since, 6)
+        if progress is not None and name != "total":
+            progress(name)
         return now
 
     reqs = requirements if isinstance(requirements, RequirementsContract) else RequirementsContract.model_validate(requirements)

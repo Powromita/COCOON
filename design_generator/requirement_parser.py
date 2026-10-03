@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Mapping
 
-from cocoon_contracts.requirements import ProjectMode, RequirementsContract
+from cocoon_contracts.requirements import DesignConstraints, MissionRequirements, ProjectMode, RequirementsContract
 
 
 # --------------------------------------------------------------------------
@@ -168,8 +168,20 @@ def parse_requirements(
             "(existing shelters supply their own geometry)",
             {"mode": requirements.mode.value},
         )
+    return parse_mission(requirements.mission, requirements.constraints, requirements.project_id, sizing)
 
-    mission, cons = requirements.mission, requirements.constraints
+
+def parse_mission(
+    mission: MissionRequirements,
+    cons: DesignConstraints,
+    project_id: str,
+    sizing: SizingTable = DEFAULT_SIZING,
+) -> GenerationSpec:
+    """The mission + constraints part of ``parse_requirements``.
+
+    Lets a caller (the compatibility check) size an incomplete draft whose site or economics are not filled in yet,
+    with exactly the rules generation uses.
+    """
 
     wanted = list(mission.required_rooms)
     if not wanted:
@@ -233,7 +245,7 @@ def parse_requirements(
     )
 
     return GenerationSpec(
-        project_id=requirements.project_id,
+        project_id=project_id,
         mission_type=mission.type,
         occupants=mission.occupants,
         target_temperature_c=mission.target_temperature_c,

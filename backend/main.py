@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import settings
 from .jobs import sweep_old_runs
-from .routes import ansys, economics, pipeline, reference, run
+from .routes import ansys, design, economics, pipeline, reference, run
 
 app = FastAPI(title="COCOON API", version="0.1.0")
 
@@ -27,6 +27,7 @@ app.include_router(run.router)
 app.include_router(ansys.router)
 app.include_router(economics.router)
 app.include_router(pipeline.router)
+app.include_router(design.router)
 
 
 @app.on_event("startup")
