@@ -79,6 +79,48 @@ def test_generate_designs_infeasible_requirements_use_the_error_envelope():
     assert r.json()["error"]["code"] == "VALIDATION_ERROR" and r.json()["error"]["details"]["m2_code"] == "INFEASIBLE_REQUIREMENTS"
 
 
+def test_optimization_preflight_uses_fixed_dimensions_for_area_feasibility():
+    body = {
+        "requirements": requirements(),
+        "design_options": {"length_m": 5.0, "width_m": 5.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 422
+    error = r.json()["error"]
+    assert error["code"] == "VALIDATION_ERROR"
+    assert error["details"]["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+    assert error["details"]["fixed_footprint_m2"] == 25.0
+    assert error["details"]["usable_area_by_floor_count_m2"] == {"1": 25.0, "2": 44.0}
+
+
+def test_optimization_preflight_rejects_a_fixed_side_narrower_than_a_room():
+    req = requirements()
+    req["constraints"]["maximum_footprint_m2"] = 100.0
+    body = {
+        "requirements": req,
+        "design_options": {"length_m": 2.0, "width_m": 50.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 422
+    details = r.json()["error"]["details"]
+    assert details["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+    assert details["shortest_side_m"] == 2.0
+    assert details["required_minimum_dimension_m"] == 2.5
+
+
+def test_optimization_preflight_reports_feasible_fixed_floor_counts():
+    body = {
+        "requirements": requirements(),
+        "design_options": {"length_m": 8.0, "width_m": 6.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 200
+    result = r.json()
+    assert result["feasible"] is True
+    assert result["usable_area_by_floor_count_m2"] == {"1": 48.0, "2": 90.0}
+    assert result["allowed_floor_counts"] == [2]
+
+
 def _building():
     return client.post("/api/v1/generate-designs", json={"requirements": requirements(), "count": 1, "seed": 42}).json()["candidates"][0]["building"]
 

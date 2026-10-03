@@ -86,16 +86,16 @@ def test_real_errors_map_to_contract_codes():
     env = _envelope(e1.value, trace_id="abc")
     assert env.error.code == ErrorCode.VALIDATION_ERROR and env.error.trace_id == "abc"
     assert env.error.details["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+    assert env.error.details["failure_category"] == "REQUIREMENTS_INFEASIBLE"
+    assert env.error.details["failure_phase"] == "requirements"
+    assert env.error.details["proven_infeasible"] is True
+    assert env.error.details["suggestions"]
     assert env.error.details["required_total_area_m2"] > 0                 # the numbers travel with it
     assert env.error.retryable is False and env.error.message == str(e1.value)
 
-    req2 = load_fixture("requirements_ladakh_30p.json")
-    req2["constraints"].update(maximum_floors=1, maximum_footprint_m2=100.0)
-    req2["mission"]["required_rooms"] = ["airlock", "command", "medical"]
-    with pytest.raises(NoTemplateError) as e2:
-        generate_designs(req2, load_fixture("material_snapshot_standard.json"), seed=1, count=1)
-    assert _envelope(e2.value).error.code == ErrorCode.VALIDATION_ERROR
-    assert _envelope(e2.value).error.details["m2_code"] == "NO_TEMPLATE_FITS"
+    legacy = NoTemplateError("no layout source", {"allowed_floor_counts": [1]})
+    assert _envelope(legacy).error.code == ErrorCode.VALIDATION_ERROR
+    assert _envelope(legacy).error.details["m2_code"] == "NO_TEMPLATE_FITS"
 
 
 @pytest.mark.parametrize("m2_code, expected", [
@@ -108,7 +108,10 @@ def test_real_errors_map_to_contract_codes():
 def test_code_mapping(m2_code, expected):
     exc = UserGeometryError("boom", m2_code, {"k": 1})
     env = _envelope(exc)
-    assert env.error.code == expected and env.error.details == {"m2_code": m2_code, "k": 1}
+    assert env.error.code == expected
+    assert env.error.details["m2_code"] == m2_code and env.error.details["k"] == 1
+    if m2_code in {"NO_FEASIBLE_LAYOUT", "DOOR_DOES_NOT_FIT"}:
+        assert env.error.details["failure_category"]
 
 
 def test_foreign_and_pydantic_errors_are_wrapped():

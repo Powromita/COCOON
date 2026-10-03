@@ -14,6 +14,7 @@ import {
   getReport,
   getTimeseries,
   getDesign,
+  describePipelineError,
   type BuildingModel,
   type CandidateOutcome,
   type FinalReport,
@@ -126,7 +127,8 @@ function ValidationSummary({ validation }: { validation: { state: string; [k: st
   const thresholds = validation.acceptance_thresholds as { mae_c_max?: number; rmse_c_max?: number; max_abs_c_max?: number } | undefined;
   const pooled = comparison?.pooled;
   const accepted = validation.accepted === true;
-  const reason = (validation.error_reason ?? validation.reason) as string | null | undefined;
+  const agreementWithinThresholds = validation.agreement_within_thresholds as boolean | undefined;
+  const reason = (validation.error_reason ?? validation.reason ?? validation.warning) as string | null | undefined;
   const fmt = (v: number | undefined) => (typeof v === "number" ? `${v.toFixed(2)} °C` : "—");
   const limit = (v: number | undefined) => (typeof v === "number" ? `limit ${v.toFixed(1)} °C` : undefined);
 
@@ -135,7 +137,9 @@ function ValidationSummary({ validation }: { validation: { state: string; [k: st
       <div className="flex flex-wrap items-center gap-2">
         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${accepted ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
           <span className="material-symbols-outlined text-[16px]">{accepted ? "check_circle" : "info"}</span>
-          {validationStateLabel(validation.state)}{pooled ? (accepted ? " · within acceptance limits" : " · outside acceptance limits") : ""}
+          {validationStateLabel(validation.state)}
+          {pooled && agreementWithinThresholds === true ? " · RC agreement within thresholds" : ""}
+          {pooled && agreementWithinThresholds === false ? " · RC agreement warning" : ""}
         </span>
         {comparison?.scenario && <span className="text-xs text-on-surface-variant">{comparison.scenario}</span>}
       </div>
@@ -1206,6 +1210,7 @@ function CandidateTelemetryContent() {
   }
   // ── Backend unreachable / run failed ─────────────────────────────────────
   if (error) {
+    const failure = describePipelineError(status?.error);
     const reasons = (errorDetails?.reasons as Record<string, number>) || {};
     const hasMassError = "constraints:envelope_mass_within_limit" in reasons;
     const hasAssemblyError = Object.keys(reasons).some(
@@ -1218,9 +1223,25 @@ function CandidateTelemetryContent() {
           <span className="material-symbols-outlined text-[32px]">error</span>
         </div>
         <div className="flex flex-col gap-2">
-          <h1 className="font-headline-md text-headline-md font-bold text-on-surface"><T>Simulation Unsuccessful</T></h1>
+          <h1 className="font-headline-md text-headline-md font-bold text-on-surface"><T>{failure.title}</T></h1>
+          {failure.phase && (
+            <p className="font-label-mono-xs text-[11px] uppercase tracking-wide text-on-surface-variant">
+              Failed during: {failure.phase}
+            </p>
+          )}
           <p className="font-body-sm text-body-sm text-error font-medium">{error}</p>
         </div>
+
+        {failure.suggestions.length > 0 && (
+          <div className="w-full p-4 rounded-xl bg-primary-fixed/20 border border-primary/20 text-left flex flex-col gap-2">
+            <span className="font-label-mono-xs text-[11px] text-primary uppercase font-semibold">
+              {failure.provenInfeasible ? "Required changes" : "Suggested changes"}
+            </span>
+            <ul className="list-disc pl-5 text-xs text-on-surface font-body-sm space-y-1">
+              {failure.suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+            </ul>
+          </div>
+        )}
 
         {hasMassError ? (
           <div className="w-full p-4 rounded-xl bg-surface-container-low border border-outline-variant text-left flex flex-col gap-2">

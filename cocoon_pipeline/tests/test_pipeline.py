@@ -214,7 +214,7 @@ def test_staged_config_rejects_invalid_bounds():
     with pytest.raises(ValueError, match="reliability_designs"):
         PipelineConfig(count=20, validation_strategy="staged", shortlist_size=5, reliability_designs=6)
 
-def test_ansys_completion_requires_comparison_acceptance(monkeypatch, tmp_path):
+def test_ansys_completion_retains_evidence_when_comparison_is_outside_thresholds(monkeypatch, tmp_path):
     from cocoon_pipeline import ansys_stage
 
     class Weather:
@@ -229,8 +229,12 @@ def test_ansys_completion_requires_comparison_acceptance(monkeypatch, tmp_path):
         "compared": True, "pooled": {"mae_c": 1.0, "rmse_c": 1.5, "max_abs_c": 3.0}})
     accepted = ansys_stage.run_ansys_validation(object(), Weather(), object(), hours=8, wait=True)
     assert accepted["state"] == "VALIDATED_BY_ANSYS" and accepted["accepted"] is True
+    assert accepted["agreement_within_thresholds"] is True
+    assert accepted["warning"] is None
 
     monkeypatch.setattr(ansys_stage, "compare_m4_with_ansys", lambda p: {
         "compared": True, "pooled": {"mae_c": 3.0, "rmse_c": 3.5, "max_abs_c": 6.0}})
-    rejected = ansys_stage.run_ansys_validation(object(), Weather(), object(), hours=8, wait=True)
-    assert rejected["state"] == "RC_ONLY_ANSYS_FAILED" and rejected["accepted"] is False
+    warned = ansys_stage.run_ansys_validation(object(), Weather(), object(), hours=8, wait=True)
+    assert warned["state"] == "VALIDATED_BY_ANSYS" and warned["accepted"] is True
+    assert warned["agreement_within_thresholds"] is False
+    assert "evidence is retained" in warned["warning"]

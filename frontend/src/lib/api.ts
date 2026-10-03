@@ -6,6 +6,58 @@
 export const API_BASE = "/api/backend";
 export const LATEST_OPTIMIZATION_STORAGE_KEY = "cocoon.optimizations.latest";
 
+export type PipelineError = {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+  retryable?: boolean;
+};
+
+export class ApiError extends Error {
+  code: string;
+  details: Record<string, unknown>;
+  retryable: boolean;
+
+  constructor(error: PipelineError) {
+    super(error.message);
+    this.name = "ApiError";
+    this.code = error.code;
+    this.details = error.details ?? {};
+    this.retryable = error.retryable === true;
+  }
+}
+
+const FAILURE_TITLES: Record<string, string> = {
+  REQUIREMENTS_INFEASIBLE: "Requirements Cannot Fit",
+  LAYOUT_SEARCH_EXHAUSTED: "Layout Generation Unsuccessful",
+  ACCESS_GRAPH_INFEASIBLE: "Room Access Could Not Be Resolved",
+  ENTRANCE_PLACEMENT_INFEASIBLE: "Entrance Placement Unsuccessful",
+  GEOMETRY_INFEASIBLE: "Geometry Validation Unsuccessful",
+  MASS_LIMIT_EXCEEDED: "Mass Constraint Exceeded",
+  MATERIAL_COMPOSITION_INFEASIBLE: "Material Combination Unavailable",
+  NO_VALID_CANDIDATES: "No Valid Candidate Found",
+};
+
+export function describePipelineError(error?: PipelineError | null) {
+  const details = error?.details ?? {};
+  const category = typeof details.failure_category === "string"
+    ? details.failure_category
+    : "PIPELINE_FAILED";
+  const phase = typeof details.failure_phase === "string"
+    ? details.failure_phase.replaceAll("_", " ")
+    : null;
+  const suggestions = Array.isArray(details.suggestions)
+    ? details.suggestions.filter((item): item is string => typeof item === "string")
+    : [];
+  return {
+    category,
+    title: FAILURE_TITLES[category] ?? "Simulation Unsuccessful",
+    phase,
+    suggestions,
+    provenInfeasible: details.proven_infeasible === true,
+  };
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
@@ -16,9 +68,11 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    const message =
-      body?.error?.message ?? `Request to ${path} failed (${res.status})`;
-    throw new Error(message);
+    const error = body?.error as PipelineError | undefined;
+    throw new ApiError(error ?? {
+      code: "HTTP_ERROR",
+      message: `Request to ${path} failed (${res.status})`,
+    });
   }
   return body as T;
 }
@@ -35,7 +89,7 @@ export type OptimizationStatus = {
   validation?: { state: string; [k: string]: unknown };
   summary?: { generated: number; on_front: number; dominated: number };
   timings_s?: Record<string, number>;
-  error?: { code: string; message: string };
+  error?: PipelineError;
   result?: {
     run_id: string;
     recommended_design_id: string | null;

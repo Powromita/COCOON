@@ -553,6 +553,40 @@ def test_requirements_that_cannot_be_met_raise_the_m2_error_and_map_to_its_envel
     assert env.error.details["m2_code"] in ("INFEASIBLE_REQUIREMENTS", "NO_TEMPLATE_FITS", "REQUIREMENT_ERROR")
 
 
+def test_requirement_generated_candidates_flow_through_optimization(reqs, snapshot, evaluator, econ):
+    dynamic = copy.deepcopy(reqs)
+    dynamic["mission"].update(
+        occupants=12,
+        required_rooms=["airlock", "living", "equipment", "sleeping", "storage"],
+    )
+    dynamic["constraints"].update(
+        maximum_floors=1,
+        maximum_footprint_m2=80.0,
+        maximum_mass_kg=40000.0,
+    )
+    result = run(
+        dynamic,
+        snapshot,
+        evaluator,
+        econ,
+        count=2,
+        settings=OptimizationSettings(
+            generation=GenerationOptions(
+                fixed_length_m=9.0,
+                fixed_width_m=7.0,
+                require_separate_rooms=True,
+                max_attempts=30,
+            ),
+            reliability=None,
+        ),
+    )
+
+    assert len(result.candidates) == 2
+    assert {candidate.extras["layout_source"] for candidate in result.candidates} == {"requirements"}
+    assert result.verified
+    assert result.recommended.status == "selected"
+
+
 def test_no_valid_design_is_an_error_with_the_reasons(reqs, snapshot, evaluator, econ):
     impossible = copy.deepcopy(reqs)
     impossible["constraints"]["maximum_mass_kg"] = 50.0                                   # M2 rejects every envelope this heavy
@@ -560,6 +594,10 @@ def test_no_valid_design_is_an_error_with_the_reasons(reqs, snapshot, evaluator,
     with pytest.raises(OptimizationError) as e:
         run(impossible, snapshot, spy, econ, count=2, settings=OptimizationSettings(generation=GenerationOptions(max_attempts=6)))
     assert e.value.code == "NO_CANDIDATES" and e.value.details["attempts"] <= 6 and e.value.details["reasons"] and spy.jobs == []
+    assert e.value.details["failure_category"] == "MASS_LIMIT_EXCEEDED"
+    assert e.value.details["failure_phase"] == "candidate_validation"
+    assert e.value.details["proven_infeasible"] is False
+    assert e.value.details["suggestions"]
     env = to_error_envelope(e.value)
     assert env.error.details["m6_code"] == "NO_CANDIDATES" and env.error.details["reasons"]
 

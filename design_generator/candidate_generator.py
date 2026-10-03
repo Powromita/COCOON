@@ -75,7 +75,15 @@ from design_generator.constraints import (
     validate_candidate,
 )
 from design_generator.geometry_resolver import AssemblyIds, GeometryResolveError, resolve_geometry
-from design_generator.layout_generator import Layout, NoFeasibleLayoutError, generate_layout, plan_rooms
+from design_generator.layout_generator import (
+    Layout,
+    NoFeasibleLayoutError,
+    RoomPlan,
+    generate_layout,
+    generate_layout_from_plan,
+    plan_rooms,
+    plan_rooms_from_requirements,
+)
 from design_generator.quantities import ORIENTATIONS, QuantityError, Quantities, compute_quantities, orientation_bucket
 from design_generator.requirement_parser import DEFAULT_SIZING, GenerationSpec, SizingTable, parse_requirements
 from design_generator.template_catalog import TemplateMatch, filter_templates
@@ -192,6 +200,34 @@ def to_error_envelope(exc: BaseException, trace_id: str | None = None) -> ErrorE
     m2_code = getattr(exc, "code", None) or type(exc).__name__
     code = next((k for k, members in _ENVELOPE_CODE.items() if m2_code in members), "VALIDATION_ERROR")
     raw = dict(getattr(exc, "details", {}) or {})
+    classifications = {
+        "INFEASIBLE_REQUIREMENTS": (
+            "REQUIREMENTS_INFEASIBLE", "requirements", True,
+            ["Increase the footprint or allowed floor count.", "Reduce or merge requested rooms."],
+        ),
+        "NO_FEASIBLE_LAYOUT": (
+            "LAYOUT_SEARCH_EXHAUSTED", "layout_generation", False,
+            ["Increase the footprint or allowed floor count.", "Relax fixed dimensions or room separation."],
+        ),
+        "CONNECTION_DETECT_ERROR": (
+            "ACCESS_GRAPH_INFEASIBLE", "connection_generation", False,
+            ["Increase room dimensions so doors and circulation paths can fit."],
+        ),
+        "DOOR_DOES_NOT_FIT": (
+            "ACCESS_GRAPH_INFEASIBLE", "connection_generation", False,
+            ["Increase room dimensions so required doors have enough shared wall."],
+        ),
+        "NO_ENTRANCE_WALL": (
+            "ENTRANCE_PLACEMENT_INFEASIBLE", "connection_generation", False,
+            ["Increase the entrance-room dimensions or change the footprint proportions."],
+        ),
+    }
+    if m2_code in classifications:
+        category, phase, proven, suggestions = classifications[m2_code]
+        raw.setdefault("failure_category", category)
+        raw.setdefault("failure_phase", phase)
+        raw.setdefault("proven_infeasible", proven)
+        raw.setdefault("suggestions", suggestions)
     details = json.loads(json.dumps({"m2_code": m2_code, **raw}, default=str))
     return ErrorEnvelope(error=ErrorDetail(code=ErrorCode(code), message=str(exc), details=details,
                                            trace_id=trace_id or str(uuid.uuid4()), retryable=False))
@@ -515,24 +551,43 @@ def _revision_id(model: BuildingModel) -> str:
 
 
 # ----- one attempt ----------------------------------------------------------------
-def _attempt(index: int, seed: int, spec: GenerationSpec, matches: list[TemplateMatch], pool: dict,
+def _attempt(index: int, seed: int, spec: GenerationSpec, sources: list[TemplateMatch | RoomPlan], pool: dict,
              snapshot: MaterialSnapshot, options: GenerationOptions, created_at: datetime) -> Candidate:
     rng = np.random.default_rng([seed, index])
-    match = matches[int(rng.integers(len(matches)))]
+    source = sources[int(rng.integers(len(sources)))]
     try:
-        return _build(index, seed, rng, match, spec, pool, snapshot, options, created_at)
+        return _build(index, seed, rng, source, spec, pool, snapshot, options, created_at)
     except _Reject as rej:
-        rej.template_id = match.template.id
+        rej.template_id = source.template.id if isinstance(source, TemplateMatch) else source.template_id
         raise
 
 
-def _build(index: int, seed: int, rng, match: TemplateMatch, spec: GenerationSpec, pool: dict,
+def _build(index: int, seed: int, rng, source: TemplateMatch | RoomPlan, spec: GenerationSpec, pool: dict,
            snapshot: MaterialSnapshot, options: GenerationOptions, created_at: datetime) -> Candidate:
-    template_id = match.template.id
+    if isinstance(source, TemplateMatch):
+        template_id = source.template.id
+        plan = plan_rooms(source, spec)
+        merged_rooms = dict(source.merged)
+        layout_source = "template"
+    else:
+        template_id = source.template_id
+        plan = source
+        merged_rooms = {}
+        layout_source = "requirements"
     try:
-        layout = generate_layout(match, spec, int(rng.integers(0, 2**31 - 1)),
-                                 fixed_length_m=options.fixed_length_m, fixed_width_m=options.fixed_width_m,
-                                 fixed_height_m=options.fixed_height_m)
+        layout_seed = int(rng.integers(0, 2**31 - 1))
+        if isinstance(source, TemplateMatch):
+            layout = generate_layout(
+                source, spec, layout_seed,
+                fixed_length_m=options.fixed_length_m, fixed_width_m=options.fixed_width_m,
+                fixed_height_m=options.fixed_height_m,
+            )
+        else:
+            layout = generate_layout_from_plan(
+                plan, spec, layout_seed,
+                fixed_length_m=options.fixed_length_m, fixed_width_m=options.fixed_width_m,
+                fixed_height_m=options.fixed_height_m,
+            )
     except NoFeasibleLayoutError as exc:
         reasons = exc.details.get("reasons", {})
         raise _Reject("layout", exc.code, f"{exc} {dict(reasons)}") from exc
@@ -585,7 +640,7 @@ def _build(index: int, seed: int, rng, match: TemplateMatch, spec: GenerationSpe
     except ValidationError as exc:
         raise _Reject("contract", "CONTRACT_INVALID", str(exc.errors()[0]["msg"])) from exc
 
-    ctx = CandidateContext(spec=spec, plan=plan_rooms(match, spec), materials=snapshot, wwr=options.wwr,
+    ctx = CandidateContext(spec=spec, plan=plan, materials=snapshot, wwr=options.wwr,
                            assembly_mm=options.assembly_mm)
     report = validate_candidate(model, ctx)
     if not report.ok:
@@ -597,11 +652,12 @@ def _build(index: int, seed: int, rng, match: TemplateMatch, spec: GenerationSpe
         raise _Reject("quantities", exc.code, str(exc)) from exc
 
     extras = {
-        "template_id": template_id, "layout_seed": layout.seed, "orientation_deg": orientation,
+        "template_id": template_id, "layout_source": layout_source,
+        "layout_seed": layout.seed, "orientation_deg": orientation,
         "glazing": glazing, "airtightness_class": air_class, "air_changes_per_hour": options.airtightness[air_class][0],
         "wwr_target": wwr_target, "occupants_by_zone": occupants_by_zone,
         "heater_zone_ids": sorted(z for z, u_ in zone_updates.items() if "hvac_id" in u_),
-        "merged_rooms": dict(match.merged),
+        "merged_rooms": merged_rooms,
     }
     return Candidate(index, model, quantities, report, layout, conn.placements, tuple(w_places), extras)
 
@@ -627,10 +683,22 @@ def generate_candidates(
     matches = [m for m in filter_templates(list(r.room_type for r in spec.rooms), spec.max_floors,
                                            allow_room_merging=not options.require_separate_rooms)
                if m.template.floor_count in spec.allowed_floor_counts]
-    if not matches:
-        raise NoTemplateError(
-            f"no template provides rooms {[r.room_type for r in spec.rooms]} in "
-            f"{list(spec.allowed_floor_counts)} floor(s)", {"allowed_floor_counts": list(spec.allowed_floor_counts)})
+    sources: list[TemplateMatch | RoomPlan] = list(matches)
+    if not sources:
+        allocation_errors = []
+        for floor_count in spec.allowed_floor_counts:
+            try:
+                sources.append(plan_rooms_from_requirements(spec, floor_count))
+            except NoFeasibleLayoutError as exc:
+                allocation_errors.append(exc)
+        if not sources:
+            if allocation_errors:
+                raise allocation_errors[-1]
+            raise NoTemplateError(
+                f"no layout source can provide rooms {[r.room_type for r in spec.rooms]} in "
+                f"{list(spec.allowed_floor_counts)} floor(s)",
+                {"allowed_floor_counts": list(spec.allowed_floor_counts)},
+            )
     pool = _material_pool(spec, snapshot, options)
 
     limit = options.max_attempts or count * options.attempts_per_candidate
@@ -644,7 +712,7 @@ def generate_candidates(
             break
         attempts += 1
         try:
-            cand = _attempt(index, seed, spec, matches, pool, snapshot, options, created_at)
+            cand = _attempt(index, seed, spec, sources, pool, snapshot, options, created_at)
         except _Reject as rej:
             rejected.append(RejectedCandidate(index, rej.template_id, rej.stage, rej.code, rej.message,
                                               rej.report, rej.building))

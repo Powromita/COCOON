@@ -39,7 +39,7 @@ from pydantic import BaseModel, Field
 from cocoon_contracts import (BuildingModel, ErrorCode, ErrorDetail, ErrorEnvelope, RequirementsContract,
                               SimulationEngineMode, SimulationResult)
 from design_generator import GenerationOptions, generate_designs, to_error_envelope as m2_envelope
-from design_generator.requirement_parser import parse_requirements
+from design_generator.requirement_parser import InfeasibleRequirementsError, parse_requirements
 from economics.provider import DEFAULT_ASSUMPTIONS_DIR
 from m3_data import WeatherError, WeatherStore, extended_snapshot, load_snapshot, standard_snapshot
 from m4_engine import ENGINE_NAME, ENGINE_VERSION, M4Error, M4Evaluator
@@ -321,10 +321,56 @@ def _preflight(body: OptimizationBody) -> dict:
         spec = parse_requirements(body.requirements)
     except Exception as exc:
         return {"error": m2_envelope(exc).model_dump(mode="json")}
+
+    usable_area = dict(spec.usable_area_by_floor_count_m2)
+    allowed_floor_counts = list(spec.allowed_floor_counts)
+    if dimensions.length_m is not None and dimensions.width_m is not None:
+        fixed_area = dimensions.length_m * dimensions.width_m
+        usable_area = {
+            floors: round(floors * fixed_area - 2 * (floors - 1) * spec.stair_allowance_m2, 6)
+            for floors in range(1, spec.max_floors + 1)
+        }
+        allowed_floor_counts = [
+            floors for floors, usable in usable_area.items()
+            if usable >= spec.required_total_area_m2
+        ]
+        if not allowed_floor_counts:
+            exc = InfeasibleRequirementsError(
+                f"rooms need {spec.required_total_area_m2:.1f} m2 (incl. circulation), but the fixed "
+                f"{dimensions.length_m:g} m x {dimensions.width_m:g} m footprint provides at most "
+                f"{usable_area[spec.max_floors]:.1f} m2 across {spec.max_floors} floor(s)",
+                {
+                    "required_total_area_m2": spec.required_total_area_m2,
+                    "room_area_sum_m2": spec.room_area_sum_m2,
+                    "fixed_length_m": dimensions.length_m,
+                    "fixed_width_m": dimensions.width_m,
+                    "fixed_footprint_m2": fixed_area,
+                    "max_floors": spec.max_floors,
+                    "usable_area_by_floor_count_m2": usable_area,
+                },
+            )
+            return {"error": m2_envelope(exc).model_dump(mode="json")}
+
+        shortest_side = min(dimensions.length_m, dimensions.width_m)
+        widest_room = max(spec.rooms, key=lambda room: room.min_dimension_m)
+        if shortest_side + 1e-9 < widest_room.min_dimension_m:
+            exc = InfeasibleRequirementsError(
+                f"the fixed footprint's shortest side is {shortest_side:g} m, but room type "
+                f"'{widest_room.room_type}' needs a minimum dimension of {widest_room.min_dimension_m:g} m",
+                {
+                    "fixed_length_m": dimensions.length_m,
+                    "fixed_width_m": dimensions.width_m,
+                    "shortest_side_m": shortest_side,
+                    "room_type": widest_room.room_type,
+                    "required_minimum_dimension_m": widest_room.min_dimension_m,
+                },
+            )
+            return {"error": m2_envelope(exc).model_dump(mode="json")}
+
     return {"feasible": True, "required_total_area_m2": spec.required_total_area_m2,
             "room_area_sum_m2": spec.room_area_sum_m2,
-            "usable_area_by_floor_count_m2": dict(spec.usable_area_by_floor_count_m2),
-            "allowed_floor_counts": list(spec.allowed_floor_counts)}
+            "usable_area_by_floor_count_m2": usable_area,
+            "allowed_floor_counts": allowed_floor_counts}
 
 
 @router.post("/optimizations/preflight")
@@ -382,7 +428,11 @@ def _job(opt_id: str, body: OptimizationBody) -> None:
                     summary=result.optimization.summary(), timings_s=result.timings_s)
     except Exception as exc:                                        # noqa: BLE001
         env = m6_envelope(exc).model_dump(mode="json")
-        _set_status(d, status="failed", finished_at=datetime.now(timezone.utc).isoformat(), error=env["error"])
+        details = env["error"].get("details") or {}
+        failure_phase = details.get("failure_phase", "failed")
+        _set_status(d, status="failed", phase=failure_phase,
+                    phase_message=env["error"].get("message", "Pipeline failed"),
+                    finished_at=datetime.now(timezone.utc).isoformat(), error=env["error"])
     finally:
         with _lock:
             _live.discard(opt_id)

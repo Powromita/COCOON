@@ -253,6 +253,37 @@ def _values(o: ObjectiveResult) -> dict[str, float | None]:
     return {k: v.value for k, v in o.values.items()}
 
 
+def _generation_failure_details(generated) -> dict[str, Any]:
+    reasons = dict(generated.reasons)
+    keys = set(reasons)
+    if any(key.startswith("layout:") for key in keys):
+        category, phase = "LAYOUT_SEARCH_EXHAUSTED", "layout_generation"
+        suggestions = ["Increase the footprint or allowed floor count.", "Relax fixed dimensions or room separation."]
+    elif any(key.startswith("connections:") for key in keys):
+        category, phase = "ACCESS_GRAPH_INFEASIBLE", "connection_generation"
+        suggestions = ["Increase room dimensions so doors and circulation paths can fit."]
+    elif any(key.startswith("geometry:") or key.startswith("constraints:openings") for key in keys):
+        category, phase = "GEOMETRY_INFEASIBLE", "geometry_validation"
+        suggestions = ["Increase envelope dimensions or reduce the requested window count and size."]
+    elif "constraints:envelope_mass_within_limit" in keys:
+        category, phase = "MASS_LIMIT_EXCEEDED", "candidate_validation"
+        suggestions = ["Increase the maximum mass or select lightweight structural materials."]
+    elif any(key.startswith("composition:") for key in keys):
+        category, phase = "MATERIAL_COMPOSITION_INFEASIBLE", "candidate_validation"
+        suggestions = ["Enable a compatible structural material or adjust envelope thicknesses."]
+    else:
+        category, phase = "NO_VALID_CANDIDATES", "candidate_validation"
+        suggestions = ["Review the rejection breakdown and relax the corresponding hard constraints."]
+    return {
+        "attempts": generated.attempts,
+        "reasons": reasons,
+        "failure_category": category,
+        "failure_phase": phase,
+        "proven_infeasible": False,
+        "suggestions": suggestions,
+    }
+
+
 def _select_for_reliability(pool: Sequence[str], scores: Mapping[str, Mapping[str, float]], picks: Mapping[str, NamedPick],
                             cap: int, strict: bool = False) -> list[str]:
     """Choose contenders for robustness; staged mode can enforce a true upper bound."""
@@ -320,7 +351,7 @@ def optimize(
                                    dict(generated.reasons))
     if not candidates:
         raise OptimizationError("M2 produced no valid design for these requirements", "NO_CANDIDATES",
-                                {"attempts": generated.attempts, "reasons": dict(generated.reasons)})
+                                _generation_failure_details(generated))
     if not generated.complete:
         warnings.append(f"only {len(candidates)} of the {generated.requested} requested designs could be generated")
     t = lap("generation", t)

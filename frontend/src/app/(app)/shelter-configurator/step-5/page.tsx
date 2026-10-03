@@ -20,7 +20,7 @@ import {
 } from "@/lib/configurator/requirements";
 import { T } from "@/lib/i18n";
 import { ROUTES, configuratorStepRoute, type ConfiguratorStep } from "@/lib/routes";
-import { LATEST_OPTIMIZATION_STORAGE_KEY, startOptimization, type OptimizationRequest } from "@/lib/api";
+import { ApiError, LATEST_OPTIMIZATION_STORAGE_KEY, startOptimization, type OptimizationRequest } from "@/lib/api";
 
 const LAST_RUN_KEY = "cocoon.configurator.lastLaunch";
 const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -72,6 +72,7 @@ export default function ConfiguratorStep5Page() {
   const { draft, update, errors } = useWizard();
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState<string | null>(null);
+  const [launchSuggestions, setLaunchSuggestions] = useState<string[]>([]);
 
   const count = (k: StepKey) => Object.keys(errors[k] || {}).length;
   const allValid = (["site", "mission", "constraints", "design", "run"] as StepKey[]).every((k) => count(k) === 0);
@@ -100,6 +101,7 @@ export default function ConfiguratorStep5Page() {
     if (!allValid) return;
     setLaunching(true);
     setLaunchError(null);
+    setLaunchSuggestions([]);
     try { localStorage.setItem(LAST_RUN_KEY, json); } catch { /* ignore */ }
     try {
       const requirements = {
@@ -124,6 +126,9 @@ export default function ConfiguratorStep5Page() {
       router.push(ROUTES.candidateDetail(res.optimization_id));
     } catch (err) {
       setLaunchError(err instanceof Error ? err.message : "Failed to launch pipeline");
+      setLaunchSuggestions(err instanceof ApiError && Array.isArray(err.details.suggestions)
+        ? err.details.suggestions.filter((item): item is string => typeof item === "string")
+        : []);
       setLaunching(false);
     }
   }
@@ -228,7 +233,14 @@ export default function ConfiguratorStep5Page() {
               {launchError && (
                 <div className="p-3 rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm flex items-start gap-2">
                   <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">error</span>
-                  <span>{launchError}</span>
+                  <div className="flex flex-col gap-1.5">
+                    <span>{launchError}</span>
+                    {launchSuggestions.length > 0 && (
+                      <ul className="list-disc pl-4 text-xs space-y-1">
+                        {launchSuggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               )}
 
