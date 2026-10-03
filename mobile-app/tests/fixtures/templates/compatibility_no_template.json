@@ -1,0 +1,231 @@
+{
+ "catalog_version": "cat_e0112240c1d2",
+ "preliminary": true,
+ "note": "Preliminary check: rooms, floors, footprint and materials match a template. Room proportions, door and stair placement, glazing and the mass limit are only checked when candidates are generated.",
+ "materials_snapshot_id": "mat_snap_himalayan_v1",
+ "ok": false,
+ "stage_reached": "physical",
+ "input_errors": [],
+ "conflicts": [
+  {
+   "layer": "functional",
+   "code": "NO_COMPATIBLE_TEMPLATE",
+   "message": "No template can hold these requirements.",
+   "field": null,
+   "details": {}
+  }
+ ],
+ "warnings": [
+  {
+   "layer": "materials",
+   "code": "MATERIAL_NOT_IN_SNAPSHOT",
+   "message": "mat_steel_panel is not in material set mat_snap_himalayan_v1 and will not be used.",
+   "field": "constraints.available_material_ids",
+   "details": {
+    "material_ids": [
+     "mat_steel_panel"
+    ]
+   }
+  },
+  {
+   "layer": "physical",
+   "code": "MASS_CHECKED_AT_GENERATION",
+   "message": "The 15000 kg envelope mass limit is checked only on generated candidates; a tight limit can reject many of them.",
+   "field": "constraints.maximum_mass_kg",
+   "details": {}
+  }
+ ],
+ "alternatives": [],
+ "templates": [
+  {
+   "template_id": "airlock_living",
+   "name": "Airlock plus living room",
+   "version": "tpl_fa6389237e97",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Airlock plus living room has no room for: medical, command.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "medical",
+       "command"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "airlock_living_equipment",
+   "name": "Airlock, living room and equipment room",
+   "version": "tpl_7d911046099d",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Airlock, living room and equipment room has no room for: medical, command.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "medical",
+       "command"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "command_post",
+   "name": "Command post",
+   "version": "tpl_01d1cf65e56c",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Command post has no room for: medical.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "medical"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "living_sleeping_storage",
+   "name": "Living, sleeping and storage rooms",
+   "version": "tpl_7190a0dc9038",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Living, sleeping and storage rooms has no room for: medical, command.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "medical",
+       "command"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "medical_post",
+   "name": "Medical post",
+   "version": "tpl_9923e157db37",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Medical post has no room for: command.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "command"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "single_room",
+   "name": "Single multipurpose room",
+   "version": "tpl_5fbb7d5be874",
+   "floor_count": 1,
+   "compatible": false,
+   "provided_by": {
+    "medical": "main",
+    "command": "main"
+   },
+   "shared": {
+    "medical": "main",
+    "command": "main"
+   },
+   "issues": [
+    {
+     "layer": "arrangement",
+     "code": "SHARED_NOT_DEDICATED",
+     "message": "Single multipurpose room has no separate command room; it uses the multipurpose room for it.",
+     "field": "room_arrangement",
+     "details": {
+      "room_type": "command",
+      "host_room": "main"
+     }
+    }
+   ]
+  },
+  {
+   "template_id": "two_floor_compact",
+   "name": "Compact two-floor shelter",
+   "version": "tpl_aa5b1627bbaf",
+   "floor_count": 2,
+   "compatible": false,
+   "provided_by": {},
+   "shared": {},
+   "issues": [
+    {
+     "layer": "functional",
+     "code": "ROOMS_NOT_PROVIDED",
+     "message": "Compact two-floor shelter has no room for: medical, command.",
+     "field": "mission.required_rooms",
+     "details": {
+      "missing_room_types": [
+       "medical",
+       "command"
+      ]
+     }
+    }
+   ]
+  }
+ ],
+ "compatible_template_ids": [],
+ "selected_template_ids": [],
+ "spec": {
+  "occupants": 4,
+  "rooms": [
+   {
+    "type": "medical",
+    "min_area_m2": 10.2,
+    "min_dimension_m": 2.5
+   },
+   {
+    "type": "command",
+    "min_area_m2": 8.0,
+    "min_dimension_m": 2.5
+   }
+  ],
+  "room_area_sum_m2": 18.2,
+  "required_total_area_m2": 20.02,
+  "footprint_cap_m2": 60.0,
+  "max_floors": 1,
+  "allowed_floor_counts": [
+   1
+  ],
+  "usable_area_by_floor_count_m2": {
+   "1": 60.0
+  }
+ }
+}

@@ -8,6 +8,12 @@
  *   value is not.
  * - completeSchema: the fields the contract requires, plus the same range
  *   checks. A project must pass it before designs can be generated.
+ *
+ * Bounds follow the contract only. Which room types, floor counts,
+ * arrangements and materials M2 can actually build is not restated here:
+ * it comes from the backend's template catalogue and compatibility check
+ * (services/interfaces/TemplateService.ts), which the backend repeats before
+ * generating anything.
  */
 import type { RequirementsContract } from "@cocoon/contracts";
 import { z } from "zod";
@@ -27,8 +33,6 @@ import {
   WINDOW_ORIENTATIONS,
 } from "./options";
 import type { WizardStepId } from "./steps";
-
-const ROOM_VALUES = ["airlock", "living", "sleeping", "equipment", "storage", "command", "medical", "mixed"];
 
 const finite = (label: string) => z.number({ error: `${label} must be a number.` });
 const positive = (label: string) => finite(label).positive({ error: `${label} must be greater than 0.` });
@@ -66,8 +70,9 @@ const mission = {
     error: "At least one occupant is required.",
   }).max(500, { error: "Occupancy cannot exceed 500 people." }),
   occupancy_schedule_id: z.string().trim().nullable().optional(),
+  // Which types exist is the catalogue's call (GET /api/v1/templates); an unknown one is reported by the compatibility check.
   required_rooms: z
-    .array(z.enum(ROOM_VALUES as [string, ...string[]], { error: "Unknown room type." }))
+    .array(z.string().trim().min(1, { error: "Unknown room type." }))
     .refine((rooms) => new Set(rooms).size === rooms.length, { error: "Each room type can be listed only once." }),
   target_temperature_c: finite("Target temperature"),
   maximum_unmet_hours: finite("Unmet hours").min(0, { error: "Cannot be negative." }).max(168, { error: "Maximum unmet hours cannot exceed 168." }),
@@ -112,6 +117,8 @@ const generationOptions = z
     count: finite("Design count").int().min(1, { error: "Choose at least 1 candidate." }).max(200, { error: "The backend accepts at most 200 designs." }).optional(),
     seed: finite("Seed").int().optional(),
     baseline_economics: z.boolean().optional(),
+    template_id: z.string().trim().min(1).nullable().optional(),
+    room_arrangement: z.record(z.string(), z.enum(["dedicated", "shared"])).optional(),
   })
   .optional();
 
@@ -156,6 +163,8 @@ export const completeSchema = z.object({
     target_temperature_c: mission.target_temperature_c.optional(),
     maximum_unmet_hours: mission.maximum_unmet_hours.optional(),
   }),
+  // Whether the materials can form every assembly is checked against M2's material roles by the backend
+  // (POST /api/v1/design-compatibility, NO_STRUCTURAL_MATERIAL), not by a hardcoded list here.
   constraints: z.object({
     maximum_footprint_m2: constraints.maximum_footprint_m2,
     maximum_floors: constraints.maximum_floors.optional(),
@@ -165,18 +174,6 @@ export const completeSchema = z.object({
     heater_fuels: constraints.heater_fuels.optional(),
     maximum_mass_kg: constraints.maximum_mass_kg.optional(),
     max_assembly_time_hours: constraints.max_assembly_time_hours.optional(),
-  }).superRefine((value, ctx) => {
-    const selected = value.available_material_ids;
-    if (!selected?.length) return;
-    // At least one structural material must be chosen (matches backend M2 requirement).
-    const structural = ["mat_stone", "mat_concrete", "mat_reinforced_concrete", "mat_plywood", "mat_adobe", "mat_rammed_earth", "mat_wood_timber", "mat_straw_clay"];
-    if (!selected.some((id) => structural.includes(id))) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["available_material_ids"],
-        message: "Choose a structural material (stone, concrete, plywood, or timber). Insulation such as PUF can be added alongside it.",
-      });
-    }
   }),
   envelope: z.object(optionalAll(envelope)).optional(),
   economic_assumption_set_id: z.string().trim().min(1, { error: "Choose an economic assumption set." }),
@@ -241,6 +238,8 @@ export const FIELD_META: Record<string, { step: WizardStepId; label: string }> =
   "generation_options.baseline_economics": { step: "optimize", label: "Baseline economics" },
   "generation_options.materials_snapshot_id": { step: "design", label: "Material set" },
   "generation_options.seed": { step: "optimize", label: "Seed" },
+  "generation_options.template_id": { step: "review", label: "Template" },
+  "generation_options.room_arrangement": { step: "mission", label: "Room arrangement" },
   economic_assumption_set_id: { step: "budget", label: "Economic assumption set" },
 };
 
@@ -319,6 +318,23 @@ export function hasBlockingErrors(errors: FieldErrors): boolean {
   return errors.length > 0;
 }
 
+/** The DesignConstraints fields the wizard submits (the compatibility preview checks exactly these). */
+const SUBMITTED_CONSTRAINT_KEYS = [
+  "maximum_footprint_m2",
+  "maximum_floors",
+  "preferred_orientation_deg",
+  "available_material_ids",
+  "maximum_capex_inr",
+  "heater_fuels",
+  "maximum_mass_kg",
+  "max_assembly_time_hours",
+];
+
+/** Heater fuels as submitted: UI-only values are mapped onto contract fuels. */
+function submittedFuels(fuels: string[] | undefined): string[] {
+  return (fuels ?? ["kerosene"]).map((f) => (f === "passive_solar" ? "kerosene" : f));
+}
+
 /** Assembles the M0 RequirementsContract a generation request carries. */
 export function buildRequirementsContract(draft: DraftRequirements, projectId: string): Result<RequirementsContract, FieldErrors> {
   const full = withEmptyGroups(draft);
@@ -326,24 +342,9 @@ export function buildRequirementsContract(draft: DraftRequirements, projectId: s
   if (!parsed.success) return err(toFieldErrors(full, parsed.error.issues));
   const d = parsed.data;
 
-  // Filter fuel types to standard contract values
-  const sanitizedFuels = (d.constraints.heater_fuels ?? ["kerosene"]).map((f) =>
-    f === "passive_solar" ? "kerosene" : f
-  );
-
-  const allowedConstraintKeys = [
-    "maximum_footprint_m2",
-    "maximum_floors",
-    "preferred_orientation_deg",
-    "available_material_ids",
-    "maximum_capex_inr",
-    "heater_fuels",
-    "maximum_mass_kg",
-    "max_assembly_time_hours",
-  ];
   const constraints = Object.fromEntries(
-    Object.entries({ ...d.constraints, heater_fuels: sanitizedFuels }).filter(
-      ([key, value]) => allowedConstraintKeys.includes(key) && value !== undefined
+    Object.entries({ ...d.constraints, heater_fuels: submittedFuels(d.constraints.heater_fuels) }).filter(
+      ([key, value]) => SUBMITTED_CONSTRAINT_KEYS.includes(key) && value !== undefined
     )
   ) as unknown as RequirementsContract["constraints"];
 
@@ -372,6 +373,34 @@ export function buildRequirementsContract(draft: DraftRequirements, projectId: s
     constraints,
     economic_assumption_set_id: economicAssumptionSetId,
   });
+}
+
+/**
+ * The draft as a partial RequirementsContract for the compatibility check. Unlike
+ * buildRequirementsContract it never fails: missing fields are left out and the
+ * backend reports them, layer by layer, next to what already fits.
+ */
+export function previewRequirements(draft: DraftRequirements, projectId: string): Record<string, unknown> {
+  const mission = draft.mission ?? {};
+  const raw = draft.constraints ?? {};
+  const constraints = Object.fromEntries(
+    Object.entries(raw.heater_fuels ? { ...raw, heater_fuels: submittedFuels(raw.heater_fuels) } : raw).filter(
+      ([key, value]) => SUBMITTED_CONSTRAINT_KEYS.includes(key) && value !== undefined
+    )
+  );
+  return {
+    schema_version: "4.0",
+    project_id: projectId,
+    mode: "new_shelter",
+    ...(draft.site ? { site: draft.site } : {}),
+    mission: {
+      ...mission,
+      ...(typeof mission.occupants === "number" && !mission.occupancy_schedule_id
+        ? { occupancy_schedule_id: `continuous_${mission.occupants}` }
+        : {}),
+    },
+    constraints,
+  };
 }
 
 export {

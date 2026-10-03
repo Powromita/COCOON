@@ -66,7 +66,10 @@ export const LOCATION_PRESETS: LocationPreset[] = [
 ];
 
 /**
- * Room types checklist with clear descriptions for tactical shelter design.
+ * Display labels and descriptions for M2 room types. This is wording only:
+ * which room types exist, and which can be combined, shared or kept separate,
+ * comes from the live template catalogue (GET /api/v1/templates). A type the
+ * catalogue adds later is shown with a humanized label.
  */
 export const ROOM_TYPES: Option[] = [
   {

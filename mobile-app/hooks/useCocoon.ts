@@ -7,7 +7,8 @@
  * — there are no free-running timers in screens.
  */
 import type { AnsysValidationResult, BuildingModel, RequirementsContract, SimulationResult } from "@cocoon/contracts";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 import { isAnsysActive, isFullAnsysResult } from "../adapters/ansys";
 import { buildingToVisualizationModel } from "../adapters/visualization";
@@ -24,12 +25,14 @@ import {
   materialsService,
   projectService,
   simulationService,
+  templateService,
   visualizationService,
 } from "../services/registry";
 import type { GenerationJob } from "../services/interfaces/GenerationService";
 import type { VisualizationResult } from "../services/interfaces/VisualizationService";
 import { capabilityStatus } from "../services/interfaces/CapabilitiesService";
 import { kickJobMonitor } from "./useJobMonitor";
+import type { CompatibilityInput } from "../services/interfaces/TemplateService";
 import type { AnsysNotRequested } from "../types/backend";
 import { AppError } from "../utils/errors";
 import { buildRequirementsContract, type FieldErrors } from "../validation/schemas";
@@ -55,6 +58,8 @@ export const queryKeys = {
   ansysLatest: (revisionId: string) => ["ansys", DATA_PROVIDER, revisionId] as const,
   materials: ["materials", DATA_PROVIDER] as const,
   assumptionSets: ["assumption-sets", DATA_PROVIDER] as const,
+  templateCatalog: ["template-catalog", DATA_PROVIDER] as const,
+  compatibility: (input: CompatibilityInput) => ["compatibility", DATA_PROVIDER, JSON.stringify(input)] as const,
 };
 
 export function useCapabilities() {
@@ -74,6 +79,48 @@ export function useAssumptionSets() {
   return useCachedQuery(queryKeys.assumptionSets, () => economicsService.listAssumptionSets(), {
     staleTime: 10 * 60_000,
   });
+}
+
+// ---------------------------------------------------------------------------
+// M2 template catalogue and compatibility
+// ---------------------------------------------------------------------------
+
+/** The live M2 catalogue; the last copy is kept for offline viewing (labelled as cached by `source`). */
+export function useTemplateCatalog() {
+  return useCachedQuery(queryKeys.templateCatalog, () => templateService.getCatalog(), { staleTime: 10 * 60_000 });
+}
+
+/** Delays a value until it has stopped changing, so typing does not fire a request per keystroke. */
+export function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(t);
+  }, [value, delayMs]);
+  return debounced;
+}
+
+export const COMPATIBILITY_DEBOUNCE_MS = 600;
+
+/**
+ * Backend compatibility of the current draft, re-checked whenever a relevant
+ * input changes. Never cached on the device: an old answer must not pass for
+ * a current one. The previous result stays visible (marked stale) while the
+ * new one loads, so the screen does not flicker.
+ */
+export function useCompatibility(input: CompatibilityInput | null, enabled = true) {
+  const debounced = useDebouncedValue(input, COMPATIBILITY_DEBOUNCE_MS);
+  const query = useQuery({
+    queryKey: queryKeys.compatibility(debounced ?? { requirements: {} }),
+    queryFn: ({ signal }) => templateService.checkCompatibility(debounced as CompatibilityInput, signal),
+    enabled: enabled && debounced !== null,
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
+    retry: (failureCount, error) => failureCount < 1 && error instanceof AppError && error.retryable && error.kind !== "offline",
+  });
+  // True while the inputs changed but their check has not come back yet: the shown result is for older inputs.
+  const pending = JSON.stringify(debounced) !== JSON.stringify(input) || query.isFetching;
+  return { ...query, pending };
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +163,8 @@ export function useStartGeneration(projectId: string | undefined) {
         validateWithAnsys: opts.validate_with_ansys ?? false,
         baselineEconomics: opts.baseline_economics ?? true,
         idempotencyKey,
+        templateId: opts.template_id ?? null,
+        roomArrangement: opts.room_arrangement ?? {},
       });
 
       const saved = await repo.recordRunStarted(record.row.id, jobId, DATA_PROVIDER);
@@ -134,10 +183,36 @@ export function useStartGeneration(projectId: string | undefined) {
   });
 }
 
+/**
+ * Retries a failed job (backend POST /optimizations/{id}/retry) and moves the
+ * project and the device's run index to the new job.
+ */
+export function useRetryGeneration(projectId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      const res = await generationService.retryGeneration(jobId);
+      if (projectId) {
+        const saved = await (await getProjectsRepository()).recordRunStarted(projectId, res.jobId, DATA_PROVIDER);
+        if (!saved.ok) throw new Error(saved.error);
+        await (await getRunsRepository()).record(res.jobId, projectId, DATA_PROVIDER);
+      }
+      kickJobMonitor();
+      return res;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: PROJECTS_LIST_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: projectRecordQueryKey(projectId) });
+    },
+  });
+}
+
 /** Poll while the job is unknown yet, queued or running; stop at any terminal state. */
 export function generationPollInterval(job: GenerationJob | undefined, intervalMs: number = JOB_POLL_MS): number | false {
   if (job === undefined) return intervalMs;
-  return job.status === "queued" || job.status === "running" ? intervalMs : false;
+  if (job.status === "queued" || job.status === "running") return intervalMs;
+  // RC results are final, but a requested ANSYS solve is still running: poll at the slower ANSYS cadence.
+  return job.status === "completed" && job.phase === "ansys_validation" ? ANSYS_POLL_MS : false;
 }
 
 /** Poll ANSYS only while M8 reports an active state. */

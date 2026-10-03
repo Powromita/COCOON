@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { DraftRequirements } from "../../../database/schema/types";
 import { useTheme } from "../../../theme";
-import { formatInr, formatWithUnit, NOT_AVAILABLE } from "../../../utils/format";
+import { formatInr, formatWithUnit, humanize, NOT_AVAILABLE } from "../../../utils/format";
 import {
   GLAZING_SPECS,
   HEATER_FUELS,
@@ -29,6 +29,12 @@ const num = (v: number | null | undefined, unit: string, decimals = 1) =>
   typeof v === "number" ? formatWithUnit(v, unit, decimals) : undefined;
 const limit = (v: number | null | undefined, unit: string, decimals = 0) =>
   v === null ? "No limit" : num(v, unit, decimals);
+
+function arrangementText(map: Record<string, "dedicated" | "shared"> | undefined): string {
+  const entries = Object.entries(map ?? {});
+  if (entries.length === 0) return "Any supported arrangement";
+  return entries.map(([type, a]) => `${optionLabel(ROOM_TYPES, type)}: ${a === "dedicated" ? "own room" : "shared"}`).join(", ");
+}
 
 function sections(d: DraftRequirements): Section[] {
   const s = d.site ?? {};
@@ -60,6 +66,7 @@ function sections(d: DraftRequirements): Section[] {
         ["Target indoor temp", num(m.target_temperature_c, "°C")],
         ["Max unmet hours", num(m.maximum_unmet_hours, "h", 0)],
         ["Required rooms", m.required_rooms?.map((r) => optionLabel(ROOM_TYPES, r)).join(", ")],
+        ["Room arrangement", arrangementText(d.generation_options?.room_arrangement)],
       ],
     },
     {
@@ -94,6 +101,7 @@ function sections(d: DraftRequirements): Section[] {
       title: "5. Solver & Optimization",
       rows: [
         ["Candidate pool count", num(d.generation_options?.count, "candidates", 0) ?? "24"],
+        ["Shelter template", d.generation_options?.template_id ? humanize(d.generation_options.template_id) : "Automatic"],
       ],
     },
   ];

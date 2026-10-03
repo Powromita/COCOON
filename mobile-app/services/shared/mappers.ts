@@ -55,8 +55,23 @@ export function toGenerationJob(resp: OptimizationStatusResponse): GenerationJob
     siteUsed: resp.result?.site_used,
     warnings: resp.result?.warnings,
     error: resp.error
-      ? { code: resp.error.code, message: resp.error.message, retryable: resp.error.retryable, details: resp.error.details }
+      ? {
+          code: resp.error.code,
+          message: resp.error.message,
+          retryable: resp.error.retryable,
+          details: resp.error.details,
+          traceId: resp.error.trace_id,
+        }
       : undefined,
+    phase: resp.phase,
+    stages: resp.stages,
+    templateIds: resp.template_ids,
+    templateSelection: resp.template_selection,
+    catalogVersion: resp.template_catalog_version,
+    generation: resp.generation,
+    ansys: resp.ansys ? { jobId: resp.ansys.job_id, status: resp.ansys.status, errorReason: resp.ansys.error_reason } : undefined,
+    retryOf: resp.retry_of,
+    retriedAs: resp.retried_as,
   };
 }
 

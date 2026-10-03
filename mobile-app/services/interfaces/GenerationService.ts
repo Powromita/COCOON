@@ -1,6 +1,13 @@
 import type { RequirementsContract } from "@cocoon/contracts";
 
-import type { OptimizationJobStatus, SiteUsed } from "../../types/backend";
+import type {
+  GenerationSummary,
+  JobPhase,
+  JobStage,
+  OptimizationJobStatus,
+  RoomArrangement,
+  SiteUsed,
+} from "../../types/backend";
 
 export interface StartGenerationInput {
   requirements: RequirementsContract;
@@ -14,6 +21,10 @@ export interface StartGenerationInput {
   baselineEconomics?: boolean;
   /** Sent as Idempotency-Key so a retried submission never starts a second job. */
   idempotencyKey: string;
+  /** A template the user picked; omitted = the backend uses every compatible template. */
+  templateId?: string | null;
+  /** Dedicated / shared choice per room type; the backend re-checks it against the catalogue. */
+  roomArrangement?: Record<string, RoomArrangement>;
 }
 
 /** The backend reports only these states. "unknown" covers anything it adds later. */
@@ -33,7 +44,24 @@ export interface GenerationJob {
   weatherSnapshotId?: string;
   siteUsed?: SiteUsed;
   warnings?: string[];
-  error?: { code?: string; message: string; retryable?: boolean; details?: Record<string, unknown> };
+  error?: {
+    code?: string;
+    message: string;
+    retryable?: boolean;
+    details?: Record<string, unknown>;
+    traceId?: string;
+  };
+  /** Backend-derived position in the pipeline; undefined on older backends. */
+  phase?: JobPhase;
+  /** Recorded pipeline stages (M2 generation, M4 simulation, M7, M6, M8 ANSYS are separate entries). */
+  stages?: JobStage[];
+  templateIds?: string[];
+  templateSelection?: "automatic" | "manual";
+  catalogVersion?: string;
+  generation?: GenerationSummary;
+  ansys?: { jobId: string; status?: string; errorReason?: string | null };
+  retryOf?: string;
+  retriedAs?: string;
 }
 
 /**
@@ -49,4 +77,9 @@ export interface GenerationService {
    * Returns null if it isn't known on this device.
    */
   getSubmittedRequirements(jobId: string): Promise<RequirementsContract | null>;
+  /**
+   * Re-runs a failed job from the request the backend stored (POST /optimizations/{id}/retry).
+   * The backend allows one retry per failed job and returns the same new job on a repeated call.
+   */
+  retryGeneration(jobId: string): Promise<{ jobId: string; notes: string[] }>;
 }

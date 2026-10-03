@@ -1,0 +1,754 @@
+{
+ "catalog_version": "cat_e0112240c1d2",
+ "generator_version": "layout_generator_v1",
+ "templates": [
+  {
+   "id": "airlock_living",
+   "name": "Airlock plus living room",
+   "description": "A small airlock between the outdoors and one large room that doubles as living, sleeping, equipment and storage space.",
+   "version": "tpl_fa6389237e97",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": true,
+   "dedicated_functions": [
+    "airlock",
+    "living"
+   ],
+   "shared_functions": {
+    "equipment": [
+     "living"
+    ],
+    "sleeping": [
+     "living"
+    ],
+    "storage": [
+     "living"
+    ]
+   },
+   "supported_functions": [
+    "airlock",
+    "equipment",
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "airlock",
+     "type": "airlock",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "living",
+     "type": "living",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": false,
+     "serves": [
+      "sleeping",
+      "equipment",
+      "storage"
+     ]
+    }
+   ],
+   "links": [
+    {
+     "a": "airlock",
+     "b": "living",
+     "kind": "door"
+    }
+   ]
+  },
+  {
+   "id": "airlock_living_equipment",
+   "name": "Airlock, living room and equipment room",
+   "description": "Airlock leads to the living room; a separate equipment room is reached from the living room. Sleeping happens in the living room.",
+   "version": "tpl_7d911046099d",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": true,
+   "dedicated_functions": [
+    "airlock",
+    "equipment",
+    "living"
+   ],
+   "shared_functions": {
+    "sleeping": [
+     "living"
+    ],
+    "storage": [
+     "equipment",
+     "living"
+    ]
+   },
+   "supported_functions": [
+    "airlock",
+    "equipment",
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "airlock",
+     "type": "airlock",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "living",
+     "type": "living",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": false,
+     "serves": [
+      "sleeping",
+      "storage"
+     ]
+    },
+    {
+     "id": "equipment",
+     "type": "equipment",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": [
+      "storage"
+     ]
+    }
+   ],
+   "links": [
+    {
+     "a": "airlock",
+     "b": "living",
+     "kind": "door"
+    },
+    {
+     "a": "living",
+     "b": "equipment",
+     "kind": "door"
+    }
+   ]
+  },
+  {
+   "id": "command_post",
+   "name": "Command post",
+   "description": "Airlock, a command room where staff work, and an equipment room for communications and heating gear.",
+   "version": "tpl_01d1cf65e56c",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": true,
+   "dedicated_functions": [
+    "airlock",
+    "command",
+    "equipment"
+   ],
+   "shared_functions": {
+    "living": [
+     "command"
+    ],
+    "storage": [
+     "equipment"
+    ]
+   },
+   "supported_functions": [
+    "airlock",
+    "command",
+    "equipment",
+    "living",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "airlock",
+     "type": "airlock",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "command",
+     "type": "command",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": false,
+     "serves": [
+      "living"
+     ]
+    },
+    {
+     "id": "equipment",
+     "type": "equipment",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": [
+      "storage"
+     ]
+    }
+   ],
+   "links": [
+    {
+     "a": "airlock",
+     "b": "command",
+     "kind": "door"
+    },
+    {
+     "a": "command",
+     "b": "equipment",
+     "kind": "door"
+    }
+   ]
+  },
+  {
+   "id": "living_sleeping_storage",
+   "name": "Living, sleeping and storage rooms",
+   "description": "Three separate rooms without an airlock. The living room has the outside door and connects to both other rooms.",
+   "version": "tpl_7190a0dc9038",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": false,
+   "dedicated_functions": [
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "shared_functions": {},
+   "supported_functions": [
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "living",
+     "type": "living",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "sleeping",
+     "type": "sleeping",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "storage",
+     "type": "storage",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    }
+   ],
+   "links": [
+    {
+     "a": "living",
+     "b": "sleeping",
+     "kind": "door"
+    },
+    {
+     "a": "living",
+     "b": "storage",
+     "kind": "door"
+    }
+   ]
+  },
+  {
+   "id": "medical_post",
+   "name": "Medical post",
+   "description": "Airlock, a treatment room, a recovery room for sleeping patients and a storage room.",
+   "version": "tpl_9923e157db37",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": true,
+   "dedicated_functions": [
+    "airlock",
+    "medical",
+    "sleeping",
+    "storage"
+   ],
+   "shared_functions": {},
+   "supported_functions": [
+    "airlock",
+    "medical",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "airlock",
+     "type": "airlock",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "medical",
+     "type": "medical",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "sleeping",
+     "type": "sleeping",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "storage",
+     "type": "storage",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    }
+   ],
+   "links": [
+    {
+     "a": "airlock",
+     "b": "medical",
+     "kind": "door"
+    },
+    {
+     "a": "medical",
+     "b": "sleeping",
+     "kind": "door"
+    },
+    {
+     "a": "medical",
+     "b": "storage",
+     "kind": "door"
+    }
+   ]
+  },
+  {
+   "id": "single_room",
+   "name": "Single multipurpose room",
+   "description": "One undivided room used for every function. No airlock; the room opens directly to the outdoors.",
+   "version": "tpl_5fbb7d5be874",
+   "active": true,
+   "floor_count": 1,
+   "airlock_required": false,
+   "dedicated_functions": [
+    "multipurpose"
+   ],
+   "shared_functions": {
+    "command": [
+     "main"
+    ],
+    "equipment": [
+     "main"
+    ],
+    "living": [
+     "main"
+    ],
+    "medical": [
+     "main"
+    ],
+    "sleeping": [
+     "main"
+    ],
+    "storage": [
+     "main"
+    ]
+   },
+   "supported_functions": [
+    "command",
+    "equipment",
+    "living",
+    "medical",
+    "multipurpose",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "main",
+     "type": "multipurpose",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": true,
+     "serves": [
+      "living",
+      "sleeping",
+      "equipment",
+      "storage",
+      "command",
+      "medical"
+     ]
+    }
+   ],
+   "links": []
+  },
+  {
+   "id": "two_floor_compact",
+   "name": "Compact two-floor shelter",
+   "description": "Ground floor: airlock, living room and equipment room. Upper floor: sleeping and storage, reached by a stair from the living room.",
+   "version": "tpl_aa5b1627bbaf",
+   "active": true,
+   "floor_count": 2,
+   "airlock_required": true,
+   "dedicated_functions": [
+    "airlock",
+    "equipment",
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "shared_functions": {},
+   "supported_functions": [
+    "airlock",
+    "equipment",
+    "living",
+    "sleeping",
+    "storage"
+   ],
+   "rooms": [
+    {
+     "id": "airlock",
+     "type": "airlock",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": true,
+     "serves": []
+    },
+    {
+     "id": "living",
+     "type": "living",
+     "floor_level": 0,
+     "is_primary_occupied": true,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "equipment",
+     "type": "equipment",
+     "floor_level": 0,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "sleeping",
+     "type": "sleeping",
+     "floor_level": 1,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    },
+    {
+     "id": "storage",
+     "type": "storage",
+     "floor_level": 1,
+     "is_primary_occupied": false,
+     "exterior_access": false,
+     "serves": []
+    }
+   ],
+   "links": [
+    {
+     "a": "airlock",
+     "b": "living",
+     "kind": "door"
+    },
+    {
+     "a": "living",
+     "b": "equipment",
+     "kind": "door"
+    },
+    {
+     "a": "living",
+     "b": "sleeping",
+     "kind": "stair"
+    },
+    {
+     "a": "sleeping",
+     "b": "storage",
+     "kind": "door"
+    }
+   ]
+  }
+ ],
+ "room_types": [
+  {
+   "type": "airlock",
+   "min_area_fixed_m2": 3.0,
+   "min_area_per_person_m2": 0.0,
+   "min_dimension_m": 1.2,
+   "dedicated_in": [
+    "airlock_living",
+    "airlock_living_equipment",
+    "command_post",
+    "medical_post",
+    "two_floor_compact"
+   ],
+   "shared_in": []
+  },
+  {
+   "type": "command",
+   "min_area_fixed_m2": 6.0,
+   "min_area_per_person_m2": 0.5,
+   "min_dimension_m": 2.5,
+   "dedicated_in": [
+    "command_post"
+   ],
+   "shared_in": [
+    "single_room"
+   ]
+  },
+  {
+   "type": "equipment",
+   "min_area_fixed_m2": 4.0,
+   "min_area_per_person_m2": 0.1,
+   "min_dimension_m": 1.5,
+   "dedicated_in": [
+    "airlock_living_equipment",
+    "command_post",
+    "two_floor_compact"
+   ],
+   "shared_in": [
+    "airlock_living",
+    "single_room"
+   ]
+  },
+  {
+   "type": "living",
+   "min_area_fixed_m2": 0.0,
+   "min_area_per_person_m2": 0.8,
+   "min_dimension_m": 2.5,
+   "dedicated_in": [
+    "airlock_living",
+    "airlock_living_equipment",
+    "living_sleeping_storage",
+    "two_floor_compact"
+   ],
+   "shared_in": [
+    "command_post",
+    "single_room"
+   ]
+  },
+  {
+   "type": "medical",
+   "min_area_fixed_m2": 9.0,
+   "min_area_per_person_m2": 0.3,
+   "min_dimension_m": 2.5,
+   "dedicated_in": [
+    "medical_post"
+   ],
+   "shared_in": [
+    "single_room"
+   ]
+  },
+  {
+   "type": "sleeping",
+   "min_area_fixed_m2": 0.0,
+   "min_area_per_person_m2": 1.2,
+   "min_dimension_m": 2.4,
+   "dedicated_in": [
+    "living_sleeping_storage",
+    "medical_post",
+    "two_floor_compact"
+   ],
+   "shared_in": [
+    "airlock_living",
+    "airlock_living_equipment",
+    "single_room"
+   ]
+  },
+  {
+   "type": "storage",
+   "min_area_fixed_m2": 2.0,
+   "min_area_per_person_m2": 0.1,
+   "min_dimension_m": 1.5,
+   "dedicated_in": [
+    "living_sleeping_storage",
+    "medical_post",
+    "two_floor_compact"
+   ],
+   "shared_in": [
+    "airlock_living",
+    "airlock_living_equipment",
+    "command_post",
+    "single_room"
+   ]
+  }
+ ],
+ "floors": {
+  "template_floor_counts": [
+   1,
+   2
+  ],
+  "contract_max_floors": 5
+ },
+ "sizing": {
+  "circulation_factor": 1.1,
+  "stair_allowance_m2": 3.0,
+  "ceiling_height_range_m": [
+   2.3,
+   3.0
+  ],
+  "assumptions_note": "Placeholder planning assumptions from design_generator/requirement_parser.py; not standards."
+ },
+ "materials": {
+  "mat_snap_himalayan_v1": [
+   {
+    "id": "mat_concrete",
+    "display_name": "Dense Concrete (Sub-floor)",
+    "category": "structural",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "interfloor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_plywood",
+    "display_name": "Marine Grade Structural Plywood",
+    "category": "structural",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "interfloor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_puf",
+    "display_name": "Polyurethane Foam Insulation",
+    "category": "insulation",
+    "role": "insulation",
+    "elements": [
+     "floor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_stone",
+    "display_name": "Granite / Field Stone",
+    "category": "masonry",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "wall"
+    ]
+   }
+  ],
+  "mat_snap_himalayan_v2": [
+   {
+    "id": "mat_adobe",
+    "display_name": "Adobe (Sun-dried Mud Brick)",
+    "category": "traditional_ladakh",
+    "role": null,
+    "elements": []
+   },
+   {
+    "id": "mat_concrete",
+    "display_name": "Dense Concrete (Sub-floor)",
+    "category": "structural",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "interfloor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_plywood",
+    "display_name": "Marine Grade Structural Plywood",
+    "category": "structural",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "interfloor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_puf",
+    "display_name": "Polyurethane Foam Insulation",
+    "category": "insulation",
+    "role": "insulation",
+    "elements": [
+     "floor",
+     "partition",
+     "roof",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_rammed_earth",
+    "display_name": "Rammed Earth",
+    "category": "traditional_ladakh",
+    "role": null,
+    "elements": []
+   },
+   {
+    "id": "mat_reinforced_concrete",
+    "display_name": "Reinforced Concrete",
+    "category": "modern_engineered",
+    "role": null,
+    "elements": []
+   },
+   {
+    "id": "mat_stone",
+    "display_name": "Granite / Field Stone",
+    "category": "masonry",
+    "role": "structural",
+    "elements": [
+     "floor",
+     "wall"
+    ]
+   },
+   {
+    "id": "mat_straw_clay",
+    "display_name": "Straw-Clay",
+    "category": "passive_solar_ladakh",
+    "role": null,
+    "elements": []
+   },
+   {
+    "id": "mat_wood_timber",
+    "display_name": "Wood / Structural Timber",
+    "category": "traditional_ladakh",
+    "role": null,
+    "elements": []
+   }
+  ]
+ },
+ "required_structural_elements": [
+  "wall",
+  "roof",
+  "floor"
+ ],
+ "notes": [
+  "A template fixes topology only; dimensions and materials are chosen per candidate.",
+  "A shared function is provided by a room of another type (its 'serves' list), e.g. sleeping in the living room."
+ ]
+}

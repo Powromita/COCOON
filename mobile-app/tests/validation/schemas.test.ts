@@ -31,15 +31,13 @@ describe("the M0 sample requirements", () => {
 });
 
 describe("materials needed by M2", () => {
-  it("rejects an insulation-only selection with a useful correction", () => {
+  it("leaves the structural-material rule to the backend's M2 material roles (no hardcoded list here)", () => {
+    // An insulation-only set is reported by POST /api/v1/design-compatibility as NO_STRUCTURAL_MATERIAL
+    // (design_generator/tests/test_catalog.py), using the generator's own material pool.
     const errors = validateStep("design", withPatch((d) => {
       d.constraints!.available_material_ids = ["mat_puf"];
     }));
-    expect(errors).toEqual([expect.objectContaining({
-      field: "constraints.available_material_ids",
-      kind: "invalid",
-      message: expect.stringContaining("Choose a structural material"),
-    })]);
+    expect(errors.filter((e) => e.field === "constraints.available_material_ids")).toEqual([]);
   });
 
   it("allows insulation when a structural material is also selected", () => {
@@ -108,9 +106,11 @@ describe("invalid occupancy", () => {
 });
 
 describe("invalid rooms", () => {
-  it("rejects room types the M2 generator has no sizing rule for", () => {
+  it("leaves unknown room types to the M2 catalogue (the backend reports UNKNOWN_ROOM_TYPE)", () => {
+    // The wizard only offers catalogue room types; an old draft's unknown type is flagged by the rooms step and by
+    // POST /api/v1/design-compatibility (design_generator/tests/test_catalog.py), not by a hardcoded list here.
     const errors = validateStep("rooms", withPatch((d) => void (d.mission!.required_rooms = ["living", "hangar"])));
-    expect(errors[0]).toEqual(expect.objectContaining({ field: "mission.required_rooms", kind: "invalid" }));
+    expect(errors.filter((e) => e.field === "mission.required_rooms" && e.kind === "invalid")).toEqual([]);
   });
 
   it("rejects a room type listed twice", () => {

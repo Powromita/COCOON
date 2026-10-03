@@ -16,6 +16,10 @@ export interface DraftGenerationOptions {
   /** Include the standard baseline comparison in lifecycle economics. */
   baseline_economics?: boolean;
   validate_with_ansys?: boolean;
+  /** A template the user picked on the review step; null/absent = automatic (every compatible template). */
+  template_id?: string | null;
+  /** Per room type: must it have its own room, or share one? Absent = either. Checked by the backend catalogue. */
+  room_arrangement?: Record<string, "dedicated" | "shared">;
 }
 
 export interface DraftEnvelope {

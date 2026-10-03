@@ -1,7 +1,10 @@
 /**
  * Generation progress. Polls the backend job (GET /api/v1/optimizations/{id})
- * until it is completed or failed. The backend reports only a status and
- * timestamps — no stages or percentages — so that is all this screen shows.
+ * until it is completed or failed, and while a requested ANSYS validation is
+ * still running. The backend records real stage transitions — M2 generation,
+ * M4 simulation, M7 economics, M6 ranking and M8 ANSYS are separate rows — and
+ * no percentages, so none are shown. Older backends report only a status; then
+ * the three-step timeline is shown instead.
  */
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
@@ -16,16 +19,18 @@ import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { SecondaryButton } from "../../components/common/SecondaryButton";
 import { SectionHeader } from "../../components/common/SectionHeader";
 import { Tag } from "../../components/common/Tag";
-import { useGenerationJob } from "../../hooks/useCocoon";
+import { STAGE_STATUS_TEXT, visibleStages } from "../../adapters/templates";
+import { FailureNotice } from "../../components/generation/FailureNotice";
+import { InfoBanner } from "../../components/common/InfoBanner";
+import { useGenerationJob, useRetryGeneration } from "../../hooks/useCocoon";
 import { useRecordRunStatus } from "../../hooks/useProjects";
 import type { GenerationJob, GenerationJobStatus } from "../../services/interfaces/GenerationService";
 import { getRunsRepository } from "../../database";
 import { useT } from "../../i18n";
 import { markJobStatusSeen } from "../../notifications/jobs";
 import { useTheme } from "../../theme";
-import { PipelineFailure } from "../../utils/errors";
 import { formatLocalDateTime, formatNumber, humanize } from "../../utils/format";
-import { REVIEW_STEP_INDEX } from "../../validation/steps";
+import { REVIEW_STEP_INDEX, stepIndexOf } from "../../validation/steps";
 
 const ORDER: GenerationJobStatus[] = ["queued", "running", "completed"];
 
@@ -62,22 +67,42 @@ function StatusTimeline({ job }: { job: GenerationJob }) {
   );
 }
 
-function failureGuidance(job: GenerationJob): string[] {
-  const raw = job.error?.details?.reasons;
-  const reasons = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};
-  const guidance: string[] = [];
-  const wallCount = reasons["composition:no_materials_for_wall"];
-  const layoutCount = reasons["layout:NO_FEASIBLE_LAYOUT"];
-  if (typeof wallCount === "number" && wallCount > 0) {
-    guidance.push(`The selected materials could not form a structural wall (${wallCount} attempts). Include stone, plywood, or concrete; insulation such as PUF can be added alongside it.`);
-  }
-  if (typeof layoutCount === "number" && layoutCount > 0) {
-    guidance.push(`The requested room layout could not be placed (${layoutCount} attempts). Try one floor, keep only the rooms you need, and use a practical footprint limit.`);
-  }
-  if (guidance.length === 0 && job.error?.code === "VALIDATION_ERROR") {
-    guidance.push("Review the permitted materials and include at least one structural option, such as stone, plywood, or concrete. Insulation such as PUF can be selected with it.");
-  }
-  return guidance;
+/** The backend's recorded stages; completed stages stay visible when a later one fails. */
+function StageTimeline({ job }: { job: GenerationJob }) {
+  const { colors, spacing, typography } = useTheme();
+  const stages = visibleStages(job.stages);
+  return (
+    <AppCard>
+      {stages.map((stage) => {
+        const done = stage.status === "completed";
+        const active = stage.status === "running" || stage.status === "queued";
+        const bad = stage.status === "failed" || stage.status === "unavailable";
+        const tint = bad ? colors.danger : done || active ? colors.accent : colors.border;
+        return (
+          <View
+            key={stage.id}
+            style={[styles.step, { paddingVertical: spacing.sm }]}
+            accessible
+            accessibilityLabel={`${stage.label}: ${STAGE_STATUS_TEXT[stage.status] ?? stage.status}`}
+          >
+            <View style={[styles.dot, { borderColor: tint, backgroundColor: done ? colors.accent : bad ? colors.danger : "transparent" }]}>
+              {active ? <ActivityIndicator size="small" color={colors.accent} /> : null}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[typography.bodyStrong, { color: done || active || bad ? colors.textPrimary : colors.textSecondary }]}>{stage.label}</Text>
+              <Text style={[typography.caption, { color: bad ? colors.danger : colors.textSecondary }]}>
+                {STAGE_STATUS_TEXT[stage.status] ?? humanize(stage.status)}
+                {stage.finished_at && done ? ` · ${formatLocalDateTime(stage.finished_at)}` : ""}
+              </Text>
+            </View>
+          </View>
+        );
+      })}
+      <Text style={[typography.caption, { color: colors.textSecondary, marginTop: spacing.xs }]}>
+        Stages are reported by the backend as they finish; there is no percentage, so no progress bar is shown.
+      </Text>
+    </AppCard>
+  );
 }
 
 export default function GenerationScreen() {
@@ -85,6 +110,7 @@ export default function GenerationScreen() {
   const router = useRouter();
   const { colors, spacing, typography } = useTheme();
   const job = useGenerationJob(jobId);
+  const retry = useRetryGeneration(projectId);
   const recordStatus = useRecordRunStatus(projectId);
   const lastRecorded = useRef<string | null>(null);
 
@@ -128,28 +154,36 @@ export default function GenerationScreen() {
           <>
             {data.status === "failed" ? (
               <>
-                <ErrorView error={new PipelineFailure(data.error?.message ?? "The backend did not give a reason.", data.error?.code)} />
-                <AppCard>
-                  <KeyValueRow label="Reason" value={data.error?.message ?? "Not reported"} />
-                  <KeyValueRow label="Error code" value={data.error?.code ?? "Not reported"} mono last />
-                </AppCard>
-                {failureGuidance(data).map((hint) => (
-                  <Text key={hint} style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.sm }]}>{hint}</Text>
-                ))}
-                <View style={{ gap: spacing.sm }}>
-                  {projectId ? (
-                    <PrimaryButton
-                      label="Retry from review"
-                      onPress={() => router.replace({ pathname: "/project/[id]/edit", params: { id: projectId, step: String(REVIEW_STEP_INDEX) } })}
-                    />
-                  ) : null}
-                  {projectId ? (
-                    <SecondaryButton label="Back to project" onPress={() => router.replace({ pathname: "/project/[id]", params: { id: projectId } })} />
-                  ) : null}
-                </View>
+                <FailureNotice
+                  error={data.error ?? { message: "The backend did not give a reason." }}
+                  generation={data.generation}
+                  retrying={retry.isPending}
+                  onRetry={() =>
+                    retry.mutate(data.jobId, {
+                      onSuccess: (res) =>
+                        router.replace({ pathname: "/generation/[jobId]", params: { jobId: res.jobId, projectId: projectId ?? "" } }),
+                    })
+                  }
+                  onEdit={
+                    projectId
+                      ? (ex) =>
+                          router.replace({
+                            pathname: "/project/[id]/edit",
+                            params: { id: projectId, step: String(ex.step && ex.step !== "review" ? stepIndexOf(ex.step) : REVIEW_STEP_INDEX) },
+                          })
+                      : undefined
+                  }
+                />
+                {retry.isError ? <ErrorView compact error={retry.error} title="The retry could not start" /> : null}
+                {data.stages?.length ? <StageTimeline job={data} /> : null}
+                {projectId ? (
+                  <SecondaryButton label="Back to project" onPress={() => router.replace({ pathname: "/project/[id]", params: { id: projectId } })} />
+                ) : null}
               </>
             ) : data.status === "unknown" ? (
               <ErrorView error={new Error("The backend reported a status this app does not recognise.")} title="Unknown job status" onRetry={() => void job.refetch()} />
+            ) : data.stages?.length ? (
+              <StageTimeline job={data} />
             ) : (
               <StatusTimeline job={data} />
             )}
@@ -159,8 +193,36 @@ export default function GenerationScreen() {
             {data.status === "completed" ? (
               <>
                 <SectionHeader title="Result" />
+                {data.phase === "ansys_validation" ? (
+                  <InfoBanner
+                    title="ANSYS validation still running"
+                    message="The RC results below are complete. The independent ANSYS check of the recommended design is still in progress; it is a separate status and is updated here."
+                  />
+                ) : data.phase === "partially_completed" ? (
+                  <InfoBanner
+                    tone="warning"
+                    title="Partially completed"
+                    message={
+                      data.generation && !data.generation.complete
+                        ? `Only ${data.generation.generated} of the ${data.generation.requested} requested designs passed M2 validation. The results below use those designs.`
+                        : "The RC results are complete, but the ANSYS validation did not finish. The designs are not ANSYS-validated."
+                    }
+                  />
+                ) : null}
                 <AppCard>
                   <KeyValueRow label="Designs generated" value={formatNumber(data.summary?.generated, 0)} />
+                  {data.generation ? (
+                    <KeyValueRow
+                      label="M2 layouts tried"
+                      value={`${formatNumber(data.generation.attempts, 0)} (${formatNumber(data.generation.generated, 0)} passed validation)`}
+                    />
+                  ) : null}
+                  {data.templateIds?.length ? (
+                    <KeyValueRow
+                      label={data.templateSelection === "manual" ? "Template (your choice)" : "Templates used"}
+                      value={data.templateIds.map((t) => humanize(t)).join(", ")}
+                    />
+                  ) : null}
                   <KeyValueRow label="On the Pareto front" value={formatNumber(data.summary?.on_front, 0)} />
                   <KeyValueRow label="Dominated" value={formatNumber(data.summary?.dominated, 0)} />
                   <KeyValueRow label="Recommended by optimizer" value={data.recommendedDesignId ?? "None"} mono />
@@ -175,7 +237,8 @@ export default function GenerationScreen() {
                         : undefined
                     }
                   />
-                  <KeyValueRow label="Weather snapshot" value={data.weatherSnapshotId} mono last />
+                  <KeyValueRow label="Weather snapshot" value={data.weatherSnapshotId} mono last={!data.catalogVersion} />
+                  {data.catalogVersion ? <KeyValueRow label="Template catalogue" value={data.catalogVersion} mono last /> : null}
                 </AppCard>
                 {(data.warnings ?? []).map((w) => (
                   <View key={w} style={{ marginBottom: spacing.sm }}>

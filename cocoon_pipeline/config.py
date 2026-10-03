@@ -35,6 +35,8 @@ class PipelineConfig:
     use_ml: str = "auto"                          # "auto" = M5 screening only when count >= ml_min_designs and the model is valid
     ml_min_designs: int = 60                      # below this the RC engine simulates everything (ML saves nothing on small runs)
     final_report: bool = True                     # build final_report.json / REPORT.md for the recommended design
+    progress: Any = None                          # optional observer: called with each stage name as it finishes
+                                                  # ("weather", the M6 stages, "ansys", "final_report"); never changes results
 
     def __post_init__(self) -> None:
         if self.ansys not in (ANSYS_NOT_REQUESTED, ANSYS_SUBMIT):

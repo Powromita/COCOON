@@ -82,9 +82,21 @@ export function stepAt(index: number): WizardStepDef {
   return WIZARD_STEPS[clampStepIndex(index)];
 }
 
+/** Older field groups (FIELD_META still uses some) and the screen that now holds them. */
+const STEP_ALIASES: Partial<Record<WizardStepId, WizardStepId>> = {
+  design: "constraints",
+  footprint: "constraints",
+  budget: "constraints",
+  location: "site",
+  weather: "site",
+  occupancy: "mission",
+  rooms: "mission",
+  comfort: "mission",
+};
+
 export function stepIndexOf(id: WizardStepId): number {
-  if (id === "design") return 2; // maps to constraints
-  const idx = WIZARD_STEPS.findIndex((s) => s.id === id);
+  const target = STEP_ALIASES[id] ?? id;
+  const idx = WIZARD_STEPS.findIndex((s) => s.id === target);
   return idx >= 0 ? idx : 0;
 }
 

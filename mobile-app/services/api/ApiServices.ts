@@ -28,7 +28,9 @@ import type {
   MaterialsListResponse,
   OptimizationCreateResponse,
   OptimizationStatusResponse,
+  CompatibilityResult,
   ParetoResponse,
+  TemplateCatalog,
   TimeseriesResponse,
 } from "../../types/backend";
 import { AppError, isAppErrorKind } from "../../utils/errors";
@@ -41,6 +43,7 @@ import type { MaterialCatalog, MaterialsService } from "../interfaces/MaterialsS
 import type { AuthAvailability, AuthService, SignInResult } from "../interfaces/AuthService";
 import type { OptimizationHistoryService, RunList, RunReport, RunSummary } from "../interfaces/OptimizationHistoryService";
 import type { ProjectService } from "../interfaces/ProjectService";
+import type { CompatibilityInput, TemplateService } from "../interfaces/TemplateService";
 import type { DesignSimulationRequest, SimulationService } from "../interfaces/SimulationService";
 import type { VisualizationRequest, VisualizationResult, VisualizationService } from "../interfaces/VisualizationService";
 import { capabilitiesFromBackend, checkLocalStorage, toGenerationJob, toSimulationContract } from "../shared/mappers";
@@ -104,6 +107,8 @@ export class ApiGenerationService implements GenerationService {
       materials_snapshot_id: input.materialsSnapshotId ?? null,
       validate_with_ansys: false,
       baseline_economics: input.baselineEconomics ?? true,
+      template_id: input.templateId ?? null,
+      room_arrangement: input.roomArrangement ?? {},
     };
     const res = await this.api.post<OptimizationCreateResponse>(`${V1}/optimizations`, body, {
       idempotencyKey: input.idempotencyKey,
@@ -121,6 +126,41 @@ export class ApiGenerationService implements GenerationService {
 
   async getGenerationJob(jobId: string): Promise<GenerationJob> {
     return toGenerationJob(await this.api.get<OptimizationStatusResponse>(`${V1}/optimizations/${enc(jobId)}`));
+  }
+
+  async retryGeneration(jobId: string): Promise<{ jobId: string; notes: string[] }> {
+    const res = await this.api.post<{ optimization_id: string; notes?: string[] }>(
+      `${V1}/optimizations/${enc(jobId)}/retry`,
+      {}
+    );
+    // The retried job ran the same requirements; keep them reachable for the results screens.
+    const cache = await getCacheRepository();
+    const submitted = await cache.get<RequirementsContract>(submittedKey(jobId));
+    if (submitted?.value) await cache.set(submittedKey(res.optimization_id), submitted.value, "local");
+    return { jobId: res.optimization_id, notes: res.notes ?? [] };
+  }
+}
+
+export class ApiTemplateService implements TemplateService {
+  constructor(private readonly api: ApiClient) {}
+
+  getCatalog(): Promise<TemplateCatalog> {
+    return this.api.get<TemplateCatalog>(`${V1}/templates`).catch(notSupportedOn404("Template catalogue"));
+  }
+
+  checkCompatibility(input: CompatibilityInput, signal?: AbortSignal): Promise<CompatibilityResult> {
+    return this.api
+      .post<CompatibilityResult>(
+        `${V1}/design-compatibility`,
+        {
+          requirements: input.requirements,
+          template_id: input.templateId ?? null,
+          room_arrangement: input.roomArrangement ?? {},
+          materials_snapshot_id: input.materialsSnapshotId ?? null,
+        },
+        { signal, timeoutMs: 15_000 }
+      )
+      .catch(notSupportedOn404("Compatibility check"));
   }
 }
 
