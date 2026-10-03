@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Grid, Text } from "@react-three/drei";
 import * as THREE from "three";
 import type { BuildingModel, BuildingSurface, Vector3 } from "@/lib/api";
@@ -350,6 +350,28 @@ function GroundCompass({
   );
 }
 
+const CARDINALS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+
+/**
+ * Reports where scene-north (-Z, the axis GroundCompass labels "N") appears on screen,
+ * as degrees clockwise from screen-up. Sampled every frame so drags, rotate steps and
+ * resets all drive the same value.
+ */
+function HeadingSync({ onChange }: { onChange: (screenNorthDeg: number) => void }) {
+  const { camera } = useThree();
+  const last = useRef<number | null>(null);
+  useFrame(() => {
+    const e = camera.matrixWorld.elements; // column 0 = right, column 1 = up
+    let deg = (Math.atan2(-e[2], -e[6]) * 180) / Math.PI;
+    deg = ((deg % 360) + 360) % 360;
+    if (last.current === null || Math.abs(((deg - last.current + 540) % 360) - 180) > 0.2) {
+      last.current = deg;
+      onChange(deg);
+    }
+  });
+  return null;
+}
+
 /** Controls camera position smoothly across modes, reset triggers, and 360-degree rotation */
 function CameraController({
   bbox,
@@ -427,11 +449,13 @@ function Scene({
   viewMode,
   resetTrigger,
   rotationStep,
+  onHeadingChange,
 }: {
   building: BuildingModel;
   viewMode: ViewMode;
   resetTrigger: number;
   rotationStep: { angle: number; id: number };
+  onHeadingChange: (screenNorthDeg: number) => void;
 }) {
   const bbox = useMemo(() => {
     let minX = Infinity, maxX = -Infinity;
@@ -527,6 +551,7 @@ function Scene({
       ))}
 
       <CameraController bbox={bbox} mode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} />
+      <HeadingSync onChange={onHeadingChange} />
     </>
   );
 }
@@ -535,6 +560,10 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
   const [viewMode, setViewMode] = useState<ViewMode>("exterior");
   const [resetTrigger, setResetTrigger] = useState(0);
   const [rotationStep, setRotationStep] = useState<{ angle: number; id: number }>({ angle: 0, id: 0 });
+  // Screen angle of north, shared by the on-canvas dial and the in-scene ground compass.
+  const [northDeg, setNorthDeg] = useState(0);
+  const viewBearing = Math.round((360 - northDeg) % 360);
+  const viewCardinal = CARDINALS[Math.round(viewBearing / 45) % 8];
 
   // Derive all active materials present in this specific building
   const activeMaterials = useMemo(() => {
@@ -552,7 +581,7 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
     <div className="w-full flex flex-col rounded-2xl border border-outline-variant bg-surface-container-lowest overflow-hidden shadow-card">
       {/* Viewer Header / Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-surface-container-low border-b border-outline-variant">
-        <div className="flex items-center gap-1 bg-surface-container rounded-xl p-1 border border-outline-variant/60">
+        <div className="flex flex-wrap items-center gap-1 bg-surface-container rounded-xl p-1 border border-outline-variant/60 max-w-full">
           <button
             type="button"
             onClick={() => setViewMode("exterior")}
@@ -603,7 +632,7 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
           </button>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Manual 360 Step Rotation Controls */}
           <button
             type="button"
@@ -637,13 +666,13 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
       </div>
 
       {/* 3D Canvas Area */}
-      <div className="relative w-full h-[480px] sm:h-[540px] bg-gradient-to-b from-slate-100 via-sky-50/50 to-slate-200">
+      <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[540px] bg-gradient-to-b from-slate-100 via-sky-50/50 to-slate-200">
         <Canvas shadows camera={{ position: [14, 10, 14], fov: 42 }}>
-          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} />
+          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} onHeadingChange={setNorthDeg} />
         </Canvas>
 
         {/* Material Legend Badge Overlay */}
-        <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 px-3 py-1.5 bg-surface-container-lowest/90 backdrop-blur-md rounded-xl border border-outline-variant/60 shadow-sm pointer-events-none">
+        <div className="absolute top-3 left-3 max-w-[calc(100%-5.5rem)] flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 bg-surface-container-lowest/90 backdrop-blur-md rounded-xl border border-outline-variant/60 shadow-sm pointer-events-none">
           <span className="font-label-mono-xs text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">
             Materials:
           </span>
@@ -663,36 +692,39 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
         <div className="absolute top-3 right-3 flex flex-col items-center gap-1 z-10 select-none pointer-events-auto">
           <div
             className="relative w-14 h-14 rounded-full bg-surface-container-lowest/95 backdrop-blur-md border border-outline-variant shadow-md flex items-center justify-center p-1.5 hover:shadow-lg transition-shadow cursor-default"
-            title={`Orientation: ${building.orientation_deg ?? 180}° (${building.orientation_deg === 180 ? "True South" : building.orientation_deg === 0 ? "True North" : "Azimuth"})`}
+            title={`Camera facing ${viewBearing}° ${viewCardinal} · building orientation ${building.orientation_deg ?? 180}°`}
           >
             <svg className="w-full h-full" viewBox="0 0 100 100">
-              {/* Outer compass degree ticks */}
-              <circle cx="50" cy="50" r="46" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="2 3" />
-              <circle cx="50" cy="50" r="38" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1.2" />
+              {/* Dial turns with the camera so N/E/S/W always point where they do in the scene */}
+              <g transform={`rotate(${northDeg.toFixed(1)}, 50, 50)`}>
+                <circle cx="50" cy="50" r="46" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="2 3" />
+                <circle cx="50" cy="50" r="38" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1.2" />
 
-              {/* Cardinal directions */}
-              <text x="50" y="16" fill="#dc2626" fontSize="12" fontWeight="800" textAnchor="middle">N</text>
-              <text x="50" y="93" fill="#d97706" fontSize="11" fontWeight="700" textAnchor="middle">S</text>
-              <text x="92" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">E</text>
-              <text x="8" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">W</text>
+                <text x="50" y="16" fill="#dc2626" fontSize="12" fontWeight="800" textAnchor="middle">N</text>
+                <text x="50" y="93" fill="#d97706" fontSize="11" fontWeight="700" textAnchor="middle">S</text>
+                <text x="92" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">E</text>
+                <text x="8" y="54" fill="#64748b" fontSize="10" fontWeight="600" textAnchor="middle">W</text>
 
-              {/* Orientation needle */}
-              <g transform={`rotate(${-(building.orientation_deg ?? 180) + 180}, 50, 50)`}>
-                <polygon points="50,18 45,50 55,50" fill="#dc2626" />
-                <polygon points="50,82 45,50 55,50" fill="#d97706" />
-                <circle cx="50" cy="50" r="3.5" fill="#1e293b" />
-                <circle cx="50" cy="50" r="1.5" fill="#ffffff" />
+                {/* Orientation needle (building azimuth, fixed to the dial) */}
+                <g transform={`rotate(${-(building.orientation_deg ?? 180) + 180}, 50, 50)`}>
+                  <polygon points="50,18 45,50 55,50" fill="#dc2626" />
+                  <polygon points="50,82 45,50 55,50" fill="#d97706" />
+                </g>
               </g>
+              <circle cx="50" cy="50" r="3.5" fill="#1e293b" />
+              <circle cx="50" cy="50" r="1.5" fill="#ffffff" />
+              {/* Fixed lubber mark: the direction the camera is facing */}
+              <polygon points="50,1 46,8 54,8" fill="#1e293b" />
             </svg>
           </div>
           <span className="font-label-mono-xs text-[10px] font-bold text-on-surface bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-outline-variant/60 shadow-xs">
-            {building.orientation_deg ?? 180}° {building.orientation_deg === 0 ? "N" : building.orientation_deg === 180 ? "S" : ""}
+            View {viewBearing}° {viewCardinal}
           </span>
         </div>
 
         {/* Interaction Hint */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md border border-outline-variant/60 text-[11px] font-body-sm text-on-surface-variant shadow-sm pointer-events-none">
-          Left-click + drag to rotate 360° • Scroll to zoom • Right-click to pan
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-max max-w-[calc(100%-1.5rem)] text-center px-3.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md border border-outline-variant/60 text-[11px] font-body-sm text-on-surface-variant shadow-sm pointer-events-none">
+          Drag to rotate · Scroll to zoom · Right-click to pan
         </div>
       </div>
     </div>

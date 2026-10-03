@@ -37,6 +37,14 @@ function scaleY(val: number, min: number, max: number, height: number, pad = 20)
   return pad + ((max - val) / (max - min)) * (height - 2 * pad);
 }
 
+function validationStateLabel(state: string | null | undefined) {
+  if (!state) return "—";
+  if (state === "RC_ONLY_ANSYS_NOT_REQUESTED") return "Not requested";
+  const words = state.replace(/_/g, " ").toLowerCase();
+  // "VALIDATED_BY_ANSYS" -> "Validated by ANSYS"
+  return (words.charAt(0).toUpperCase() + words.slice(1)).replace(/ansys/i, "ANSYS");
+}
+
 function formatYears(value: number | null | undefined) {
   if (value == null) return 'N/A';
   return `${value.toFixed(1)} yr`;
@@ -111,6 +119,69 @@ function MetricCard({
   );
 }
 
+type ErrorStats = { n?: number; mae_c?: number; rmse_c?: number; max_abs_c?: number; bias_ansys_minus_m4_c?: number };
+
+function ValidationSummary({ validation }: { validation: { state: string; [k: string]: unknown } }) {
+  const comparison = validation.comparison_m4_vs_ansys as { pooled?: ErrorStats; zones?: Record<string, ErrorStats>; scenario?: string } | undefined;
+  const thresholds = validation.acceptance_thresholds as { mae_c_max?: number; rmse_c_max?: number; max_abs_c_max?: number } | undefined;
+  const pooled = comparison?.pooled;
+  const accepted = validation.accepted === true;
+  const reason = (validation.error_reason ?? validation.reason) as string | null | undefined;
+  const fmt = (v: number | undefined) => (typeof v === "number" ? `${v.toFixed(2)} °C` : "—");
+  const limit = (v: number | undefined) => (typeof v === "number" ? `limit ${v.toFixed(1)} °C` : undefined);
+
+  return (
+    <div className="flex flex-col gap-4 min-w-0">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${accepted ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
+          <span className="material-symbols-outlined text-[16px]">{accepted ? "check_circle" : "info"}</span>
+          {validationStateLabel(validation.state)}{pooled ? (accepted ? " · within acceptance limits" : " · outside acceptance limits") : ""}
+        </span>
+        {comparison?.scenario && <span className="text-xs text-on-surface-variant">{comparison.scenario}</span>}
+      </div>
+
+      {pooled && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <MetricCard label="Mean abs. error" value={fmt(pooled.mae_c)} subtext={limit(thresholds?.mae_c_max)} icon="straighten" variant="primary" />
+          <MetricCard label="RMSE" value={fmt(pooled.rmse_c)} subtext={limit(thresholds?.rmse_c_max)} icon="functions" />
+          <MetricCard label="Max abs. error" value={fmt(pooled.max_abs_c)} subtext={limit(thresholds?.max_abs_c_max)} icon="vertical_align_top" />
+          <MetricCard label="Samples" value={pooled.n != null ? String(pooled.n) : "—"} subtext="Zone × hour comparisons" icon="database" />
+        </div>
+      )}
+
+      {comparison?.zones && Object.keys(comparison.zones).length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-surface-container-low border-b border-outline-variant uppercase tracking-wider text-on-surface-variant">
+                <th className="py-2 px-3 font-semibold">Zone</th>
+                <th className="py-2 px-3 font-semibold text-right">MAE</th>
+                <th className="py-2 px-3 font-semibold text-right">RMSE</th>
+                <th className="py-2 px-3 font-semibold text-right">Max</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-container">
+              {Object.entries(comparison.zones).map(([zone, st]) => (
+                <tr key={zone}>
+                  <td className="py-2 px-3 capitalize font-medium text-on-surface">{zone}</td>
+                  <td className="py-2 px-3 text-right font-data text-on-surface-variant">{fmt(st.mae_c)}</td>
+                  <td className="py-2 px-3 text-right font-data text-on-surface-variant">{fmt(st.rmse_c)}</td>
+                  <td className="py-2 px-3 text-right font-data text-on-surface-variant">{fmt(st.max_abs_c)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {reason && <p className="font-body-sm text-xs text-on-surface-variant">{reason}</p>}
+      {typeof validation.meaning === "string" && (
+        <p className="font-body-sm text-xs text-on-surface-variant leading-relaxed">{validation.meaning}</p>
+      )}
+    </div>
+  );
+}
+
 export type TemperaturePoint = {
   h: string;
   inside: number;
@@ -128,11 +199,14 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
   const [chartMode, setChartMode] = useState<"all" | "conditioned" | "passive" | "multizone">(
     isPassiveOnly ? "passive" : "all"
   );
+  // Optional zoom to the interior band (off by default: outside ambient + comfort band share the axis).
+  const [fitOverride, setFitOverride] = useState<boolean | null>(null);
   const W = 840, H = 280;
   const PAD_LEFT = 60, PAD_RIGHT = 30, PAD_TOP = 25, PAD_BOTTOM = 40;
 
   if (data.length === 0) return null;
 
+  const fitInterior = fitOverride === true;
   const hasPassive = data.some((d) => d.passive !== undefined);
   const hasAirlock = data.some((d) => d.airlock !== undefined);
   const hasStorage = data.some((d) => d.storage !== undefined);
@@ -140,7 +214,7 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
   // Collect values across the active mode to calculate range
   const allTemps: number[] = [];
   data.forEach((d) => {
-    allTemps.push(d.outside);
+    if (!fitInterior) allTemps.push(d.outside);
     if (chartMode === "all" || chartMode === "conditioned") allTemps.push(d.inside);
     if ((chartMode === "all" || chartMode === "passive") && d.passive !== undefined) allTemps.push(d.passive);
     if (chartMode === "multizone") {
@@ -151,17 +225,17 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
     }
   });
 
-  const rawMin = Math.min(...allTemps, 15);
-  const rawMax = Math.max(...allTemps, 24);
+  const rawMin = fitInterior ? Math.min(...allTemps) : Math.min(...allTemps, 15);
+  const rawMax = fitInterior ? Math.max(...allTemps) : Math.max(...allTemps, 24);
 
   const range = rawMax - rawMin;
-  const step = range <= 30 ? 5 : range <= 65 ? 10 : 15;
+  const step = range <= 3 ? 0.5 : range <= 6 ? 1 : range <= 12 ? 2 : range <= 30 ? 5 : range <= 65 ? 10 : 15;
   const minVal = Math.floor(rawMin / step) * step;
   const maxVal = Math.ceil(rawMax / step) * step;
 
   const ticks: number[] = [];
-  for (let v = minVal; v <= maxVal; v += step) {
-    ticks.push(v);
+  for (let v = minVal; v <= maxVal + 1e-9; v += step) {
+    ticks.push(Math.round(v * 100) / 100);
   }
 
   const chartW = W - PAD_LEFT - PAD_RIGHT;
@@ -171,19 +245,30 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
   const x = (i: number) => PAD_LEFT + (i / Math.max(data.length - 1, 1)) * chartW;
 
   const insidePath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.inside).toFixed(1)}`).join(" ");
-  const passivePath = hasPassive ? data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.passive ?? d.inside).toFixed(1)}`).join(" ") : "";
-  const airlockPath = hasAirlock ? data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.airlock ?? d.inside).toFixed(1)}`).join(" ") : "";
-  const storagePath = hasStorage ? data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.storage ?? d.inside).toFixed(1)}`).join(" ") : "";
-  const livingPath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.living ?? d.inside).toFixed(1)}`).join(" ");
-  const sleepingPath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.sleeping ?? d.inside).toFixed(1)}`).join(" ");
+  const linePath = (pick: (d: TemperaturePoint) => number | undefined) => {
+    let started = false;
+    return data.map((d, i) => {
+      const v = pick(d);
+      if (v === undefined) { started = false; return ""; }
+      const seg = `${started ? "L" : "M"} ${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+      started = true;
+      return seg;
+    }).filter(Boolean).join(" ");
+  };
+  const passivePath = hasPassive ? linePath((d) => d.passive) : "";
+  const airlockPath = hasAirlock ? linePath((d) => d.airlock) : "";
+  const storagePath = hasStorage ? linePath((d) => d.storage) : "";
+  const livingPath = linePath((d) => d.living);
+  const sleepingPath = linePath((d) => d.sleeping);
   const outsidePath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)},${y(d.outside).toFixed(1)}`).join(" ");
 
   const activeFilledPath = chartMode === "passive" && hasPassive ? passivePath : insidePath;
   const insideArea = `${activeFilledPath} L ${x(data.length - 1).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} L ${x(0).toFixed(1)},${(PAD_TOP + chartH).toFixed(1)} Z`;
 
-  const yComfortHigh = y(24);
-  const yComfortLow = y(15);
-  const comfortH = Math.max(yComfortLow - yComfortHigh, 0);
+  const comfortVisible = 24 > minVal && 15 < maxVal;
+  const yComfortHigh = y(Math.min(24, maxVal));
+  const yComfortLow = y(Math.max(15, minVal));
+  const comfortH = comfortVisible ? Math.max(yComfortLow - yComfortHigh, 0) : 0;
 
   const zeroY = y(0);
   const showZero = 0 >= minVal && 0 <= maxVal;
@@ -340,10 +425,23 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
               )}
             </>
           )}
-          <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-0.5 border-t-2 border-dashed border-[#64748b] inline-block" />
+          <button
+            type="button"
+            onClick={() => setFitOverride(!fitInterior)}
+            aria-pressed={!fitInterior}
+            title={fitInterior ? "Show outside ambient on the same axis" : "Zoom the axis to the interior temperatures"}
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-line hover:bg-surface-container"
+          >
+            <span className={`w-3.5 h-0.5 border-t-2 border-dashed inline-block ${fitInterior ? "border-[#cbd5e1]" : "border-[#64748b]"}`} />
             <span className="font-body-sm text-on-surface-variant font-medium">Outside Ambient</span>
-          </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setFitOverride(!fitInterior)}
+            className="px-2 py-0.5 rounded-md border border-line text-on-surface-variant font-medium hover:bg-surface-container"
+          >
+            {fitInterior ? "Show full range" : "Zoom to interior"}
+          </button>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-2.5 bg-emerald-100 border border-emerald-300 rounded inline-block" />
             <span className="font-body-sm text-emerald-800 font-medium">Comfort (15°C–24°C)</span>
@@ -426,7 +524,7 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
           <line x1={PAD_LEFT} y1={yComfortLow} x2={W - PAD_RIGHT} y2={yComfortLow} stroke="#10b981" strokeDasharray="2,2" strokeWidth={0.8} opacity={0.6} />
 
           <path d={insideArea} fill={chartMode === "passive" ? "url(#passiveTempGrad)" : "url(#insideTempGrad)"} />
-          <path d={outsidePath} fill="none" stroke="#64748b" strokeWidth={2} strokeDasharray="5,4" />
+          {!fitInterior && <path d={outsidePath} fill="none" stroke="#64748b" strokeWidth={2} strokeDasharray="5,4" />}
 
           {/* Comparative Mode: Render both Conditioned and Passive */}
           {chartMode === "all" && (
@@ -480,7 +578,7 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
                 strokeWidth={1.5}
                 strokeDasharray="3,3"
               />
-              <circle cx={x(hoverIdx)} cy={y(activePoint.outside)} r={4} fill="#64748b" stroke="#ffffff" strokeWidth={2} />
+              {!fitInterior && <circle cx={x(hoverIdx)} cy={y(activePoint.outside)} r={4} fill="#64748b" stroke="#ffffff" strokeWidth={2} />}
               {(chartMode === "all" || chartMode === "conditioned") && (
                 <circle cx={x(hoverIdx)} cy={y(activePoint.inside)} r={5} fill="#0284c7" stroke="#ffffff" strokeWidth={2} />
               )}
@@ -754,6 +852,7 @@ function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
 function buildTemperatureSeries(
   series: TimeseriesResponse | null,
   freeSeries: TimeseriesResponse | null = null,
+  zonesFromFreeRun = false,
 ): TemperaturePoint[] {
   if (!series || series.points.length === 0) return [];
   const UNHEATED_BUFFER = new Set(["airlock", "equipment", "storage", "corridor", "battery"]);
@@ -784,24 +883,32 @@ function buildTemperatureSeries(
 
   const result: TemperaturePoint[] = [];
 
-  for (let i = 0; i < window.length; i += 4) {
+  for (let i = 0; i < window.length; i += 1) {
     const p = window[i];
-    const freeP = freeMap.get(p.timestamp) ?? freeSeries?.points?.[worstStart + i];
+    // Match by timestamp; only fall back to index when both series share the same length/grid.
+    const freeP = freeMap.get(p.timestamp)
+      ?? (freeSeries && freeSeries.points.length === series.points.length ? freeSeries.points[worstStart + i] : undefined);
 
     // Inside conditioned temperature (averaging heated habitable living/sleeping zones)
-    const inside = zones.reduce((s, z) => s + (p.zone_temp_c[z] ?? 0), 0) / (zones.length || 1);
+    const insideVals = zones.map((z) => p.zone_temp_c[z]).filter((v): v is number => typeof v === "number");
+    if (insideVals.length === 0) continue;
+    const inside = insideVals.reduce((s, v) => s + v, 0) / insideVals.length;
 
     // Passive unheated temperature for habitable zones
     let passive: number | undefined = undefined;
     if (freeP && freeP.zone_temp_c) {
-      passive = freeZones.reduce((s, z) => s + (freeP.zone_temp_c[z] ?? 0), 0) / (freeZones.length || 1);
+      const vals = freeZones.map((z) => freeP.zone_temp_c[z]).filter((v): v is number => typeof v === "number");
+      if (vals.length > 0) passive = vals.reduce((s, v) => s + v, 0) / vals.length;
     }
 
     // Specific zone temperatures
-    const airlock = p.zone_temp_c["airlock"];
-    const storage = p.zone_temp_c["storage"];
-    const living = p.zone_temp_c["living"] ?? (zones.includes("main") ? p.zone_temp_c["main"] : inside);
-    const sleeping = p.zone_temp_c["sleeping"];
+    // Passive-only designs have no heater, so the zone breakdown must come from the unheated run;
+    // the conditioned run is a hypothetical benchmark whose heated zones just sit at the setpoint.
+    const zp = zonesFromFreeRun && freeP?.zone_temp_c ? freeP.zone_temp_c : p.zone_temp_c;
+    const airlock = zp["airlock"];
+    const storage = zp["storage"];
+    const living = zp["living"] ?? (zones.includes("main") ? zp["main"] : undefined);
+    const sleeping = zp["sleeping"];
 
     // Total auxiliary heating load in watts at this hour
     const heatingW = series.zone_ids.reduce((s, z) => s + (p.zone_heating_w[z] ?? 0), 0);
@@ -872,7 +979,7 @@ function CandidateTelemetryContent() {
   const [freeSeries, setFreeSeries] = useState<TimeseriesResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<Record<string, unknown> | null>(null);
-  const [activeTab, setActiveTab] = useState<"results" | "3d" | "solver">("results");
+  const [activeTab, setActiveTab] = useState<"results" | "3d">("results");
   const [building, setBuilding] = useState<BuildingModel | null>(null);
   const [buildingError, setBuildingError] = useState<string | null>(null);
   const [savedRuns, setSavedRuns] = useState<OptimizationListItem[]>([]);
@@ -997,7 +1104,11 @@ function CandidateTelemetryContent() {
     return () => { cancelled = true; };
   }, [optId, targetDesignId]);
 
-  const tempData = useMemo(() => buildTemperatureSeries(series, freeSeries), [series, freeSeries]);
+  const passiveOnly = useMemo(() => {
+    const fuels = report?.input.constraints?.heater_fuels ?? [];
+    return fuels.length > 0 && fuels.every((f: string) => f === "none");
+  }, [report]);
+  const tempData = useMemo(() => buildTemperatureSeries(series, freeSeries, passiveOnly), [series, freeSeries, passiveOnly]);
   const solarData = useMemo(() => buildSolarDaily(series), [series]);
   const heatFlowData = useMemo(() => buildHeatFlow(series), [series]);
 
@@ -1239,7 +1350,7 @@ function CandidateTelemetryContent() {
     { label: "Comfort Hours", value: `${obj.occupied_comfort_hours.toFixed(0)} h`, sub: `Unmet: ${obj.unmet_hours.toFixed(0)} h`, icon: "check_circle", color: obj.unmet_hours === 0 ? "text-equilibrium" : "text-error", bg: "bg-equilibrium-tint/30" },
     { label: "Heating Energy", value: `${cond.heating_energy_kwh.toFixed(1)} kWh`, sub: `Over ${days} days`, icon: "bolt", color: "text-on-surface", bg: "bg-surface-container-low" },
     { label: "Est. Fuel Demand", value: `${fuelLitresPerDay.toFixed(2)} L/day`, sub: "Kerosene, sized heater", icon: "oil_barrel", color: "text-on-surface", bg: "bg-surface-container-low" },
-    { label: "ANSYS Status", value: report.validation.state === "RC_ONLY_ANSYS_NOT_REQUESTED" ? "Not requested" : report.validation.state, sub: "Validation state", icon: "verified", color: "text-primary", bg: "bg-primary-fixed/20" },
+    { label: "ANSYS Status", value: validationStateLabel(report.validation.state), sub: "Validation state", icon: "verified", color: "text-primary", bg: "bg-primary-fixed/20" },
     { label: "U-Value (Wall)", value: wallAssembly ? `${wallAssembly.u_value_w_m2k.toFixed(3)}` : "—", sub: "W/m²·K", icon: "layers", color: "text-primary", bg: "bg-primary-fixed/20" },
   ];
 
@@ -1289,10 +1400,10 @@ function CandidateTelemetryContent() {
       </section>
 
       <div className="w-full px-gutter-lg bg-surface-container-low border-b border-outline-variant">
-        <div className="max-w-[1720px] mx-auto flex items-center gap-1 pt-2">
-          {[{ id: "results", label: "Simulation Results", icon: "analytics" }, { id: "3d", label: "3D Model", icon: "view_in_ar" }, { id: "solver", label: "Run Details", icon: "terminal" }].map((tab) => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id as "results" | "3d" | "solver")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-label-mono-sm text-label-mono-sm font-medium transition-colors border-b-2 ${activeTab === tab.id ? "bg-surface-container-lowest border-primary text-primary" : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container"}`}>
+        <div className="max-w-[1720px] mx-auto flex items-center gap-1 pt-2 overflow-x-auto">
+          {[{ id: "results", label: "Simulation Results", icon: "analytics" }, { id: "3d", label: "3D Model", icon: "view_in_ar" }].map((tab) => (
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id as "results" | "3d")}
+              className={`flex items-center gap-2 px-4 py-2.5 shrink-0 whitespace-nowrap rounded-t-lg font-label-mono-sm text-label-mono-sm font-medium transition-colors border-b-2 ${activeTab === tab.id ? "bg-surface-container-lowest border-primary text-primary" : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container"}`}>
               <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
               <T>{tab.label}</T>
             </button>
@@ -1309,15 +1420,15 @@ function CandidateTelemetryContent() {
                 <span className="material-symbols-outlined text-primary text-[22px]">summarize</span>
                 <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Executive Summary</T></h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-4 min-[1500px]:grid-cols-8 gap-3">
                 {EXEC.map((card) => (
-                  <div key={card.label} className={`${card.bg} rounded-xl p-4 flex flex-col gap-1.5 border border-white/50`}>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight">{card.label}</span>
-                      <span className={`material-symbols-outlined text-[16px] ${card.color}`}>{card.icon}</span>
+                  <div key={card.label} className={`${card.bg} rounded-xl p-4 flex flex-col gap-1.5 border border-white/50 min-w-0 overflow-hidden`}>
+                    <div className="flex items-start justify-between gap-2 min-w-0">
+                      <span className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight min-w-0 break-words">{card.label}</span>
+                      <span className={`material-symbols-outlined text-[16px] shrink-0 ${card.color}`}>{card.icon}</span>
                     </div>
-                    <span className={`font-data text-xl font-extrabold leading-tight ${card.color}`}>{card.value}</span>
-                    <span className="font-body-sm text-[10px] text-on-surface-variant">{card.sub}</span>
+                    <span className={`font-data text-xl font-extrabold leading-tight break-words ${card.color}`}>{card.value}</span>
+                    <span className="font-body-sm text-[10px] text-on-surface-variant break-words">{card.sub}</span>
                   </div>
                 ))}
               </div>
@@ -1593,7 +1704,7 @@ function CandidateTelemetryContent() {
                   ANSYS FEA cross-check was not requested for this run. The result above comes from the RC thermal engine (M4) only.
                 </p>
               ) : (
-                <pre className="font-data text-[11px] bg-surface-container-low rounded-xl p-3 overflow-x-auto">{JSON.stringify(report.validation, null, 1)}</pre>
+                <ValidationSummary validation={report.validation} />
               )}
             </section>
           </div>
@@ -1884,26 +1995,6 @@ function CandidateTelemetryContent() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "solver" && (
-          <div className="flex flex-col gap-4">
-            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-card">
-              <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface mb-3"><T>Run timings</T></h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {Object.entries(status.timings_s ?? {}).map(([k, v]) => (
-                  <div key={k} className="p-3 bg-surface-container-low rounded-xl">
-                    <div className="font-data text-sm font-bold text-navy">{v.toFixed(2)}s</div>
-                    <div className="font-body-sm text-[10px] text-on-surface-variant mt-0.5">{k}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-card">
-              <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface mb-3"><T>Weather & site</T></h3>
-              <pre className="font-data text-[11px] bg-surface-container-low rounded-xl p-3 overflow-x-auto">{JSON.stringify(status.result?.site_used, null, 1)}</pre>
             </div>
           </div>
         )}
