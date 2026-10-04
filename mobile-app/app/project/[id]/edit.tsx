@@ -134,6 +134,7 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
       generation_options: {
         count: 24,
         baseline_economics: true,
+        validate_with_ansys: true, // same default as the website
         ...(saved.generation_options ?? {}),
       },
     };
@@ -181,8 +182,9 @@ function Wizard({ record, initialStep }: { record: ProjectRecord; initialStep?: 
   const compatInput = useMemo(
     () => ({
       requirements: previewRequirements(values, projectId),
-      templateId: values.generation_options?.template_id ?? null,
-      roomArrangement: values.generation_options?.room_arrangement ?? {},
+      // The website has no template choice: the backend always picks among every compatible template.
+      templateId: null,
+      roomArrangement: {},
       materialsSnapshotId: values.generation_options?.materials_snapshot_id,
     }),
     [values, projectId]

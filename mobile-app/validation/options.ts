@@ -155,6 +155,7 @@ export const STANDARD_MATERIALS: Option[] = [
   { value: "mat_concrete", label: "Dense Concrete", description: "Structural foundation slab and load-bearing walls." },
   { value: "mat_puf", label: "Polyurethane Foam (PUF)", description: "Ultra-low conductivity core thermal insulation." },
   { value: "mat_plywood", label: "Marine Structural Plywood", description: "Lightweight modular interior panels & decking." },
+  { value: "mat_steel_panel", label: "Corrugated Steel Panels", description: "Rigid weather-shield exterior skin & roof protection." },
   { value: "mat_reinforced_concrete", label: "Reinforced Concrete (RCC)", description: "Structural RCC columns and slabs for multi-storey." },
   { value: "mat_adobe", label: "Adobe / Sun-dried Brick", description: "Traditional high-mass local earth construction." },
   { value: "mat_rammed_earth", label: "Rammed Earth", description: "Compacted earth walls with high thermal mass." },

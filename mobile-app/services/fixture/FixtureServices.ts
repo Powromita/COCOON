@@ -268,6 +268,10 @@ export class FixtureOptimizationHistoryService implements OptimizationHistorySer
     });
   }
 
+  async getRunTimeseries(): Promise<TimeseriesResponse> {
+    throw new AppError({ kind: "not_supported", message: "Demo mode has no per-run series; the design's simulation series is shown instead." });
+  }
+
   async getReport(): Promise<RunReport> {
     throw new AppError({
       kind: "not_supported",

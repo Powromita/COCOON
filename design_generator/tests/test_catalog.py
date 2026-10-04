@@ -121,7 +121,9 @@ def test_dedicated_and_shared_arrangements_filter_templates(snapshot):
     req = small_request(["living", "sleeping"])
     dedicated = check_compatibility(req, snapshot, room_arrangement={"sleeping": "dedicated"})
     shared = check_compatibility(req, snapshot, room_arrangement={"sleeping": "shared"})
-    assert set(dedicated["compatible_template_ids"]) == {"living_sleeping_storage"}
+    # main added the airlock_living_sleeping* templates, which also hold a dedicated sleeping room
+    assert set(dedicated["compatible_template_ids"]) == {"living_sleeping_storage", "airlock_living_sleeping",
+                                                         "airlock_living_sleeping_storage"}
     assert set(shared["compatible_template_ids"]) == {"airlock_living", "airlock_living_equipment", "single_room"}
     al = next(t for t in dedicated["templates"] if t["template_id"] == "airlock_living")
     assert al["issues"][0]["code"] == "SHARED_NOT_DEDICATED"

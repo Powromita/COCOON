@@ -49,7 +49,13 @@ def _verify_access_token(token: str) -> dict[str, Any]:
         raise _unauthorized() from exc
 
 
+DEV_USER = AuthenticatedUser(id=UUID("00000000-0000-4000-8000-00000000d3e0"), email="dev@local.invalid",
+                             role="authenticated", claims={"dev_auth_disabled": True})
+
+
 def require_user(credentials: HTTPAuthorizationCredentials | None = Security(bearer)) -> AuthenticatedUser:
+    if settings.AUTH_MODE == "disabled":                            # local development only
+        return DEV_USER
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise _unauthorized("Bearer access token required")
     claims = _verify_access_token(credentials.credentials)

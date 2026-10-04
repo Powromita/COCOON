@@ -9,6 +9,7 @@ Env overrides (all optional):
   COCOON_CORS_ORIGINS    default http://localhost:3000,http://127.0.0.1:3000
   COCOON_RUN_TIMEOUT_S   default 2400 (hard kill for a stuck subprocess)
   COCOON_ANSYS_JOBS_DIR  default <repo>/ansys-pipeline/jobs (M8 job queue)
+  COCOON_AUTH_MODE       default supabase; "disabled" = no auth, local dev only
   COCOON_MAX_ANSYS_WORKERS default 1 (concurrent MAPDL solves; one ANSYS
                          Student session at a time)
 """
@@ -33,6 +34,12 @@ CORS_ORIGINS = os.environ.get(
     "COCOON_CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 ).split(",")
+
+# COCOON_AUTH_MODE=disabled turns off bearer-token checks and Supabase run ownership for LOCAL DEVELOPMENT ONLY
+# (e.g. testing the mobile app before it has real sign-in). Default "supabase" = fully enforced. Never set in production.
+AUTH_MODE = os.environ.get("COCOON_AUTH_MODE", "supabase").strip().lower()
+if AUTH_MODE not in ("supabase", "disabled"):
+    raise RuntimeError(f"COCOON_AUTH_MODE must be 'supabase' or 'disabled', got {AUTH_MODE!r}")
 
 # Supabase Auth. Browser tokens are verified against the project JWKS.
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")

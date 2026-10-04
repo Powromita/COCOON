@@ -11,6 +11,10 @@ import type {
 
 export interface StartGenerationInput {
   requirements: RequirementsContract;
+  /** Project name shown in the backend's project list. */
+  name?: string;
+  /** Envelope choices (backend `design_options`): dimensions, thicknesses, windows, glazing, airtightness. */
+  designOptions?: Record<string, unknown>;
   /** Selected cached weather archive, passed through to the backend optimizer. */
   site?: string;
   /** Number of candidate designs to generate (backend accepts 1..200). */

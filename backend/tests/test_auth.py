@@ -51,6 +51,24 @@ def test_invalid_identity_claims_are_rejected(monkeypatch, claims):
     assert raised.value.status_code == 401
 
 
+def test_auth_defaults_to_enforced():
+    from backend import settings
+    assert settings.AUTH_MODE == "supabase"
+
+
+def test_disabled_auth_mode_returns_dev_user_without_token(monkeypatch):
+    from backend.auth import DEV_USER
+    monkeypatch.setattr("backend.settings.AUTH_MODE", "disabled")
+    assert require_user(None) is DEV_USER
+
+
+def test_enforced_auth_mode_still_rejects_missing_token(monkeypatch):
+    monkeypatch.setattr("backend.settings.AUTH_MODE", "supabase")
+    with pytest.raises(HTTPException) as raised:
+        require_user(None)
+    assert raised.value.status_code == 401
+
+
 def test_test_identity_shape_is_not_privileged():
     user = AuthenticatedUser(id=UUID("10000000-0000-4000-8000-000000000001"),
                              email="test@example.test", role="authenticated", claims={})

@@ -117,6 +117,7 @@ const generationOptions = z
     count: finite("Design count").int().min(1, { error: "Choose at least 1 candidate." }).max(200, { error: "The backend accepts at most 200 designs." }).optional(),
     seed: finite("Seed").int().optional(),
     baseline_economics: z.boolean().optional(),
+    validate_with_ansys: z.boolean().optional(),
     template_id: z.string().trim().min(1).nullable().optional(),
     room_arrangement: z.record(z.string(), z.enum(["dedicated", "shared"])).optional(),
   })
@@ -236,6 +237,7 @@ export const FIELD_META: Record<string, { step: WizardStepId; label: string }> =
   "envelope.air_changes_per_hour": { step: "envelope", label: "Airtightness (ACH)" },
   "generation_options.count": { step: "optimize", label: "Design count" },
   "generation_options.baseline_economics": { step: "optimize", label: "Baseline economics" },
+  "generation_options.validate_with_ansys": { step: "optimize", label: "ANSYS validation" },
   "generation_options.materials_snapshot_id": { step: "design", label: "Material set" },
   "generation_options.seed": { step: "optimize", label: "Seed" },
   "generation_options.template_id": { step: "review", label: "Template" },
@@ -256,7 +258,7 @@ export const STEP_FIELD_GROUPS: Record<string, string[]> = {
   footprint: ["constraints.maximum_footprint_m2", "constraints.maximum_floors", "constraints.preferred_orientation_deg"],
   budget: ["constraints.maximum_capex_inr", "constraints.heater_fuels", "constraints.maximum_mass_kg", "constraints.max_assembly_time_hours", "economic_assumption_set_id"],
   envelope: ["envelope.length_m", "envelope.width_m", "envelope.height_m", "envelope.wall_thickness_mm", "envelope.roof_thickness_mm", "envelope.floor_thickness_mm", "envelope.window_count", "envelope.window_width_m", "envelope.window_height_m", "envelope.window_orientation", "envelope.glazing_spec", "envelope.air_changes_per_hour"],
-  optimize: ["generation_options.count", "generation_options.baseline_economics", "generation_options.materials_snapshot_id", "generation_options.seed", "economic_assumption_set_id"],
+  optimize: ["generation_options.count", "generation_options.baseline_economics", "generation_options.validate_with_ansys", "generation_options.materials_snapshot_id", "generation_options.seed", "economic_assumption_set_id"],
 };
 
 function valueAt(obj: unknown, path: PropertyKey[]): unknown {
@@ -335,6 +337,53 @@ function submittedFuels(fuels: string[] | undefined): string[] {
   return (fuels ?? ["kerosene"]).map((f) => (f === "passive_solar" ? "kerosene" : f));
 }
 
+/**
+ * Weather archives are hourly, on the hour. A window starting at e.g. 23:24 matches no archive row and the weather
+ * snapshot fails with a whole-window "gap" (WEATHER_GAP_TOO_LARGE), so the window is snapped to the hour.
+ */
+export function snapToHour(iso: string | undefined): string | undefined {
+  return typeof iso === "string" ? iso.replace(/T(\d{2}):\d{2}:\d{2}(\.\d+)?/, "T$1:00:00") : iso;
+}
+
+function withHourlyWindow<S extends { analysis_start?: string; analysis_end?: string }>(site: S): S {
+  return { ...site, analysis_start: snapToHour(site.analysis_start), analysis_end: snapToHour(site.analysis_end) };
+}
+
+const ECONOMIC_SET_IDS: Record<string, string> = {
+  expected: "econ_ladakh_expected_v1",
+  conservative: "econ_ladakh_conservative_v1",
+  optimistic: "econ_ladakh_optimistic_v1",
+};
+
+export function economicSetId(id: string | undefined): string {
+  return !id ? ECONOMIC_SET_IDS.expected : ECONOMIC_SET_IDS[id] ?? id;
+}
+
+/**
+ * The envelope step as the backend's `design_options` (same shape the website sends). Only fields the user
+ * filled in are sent, so anything left blank is still chosen by the generator.
+ */
+export function buildDesignOptions(draft: DraftRequirements): Record<string, unknown> {
+  const e = draft.envelope ?? {};
+  const out: Record<string, unknown> = { shape: "rectangular", require_separate_rooms: true };
+  const set = (key: string, value: unknown) => {
+    if (value !== undefined && value !== null && value !== "") out[key] = value;
+  };
+  set("length_m", e.length_m);
+  set("width_m", e.width_m);
+  set("height_m", e.height_m);
+  set("wall_thickness_mm", e.wall_thickness_mm);
+  set("roof_thickness_mm", e.roof_thickness_mm);
+  set("floor_thickness_mm", e.floor_thickness_mm);
+  set("window_count", e.window_count);
+  set("window_width_m", e.window_width_m);
+  set("window_height_m", e.window_height_m);
+  set("window_orientation", e.window_orientation?.toLowerCase());
+  set("glazing", e.glazing_spec);
+  set("air_changes_per_hour", e.air_changes_per_hour);
+  return out;
+}
+
 /** Assembles the M0 RequirementsContract a generation request carries. */
 export function buildRequirementsContract(draft: DraftRequirements, projectId: string): Result<RequirementsContract, FieldErrors> {
   const full = withEmptyGroups(draft);
@@ -352,23 +401,14 @@ export function buildRequirementsContract(draft: DraftRequirements, projectId: s
     Object.entries(d.mission).filter(([, v]) => v !== undefined)
   ) as unknown as RequirementsContract["mission"];
 
-  let economicAssumptionSetId = d.economic_assumption_set_id;
-  // Map UI scenario labels to the actual assumption set ID available on the backend.
-  // All three scenarios resolve to the single Ladakh dataset until additional sets are added.
-  if (
-    economicAssumptionSetId === "expected" ||
-    economicAssumptionSetId === "conservative" ||
-    economicAssumptionSetId === "optimistic" ||
-    !economicAssumptionSetId
-  ) {
-    economicAssumptionSetId = "econ_ladakh_expected_v1";
-  }
+  // UI scenario labels map to the backend assumption-set ids the website uses; an unknown id passes through.
+  const economicAssumptionSetId = economicSetId(d.economic_assumption_set_id);
 
   return ok({
     schema_version: "4.0",
     project_id: projectId,
     mode: "new_shelter",
-    site: d.site,
+    site: withHourlyWindow(d.site),
     mission: { ...mission, occupancy_schedule_id: d.mission.occupancy_schedule_id ?? `continuous_${d.mission.occupants}` },
     constraints,
     economic_assumption_set_id: economicAssumptionSetId,
@@ -392,7 +432,7 @@ export function previewRequirements(draft: DraftRequirements, projectId: string)
     schema_version: "4.0",
     project_id: projectId,
     mode: "new_shelter",
-    ...(draft.site ? { site: draft.site } : {}),
+    ...(draft.site ? { site: withHourlyWindow(draft.site) } : {}),
     mission: {
       ...mission,
       ...(typeof mission.occupants === "number" && !mission.occupancy_schedule_id
@@ -400,6 +440,8 @@ export function previewRequirements(draft: DraftRequirements, projectId: string)
         : {}),
     },
     constraints,
+    // Required by the contract; without it the backend reports the draft as incomplete however full it is.
+    economic_assumption_set_id: economicSetId(draft.economic_assumption_set_id),
   };
 }
 

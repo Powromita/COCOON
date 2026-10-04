@@ -190,7 +190,7 @@ def test_retry_does_not_resubmit_ansys_when_a_solve_may_already_exist(monkeypatc
     (ansys_dir / "jobs" / "ans_x" / "request.json").write_text(json.dumps({"submitted_at": "2026-01-01T00:00:01+00:00"}))
     monkeypatch.setattr(settings, "ANSYS_PIPELINE_DIR", ansys_dir)
     queued = []
-    monkeypatch.setattr(pipeline, "_queue", lambda body, compat, retry_of=None: queued.append(body) or "opt_dddddddddddd")
+    monkeypatch.setattr(pipeline, "_queue", lambda body, compat, template_ids, user, retry_of=None: queued.append(body) or "opt_dddddddddddd")
     r = client.post(f"/api/v1/optimizations/{oid}/retry").json()
     assert queued[0].validate_with_ansys is False and r["notes"]
 
@@ -203,3 +203,25 @@ def test_unexpected_errors_hide_technical_detail():
     assert out["message"] == GENERIC_MESSAGE and "secret" not in json.dumps(out) and out["trace_id"] == "t1"
     later = classify_job_error(err, ["compatibility", "weather", "generation"])
     assert later["details"]["category"] == "downstream_failure" and "secret" not in json.dumps(later)
+
+
+def test_ansys_flag_and_frozen_materials_reach_the_pipeline_config(monkeypatch):
+    """validate_with_ansys=true -> PipelineConfig(ansys='submit', ansys_wait); the named material snapshot is the one used."""
+    import cocoon_pipeline
+    seen = {}
+
+    def capture(reqs, cfg):
+        seen["cfg"] = cfg
+        raise RuntimeError("stop before any simulation")
+
+    monkeypatch.setattr(cocoon_pipeline, "run_pipeline", capture)
+    ok = client.post("/api/v1/optimizations", json={"requirements": requirements(), "count": 2, "validate_with_ansys": True,
+                                                    "materials_snapshot_id": "mat_snap_himalayan_v1"})
+    assert ok.status_code == 201
+    wait(ok.json()["optimization_id"], 60)
+    cfg = seen["cfg"]
+    assert cfg.ansys == "submit" and cfg.ansys_wait is True
+    assert cfg.materials.snapshot_id == "mat_snap_himalayan_v1"
+    off = client.post("/api/v1/optimizations", json={"requirements": requirements(), "count": 2}).json()["optimization_id"]
+    wait(off, 60)
+    assert seen["cfg"].ansys == "not_requested"

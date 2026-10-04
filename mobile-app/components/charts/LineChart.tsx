@@ -29,12 +29,14 @@ interface LineChartProps {
   refLines?: { value: number; color: string; label: string; dashed?: boolean }[];
   /** A shaded horizontal band, e.g. "at or above target"; `to` may be omitted to fill to the top. */
   band?: { from: number; to?: number; color: string };
+  /** Replaces the default time axis, e.g. for a curve plotted against temperature difference. */
+  xAxis?: { title: string; tickLabel: (index: number) => string };
 }
 
 const PAD = { left: 44, right: 10, top: 10, bottom: 34 };
 const MAX_DRAW_POINTS = 400;
 
-export function LineChart({ timestamps, series, styleFor, yLabel, height = 200, transform = (v) => v, refLines = [], band }: LineChartProps) {
+export function LineChart({ timestamps, series, styleFor, yLabel, height = 200, transform = (v) => v, refLines = [], band, xAxis }: LineChartProps) {
   const { colors, typography } = useTheme();
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
@@ -87,11 +89,11 @@ export function LineChart({ timestamps, series, styleFor, yLabel, height = 200, 
               fill={colors.textSecondary}
               textAnchor={k === 0 ? "start" : k === xTickIdx.length - 1 ? "end" : "middle"}
             >
-              {formatTimestamp(timestamps[i]).slice(0, 11)}
+              {xAxis ? xAxis.tickLabel(i) : formatTimestamp(timestamps[i]).slice(0, 11)}
             </SvgText>
           ))}
           <SvgText x={PAD.left} y={height - 4} fontSize={10} fill={colors.textSecondary}>
-            Time (site local, as reported)
+            {xAxis ? xAxis.title : "Time (site local, as reported)"}
           </SvgText>
           <SvgText x={10} y={PAD.top + plotH / 2} fontSize={10} fill={colors.textSecondary} rotation={-90} originX={10} originY={PAD.top + plotH / 2} textAnchor="middle">
             {yLabel}

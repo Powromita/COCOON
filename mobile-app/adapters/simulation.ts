@@ -182,3 +182,128 @@ export function totalHeatingChart(ts: TimeseriesResponse): ChartData {
     ],
   };
 }
+
+// ---------------------------------------------------------------------------
+// The recommended design's own run series (GET /optimizations/{id}/timeseries) — the data behind the website's
+// three result graphs. Shaped exactly as the website shapes it.
+// ---------------------------------------------------------------------------
+
+export type RunSeriesKind = "conditioned" | "free_floating";
+
+/** The backend's per-run series: one row per step with per-zone maps. */
+export interface RawRunTimeseries {
+  which: string;
+  zone_ids: string[];
+  points: {
+    timestamp: string;
+    ambient_c: number;
+    zone_temp_c: Record<string, number>;
+    zone_heating_w: Record<string, number>;
+    zone_solar_w: Record<string, number>;
+  }[];
+}
+
+/** Maps the run series onto the same TimeseriesResponse the rest of the app charts. */
+export function runTimeseriesToResponse(optimizationId: string, which: RunSeriesKind, raw: RawRunTimeseries): TimeseriesResponse {
+  const [a, b] = raw.points;
+  const stepSeconds = a && b ? Math.round((Date.parse(b.timestamp) - Date.parse(a.timestamp)) / 1000) : 900;
+  return {
+    simulation_id: `${optimizationId}:${which}`,
+    timestep_seconds: stepSeconds > 0 ? stepSeconds : 900,
+    points: raw.points.map((p) => ({
+      timestamp: p.timestamp,
+      ambient_temperature_c: p.ambient_c,
+      zone_temperatures_c: p.zone_temp_c,
+      heating_power_w: p.zone_heating_w,
+      solar_gain_w: p.zone_solar_w,
+    })),
+  } as TimeseriesResponse;
+}
+
+/** Rooms that are not lived in; the website leaves them out of the "inside" average. */
+const UNHEATED_BUFFER = new Set(["airlock", "equipment", "storage", "corridor", "battery"]);
+
+function habitableZones(ids: string[]): string[] {
+  const heated = ids.filter((z) => !UNHEATED_BUFFER.has(z.toLowerCase()));
+  return heated.length > 0 ? heated : ids;
+}
+
+function meanOf(values: (number | undefined)[]): number | undefined {
+  const v = values.filter((x): x is number => typeof x === "number");
+  return v.length > 0 ? v.reduce((s, x) => s + x, 0) / v.length : undefined;
+}
+
+/**
+ * Graph 1 — inside temperature over the coldest 24 hours of the window: the heated rooms' average, the same rooms
+ * with no heater (when that run exists) and outdoor.
+ */
+export function worstNightChart(conditioned: TimeseriesResponse, free?: TimeseriesResponse): ChartData {
+  const pts = conditioned.points;
+  const perDay = Math.max(1, Math.round(86400 / conditioned.timestep_seconds));
+  let start = 0;
+  let coldest = Number.POSITIVE_INFINITY;
+  const stride = Math.max(1, Math.round(perDay / 24));
+  for (let i = 0; i + perDay <= pts.length; i += stride) {
+    let m = Number.POSITIVE_INFINITY;
+    for (let j = i; j < i + perDay; j++) m = Math.min(m, pts[j].ambient_temperature_c);
+    if (m < coldest) {
+      coldest = m;
+      start = i;
+    }
+  }
+  const win = pts.slice(start, start + perDay);
+  const zones = habitableZones(Object.keys(win[0]?.zone_temperatures_c ?? {}));
+  const freeByTime = new Map((free?.points ?? []).map((p) => [p.timestamp, p]));
+  const freeZones = habitableZones(Object.keys(free?.points[0]?.zone_temperatures_c ?? {}));
+
+  const inside: SeriesPoint[] = [];
+  const passive: SeriesPoint[] = [];
+  const outside: SeriesPoint[] = [];
+  win.forEach((p, i) => {
+    outside.push({ i, value: p.ambient_temperature_c });
+    const v = meanOf(zones.map((z) => p.zone_temperatures_c?.[z]));
+    if (v !== undefined) inside.push({ i, value: v });
+    const f = freeByTime.get(p.timestamp);
+    const fv = f ? meanOf(freeZones.map((z) => f.zone_temperatures_c?.[z])) : undefined;
+    if (fv !== undefined) passive.push({ i, value: fv });
+  });
+  return {
+    timestamps: win.map((p) => p.timestamp),
+    series: [
+      { key: "__ambient", label: "Outdoor", points: outside },
+      { key: "__inside", label: "Inside (heated rooms)", points: inside },
+      ...(passive.length > 0 ? [{ key: "__passive", label: "Inside, no heater", points: passive }] : []),
+    ],
+  };
+}
+
+export interface HeatDemandPoint {
+  /** Indoor minus outdoor air temperature, rounded to 3 °C buckets. */
+  deltaT: number;
+  /** Average heater output (W) over the hours in that bucket. */
+  watts: number;
+  samples: number;
+}
+
+/** Graph 3 — average heater output against the indoor–outdoor temperature gap (hours with a positive gap only). */
+export function heatDemandByGap(conditioned: TimeseriesResponse): HeatDemandPoint[] {
+  const first = conditioned.points[0];
+  if (!first) return [];
+  const ids = Object.keys(first.zone_temperatures_c ?? {});
+  const zones = (() => {
+    const heated = ids.filter((z) => z !== "airlock" && z !== "equipment");
+    return heated.length > 0 ? heated : ids;
+  })();
+  const buckets = new Map<number, number[]>();
+  for (const p of conditioned.points) {
+    const inside = zones.reduce((s, z) => s + (p.zone_temperatures_c?.[z] ?? 0), 0) / zones.length;
+    const dT = Math.round(inside - p.ambient_temperature_c);
+    if (dT <= 0) continue;
+    const watts = zones.reduce((s, z) => s + (p.heating_power_w?.[z] ?? 0), 0);
+    const bucket = Math.round(dT / 3) * 3;
+    buckets.set(bucket, [...(buckets.get(bucket) ?? []), watts]);
+  }
+  return [...buckets.entries()]
+    .map(([deltaT, v]) => ({ deltaT, watts: v.reduce((a, b) => a + b, 0) / v.length, samples: v.length }))
+    .sort((a, b) => a.deltaT - b.deltaT);
+}

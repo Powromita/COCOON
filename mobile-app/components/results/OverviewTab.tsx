@@ -13,6 +13,7 @@ import { ErrorView } from "../common/ErrorView";
 import { MetricCard, MetricGrid } from "../common/MetricCard";
 import { SectionHeader } from "../common/SectionHeader";
 import { Tag } from "../common/Tag";
+import { ReportSection } from "./ReportSection";
 import type { ResultsContext } from "./ResultsContext";
 
 export function OverviewTab({ ctx }: { ctx: ResultsContext }) {
@@ -79,6 +80,8 @@ export function OverviewTab({ ctx }: { ctx: ResultsContext }) {
         <MetricCard label="CAPEX" value={formatInr(o?.capex_inr)} />
         <MetricCard label="Lifecycle cost" value={formatInr(o?.lcc_inr)} />
       </MetricGrid>
+
+      <ReportSection optimizationId={ctx.optimizationId} />
 
       <SectionHeader title="Validation" />
       <AppCard>

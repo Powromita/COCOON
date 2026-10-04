@@ -11,6 +11,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { useEffect, useState } from "react";
 
 import { isAnsysActive, isFullAnsysResult } from "../adapters/ansys";
+import type { RunSeriesKind } from "../adapters/simulation";
 import { buildingToVisualizationModel } from "../adapters/visualization";
 import { DATA_PROVIDER, IS_FIXTURE_MODE } from "../constants/env";
 import { getProjectsRepository, getRunsRepository } from "../database";
@@ -35,7 +36,7 @@ import { kickJobMonitor } from "./useJobMonitor";
 import type { CompatibilityInput } from "../services/interfaces/TemplateService";
 import type { AnsysNotRequested } from "../types/backend";
 import { AppError } from "../utils/errors";
-import { buildRequirementsContract, type FieldErrors } from "../validation/schemas";
+import { buildDesignOptions, buildRequirementsContract, type FieldErrors } from "../validation/schemas";
 import { useCachedQuery } from "./cachedQuery";
 import { PROJECTS_LIST_QUERY_KEY, projectRecordQueryKey } from "./useProjects";
 
@@ -154,17 +155,22 @@ export function useStartGeneration(projectId: string | undefined) {
       const opts = draft.generation_options ?? {};
       // Same draft version + same previous job → same key, so a retried tap never starts a second job.
       const idempotencyKey = `gen:${record.row.id}:${record.row.updated_at}:${record.row.run_job_id ?? "first"}`;
+      // Same rule as the website: the extended (traditional / timber / RCC) materials live in the v2 snapshot.
+      const extendedMaterials = ["mat_adobe", "mat_rammed_earth", "mat_straw_clay", "mat_wood_timber", "mat_reinforced_concrete"];
+      const needsV2 = (draft.constraints?.available_material_ids ?? []).some((id) => extendedMaterials.includes(id));
       const { jobId } = await generationService.startGeneration({
+        name: draft.project_name ?? record.row.name,
+        designOptions: buildDesignOptions(draft),
         requirements: contract.data,
         site: draft.weather_archive_site,
         count: opts.count ?? 24,
         seed: opts.seed ?? 42,
-        materialsSnapshotId: opts.materials_snapshot_id,
-        validateWithAnsys: opts.validate_with_ansys ?? false,
+        materialsSnapshotId: opts.materials_snapshot_id ?? (needsV2 ? "mat_snap_himalayan_v2" : undefined),
+        validateWithAnsys: opts.validate_with_ansys ?? true,
         baselineEconomics: opts.baseline_economics ?? true,
         idempotencyKey,
-        templateId: opts.template_id ?? null,
-        roomArrangement: opts.room_arrangement ?? {},
+        templateId: null, // same as the website: automatic template selection only
+        roomArrangement: {},
       });
 
       const saved = await repo.recordRunStarted(record.row.id, jobId, DATA_PROVIDER);
@@ -391,6 +397,17 @@ export function useSubmitAnsys(optimizationId: string, designId: string, buildin
 
 export function useRunHistory() {
   return useCachedQuery(["run-history", DATA_PROVIDER], () => historyService.listRuns(), { staleTime: 15_000 });
+}
+
+/** The recommended design's own run series (conditioned = with the sized heater, free_floating = no heater). */
+export function useRunTimeseries(optimizationId: string | undefined, which: RunSeriesKind, enabled = true) {
+  return useQuery({
+    queryKey: ["run-timeseries", DATA_PROVIDER, optimizationId, which],
+    queryFn: () => historyService.getRunTimeseries(optimizationId as string, which),
+    enabled: Boolean(optimizationId) && enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+    retry: 0,
+  });
 }
 
 export function useRunReport(optimizationId: string | undefined) {

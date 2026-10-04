@@ -15,6 +15,7 @@
 import type { AnsysValidationResult, BuildingModel, MaterialRecord, Project, RequirementsContract, SimulationResult } from "@cocoon/contracts";
 
 
+import { runTimeseriesToResponse, type RawRunTimeseries, type RunSeriesKind } from "../../adapters/simulation";
 import { buildingToVisualizationModel } from "../../adapters/visualization";
 import { getCacheRepository, getRunsRepository } from "../../database";
 import type { RunIndexEntry } from "../../database/repositories/RunsRepository";
@@ -41,7 +42,7 @@ import type { DesignEconomicsRequest, EconomicsService } from "../interfaces/Eco
 import type { GenerationJob, GenerationService, StartGenerationInput } from "../interfaces/GenerationService";
 import type { MaterialCatalog, MaterialsService } from "../interfaces/MaterialsService";
 import type { AuthAvailability, AuthService, SignInResult } from "../interfaces/AuthService";
-import type { OptimizationHistoryService, RunList, RunReport, RunSummary } from "../interfaces/OptimizationHistoryService";
+import type { FinalReportData, OptimizationHistoryService, RunList, RunReport, RunSummary } from "../interfaces/OptimizationHistoryService";
 import type { ProjectService } from "../interfaces/ProjectService";
 import type { CompatibilityInput, TemplateService } from "../interfaces/TemplateService";
 import type { DesignSimulationRequest, SimulationService } from "../interfaces/SimulationService";
@@ -100,7 +101,9 @@ export class ApiGenerationService implements GenerationService {
 
   async startGeneration(input: StartGenerationInput): Promise<{ jobId: string }> {
     const body = {
+      name: input.name?.trim() || undefined,
       requirements: input.requirements,
+      design_options: input.designOptions,
       site: input.site,
       count: input.count,
       seed: input.seed,
@@ -338,10 +341,17 @@ export class ApiOptimizationHistoryService implements OptimizationHistoryService
     return { source: usedOfflineIndex ? "device_index_offline" : "device_index", runs };
   }
 
+  async getRunTimeseries(optimizationId: string, which: RunSeriesKind): Promise<TimeseriesResponse> {
+    const raw = await this.api.get<RawRunTimeseries>(`${V1}/optimizations/${enc(optimizationId)}/timeseries?which=${which}`, {
+      timeoutMs: 60_000,
+    });
+    return runTimeseriesToResponse(optimizationId, which, raw);
+  }
+
   getReport(optimizationId: string): Promise<RunReport> {
     return this.api
-      .get<{ artifacts?: Record<string, string> }>(`${V1}/optimizations/${enc(optimizationId)}/report`)
-      .then((r) => ({ optimizationId, artifacts: r.artifacts ?? {} }))
+      .get<{ artifacts?: Record<string, string> } & FinalReportData>(`${V1}/optimizations/${enc(optimizationId)}/report`)
+      .then((r) => ({ optimizationId, artifacts: r.artifacts ?? {}, report: r }))
       .catch(notSupportedOn404("Reports"));
   }
 }

@@ -118,24 +118,9 @@ export function CompatibilityPanel(props: CompatibilityPanelProps) {
   return (
     <PanelCard title="Template compatibility" tag={staleTag ?? "Compatible"} tone="ready">
       <Body>{view.note}</Body>
-      <SectionHeader title="Shelter template" caption="Automatic lets the generator use every compatible template." />
-      <Choice
-        label={`Automatic — ${all.length} compatible template${all.length === 1 ? "" : "s"}`}
-        detail={all.map((t) => t.name).join(", ")}
-        selected={props.selectedTemplateId === null}
-        onPress={() => props.onSelectTemplate(null)}
-      />
-      {all.length > 1
-        ? all.map((t) => (
-            <Choice
-              key={t.template_id}
-              label={t.name}
-              detail={sharedText(t.shared, t.floor_count)}
-              selected={props.selectedTemplateId === t.template_id}
-              onPress={() => props.onSelectTemplate(t.template_id)}
-            />
-          ))
-        : null}
+      <Body>
+        {all.length} layout template{all.length === 1 ? "" : "s"} can hold your requirements. The generator picks the best one automatically.
+      </Body>
       {result.warnings.map((w) => (
         <Text key={w.code} style={[typography.caption, { color: colors.statusWarning, marginTop: spacing.xs }]}>
           {w.message}

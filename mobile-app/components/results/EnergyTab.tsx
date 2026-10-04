@@ -15,10 +15,14 @@ import {
   dailySolarEnergy,
   deltaTChart,
   hasAnyNonZero,
+  heatDemandByGap,
   temperatureChart,
   totalHeatingChart,
+  worstNightChart,
   type ChartSeries,
 } from "../../adapters/simulation";
+import { useRunTimeseries } from "../../hooks/useCocoon";
+import type { TimeseriesResponse } from "../../types/backend";
 import { useAppStore } from "../../store/app.store";
 import { useTheme } from "../../theme";
 import { convertTemperature, formatDate, formatNumber, formatTemperature, formatWithUnit, humanize } from "../../utils/format";
@@ -40,6 +44,10 @@ export function EnergyTab({ ctx }: { ctx: ResultsContext }) {
   const sim = ctx.simulation.data?.data;
   const toDisplay = useMemo(() => (v: number) => convertTemperature(v, unit), [unit]);
   const target = ctx.requirements?.mission.target_temperature_c;
+  // The website charts the recommended design's own run series; other candidates fall back to their simulation.
+  const isRecommended = ctx.recommendedDesignId === ctx.designId;
+  const runSeries = useRunTimeseries(ctx.optimizationId, "conditioned", isRecommended).data;
+  const freeSeries = useRunTimeseries(ctx.optimizationId, "free_floating", isRecommended).data;
   const heatLossSentences = ctx.picks.flatMap((p) => (p.explanation ?? []).filter((e) => /heat-loss|heat loss/i.test(e.sentence)));
 
   const roomColor = (s: ChartSeries, i: number) =>
@@ -61,6 +69,9 @@ export function EnergyTab({ ctx }: { ctx: ResultsContext }) {
         <MetricCard label="Timestep" value={sim ? formatWithUnit(sim.engine.timestep_seconds / 60, "min", 0) : formatNumber(undefined)} />
       </MetricGrid>
 
+      {runSeries ? (
+        <RunCharts conditioned={runSeries} free={freeSeries} unit={unit} toDisplay={toDisplay} target={target} />
+      ) : (
       <QueryView query={ctx.timeseries} loadingLabel="Loading hourly results…">
         {({ data: ts }) => {
           const temp = temperatureChart(ts);
@@ -151,6 +162,7 @@ export function EnergyTab({ ctx }: { ctx: ResultsContext }) {
           );
         }}
       </QueryView>
+      )}
 
       <SectionHeader title="Heat flow by path" />
       <AppCard>
@@ -170,6 +182,95 @@ export function EnergyTab({ ctx }: { ctx: ResultsContext }) {
           </>
         ) : null}
       </AppCard>
+    </>
+  );
+}
+
+/** The website's three graphs, from the recommended design's own run series. */
+function RunCharts({
+  conditioned,
+  free,
+  unit,
+  toDisplay,
+  target,
+}: {
+  conditioned: TimeseriesResponse;
+  free: TimeseriesResponse | undefined;
+  unit: "C" | "F";
+  toDisplay: (v: number) => number;
+  target: number | undefined;
+}) {
+  const { colors } = useTheme();
+  const night = useMemo(() => worstNightChart(conditioned, free), [conditioned, free]);
+  const days = useMemo(() => dailySolarEnergy(conditioned), [conditioned]);
+  const demand = useMemo(() => heatDemandByGap(conditioned), [conditioned]);
+  const peak = days.reduce<(typeof days)[number] | null>((a, d) => (a === null || d.kwh > a.kwh ? d : a), null);
+  const totalSolar = days.reduce((s, d) => s + d.kwh, 0);
+  const lineStyle = (s: ChartSeries) =>
+    s.key === "__ambient"
+      ? { color: colors.chartAmbient, dashed: true }
+      : s.key === "__passive"
+        ? { color: colors.chart[2 % colors.chart.length], dashed: true }
+        : { color: colors.chartTemperature };
+  const demandSeries: ChartSeries[] = [{ key: "demand", label: "Average heater output", points: demand.map((d, i) => ({ i, value: d.watts })) }];
+
+  return (
+    <>
+      <ChartCard
+        title="Inside temperature prediction"
+        caption="The coldest 24 hours of the analysis window: heated rooms with the sized heater, the same rooms with no heater, and outdoors."
+        summary={`Inside and outdoor temperature over the coldest ${night.timestamps.length} steps of the window.`}
+        legend={night.series.map((s) => ({ label: s.label, ...lineStyle(s) }))}
+        empty={night.series.length <= 1 ? "The run has no room temperatures." : null}
+      >
+        <LineChart
+          timestamps={night.timestamps}
+          series={night.series}
+          yLabel={`°${unit}`}
+          transform={toDisplay}
+          styleFor={lineStyle}
+          refLines={typeof target === "number" ? [{ value: toDisplay(target), color: colors.statusReady, label: `Target ${formatTemperature(target, unit, 0)}` }] : []}
+        />
+      </ChartCard>
+
+      <ChartCard
+        title="Solar heat gain through glazing"
+        caption={
+          days.length > 0
+            ? `Total ${formatWithUnit(totalSolar, "kWh", 1)} · peak day ${peak ? formatDate(peak.day) : "N/A"} (amber).`
+            : undefined
+        }
+        summary={`Daily solar heat gain for ${days.length} days, total ${formatNumber(totalSolar, 1)} kWh.`}
+        empty={days.length === 0 ? "Solar gain is not reported for this run." : totalSolar === 0 ? "Solar gain was zero throughout this window." : null}
+      >
+        <BarList
+          color={colors.chartSolar}
+          highlightKey={peak?.day}
+          highlightColor={colors.chartSolarHighlight}
+          rows={days.map((d) => ({
+            key: d.day,
+            label: d.hours < 24 ? `${formatDate(d.day)} (partial: ${formatNumber(d.hours, 0)} h)` : formatDate(d.day),
+            value: d.kwh,
+            display: formatWithUnit(d.kwh, "kWh", 2),
+          }))}
+        />
+      </ChartCard>
+
+      <ChartCard
+        title="Heating demand vs outdoor temperature gap"
+        caption="Average heater output at each indoor–outdoor temperature gap (3 °C steps), over hours when it is colder outside."
+        summary={`Average heater output for ${demand.length} temperature-gap steps.`}
+        legend={[{ label: "Average heater output (W)", color: colors.chartHeatFlow }]}
+        empty={demand.length < 2 ? "Not enough colder-outside hours to draw the curve." : null}
+      >
+        <LineChart
+          timestamps={demand.map((d) => String(d.deltaT))}
+          series={demandSeries}
+          yLabel="W"
+          styleFor={() => ({ color: colors.chartHeatFlow })}
+          xAxis={{ title: "Indoor − outdoor temperature gap (°C)", tickLabel: (i) => `${demand[i]?.deltaT ?? ""}°` }}
+        />
+      </ChartCard>
     </>
   );
 }

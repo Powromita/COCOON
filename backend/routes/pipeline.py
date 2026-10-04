@@ -127,7 +127,7 @@ def capabilities():
     except Exception as exc:                                        # noqa: BLE001
         ml = f"unavailable: {type(exc).__name__}"
     return {
-        "schema_versions": ["4.0"], "auth_mode": "supabase_jwt",
+        "schema_versions": ["4.0"], "auth_mode": "disabled" if settings.AUTH_MODE == "disabled" else "supabase_jwt",
         "modules": {
             "m2_design_generator": True, "m3_weather_sites": _store().sites(),
             "m4_engine": {"name": ENGINE_NAME, "version": ENGINE_VERSION},
@@ -618,6 +618,47 @@ def _ansys_stage_status(validation: dict | None) -> str:
 
 def _queue(body: OptimizationBody, compat: dict, template_ids: list[str] | None, user: AuthenticatedUser,
            retry_of: str | None = None) -> str:
+    opt_id = "opt_" + uuid.uuid4().hex[:12]
+    project_uuid = ensure_project(user.id, body.requirements.project_id, body.requirements.model_dump(mode="json"))
+    create_run(user.id, project_uuid, opt_id, body.model_dump(mode="json"), body.count, body.seed)
+    d = _run_dir(opt_id)
+    d.mkdir(parents=True)
+    _atomic(d / "request.json", body.model_dump_json(indent=1))
+    _atomic(d / "compatibility.json", json.dumps(compat, indent=1))
+    custom_name = (body.name or body.project_name or "").strip() or None
+    _set_status(d, status="queued", optimization_id=opt_id, created_at=datetime.now(timezone.utc).isoformat(),
+                project_id=body.requirements.project_id, project_name=custom_name, name=custom_name,
+                count=body.count, seed=body.seed,
+                template_catalog_version=compat["catalog_version"], template_ids=template_ids or [],
+                template_selection="manual" if body.template_id else "automatic", room_arrangement=body.room_arrangement,
+                validate_with_ansys=body.validate_with_ansys, stages=_initial_stages(body.validate_with_ansys),
+                **({"retry_of": retry_of} if retry_of else {}))
+    with _lock:
+        _live.add(opt_id)
+    _pool.submit(_job, opt_id, body, template_ids)
+    return opt_id
+
+
+@router.post("/optimizations", status_code=201)
+def create_optimization(body: OptimizationBody, response: Response, user: AuthenticatedUser = Depends(require_user),
+                        idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
+    preflight = _preflight(body)
+    if "error" in preflight:
+        response.status_code = 422
+        return preflight["error"]
+    body_hash = hashlib.sha256(body.model_dump_json().encode("utf-8")).hexdigest()
+    idem = None
+    if idempotency_key:
+        idem_dir = settings.PIPELINE_RUNS_DIR / "_idempotency"
+        idem_dir.mkdir(exist_ok=True)
+        idem = idem_dir / (hashlib.sha256(idempotency_key.encode()).hexdigest() + ".json")
+        if idem.exists():
+            seen = json.loads(idem.read_text(encoding="utf-8"))
+            if seen["request_sha256"] != body_hash:
+                return _err(409, ErrorCode.VALIDATION_ERROR, "Idempotency-Key was already used with a different request body")
+            response.status_code = 200
+            return {"optimization_id": seen["optimization_id"], "status_url": f"/api/v1/optimizations/{seen['optimization_id']}",
+                    "replayed": True}
     try:
         snapshot = _materials(body.materials_snapshot_id)
     except Exception:                                               # noqa: BLE001
