@@ -3,7 +3,8 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createElement, Suspense, useEffect, useMemo, useState } from "react";
+import { createElement, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import SimulationLoader from "@/components/telemetry/SimulationLoader";
 import { ROUTES } from "@/lib/routes";
 import { T } from "@/lib/i18n";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
@@ -1131,6 +1132,18 @@ function CandidateTelemetryContent() {
     return picks.slice(0, 3);
   }, [report]);
 
+  // Keep the loader up briefly after completion so the "Simulation complete" state is seen.
+  const resultsReady = !!report && !!series && status?.status === "completed";
+  const loaderSeen = useRef(false);
+  const [completionShown, setCompletionShown] = useState(false);
+  if (optId && status && status.status !== "completed" && status.status !== "failed") loaderSeen.current = true;
+  useEffect(() => { loaderSeen.current = false; setCompletionShown(false); }, [optId]);
+  useEffect(() => {
+    if (!resultsReady || !loaderSeen.current) return;
+    const id = setTimeout(() => setCompletionShown(true), 2200);
+    return () => clearTimeout(id);
+  }, [resultsReady]);
+
   function printReport() {
     setActiveTab("results");
     window.setTimeout(() => window.print(), 0);
@@ -1340,27 +1353,15 @@ function CandidateTelemetryContent() {
     );
   }
 
-  // ── Queued / running: real progress, no fake numbers ─────────────────────
-  if (!report || !series || !status || status.status !== "completed") {
-    const st = status?.status ?? "queued";
+  // ── Queued / running (and a short "complete" beat before the results) ────
+  if (!resultsReady || (loaderSeen.current && !completionShown)) {
     return (
-      <div className="w-full px-gutter-lg py-12 max-w-[900px] mx-auto flex flex-col items-center text-center gap-5">
-        <span className="relative flex h-4 w-4">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-thermal" />
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-thermal" />
-        </span>
-        <h1 className="font-headline-md text-headline-md font-bold text-on-surface uppercase tracking-wide">
-          {st === "running" ? (status?.phase ?? "pipeline").replaceAll("_", " ") : <T>Queued…</T>}
-        </h1>
-        <p className="font-body-sm text-body-sm text-on-surface-variant">
-          {status?.phase_message
-            ? status.phase_message
-            : status?.summary
-            ? <T>{`Generated ${status.summary.generated} candidates, ${status.summary.on_front} on the Pareto front.`}</T>
-            : <T>Generating designs, running the RC thermal engine, ranking candidates…</T>}
-        </p>
-        <p className="font-label-mono-xs text-[11px] text-on-surface-variant">optimization_id: {optId}</p>
-      </div>
+      <SimulationLoader
+        phase={status?.status === "running" ? status.phase : null}
+        phaseMessage={status?.phase_message}
+        done={resultsReady}
+        optId={optId}
+      />
     );
   }
 

@@ -13,6 +13,7 @@ from backend.main import app
 @pytest.fixture(autouse=True)
 def _authenticated_api_client(monkeypatch):
     """Existing route tests run as one authenticated user; auth behavior has dedicated tests."""
+    monkeypatch.setattr("backend.settings.MOCK_AUTH", False)  # tests cover real token checks
     monkeypatch.setattr("backend.routes.pipeline.ensure_project", lambda *_: "10000000-0000-4000-8000-000000000099")
     monkeypatch.setattr("backend.routes.pipeline.create_run", lambda *_: None)
     monkeypatch.setattr("backend.routes.pipeline.owns_run", lambda *_: True)

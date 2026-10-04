@@ -49,7 +49,13 @@ def _verify_access_token(token: str) -> dict[str, Any]:
         raise _unauthorized() from exc
 
 
+MOCK_USER = AuthenticatedUser(id=UUID("00000000-0000-0000-0000-000000000001"),
+                              email="user@cocoon.org", role="authenticated", claims={})
+
+
 def require_user(credentials: HTTPAuthorizationCredentials | None = Security(bearer)) -> AuthenticatedUser:
+    if settings.MOCK_AUTH:
+        return MOCK_USER
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise _unauthorized("Bearer access token required")
     claims = _verify_access_token(credentials.credentials)

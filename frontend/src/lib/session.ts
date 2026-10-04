@@ -4,8 +4,9 @@
  */
 export type Role = "operator" | "engineer" | "admin";
 
-export const CURRENT_USER: { name: string; role: Role } = {
+export const CURRENT_USER: { name: string; email: string; role: Role } = {
   name: "Lt. Col. Vikramaditya Rathore",
+  email: "v.rathore@dhadi.gov.in",
   role: "engineer",
 };
 

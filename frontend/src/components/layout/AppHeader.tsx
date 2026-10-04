@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from "react";
 import { NAV_ITEMS, ROUTES, isNavItemActive } from "@/lib/routes";
 import LanguageToggle from "@/components/i18n/LanguageToggle";
 import { T, useT } from "@/lib/i18n";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AppHeader({ userName, userEmail }: { userName: string; userEmail: string }) {
   const pathname = usePathname();
@@ -16,10 +15,9 @@ export default function AppHeader({ userName, userEmail }: { userName: string; u
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  async function signOut() {
-    await createClient().auth.signOut();
+  // Mock auth: there is no session to clear, just return to the login screen.
+  function signOut() {
     router.replace(ROUTES.login);
-    router.refresh();
   }
 
   useEffect(() => {
