@@ -72,10 +72,12 @@ function SurfaceMesh({
   surface,
   building,
   viewMode,
+  isolatedFloor,
 }: {
   surface: BuildingSurface;
   building: BuildingModel;
   viewMode: ViewMode;
+  isolatedFloor: boolean;
 }) {
   const geometry = useMemo(() => (surface.vertices ? surfaceGeometry(surface.vertices) : null), [surface.vertices]);
   const edgesGeometry = useMemo(() => (geometry ? new THREE.EdgesGeometry(geometry, 25) : null), [geometry]);
@@ -83,7 +85,8 @@ function SurfaceMesh({
 
   const mat = getAssemblyMat(building, surface.assembly_id);
   const isInterior = surface.boundary_type === "adjacent_zone" || surface.surface_type === "partition";
-  const isRoof = surface.surface_type === "roof";
+  // When one floor of a multi-storey plan is isolated, the slab above it must not hide the rooms either
+  const isRoof = surface.surface_type === "roof" || (isolatedFloor && surface.surface_type === "ceiling");
 
   // In cutaway or floorplan, hide or fade the roof so interior is completely unobstructed
   if ((viewMode === "cutaway" || viewMode === "floorplan") && isRoof) {
@@ -450,19 +453,34 @@ function Scene({
   resetTrigger,
   rotationStep,
   onHeadingChange,
+  planFloorId,
 }: {
   building: BuildingModel;
   viewMode: ViewMode;
   resetTrigger: number;
   rotationStep: { angle: number; id: number };
   onHeadingChange: (screenNorthDeg: number) => void;
+  /** Set only in the multi-storey top-down plan: the single floor to draw. */
+  planFloorId: string | null;
 }) {
+  // Surfaces, openings and zone labels of the isolated floor (everything when no floor is isolated)
+  const visible = useMemo(() => {
+    if (!planFloorId) {
+      return { surfaces: building.surfaces, openings: building.openings, zoneIds: null as Set<string> | null };
+    }
+    const floor = building.floors.find((f) => f.id === planFloorId);
+    const zoneIds = new Set((floor?.zones ?? []).map((z) => z.id));
+    const surfaces = building.surfaces.filter((sf) => zoneIds.has(sf.owning_zone_id));
+    const surfaceIds = new Set(surfaces.map((sf) => sf.id));
+    return { surfaces, openings: building.openings.filter((o) => surfaceIds.has(o.parent_surface_id)), zoneIds };
+  }, [building, planFloorId]);
+
   const bbox = useMemo(() => {
     let minX = Infinity, maxX = -Infinity;
     let minY = Infinity, maxY = -Infinity;
     let minZ = Infinity, maxZ = -Infinity;
 
-    building.surfaces.forEach((s) => {
+    visible.surfaces.forEach((s) => {
       s.vertices?.forEach((v) => {
         const p = toThree(v);
         if (p.x < minX) minX = p.x;
@@ -483,7 +501,7 @@ function Scene({
     const maxDim = Math.max(sizeX, sizeY, sizeZ, 6);
 
     return { center: [cx, cy, cz] as [number, number, number], maxDim };
-  }, [building]);
+  }, [visible]);
 
   const zoneFloorElevation = useMemo(() => {
     const map = new Map<string, number>();
@@ -521,12 +539,12 @@ function Scene({
       />
 
       {/* Building Surfaces */}
-      {building.surfaces.map((s) => (
-        <SurfaceMesh key={s.id} surface={s} building={building} viewMode={viewMode} />
+      {visible.surfaces.map((s) => (
+        <SurfaceMesh key={s.id} surface={s} building={building} viewMode={viewMode} isolatedFloor={planFloorId !== null} />
       ))}
 
       {/* Window & Door Openings */}
-      {building.openings.map((o) => {
+      {visible.openings.map((o) => {
         const parent = building.surfaces.find((s) => s.id === o.parent_surface_id);
         if (!parent) return null;
         return <OpeningMesh key={o.id} surface={parent} ratio={o.area_m2 / parent.area_m2} kind={o.opening_type} />;
@@ -540,7 +558,9 @@ function Scene({
       />
 
       {/* Zone Annotations */}
-      {Array.from(zoneFloorElevation.entries()).map(([zoneId, elevation]) => (
+      {Array.from(zoneFloorElevation.entries())
+        .filter(([zoneId]) => !visible.zoneIds || visible.zoneIds.has(zoneId))
+        .map(([zoneId, elevation]) => (
         <ZoneLabel
           key={zoneId}
           building={building}
@@ -562,6 +582,12 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
   const [rotationStep, setRotationStep] = useState<{ angle: number; id: number }>({ angle: 0, id: 0 });
   // Screen angle of north, shared by the on-canvas dial and the in-scene ground compass.
   const [northDeg, setNorthDeg] = useState(0);
+  // Multi-storey buildings: the top-down plan shows one floor at a time so floors never overlap.
+  const floorsByLevel = useMemo(() => [...building.floors].sort((a, b) => a.level - b.level), [building]);
+  const multiFloor = floorsByLevel.length > 1;
+  const [planFloorIndex, setPlanFloorIndex] = useState(0);
+  const activeFloor = floorsByLevel[Math.min(planFloorIndex, floorsByLevel.length - 1)];
+  const planFloorId = viewMode === "floorplan" && multiFloor && activeFloor ? activeFloor.id : null;
   const viewBearing = Math.round((360 - northDeg) % 360);
   const viewCardinal = CARDINALS[Math.round(viewBearing / 45) % 8];
 
@@ -665,10 +691,38 @@ export default function BuildingViewer3D({ building }: { building: BuildingModel
         </div>
       </div>
 
+      {/* Floor selector: one top-down plan per floor */}
+      {viewMode === "floorplan" && multiFloor && (
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-surface-container-low border-b border-outline-variant">
+          <span className="font-label-mono-xs text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">
+            Floor plan:
+          </span>
+          <div className="flex flex-wrap items-center gap-1 bg-surface-container rounded-xl p-1 border border-outline-variant/60">
+            {floorsByLevel.map((f, i) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setPlanFloorIndex(i)}
+                className={`px-3 py-1 rounded-lg font-label-mono-xs text-[11px] font-semibold transition-all ${
+                  activeFloor?.id === f.id
+                    ? "bg-surface-container-lowest text-primary shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                {f.level === 0 ? "Ground floor" : `Floor ${f.level + 1}`}
+              </button>
+            ))}
+          </div>
+          <span className="font-body-sm text-[11px] text-on-surface-variant">
+            {activeFloor?.zones.length ?? 0} room{(activeFloor?.zones.length ?? 0) === 1 ? "" : "s"} on this floor
+          </span>
+        </div>
+      )}
+
       {/* 3D Canvas Area */}
       <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[540px] bg-gradient-to-b from-slate-100 via-sky-50/50 to-slate-200">
         <Canvas shadows camera={{ position: [14, 10, 14], fov: 42 }}>
-          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} onHeadingChange={setNorthDeg} />
+          <Scene building={building} viewMode={viewMode} resetTrigger={resetTrigger} rotationStep={rotationStep} onHeadingChange={setNorthDeg} planFloorId={planFloorId} />
         </Canvas>
 
         {/* Material Legend Badge Overlay */}

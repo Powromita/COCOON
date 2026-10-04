@@ -38,12 +38,13 @@ from pydantic import BaseModel, Field
 
 from cocoon_contracts import (BuildingModel, ErrorCode, ErrorDetail, ErrorEnvelope, RequirementsContract,
                               SimulationEngineMode, SimulationResult)
-from design_generator import GenerationOptions, generate_designs, to_error_envelope as m2_envelope
+from design_generator import (GenerationOptions, generate_designs, generation_options_for_policy,
+                              to_error_envelope as m2_envelope)
 from design_generator.requirement_parser import InfeasibleRequirementsError, parse_requirements
 from economics.provider import DEFAULT_ASSUMPTIONS_DIR
 from m3_data import WeatherError, WeatherStore, extended_snapshot, load_snapshot, standard_snapshot
 from m4_engine import ENGINE_NAME, ENGINE_VERSION, M4Error, M4Evaluator
-from optimization import OptimizationSettings, to_error_envelope as m6_envelope
+from optimization import OptimizationSettings, RankingSettings, to_error_envelope as m6_envelope
 
 from .. import settings
 from ..auth import AuthenticatedUser, require_user
@@ -268,15 +269,23 @@ class DesignOptions(BaseModel):
     air_changes_per_hour: float = Field(default=0.8, ge=0.0, le=10.0)
     initial_temperature_c: float | None = Field(default=None, ge=-40, le=40)
     require_separate_rooms: bool = True
+    material_policy: str = Field(default="cost_optimized_v2", pattern="^(legacy_v1|cost_optimized_v2)$")
 
 
 def _generation_options(options: DesignOptions) -> GenerationOptions:
-    assembly = dict(GenerationOptions().assembly_mm)
-    if options.wall_thickness_mm is not None: assembly["wall"] = (options.wall_thickness_mm - 5, options.wall_thickness_mm + 5)
-    if options.roof_thickness_mm is not None: assembly["roof"] = (options.roof_thickness_mm - 5, options.roof_thickness_mm + 5)
-    if options.floor_thickness_mm is not None: assembly["floor"] = (options.floor_thickness_mm - 5, options.floor_thickness_mm + 5)
+    policy = generation_options_for_policy(options.material_policy)
+    assembly = dict(policy.assembly_mm)
+    # Configurator thicknesses are maximum build-up limits, not exact targets.
+    # Standard material combinations may be thinner but never exceed the limit.
+    if options.wall_thickness_mm is not None: assembly["wall"] = (assembly["wall"][0], min(assembly["wall"][1], options.wall_thickness_mm))
+    if options.roof_thickness_mm is not None: assembly["roof"] = (assembly["roof"][0], min(assembly["roof"][1], options.roof_thickness_mm))
+    if options.floor_thickness_mm is not None: assembly["floor"] = (assembly["floor"][0], min(assembly["floor"][1], options.floor_thickness_mm))
     glazing = options.glazing if options.glazing != "none" else "double"
     return GenerationOptions(
+        thickness_mm=policy.thickness_mm, thickness_by_category_mm=policy.thickness_by_category_mm,
+        thickness_choices_mm=policy.thickness_choices_mm,
+        insulation_probability=policy.insulation_probability, max_u_value_w_m2k=policy.max_u_value_w_m2k,
+        material_policy=policy.material_policy,
         fixed_length_m=options.length_m, fixed_width_m=options.width_m, fixed_height_m=options.height_m,
         window_count=options.window_count, window_orientation=options.window_orientation,
         window_sizes_m=((options.window_width_m, options.window_height_m),),

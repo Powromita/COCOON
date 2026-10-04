@@ -627,14 +627,16 @@ function TemperatureChart({ data, isPassiveOnly = false }: { data: TemperaturePo
   );
 }
 
-function SolarChart({ data }: { data: number[] }) {
+type SolarDailyPoint = { date: string; kwh: number };
+
+function SolarChart({ data }: { data: SolarDailyPoint[] }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const W = 840, H = 220;
   const PAD_LEFT = 60, PAD_RIGHT = 30, PAD_TOP = 25, PAD_BOTTOM = 40;
 
   if (data.length === 0) return null;
 
-  const rawMax = Math.max(...data, 0.5);
+  const rawMax = Math.max(...data.map((point) => point.kwh), 0.5);
   const step = rawMax <= 4 ? 1 : rawMax <= 10 ? 2 : 5;
   const maxVal = Math.ceil(rawMax / step) * step;
 
@@ -653,11 +655,11 @@ function SolarChart({ data }: { data: number[] }) {
       <div className="flex items-center justify-between px-2 py-1 text-xs">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded bg-amber-500 inline-block" />
-          <span className="font-body-sm font-semibold text-on-surface">Daily Incident Solar Heat Gain</span>
+          <span className="font-body-sm font-semibold text-on-surface">Daily Glazing Heat Gain</span>
         </div>
         {hoverIdx !== null && data[hoverIdx] !== undefined && (
           <span className="font-data text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            Day {hoverIdx + 1}: <strong>{data[hoverIdx].toFixed(2)} kWh</strong>
+            {data[hoverIdx].date}: <strong>{data[hoverIdx].kwh.toFixed(2)} kWh</strong>
           </span>
         )}
       </div>
@@ -687,8 +689,8 @@ function SolarChart({ data }: { data: number[] }) {
             );
           })}
 
-          {data.map((val, i) => {
-            const barH = (val / (maxVal || 1)) * chartH;
+          {data.map((point, i) => {
+            const barH = (point.kwh / (maxVal || 1)) * chartH;
             const x = PAD_LEFT + i * slotWidth + (slotWidth - barWidth) / 2;
             const y = PAD_TOP + chartH - barH;
             const isHover = hoverIdx === i;
@@ -719,7 +721,7 @@ function SolarChart({ data }: { data: number[] }) {
                   fontWeight="bold"
                   textAnchor="middle"
                 >
-                  {val.toFixed(1)}
+                  {point.kwh.toFixed(1)}
                 </text>
                 <text
                   x={x + barWidth / 2}
@@ -729,7 +731,7 @@ function SolarChart({ data }: { data: number[] }) {
                   fontFamily="monospace"
                   textAnchor="middle"
                 >
-                  Day {i + 1}
+                  {point.date.slice(5)}
                 </text>
               </g>
             );
@@ -748,12 +750,15 @@ function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
   if (data.length === 0) return null;
 
   const maxQRaw = Math.max(...data.map((d) => d.q), 100);
+  const minDTRaw = Math.min(...data.map((d) => d.deltaT));
   const maxDTRaw = Math.max(...data.map((d) => d.deltaT), 10);
 
   const stepQ = maxQRaw <= 1000 ? 200 : maxQRaw <= 3000 ? 500 : 1000;
   const maxQ = Math.ceil(maxQRaw / stepQ) * stepQ;
 
-  const stepDT = maxDTRaw <= 20 ? 5 : maxDTRaw <= 40 ? 10 : 15;
+  const rangeDT = maxDTRaw - minDTRaw;
+  const stepDT = rangeDT <= 15 ? 3 : rangeDT <= 30 ? 5 : 10;
+  const minDT = Math.floor(minDTRaw / stepDT) * stepDT;
   const maxDT = Math.ceil(maxDTRaw / stepDT) * stepDT;
 
   const ticksQ: number[] = [];
@@ -762,14 +767,14 @@ function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
   }
 
   const ticksDT: number[] = [];
-  for (let v = 0; v <= maxDT; v += stepDT) {
+  for (let v = minDT; v <= maxDT; v += stepDT) {
     ticksDT.push(v);
   }
 
   const chartW = W - PAD_LEFT - PAD_RIGHT;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
-  const x = (dt: number) => PAD_LEFT + (dt / (maxDT || 1)) * chartW;
+  const x = (dt: number) => PAD_LEFT + ((dt - minDT) / (maxDT - minDT || 1)) * chartW;
   const y = (q: number) => PAD_TOP + ((maxQ - q) / (maxQ || 1)) * chartH;
 
   const points = [...data].sort((a, b) => a.deltaT - b.deltaT);
@@ -783,11 +788,11 @@ function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
       <div className="flex items-center justify-between px-2 py-1 text-xs">
         <div className="flex items-center gap-2">
           <span className="w-3 h-1 bg-[#0d9488] rounded-full inline-block" />
-          <span className="font-body-sm font-semibold text-on-surface">Heat Loss vs Temperature Lift (ΔT)</span>
+          <span className="font-body-sm font-semibold text-on-surface">Average Heating Demand by Temperature Gap</span>
         </div>
         {activePoint && (
           <span className="font-data text-xs text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded border border-teal-200">
-            ΔT = {activePoint.deltaT.toFixed(1)}°C → Heat Loss Rate: <strong>{Math.round(activePoint.q)} W</strong>
+            Indoor-outdoor gap: {activePoint.deltaT.toFixed(0)}°C · <strong>{Math.round(activePoint.q)} W average auxiliary heat</strong>
           </span>
         )}
       </div>
@@ -823,7 +828,7 @@ function HeatFlowChart({ data }: { data: { deltaT: number; q: number }[] }) {
               <g key={dtVal}>
                 <line x1={xPos} y1={PAD_TOP} x2={xPos} y2={PAD_TOP + chartH} stroke="#f1f5f9" strokeWidth={0.6} />
                 <text x={xPos} y={H - 12} fill="#64748b" fontSize={10} fontFamily="monospace" textAnchor="middle">
-                  ΔT={dtVal}°
+                  {dtVal}°C
                 </text>
               </g>
             );
@@ -933,18 +938,24 @@ function buildTemperatureSeries(
   return result;
 }
 
-function buildSolarDaily(series: TimeseriesResponse | null): number[] {
+function buildSolarDaily(series: TimeseriesResponse | null): SolarDailyPoint[] {
   if (!series || series.points.length === 0) return [];
-  const byDay = new Map<string, number>();
+  const byDay = new Map<string, { wattHours: number; points: number }>();
   for (const p of series.points) {
     const day = p.timestamp.slice(0, 10);
-    const wattsSum = series.zone_ids.reduce((s, z) => s + (p.zone_solar_w[z] ?? 0), 0);
-    byDay.set(day, (byDay.get(day) ?? 0) + wattsSum * 0.25 /* 15-min -> Wh */ / 1000 /* -> kWh */);
+    const wattsSum = series.zone_ids.reduce((sum, z) => sum + (p.zone_solar_w[z] ?? 0), 0);
+    const total = byDay.get(day) ?? { wattHours: 0, points: 0 };
+    total.wattHours += wattsSum * 0.25;
+    total.points += 1;
+    byDay.set(day, total);
   }
-  return Array.from(byDay.values());
+  // The RC engine may emit one endpoint at the next midnight. Do not plot it as a 0 kWh day.
+  return Array.from(byDay.entries())
+    .filter(([, total]) => total.points >= 95)
+    .map(([date, total]) => ({ date, kwh: total.wattHours / 1000 }));
 }
 
-function buildHeatFlow(series: TimeseriesResponse | null): { deltaT: number; q: number }[] {
+function buildHeatFlow(series: TimeseriesResponse | null): { deltaT: number; q: number; samples: number }[] {
   if (!series || series.points.length === 0) return [];
   const heated = series.zone_ids.filter((z) => z !== "airlock" && z !== "equipment");
   const zones = heated.length ? heated : series.zone_ids;
@@ -959,7 +970,7 @@ function buildHeatFlow(series: TimeseriesResponse | null): { deltaT: number; q: 
     buckets.get(bucket)!.push(heatingW);
   }
   return Array.from(buckets.entries())
-    .map(([deltaT, values]) => ({ deltaT, q: values.reduce((a, b) => a + b, 0) / values.length }))
+    .map(([deltaT, values]) => ({ deltaT, q: values.reduce((a, b) => a + b, 0) / values.length, samples: values.length }))
     .sort((a, b) => a.deltaT - b.deltaT);
 }
 
@@ -1115,6 +1126,10 @@ function CandidateTelemetryContent() {
   const tempData = useMemo(() => buildTemperatureSeries(series, freeSeries, passiveOnly), [series, freeSeries, passiveOnly]);
   const solarData = useMemo(() => buildSolarDaily(series), [series]);
   const heatFlowData = useMemo(() => buildHeatFlow(series), [series]);
+  const comparisonCandidates = useMemo(() => {
+    const picks = report?.alternatives.filter((row) => row.picked_as.length > 0) ?? [];
+    return picks.slice(0, 3);
+  }, [report]);
 
   function printReport() {
     setActiveTab("results");
@@ -1130,7 +1145,7 @@ function CandidateTelemetryContent() {
     URL.revokeObjectURL(url);
   }
 
-  const days = series ? Math.round(series.points.length / 96) : 0;
+  const days = solarData.length;
 
   // ── Saved simulation history ───────────────────────────────────────────────
   if (!optId) {
@@ -1545,30 +1560,30 @@ function CandidateTelemetryContent() {
             <section className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold bg-amber-100 text-amber-800 uppercase">Task 2</span>
-                <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Solar Thermal Energy Generated</T></h2>
+                <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Solar Heat Gain Through Glazing</T></h2>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">Daily solar gain through glazing · {days}-day window</p>
               <div className="bg-surface-container-low rounded-xl p-4"><SolarChart data={solarData} /></div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <MetricCard
                   label="Average Daily Solar Gain"
-                  value={(solarData.reduce((a, b) => a + b, 0) / Math.max(solarData.length, 1)).toFixed(2)}
+                  value={(solarData.reduce((sum, point) => sum + point.kwh, 0) / Math.max(solarData.length, 1)).toFixed(2)}
                   unit="kWh/day"
-                  subtext="Passive solar harvest"
+                  subtext="Heat transmitted through glazing"
                   icon="wb_sunny"
                   variant="thermal"
                 />
                 <MetricCard
                   label="Peak Solar Day"
-                  value={Math.max(...solarData, 0).toFixed(2)}
+                  value={Math.max(...solarData.map((point) => point.kwh), 0).toFixed(2)}
                   unit="kWh"
-                  subtext="Max diurnal radiation"
+                  subtext="Highest daily glazing gain"
                   icon="solar_power"
                   variant="thermal"
                 />
                 <MetricCard
                   label="Total Over Window"
-                  value={solarData.reduce((a, b) => a + b, 0).toFixed(1)}
+                  value={solarData.reduce((sum, point) => sum + point.kwh, 0).toFixed(1)}
                   unit="kWh"
                   subtext={`${days}-day aggregate harvest`}
                   icon="bolt"
@@ -1581,21 +1596,29 @@ function CandidateTelemetryContent() {
             <section className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs font-bold uppercase bg-teal-100 text-teal-800">Task 3</span>
-                <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Heat Flow vs. Ambient Temperature Difference</T></h2>
+                <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Heating Demand vs. Outdoor Temperature Gap</T></h2>
               </div>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">Sized-heater power vs. inside−outside ΔT (proxy for envelope heat loss)</p>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">Each point averages the auxiliary heating needed for the observed indoor-outdoor temperature gap.</p>
               <div className="bg-surface-container-low rounded-xl p-4"><HeatFlowChart data={heatFlowData} /></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2.5 text-teal-950">
+                  <span className="font-bold">How to read it:</span> the x-axis is indoor temperature minus outdoor temperature; each dot is the average heater power for a 3°C temperature-gap band.
+                </div>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-amber-950">
+                  <span className="font-bold">Scope:</span> this is whole-shelter heating demand, not separate wall, roof, floor, or window heat-flow values.
+                </div>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <MetricCard
-                  label="Peak Heating Power"
+                  label="Peak Auxiliary Heat"
                   value={(cond.peak_heating_kw ?? 0).toFixed(2)}
                   unit="kW"
-                  subtext="Worst-case sizing load"
+                  subtext="Highest observed demand"
                   icon="mode_heat"
                   variant="primary"
                 />
                 <MetricCard
-                  label="Total Heating Energy"
+                  label="Auxiliary Heat Energy"
                   value={cond.heating_energy_kwh.toFixed(1)}
                   unit="kWh"
                   subtext={`Cumulative over ${days} days`}
@@ -1675,36 +1698,36 @@ function CandidateTelemetryContent() {
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[22px]">compare</span>
                 <div>
-                  <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Candidate Comparison (M6)</T></h2>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">All generated candidates, ranked by the optimizer</p>
+                  <h2 className="font-headline-md text-headline-md text-on-surface font-bold"><T>Top 3 Recommended Structures</T></h2>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Decision-ready optimizer picks: best overall, lowest lifecycle cost, and lowest initial cost</p>
                 </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-surface-container-low border-b border-outline-variant text-xs uppercase tracking-wider text-on-surface-variant">
-                      <th className="py-3 px-4 font-semibold">Design</th>
+                      <th className="py-3 px-4 font-semibold">Rank / Design</th>
                       <th className="py-3 px-4 font-semibold text-right">Capex (₹L)</th>
                       <th className="py-3 px-4 font-semibold text-right">LCC (₹L)</th>
                       <th className="py-3 px-4 font-semibold text-right">Mass (kg)</th>
                       <th className="py-3 px-4 font-semibold text-right">Comfort (h)</th>
                       <th className="py-3 px-4 font-semibold text-right">Reliability</th>
-                      <th className="py-3 px-4 font-semibold">Status</th>
+                      <th className="py-3 px-4 font-semibold">Why shown</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-surface-container">
-                    {report.alternatives.map((row) => (
+                    {comparisonCandidates.map((row, index) => (
                       <tr key={row.design_id} className={`hover:bg-surface-container-low/40 transition-colors ${row.status === "selected" ? "bg-equilibrium-tint/20" : ""}`}>
-                        <td className="py-3 px-4"><span className="font-data text-body-sm text-on-surface font-medium">{row.design_id}</span></td>
+                        <td className="py-3 px-4"><div className="flex items-center gap-2"><span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-fixed text-xs font-bold text-navy">{index + 1}</span><span className="font-data text-body-sm text-on-surface font-medium">{row.design_id}</span></div></td>
                         <td className="py-3 px-4 text-right font-data text-sm text-on-surface-variant">{row.objectives.capex_inr == null ? "—" : (row.objectives.capex_inr / 1e5).toFixed(2)}</td>
                         <td className="py-3 px-4 text-right font-data text-sm text-on-surface-variant">{row.objectives.lcc_inr == null ? "—" : (row.objectives.lcc_inr / 1e5).toFixed(2)}</td>
                         <td className="py-3 px-4 text-right font-data text-sm text-on-surface-variant">{row.objectives.mass_kg == null ? "—" : row.objectives.mass_kg.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                         <td className="py-3 px-4 text-right font-data text-sm text-on-surface-variant">{row.objectives.occupied_comfort_hours == null ? "—" : row.objectives.occupied_comfort_hours.toFixed(0)}</td>
                         <td className="py-3 px-4 text-right font-data text-sm text-on-surface-variant">{row.objectives.reliability == null ? "—" : `${(row.objectives.reliability * 100).toFixed(0)}%`}</td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${row.status === "selected" ? "text-equilibrium" : "text-on-surface-variant"}`}>
-                            {row.status === "selected" && <span className="material-symbols-outlined text-[13px]">check_circle</span>}
-                            {STATUS_LABEL[row.status]}
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-equilibrium">
+                            <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                            {row.picked_as.map((pick) => pick.replaceAll("_", " ")).join(" · ")}
                           </span>
                         </td>
                       </tr>

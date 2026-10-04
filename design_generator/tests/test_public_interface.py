@@ -31,7 +31,7 @@ def test_the_public_surface_is_exactly_what_the_docstring_promises():
     assert set(m2.__all__) == {
         "generate_designs", "resolve_user_geometry", "to_error_envelope",
         "GenerationResult", "Candidate", "RejectedCandidate", "UserGeometryResult", "UserShelter", "TopologyReport",
-        "GenerationOptions", "SizingTable",
+        "GenerationOptions", "generation_options_for_policy", "SizingTable",
         "GenerationError", "NoTemplateError", "RequirementError", "UserGeometryError", "__version__"}
     for name in m2.__all__:
         assert hasattr(m2, name), name

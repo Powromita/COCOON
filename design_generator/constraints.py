@@ -42,6 +42,16 @@ DEFAULT_ASSEMBLY_MM: Mapping[str, tuple[float, float]] = {
     "roof": (180.0, 450.0),
     "floor": (130.0, 400.0),
 }
+CORRECTED_ASSEMBLY_MM: Mapping[str, tuple[float, float]] = {
+    "wall": (100.0, 570.0),
+    "roof": (100.0, 220.0),
+    "floor": (90.0, 300.0),
+}
+CORRECTED_MAX_U_VALUE: Mapping[str, float] = {
+    "wall": 0.30,
+    "roof": 0.25,
+    "floor": 0.35,
+}
 MAX_OPENING_FRACTION = 0.85     # doors + windows may cover at most this share of one wall
 AREA_TOL_M2 = 1e-6
 _BUCKETS = ("north", "east", "south", "west")
@@ -68,6 +78,7 @@ class CandidateContext:
     materials: MaterialSnapshot | None = None    # needed for the material-existence check
     wwr: WwrBounds = WwrBounds()
     assembly_mm: Mapping[str, tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_ASSEMBLY_MM))
+    max_u_value_w_m2k: Mapping[str, float] = field(default_factory=dict)
     min_support_fraction: float = 0.95           # share of an upper zone's plan area that must sit on zones below
 
 
@@ -403,6 +414,21 @@ def assembly_thickness_buildable(b: BuildingModel, ctx: CandidateContext) -> lis
     return out
 
 
+def assembly_thermal_performance(b: BuildingModel, ctx: CandidateContext) -> list[CheckFailure]:
+    """Enforce policy U-value ceilings independently of total thickness."""
+    out = []
+    for a in b.assemblies.values():
+        limit = ctx.max_u_value_w_m2k.get(a.category.value)
+        if limit is None:
+            continue
+        actual = a.u_value_w_m2k
+        if actual is None or actual > limit + 1e-9:
+            out.append(CheckFailure("assembly_thermal_performance",
+                                    f"{a.category.value} assembly '{a.id}' U-value is {actual} W/m2K, above {limit:g} W/m2K",
+                                    actual, limit))
+    return out
+
+
 def envelope_mass_within_limit(b: BuildingModel, ctx: CandidateContext) -> list[CheckFailure]:
     _require_spec(ctx)
     limit = ctx.spec.maximum_mass_kg
@@ -441,6 +467,7 @@ CHECKS: tuple[tuple[str, Callable[[BuildingModel, CandidateContext], list[CheckF
     ("assembly_materials_in_snapshot", assembly_materials_in_snapshot),
     ("assembly_materials_allowed", assembly_materials_allowed),
     ("assembly_thickness_buildable", assembly_thickness_buildable),
+    ("assembly_thermal_performance", assembly_thermal_performance),
     ("envelope_mass_within_limit", envelope_mass_within_limit),
 )
 ALL_CHECK_NAMES = ("contract_valid",) + tuple(n for n, _ in CHECKS)

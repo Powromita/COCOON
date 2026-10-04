@@ -31,6 +31,7 @@ from design_generator.candidate_generator import (
     NoTemplateError,
     RejectedCandidate,
     generate_candidates as _generate_candidates,
+    generation_options_for_policy,
     to_error_envelope,
 )
 from design_generator.existing_shelter import (
@@ -75,7 +76,7 @@ def generate_designs(
 __all__ = [
     "generate_designs", "resolve_user_geometry", "to_error_envelope",
     "GenerationResult", "Candidate", "RejectedCandidate", "UserGeometryResult", "UserShelter", "TopologyReport",
-    "GenerationOptions", "SizingTable",
+    "GenerationOptions", "generation_options_for_policy", "SizingTable",
     "GenerationError", "NoTemplateError", "RequirementError", "UserGeometryError",
     "__version__",
 ]

@@ -15,6 +15,7 @@ from design_generator.candidate_generator import (
     GenerationError,
     GenerationOptions,
     generate_candidates,
+    generation_options_for_policy,
 )
 from design_generator.quantities import compute_quantities, orientation_bucket
 from design_generator.requirement_parser import UnsupportedModeError
@@ -136,6 +137,32 @@ def test_only_referenced_assemblies_are_defined(ladakh):
     for c in ladakh.candidates:
         assert set(c.building.assemblies) == {s.assembly_id for s in c.building.surfaces}
 
+
+
+def test_cost_optimized_policy_caps_expensive_layers_and_preserves_u_values(snapshot_dict):
+    options = generation_options_for_policy("cost_optimized_v2")
+    result = generate_candidates(_req(maximum_mass_kg=None), snapshot_dict, seed=42, count=8,
+                                 created_at=T0, options=options)
+    assert result.complete
+    for candidate in result.candidates:
+        assert candidate.extras["material_policy"] == "cost_optimized_v2"
+        for assembly in candidate.building.assemblies.values():
+            for layer in assembly.layers:
+                if layer.material_id == "mat_plywood":
+                    assert layer.thickness_mm <= 30
+                if layer.material_id == "mat_puf" and assembly.category.value in {"wall", "roof"}:
+                    assert layer.thickness_mm <= 120
+            limit = options.max_u_value_w_m2k.get(assembly.category.value)
+            if limit is not None:
+                assert assembly.u_value_w_m2k <= limit
+            if assembly.category.value == "partition":
+                assert all(layer.material_id != "mat_puf" for layer in assembly.layers)
+
+
+def test_material_policy_names_are_explicit():
+    assert generation_options_for_policy("legacy_v1").material_policy == "legacy_v1"
+    with pytest.raises(ValueError, match="unknown material policy"):
+        generation_options_for_policy("unknown")
 
 # ------------------------------------------------------------------ windows
 def test_every_occupied_zone_gets_a_window_and_service_rooms_do_not(ladakh):

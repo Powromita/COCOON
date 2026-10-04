@@ -22,3 +22,6 @@ async function forward(request: NextRequest, context: { params: Promise<{ path: 
 
 export const GET = forward;
 export const POST = forward;
+export const PATCH = forward;
+export const PUT = forward;
+export const DELETE = forward;

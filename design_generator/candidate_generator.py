@@ -68,6 +68,8 @@ from design_generator.connection_detector import (
     detect_connections,
 )
 from design_generator.constraints import (
+    CORRECTED_ASSEMBLY_MM,
+    CORRECTED_MAX_U_VALUE,
     DEFAULT_ASSEMBLY_MM,
     CandidateContext,
     ValidationReport,
@@ -113,6 +115,27 @@ DEFAULT_THICKNESS_MM: Mapping[tuple[str, str], tuple[float, float]] = {
     ("partition", "mat_puf"): (25, 50),       # placeholder (core)
 }
 
+CORRECTED_THICKNESS_MM: Mapping[tuple[str, str], tuple[float, float]] = {
+    ("wall", "mat_stone"): (300, 450), ("wall", "mat_concrete"): (150, 200),
+    ("wall", "mat_plywood"): (12, 18), ("wall", "mat_puf"): (75, 120),
+    ("roof", "mat_concrete"): (120, 180), ("roof", "mat_plywood"): (18, 25),
+    ("roof", "mat_puf"): (100, 120), ("floor", "mat_stone"): (150, 250),
+    ("floor", "mat_concrete"): (120, 180), ("floor", "mat_plywood"): (18, 30),
+    ("floor", "mat_puf"): (50, 90), ("interfloor", "mat_plywood"): (18, 25),
+    ("interfloor", "mat_concrete"): (50, 100), ("partition", "mat_plywood"): (12, 18),
+    ("partition", "mat_concrete"): (75, 120), ("partition", "mat_puf"): (25, 50),
+}
+
+CORRECTED_THICKNESS_CHOICES_MM: Mapping[tuple[str, str], tuple[float, ...]] = {
+    ("wall", "mat_stone"): (300, 375, 450), ("wall", "mat_concrete"): (150, 175, 200),
+    ("wall", "mat_plywood"): (12, 15, 18), ("wall", "mat_puf"): (75, 100, 120),
+    ("roof", "mat_concrete"): (120, 150, 180), ("roof", "mat_plywood"): (18, 21, 25),
+    ("roof", "mat_puf"): (100, 120), ("floor", "mat_stone"): (150, 200, 250),
+    ("floor", "mat_concrete"): (120, 150, 180), ("floor", "mat_plywood"): (18, 25, 30),
+    ("floor", "mat_puf"): (50, 75, 90), ("interfloor", "mat_plywood"): (18, 21, 25),
+    ("interfloor", "mat_concrete"): (50, 75, 100), ("partition", "mat_plywood"): (12, 15, 18),
+    ("partition", "mat_concrete"): (75, 100, 120), ("partition", "mat_puf"): (25, 40, 50),
+}
 # PLACEHOLDER thickness ranges (mm) per (element, material CATEGORY), used ONLY for a material id that has no row in
 # DEFAULT_THICKNESS_MM (for example the 20 materials of ladakh_shelter_materials.csv). The four materials above keep their own rows,
 # so designs made from them do not change. The team should confirm these.
@@ -133,6 +156,7 @@ class GenerationOptions:
 
     thickness_mm: Mapping[tuple[str, str], tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_THICKNESS_MM))
     thickness_by_category_mm: Mapping[tuple[str, str], tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_THICKNESS_BY_CATEGORY_MM))
+    thickness_choices_mm: Mapping[tuple[str, str], tuple[float, ...]] = field(default_factory=dict)
     insulation_probability: Mapping[str, float] = field(
         default_factory=lambda: {"wall": 0.75, "roof": 0.75, "floor": 0.55, "partition": 0.5})
     assembly_mm: Mapping[str, tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_ASSEMBLY_MM))
@@ -165,7 +189,24 @@ class GenerationOptions:
     force_cardinal_orientation: bool = False
     attempts_per_candidate: int = 50
     max_attempts: int | None = None
+    material_policy: str = "legacy_v1"
+    max_u_value_w_m2k: Mapping[str, float] = field(default_factory=dict)
 
+
+def generation_options_for_policy(policy: str) -> GenerationOptions:
+    """Return a complete, versioned envelope policy."""
+    if policy == "legacy_v1":
+        return GenerationOptions()
+    if policy == "cost_optimized_v2":
+        return GenerationOptions(
+            thickness_mm=dict(CORRECTED_THICKNESS_MM),
+            thickness_choices_mm=dict(CORRECTED_THICKNESS_CHOICES_MM),
+            insulation_probability={"wall": 1.0, "roof": 1.0, "floor": 1.0, "partition": 0.0},
+            assembly_mm=dict(CORRECTED_ASSEMBLY_MM),
+            max_u_value_w_m2k=dict(CORRECTED_MAX_U_VALUE),
+            material_policy=policy,
+        )
+    raise ValueError(f"unknown material policy '{policy}'")
 
 # ----- errors and outputs ------------------------------------------------------
 class GenerationError(ValueError):
@@ -320,6 +361,15 @@ def _snap(value: float, lo: float, hi: float) -> float:
     return float(min(max(round(value / 5.0) * 5, lo), hi))
 
 
+def _pick_thickness(rng, element: str, material_id: str, lo: float, hi: float,
+                    options: GenerationOptions) -> float:
+    choices = tuple(v for v in options.thickness_choices_mm.get((element, material_id), ())
+                    if lo - 1e-9 <= v <= hi + 1e-9)
+    if choices:
+        return float(choices[int(rng.integers(len(choices)))])
+    return _snap(rng.uniform(lo, hi), lo, hi)
+
+
 def _compose(rng, element: str, pool: dict, options: GenerationOptions) -> list[tuple[str, float]]:
     """Layers inner -> outer as (material_id, thickness_mm)."""
     structural = pool["structural"].get(element, [])
@@ -331,25 +381,25 @@ def _compose(rng, element: str, pool: dict, options: GenerationOptions) -> list[
 
     if element == "interfloor":
         mid, (lo, hi) = structural[int(rng.integers(len(structural)))]
-        return [(mid, _snap(rng.uniform(lo, hi), lo, hi))]
+        return [(mid, _pick_thickness(rng, element, mid, lo, hi, options))]
     if element == "partition":
         mid, (lo, hi) = structural[int(rng.integers(len(structural)))]
-        skin = _snap(rng.uniform(lo, hi), lo, hi)
+        skin = _pick_thickness(rng, element, mid, lo, hi, options)
         if insulation and rng.random() < p_ins:
             imid, (ilo, ihi) = insulation[int(rng.integers(len(insulation)))]
-            return [(mid, skin), (imid, _snap(rng.uniform(ilo, ihi), ilo, ihi)), (mid, skin)]
+            return [(mid, skin), (imid, _pick_thickness(rng, element, imid, ilo, ihi, options)), (mid, skin)]
         return [(mid, skin)]
 
     clamp_lo, clamp_hi = options.assembly_mm.get(_ELEMENT_CATEGORY[element].value, (0.0, float("inf")))
     for _ in range(60):
         mid, (lo, hi) = structural[int(rng.integers(len(structural)))]
-        t_s = _snap(rng.uniform(lo, hi), lo, hi)
+        t_s = _pick_thickness(rng, element, mid, lo, hi, options)
         if insulation and rng.random() < p_ins:
             imid, (ilo, ihi) = insulation[int(rng.integers(len(insulation)))]
             lo_i, hi_i = max(ilo, clamp_lo - t_s), min(ihi, clamp_hi - t_s)
             if lo_i > hi_i:
                 continue
-            return [(mid, t_s), (imid, _snap(rng.uniform(lo_i, hi_i), lo_i, hi_i))]
+            return [(mid, t_s), (imid, _pick_thickness(rng, element, imid, lo_i, hi_i, options))]
         if clamp_lo <= t_s <= clamp_hi:
             return [(mid, t_s)]
     raise _Reject("composition", "assembly_composition_failed",
@@ -641,7 +691,7 @@ def _build(index: int, seed: int, rng, source: TemplateMatch | RoomPlan, spec: G
         raise _Reject("contract", "CONTRACT_INVALID", str(exc.errors()[0]["msg"])) from exc
 
     ctx = CandidateContext(spec=spec, plan=plan, materials=snapshot, wwr=options.wwr,
-                           assembly_mm=options.assembly_mm)
+                           assembly_mm=options.assembly_mm, max_u_value_w_m2k=options.max_u_value_w_m2k)
     report = validate_candidate(model, ctx)
     if not report.ok:
         raise _Reject("constraints", "CONSTRAINTS_FAILED", "; ".join(dict.fromkeys(f.reason for f in report.failed)),
@@ -657,7 +707,7 @@ def _build(index: int, seed: int, rng, source: TemplateMatch | RoomPlan, spec: G
         "glazing": glazing, "airtightness_class": air_class, "air_changes_per_hour": options.airtightness[air_class][0],
         "wwr_target": wwr_target, "occupants_by_zone": occupants_by_zone,
         "heater_zone_ids": sorted(z for z, u_ in zone_updates.items() if "hvac_id" in u_),
-        "merged_rooms": merged_rooms,
+        "merged_rooms": merged_rooms, "material_policy": options.material_policy,
     }
     return Candidate(index, model, quantities, report, layout, conn.placements, tuple(w_places), extras)
 
