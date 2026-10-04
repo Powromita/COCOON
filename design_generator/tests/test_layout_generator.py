@@ -8,10 +8,14 @@ from dataclasses import replace
 import pytest
 
 from design_generator import layout_generator as lg
+from design_generator.connection_detector import detect_connections
+from design_generator.geometry_resolver import resolve_geometry
 from design_generator.layout_generator import (
     NoFeasibleLayoutError,
     generate_layout,
+    generate_layout_from_plan,
     plan_rooms,
+    plan_rooms_from_requirements,
     verify_layout,
 )
 from design_generator.requirement_parser import DEFAULT_SIZING, RoomSizingRule, parse_requirements
@@ -72,6 +76,75 @@ def test_plan_keeps_connector_room_that_was_not_requested(requirements_ladakh):
     assert plan.pruned_rooms == ("equipment",)
     sleeping = next(r for r in plan.rooms if r.id == "sleeping")
     assert sleeping.min_area_m2 == pytest.approx(36 * 1.1 + 3.0)   # sized from its own rule
+
+
+def test_requirement_plan_keeps_every_requested_room_separate(requirements_ladakh):
+    req = copy.deepcopy(requirements_ladakh)
+    req["mission"].update(
+        occupants=12,
+        required_rooms=["airlock", "living", "equipment", "sleeping", "storage"],
+    )
+    req["constraints"].update(maximum_floors=1, maximum_footprint_m2=80.0)
+    spec = parse_requirements(req)
+
+    plan = plan_rooms_from_requirements(spec, 1)
+
+    assert plan.template_id == "generated_from_requirements"
+    assert plan.floor_count == 1
+    assert plan.links == () and plan.pruned_rooms == ()
+    assert {room.id for room in plan.rooms} == set(req["mission"]["required_rooms"])
+    assert all(room.provides == (room.type,) for room in plan.rooms)
+    assert next(room for room in plan.rooms if room.id == "airlock").exterior_access is True
+
+
+def test_requirement_plan_distributes_rooms_across_allowed_floors(ladakh_spec):
+    plan = plan_rooms_from_requirements(ladakh_spec, 2)
+    assert {room.floor_level for room in plan.rooms} == {0, 1}
+    assert next(room for room in plan.rooms if room.id == "airlock").floor_level == 0
+
+
+def test_layout_can_be_generated_directly_from_requirement_plan(requirements_ladakh):
+    req = copy.deepcopy(requirements_ladakh)
+    req["mission"].update(
+        occupants=12,
+        required_rooms=["airlock", "living", "equipment", "sleeping", "storage"],
+    )
+    req["constraints"].update(maximum_floors=1, maximum_footprint_m2=80.0)
+    spec = parse_requirements(req)
+    plan = plan_rooms_from_requirements(spec, 1)
+
+    layout = generate_layout_from_plan(plan, spec, 42, fixed_length_m=9.0, fixed_width_m=7.0)
+
+    assert layout.template_id == "generated_from_requirements"
+    assert layout.footprint_area_m2 == pytest.approx(63.0)
+    assert {zone.zone_id for zone in layout.zones} == {room.id for room in plan.rooms}
+    assert verify_layout(layout, plan, spec) == []
+    assert layout == generate_layout_from_plan(plan, spec, 42, fixed_length_m=9.0, fixed_width_m=7.0)
+
+    connections = detect_connections(layout, resolve_geometry(layout))
+    assert len([link for link in layout.links if link[2] == "door"]) == len(plan.rooms) - 1
+    assert connections.unreachable_zones == ()
+
+
+def test_requirement_layout_connects_floors_with_a_real_stair(ladakh_spec):
+    plan = plan_rooms_from_requirements(ladakh_spec, 2)
+    layout = generate_layout_from_plan(plan, ladakh_spec, 0)
+
+    assert len(layout.stairs) == 1
+    assert len([link for link in layout.links if link[2] == "stair"]) == 1
+    assert detect_connections(layout, resolve_geometry(layout)).unreachable_zones == ()
+
+
+def test_requirement_floor_allocation_rejects_an_unsplittable_room(requirements_ladakh):
+    req = copy.deepcopy(requirements_ladakh)
+    req["mission"].update(occupants=30, required_rooms=["airlock", "living"])
+    req["constraints"].update(maximum_floors=2, maximum_footprint_m2=20.0)
+    spec = parse_requirements(req)
+    assert spec.allowed_floor_counts == (2,)  # aggregate area fits, but living cannot fit on either floor
+
+    with pytest.raises(NoFeasibleLayoutError) as err:
+        plan_rooms_from_requirements(spec, 2)
+    assert err.value.details["reasons"] == {"floor_allocation_failed": 1}
 
 
 # ------------------------------------------------------- layout, many seeds

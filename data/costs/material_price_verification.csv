@@ -1,0 +1,10 @@
+material_id,material_name,active_price_unit,active_low_inr,active_expected_inr,active_high_inr,transport_charged,supporting_logistics_price_inr_per_m3,transportability_score,economics_status,notes
+mat_stone,Granite / Field Stone,m3,3500,4500,6000,false,2800,4,ACTIVE_PRICED,"Usually locally available in Ladakh; supporting logistics dataset calls this stone_masonry"
+mat_puf,Polyurethane Foam Insulation,m3,11000,13000,16000,true,8500,5,ACTIVE_PRICED,"Active economics price differs from the supporting logistics dataset"
+mat_plywood,Marine Grade Structural Plywood,m3,60000,70800,85000,true,,,ACTIVE_PRICED,"Expected rate derived from approximately INR 850/m2 for a 12 mm marine plywood sheet"
+mat_concrete,Dense Concrete (Sub-floor),m3,5500,6500,8000,true,6500,2,ACTIVE_PRICED,"Expected active price matches the supporting logistics dataset"
+mat_adobe,Adobe (Sun-dried Mud Brick),,,,,,1600,5,MISSING_ACTIVE_PRICE,"Available in the material snapshot but not priced by lifecycle economics"
+mat_rammed_earth,Rammed Earth,,,,,,2000,5,MISSING_ACTIVE_PRICE,"Available in the material snapshot but not priced by lifecycle economics"
+mat_straw_clay,Straw-Clay,,,,,,2400,4,MISSING_ACTIVE_PRICE,"Available in the material snapshot but not priced by lifecycle economics"
+mat_wood_timber,Wood / Structural Timber,,,,,,13000,3,MISSING_ACTIVE_PRICE,"Available in the material snapshot but not priced by lifecycle economics"
+mat_reinforced_concrete,Reinforced Concrete,,,,,,9500,2,MISSING_ACTIVE_PRICE,"Available in the material snapshot but not priced by lifecycle economics"

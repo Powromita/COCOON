@@ -43,7 +43,7 @@ def wait(opt_id, seconds=180):
 
 def test_capabilities_report_real_module_status():
     c = client.get("/api/v1/capabilities").json()
-    assert c["schema_versions"] == ["4.0"] and c["auth_mode"] == "disabled"
+    assert c["schema_versions"] == ["4.0"] and c["auth_mode"] == "supabase_jwt"
     assert c["modules"]["m4_engine"]["name"] == "cocoon_multizone_rc"
     assert "leh" in c["modules"]["m3_weather_sites"] and c["modules"]["m2_design_generator"] is True
 
@@ -77,6 +77,48 @@ def test_generate_designs_infeasible_requirements_use_the_error_envelope():
     r = client.post("/api/v1/generate-designs", json={"requirements": req, "count": 2})
     assert r.status_code == 422
     assert r.json()["error"]["code"] == "VALIDATION_ERROR" and r.json()["error"]["details"]["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+
+
+def test_optimization_preflight_uses_fixed_dimensions_for_area_feasibility():
+    body = {
+        "requirements": requirements(),
+        "design_options": {"length_m": 5.0, "width_m": 5.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 422
+    error = r.json()["error"]
+    assert error["code"] == "VALIDATION_ERROR"
+    assert error["details"]["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+    assert error["details"]["fixed_footprint_m2"] == 25.0
+    assert error["details"]["usable_area_by_floor_count_m2"] == {"1": 25.0, "2": 44.0}
+
+
+def test_optimization_preflight_rejects_a_fixed_side_narrower_than_a_room():
+    req = requirements()
+    req["constraints"]["maximum_footprint_m2"] = 100.0
+    body = {
+        "requirements": req,
+        "design_options": {"length_m": 2.0, "width_m": 50.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 422
+    details = r.json()["error"]["details"]
+    assert details["m2_code"] == "INFEASIBLE_REQUIREMENTS"
+    assert details["shortest_side_m"] == 2.0
+    assert details["required_minimum_dimension_m"] == 2.5
+
+
+def test_optimization_preflight_reports_feasible_fixed_floor_counts():
+    body = {
+        "requirements": requirements(),
+        "design_options": {"length_m": 8.0, "width_m": 6.0},
+    }
+    r = client.post("/api/v1/optimizations/preflight", json=body)
+    assert r.status_code == 200
+    result = r.json()
+    assert result["feasible"] is True
+    assert result["usable_area_by_floor_count_m2"] == {"1": 48.0, "2": 90.0}
+    assert result["allowed_floor_counts"] == [2]
 
 
 def _building():
@@ -160,6 +202,28 @@ def test_unfinished_and_unknown_optimizations():
     assert r.status_code == 409 and r.json()["error"]["details"]["status"] == "failed"
 
 
+def test_projects_reflect_the_latest_persisted_simulation():
+    directory = settings.PIPELINE_RUNS_DIR / "opt_bbbbbbbbbbbb"
+    directory.mkdir()
+    (directory / "request.json").write_text(json.dumps({"requirements": {
+        "project_id": "prj_live", "site": {"elevation_m": 3500},
+        "mission": {"type": "new_shelter", "occupants": 12, "target_temperature_c": 18},
+    }}), encoding="utf-8")
+    (directory / "final_report.json").write_text(json.dumps({"design": {
+        "template": "vault", "floors": 1, "assemblies": [{"name": "Insulated wall"}],
+    }}), encoding="utf-8")
+    (directory / "status.json").write_text(json.dumps({
+        "optimization_id": directory.name, "project_id": "prj_live", "status": "completed",
+        "created_at": "2026-09-28T10:00:00Z", "count": 100, "recommended_design_id": "des_best",
+        "validation": {"state": "VALIDATED_BY_ANSYS"},
+    }), encoding="utf-8")
+    result = client.get("/api/v1/projects")
+    assert result.status_code == 200
+    project = result.json()["projects"][0]
+    assert project["project_id"] == "prj_live" and project["candidate_count"] == 100
+    assert project["recommended_design_id"] == "des_best"
+    assert project["validation"]["state"] == "VALIDATED_BY_ANSYS"
+
 def test_optimization_idempotency_key():
     h = {"Idempotency-Key": "k1"}
     body = {"requirements": requirements(), "count": 2, "seed": 3}
@@ -183,3 +247,45 @@ def test_request_validation():
     assert client.post("/api/v1/optimizations", json={"requirements": requirements(), "count": 0}).status_code == 422
     assert client.post("/api/v1/optimizations", json={"count": 3}).status_code == 422
     assert client.post("/api/v1/generate-designs", json={"requirements": requirements(), "count": 100000}).status_code == 422
+
+
+def test_delete_optimization_and_project():
+    # 1. Create a dummy run directory
+    d = settings.PIPELINE_RUNS_DIR / "opt_dddddddddddd"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "status.json").write_text(json.dumps({
+        "optimization_id": "opt_dddddddddddd",
+        "project_id": "prj_delete_test",
+        "status": "completed",
+        "created_at": "2026-09-29T12:00:00Z"
+    }), encoding="utf-8")
+
+    # 2. Test deleting single optimization
+    del_res = client.delete("/api/v1/optimizations/opt_dddddddddddd")
+    assert del_res.status_code == 200
+    assert del_res.json()["deleted"] is True
+    assert not d.exists()
+
+    # 3. Test deleting non-existent optimization
+    assert client.delete("/api/v1/optimizations/opt_dddddddddddd").status_code == 404
+
+    # 4. Create dummy run for project deletion test
+    d2 = settings.PIPELINE_RUNS_DIR / "opt_eeeeeeeeeeee"
+    d2.mkdir(parents=True, exist_ok=True)
+    (d2 / "status.json").write_text(json.dumps({
+        "optimization_id": "opt_eeeeeeeeeeee",
+        "project_id": "prj_batch_delete",
+        "status": "completed",
+        "created_at": "2026-09-29T12:00:00Z"
+    }), encoding="utf-8")
+
+    # 5. Delete project
+    del_prj = client.delete("/api/v1/projects/prj_batch_delete")
+    assert del_prj.status_code == 200
+    assert del_prj.json()["deleted"] is True
+    assert del_prj.json()["deleted_runs_count"] == 1
+    assert not d2.exists()
+
+    # 6. Deleting non-existent project returns 404
+    assert client.delete("/api/v1/projects/prj_batch_delete").status_code == 404
+

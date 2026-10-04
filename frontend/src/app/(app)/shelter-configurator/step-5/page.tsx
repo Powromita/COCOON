@@ -6,55 +6,24 @@ import { useState, type ReactNode } from "react";
 import ConfiguratorStepper from "@/components/configurator/ConfiguratorStepper";
 import WizardFooter from "@/components/configurator/WizardFooter";
 import { useWizard } from "@/components/configurator/WizardProvider";
-import { SectionCard } from "@/components/configurator/fields";
+import { Field, NumberInput, RadioCards, SectionCard } from "@/components/configurator/fields";
 import {
   ECONOMIC_ASSUMPTION_SETS,
-  FLOOR_OPTIONS,
+  EXTENDED_MATERIAL_IDS,
   HEATER_FUELS,
-  HVAC_MODES,
   MATERIALS,
   MISSION_TYPES,
   ROOM_TYPES,
-  WEATHER_SOURCES,
+  toDesignOptions,
   toRequirements,
-  toRunOptions,
-  validateRun,
   type StepKey,
 } from "@/lib/configurator/requirements";
 import { T } from "@/lib/i18n";
 import { ROUTES, configuratorStepRoute, type ConfiguratorStep } from "@/lib/routes";
-import { CURRENT_USER, canUseEngineeringMode } from "@/lib/session";
+import { ApiError, LATEST_OPTIMIZATION_STORAGE_KEY, startOptimization, type OptimizationRequest } from "@/lib/api";
 
 const LAST_RUN_KEY = "cocoon.configurator.lastLaunch";
 const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
-
-// One-click presets for common deployments
-const QUICK_PRESETS = [
-  {
-    id: "ladakh_winter_standard",
-    label: "Ladakh Standard – Winter Post",
-    sub: "DBO sector · 12-man · −38°C",
-    icon: "ac_unit",
-    color: "#1E3A8A",
-    bg: "#EFF6FF",
-  },
-  {
-    id: "siachen_summer",
-    label: "Siachen Base – Summer",
-    sub: "Base camp · 8-man · High UV",
-    icon: "wb_sunny",
-    color: "#D97706",
-    bg: "#FFFBEB",
-  },
-  {
-    id: "kargil_medical",
-    label: "Kargil Medical Post",
-    sub: "Medical mission · 20°C target",
-    icon: "medical_services",
-    color: "#059669",
-    bg: "#ECFDF5",
-  },
-];
 
 function Row({ label, value, icon }: { label: string; value: ReactNode; icon?: string }) {
   return (
@@ -63,21 +32,8 @@ function Row({ label, value, icon }: { label: string; value: ReactNode; icon?: s
         {icon && <span className="material-symbols-outlined text-[14px]">{icon}</span>}
         <T>{label}</T>
       </dt>
-      <dd className="font-body-sm text-body-sm text-on-surface text-right">{value}</dd>
+      <dd className="font-body-sm text-body-sm text-on-surface text-right font-medium">{value}</dd>
     </div>
-  );
-}
-
-function Labels({ ids, from }: { ids: readonly (string | null)[]; from: { id: string; label: string }[] }) {
-  return (
-    <>
-      {ids.map((id, i) => (
-        <span key={String(id)}>
-          {i > 0 && ", "}
-          <T>{from.find((o) => o.id === id)?.label ?? String(id)}</T>
-        </span>
-      ))}
-    </>
   );
 }
 
@@ -100,7 +56,7 @@ function SummaryCard({ step, title, icon, issues, children }: { step: Configurat
               <T>Ready</T>
             </span>
           )}
-          <Link href={configuratorStepRoute(step)} className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg text-primary-container hover:bg-surface-container-low font-body-sm text-body-sm font-medium">
+          <Link href={configuratorStepRoute(step)} className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg text-primary hover:bg-surface-container-low font-body-sm text-body-sm font-medium">
             <span className="material-symbols-outlined text-[14px]">edit</span>
             <T>Edit</T>
           </Link>
@@ -115,209 +71,299 @@ export default function ConfiguratorStep5Page() {
   const router = useRouter();
   const { draft, update, errors } = useWizard();
   const [launching, setLaunching] = useState(false);
-  const engineering = canUseEngineeringMode(CURRENT_USER.role);
-  const runErrors = validateRun(draft.run, engineering);
+  const [launchError, setLaunchError] = useState<string | null>(null);
+  const [launchSuggestions, setLaunchSuggestions] = useState<string[]>([]);
 
-  const count = (k: StepKey) => Object.keys(errors[k]).length;
-  const allValid = (["site", "mission", "constraints", "economics"] as StepKey[]).every((k) => count(k) === 0) && Object.keys(runErrors).length === 0;
+  const count = (k: StepKey) => Object.keys(errors[k] || {}).length;
+  const allValid = (["site", "mission", "constraints", "design", "run"] as StepKey[]).every((k) => count(k) === 0);
 
-  const payload = { requirements: toRequirements(draft), run_options: toRunOptions(draft, engineering) };
+  const payload = {
+    requirements: toRequirements(draft),
+    design_options: toDesignOptions(draft),
+    solver: {
+      count: Number(draft.run.candidate_count || 20),
+      validate_with_ansys: draft.run.run_ansys,
+      economic_assumption_set_id: draft.economic_assumption_set_id,
+    },
+  };
   const json = JSON.stringify(payload, null, 2);
 
   function downloadJson() {
     const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = "requirements.json";
+    a.download = "cocoon_requirements.json";
     a.click();
     URL.revokeObjectURL(url);
   }
 
-  function launch() {
+  async function launch() {
     if (!allValid) return;
     setLaunching(true);
-    try { localStorage.setItem(LAST_RUN_KEY, json); } catch { /* storage unavailable */ }
-    setTimeout(() => router.push(ROUTES.candidateTelemetry), 800);
-  }
+    setLaunchError(null);
+    setLaunchSuggestions([]);
+    try { localStorage.setItem(LAST_RUN_KEY, json); } catch { /* ignore */ }
+    try {
+      const requirements = {
+        ...payload.requirements,
+        project_id: `prj_${Date.now().toString(36)}`,
+      };
+      const hasExtendedMaterials = draft.constraints.available_material_ids.some((id) =>
+        EXTENDED_MATERIAL_IDS.has(id)
+      );
 
-  const s = draft.site;
-  const m = draft.mission;
-  const c = draft.constraints;
-  const floors = FLOOR_OPTIONS.find((f) => f.value === c.maximum_floors)?.label ?? "";
-  const hvacLabel = HVAC_MODES.find((h) => h.id === draft.run.hvac_mode)?.label ?? draft.run.hvac_mode;
+      const request: OptimizationRequest = {
+        name: draft.name?.trim() || undefined,
+        requirements,
+        count: Math.max(1, Math.min(200, Number(draft.run.candidate_count || 20))),
+        validate_with_ansys: draft.run.run_ansys,
+        design_options: payload.design_options,
+        materials_snapshot_id: hasExtendedMaterials ? "mat_snap_himalayan_v2" : null,
+      };
+
+      const res = await startOptimization(request);
+      try { localStorage.setItem(LATEST_OPTIMIZATION_STORAGE_KEY, res.optimization_id); } catch { /* ignore */ }
+      router.push(ROUTES.candidateDetail(res.optimization_id));
+    } catch (err) {
+      setLaunchError(err instanceof Error ? err.message : "Failed to launch pipeline");
+      setLaunchSuggestions(err instanceof ApiError && Array.isArray(err.details.suggestions)
+        ? err.details.suggestions.filter((item): item is string => typeof item === "string")
+        : []);
+      setLaunching(false);
+    }
+  }
 
   return (
     <div className="flex flex-col w-full">
-      <ConfiguratorStepper current={5} title="Review & Launch Simulation" />
+      <ConfiguratorStepper current={5} title="Review & Solver Controls" />
 
       <div className="w-full px-gutter-lg mt-6">
-        <div className="max-w-[1720px] mx-auto flex flex-col gap-6">
+        <div className="max-w-[1720px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-          {/* Quick-start preset buttons (alternative to manual input) */}
-          <div className="bg-gradient-to-r from-primary-fixed/30 to-surface-container-low border border-primary/20 rounded-xl p-5 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[20px]">rocket_launch</span>
-              <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  <T>One-Click Deployment Presets</T>
-                </h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  <T>Load a pre-configured template for a common DRDO scenario and launch immediately.</T>
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {QUICK_PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={launch}
-                  disabled={launching}
-                  className="flex items-start gap-3 p-4 rounded-xl border border-outline-variant hover:border-primary hover-lift transition-all text-left group"
-                  style={{ backgroundColor: preset.bg }}
+          {/* Left Column: Solver Controls & Launch */}
+          <div className="lg:col-span-6 flex flex-col gap-5">
+
+            {/* 3. Solver & Simulation Controls */}
+            <SectionCard title="Solver &amp; Simulation Controls" contractKey="solver" icon="tune">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                <T>Configure candidate generation density, FEM validation, and cost model assumptions.</T>
+              </p>
+
+              {/* Candidate Pool Count */}
+              <div className="mb-4">
+                <Field
+                  label="Candidate Pool Count (count)"
+                  contractKey="count"
+                  htmlFor="candidate_count"
+                  error={errors.run?.candidate_count}
+                  hint="Number of generative designs to synthesize and evaluate (default 20, range 1..200)"
                 >
-                  <span className="material-symbols-outlined text-[28px] mt-0.5" style={{ color: preset.color }}>{preset.icon}</span>
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold text-sm leading-snug group-hover:underline">
-                      {preset.label}
+                  <NumberInput
+                    id="candidate_count"
+                    value={draft.run.candidate_count}
+                    onChange={(v) => update("run", { candidate_count: v })}
+                    min={1}
+                    max={200}
+                    step={1}
+                    unit="designs"
+                    invalid={!!errors.run?.candidate_count}
+                  />
+                </Field>
+              </div>
+
+              {/* ANSYS Validation Toggle */}
+              <div className="mb-4 p-4 rounded-xl border border-outline-variant bg-surface-container-lowest flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="material-symbols-outlined text-[24px] text-primary mt-0.5">verified</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-headline-sm text-headline-sm font-semibold text-on-surface">
+                      <T>ANSYS Validation (validate_with_ansys)</T>
                     </span>
-                    <span className="font-body-sm text-[11px] text-on-surface-variant">{preset.sub}</span>
-                    <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide" style={{ color: preset.color }}>
-                      <span className="material-symbols-outlined text-[12px]">play_circle</span>
-                      Launch with defaults
+                    <span className="font-body-sm text-body-sm text-on-surface-variant">
+                      <T>Request full ANSYS FEA thermal cross-validation for the top recommended design.</T>
                     </span>
                   </div>
-                </button>
-              ))}
-            </div>
-          </div>
+                </div>
+                <label className="relative inline-flex shrink-0 mt-0.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={draft.run.run_ansys}
+                    onChange={(e) => update("run", { run_ansys: e.target.checked })}
+                    className="peer sr-only"
+                  />
+                  <span className="w-11 h-6 rounded-full bg-surface-container-high peer-checked:bg-primary transition-colors" />
+                  <span className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-surface-container-lowest shadow transition-transform peer-checked:translate-x-5" />
+                </label>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Summary cards grid */}
-            <div className="lg:col-span-7 grid grid-cols-1 xl:grid-cols-2 gap-5 content-start">
+              {/* Economic Assumption Set */}
+              <div className="mt-4">
+                <Field
+                  label="Economic Assumption Set (economic_assumption_set_id)"
+                  contractKey="economic_assumption_set_id"
+                  error={errors.run?.economic_assumption_set_id}
+                  hint="Lifecycle cost baseline profile"
+                >
+                  <RadioCards<string>
+                    name="economic_assumption_set_id"
+                    value={draft.economic_assumption_set_id}
+                    onChange={(v) => update("economic_assumption_set_id", v)}
+                    options={ECONOMIC_ASSUMPTION_SETS.map((s) => ({ value: s.id, label: s.label, hint: s.hint }))}
+                  />
+                </Field>
+              </div>
+            </SectionCard>
 
-              <SummaryCard step={1} title="1. Site & Environmental Boundaries" icon="location_on" issues={count("site")}>
-                <Row label="Coordinates" icon="my_location" value={<span className="font-data">{s.latitude_deg}°N, {s.longitude_deg}°E</span>} />
-                <Row label="Site Elevation" icon="terrain" value={<span className="font-data">{s.elevation_m} m AMSL</span>} />
-                <Row label="Ground Temp Mode" icon="landscape" value={<span className="font-data">Kusuda Permafrost Profile</span>} />
-                <Row label="Film Coefficients (hi / ho)" icon="air" value={<span className="font-data">7.7 / 11.4 W/m²K</span>} />
-                <Row label="Analysis Period" icon="date_range" value={<span className="font-data">{s.analysis_start} → {s.analysis_end}</span>} />
-                <Row label="Weather Source" icon="cloud" value={<Labels ids={[s.weather_source]} from={WEATHER_SOURCES} />} />
-              </SummaryCard>
-
-              <SummaryCard step={2} title="2. Geometry & Spatial Dimensions" icon="architecture" issues={count("constraints")}>
-                <Row label="Dimensions (L × W × H)" icon="square_foot" value={<span className="font-data">6.0m × 4.0m × 2.8m</span>} />
-                <Row label="Floor Area & Volume" icon="deployed_code" value={<span className="font-data">24.0 m² · 67.2 m³ (A/V: 1.19)</span>} />
-                <Row label="Number of Floors" icon="layers" value={<T>{floors}</T>} />
-                <Row label="Capital Budget Limit" icon="payments" value={<span className="font-data">{Number(c.maximum_capex_inr) > 0 ? inr.format(Number(c.maximum_capex_inr)) : "—"}</span>} />
-                <Row label="Envelope Thickness" icon="straighten" value={<span className="font-data">Wall 350mm · Roof 280mm</span>} />
-                <Row label="Selected Materials" icon="category" value={<span className="text-right"><Labels ids={c.available_material_ids} from={MATERIALS} /></span>} />
-              </SummaryCard>
-
-              <SummaryCard step={3} title="3. Windows, Doors & Apertures" icon="window" issues={0}>
-                <Row label="Window Count & Size" icon="grid_view" value={<span className="font-data">4 Units · 1.2m × 1.5m</span>} />
-                <Row label="Glazing Area & WWR" icon="aspect_ratio" value={<span className="font-data">7.20 m² · WWR 14.5%</span>} />
-                <Row label="Glazing Quality & Tilt" icon="solar_power" value={<span className="font-data">Triple Argon · South (0°)</span>} />
-                <Row label="Entrance Doors & Airlock" icon="door_front" value={<span className="font-data">1 Insulated Door + Vestibule</span>} />
-              </SummaryCard>
-
-              <SummaryCard step={3} title="4. Internal Loads & Operating Scenario" icon="groups" issues={count("mission")}>
-                <Row label="Mission / Use Type" icon="flag" value={<Labels ids={[m.type]} from={MISSION_TYPES} />} />
-                <Row label="Occupancy & Metabolic Load" icon="person" value={<span className="font-data">{m.occupants} Troops · 120 W/soldier</span>} />
-                <Row label="Initial Temp (T_initial)" icon="thermostat" value={<span className="font-data">+5.0°C</span>} />
-                <Row label="Infiltration Rate (ACH)" icon="air" value={<span className="font-data">0.8 ACH</span>} />
-                <Row label="Comfort Target" icon="thermostat_auto" value={<span className="font-data">{m.target_temperature_c}°C (Max {m.maximum_unmet_hours} hr/wk unmet)</span>} />
-              </SummaryCard>
-
-              <SummaryCard step={4} title="5. Auxiliary Heating & Optimization" icon="tune" issues={count("economics")}>
-                <Row label="Auxiliary Heating Power" icon="local_fire_department" value={<span className="font-data">Medium (2,500 W) · Kerosene</span>} />
-                <Row label="Simulation Mode" icon="settings" value={<T>{hvacLabel}</T>} />
-                <Row label="Lifecycle Price Scenario" icon="payments" value={<Labels ids={[draft.economic_assumption_set_id]} from={ECONOMIC_ASSUMPTION_SETS} />} />
-                {engineering && <Row label="Candidate Count" icon="data_array" value={<span className="font-data">{draft.run.candidate_count}</span>} />}
-              </SummaryCard>
-
-            </div>
-
-            {/* Right column: launch actions */}
-            <div className="lg:col-span-5 flex flex-col gap-5">
-
-              {/* Launch card */}
-              <div className="bg-gradient-to-br from-primary-container via-[#172554] to-primary rounded-xl p-6 shadow-feature flex flex-col gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-white text-[24px]">rocket_launch</span>
-                  <h3 className="font-headline-md text-headline-md text-white font-bold">
-                    <T>Launch Simulation</T>
+            {/* Launch Action Card */}
+            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-card flex flex-col gap-4 border-2 border-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[22px]">rocket_launch</span>
+                </div>
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                    <T>Launch Generative Optimization</T>
                   </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    <T>Executes M3 weather freeze, M2 geometry synthesis, M4 RC verification, M7 economics and M6 Pareto ranking.</T>
+                  </p>
                 </div>
-                <p className="font-body-sm text-body-sm text-white/80">
-                  <T>COCOON will run thermal analysis, solar energy modeling, heat flow calculations and ANSYS validation. Estimated time: 4–12 minutes.</T>
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-white/80 text-xs">
-                  {[
-                    { icon: "settings", label: "3,200+ configurations evaluated" },
-                    { icon: "filter_alt", label: "Top 120 candidates shortlisted" },
-                    { icon: "verified", label: "ANSYS FEA on top picks" },
-                    { icon: "summarize", label: "Full DRDO report generated" },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[14px] text-white/60">{item.icon}</span>
-                      <span>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-                {!allValid && (
-                  <div className="flex items-start gap-2 p-3 rounded-xl bg-error-container/80 text-on-error-container font-body-sm text-body-sm">
-                    <span className="material-symbols-outlined text-[16px] shrink-0">error</span>
-                    <T>Complete all steps marked "to fix" before launching.</T>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  disabled={!allValid || launching}
-                  onClick={launch}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-primary font-bold text-sm hover:bg-slate-100 transition-all shadow-md hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="material-symbols-outlined text-[20px]">{launching ? "hourglass_top" : "play_circle"}</span>
-                  <T>{launching ? "Queuing Pareto Solver..." : "Launch Simulation"}</T>
-                </button>
               </div>
 
-              {/* Requirements JSON (for engineers) */}
-              <details className="bg-surface-container-lowest rounded-xl shadow-card group">
-                <summary className="flex items-center justify-between gap-2 p-5 cursor-pointer list-none">
-                  <span className="flex items-center gap-2 font-headline-sm text-headline-sm text-on-surface font-semibold">
-                    <span className="material-symbols-outlined text-[18px] text-secondary">data_object</span>
-                    <T>Requirements JSON</T>
-                    <span className="font-data text-[10px] px-2 py-0.5 rounded-full bg-surface-container-low text-on-surface-variant">schema 4.0</span>
-                  </span>
-                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
-                </summary>
-                <div className="px-5 pb-5 flex flex-col gap-3">
-                  <pre className="mono-scope max-h-80 overflow-auto rounded-xl bg-inverse-surface text-inverse-on-surface p-4 text-[11px] leading-relaxed">{json}</pre>
-                  <button
-                    type="button"
-                    onClick={downloadJson}
-                    className="hover-lift self-start inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm font-medium"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">download</span>
-                    <T>Download requirements.json</T>
-                  </button>
+              {launchError && (
+                <div className="p-3 rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">error</span>
+                  <div className="flex flex-col gap-1.5">
+                    <span>{launchError}</span>
+                    {launchSuggestions.length > 0 && (
+                      <ul className="list-disc pl-4 text-xs space-y-1">
+                        {launchSuggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+                      </ul>
+                    )}
+                  </div>
                 </div>
-              </details>
+              )}
 
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={launch}
+                  disabled={!allValid || launching}
+                  className="flex-1 h-11 px-5 rounded-xl bg-primary hover:bg-primary-hover active:bg-primary text-on-primary font-body-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {launching ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin" />
+                      <T>Synthesizing & Solving...</T>
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-[20px]">play_arrow</span>
+                      <T>Run Solver & Optimization</T>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={downloadJson}
+                  className="h-11 px-4 rounded-xl border border-outline-variant hover:bg-surface-container-low font-body-sm font-medium text-on-surface flex items-center justify-center gap-2 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  <T>JSON</T>
+                </button>
+              </div>
             </div>
+
           </div>
+
+          {/* Right Column: Complete Input Review */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+
+            {/* 1. Geographic & Weather Window */}
+            <SummaryCard step={1} title="Geographic & Weather Window" icon="location_on" issues={count("site")}>
+              <Row label="Coordinates" value={`${draft.site.latitude_deg}°N, ${draft.site.longitude_deg}°E`} icon="my_location" />
+              <Row label="Elevation" value={`${draft.site.elevation_m} m`} icon="altitude" />
+              <Row label="Analysis Window" value={`${draft.site.analysis_start} → ${draft.site.analysis_end}`} icon="date_range" />
+              <Row label="Timezone" value={draft.site.timezone} icon="schedule" />
+            </SummaryCard>
+
+            {/* 2. Mission & Occupancy */}
+            <SummaryCard step={2} title="Mission & Occupancy" icon="groups" issues={count("mission")}>
+              <Row
+                label="Mission Type"
+                value={MISSION_TYPES.find((t) => t.id === draft.mission.type)?.label ?? draft.mission.type}
+                icon="military_tech"
+              />
+              <Row label="Troop Count" value={`${draft.mission.occupants} personnel`} icon="person" />
+              <Row
+                label="Required Rooms"
+                value={draft.mission.required_rooms.map((r) => ROOM_TYPES.find((x) => x.id === r)?.label ?? r).join(", ")}
+                icon="meeting_room"
+              />
+              <Row label="Target Temperature" value={`${draft.mission.target_temperature_c} °C`} icon="thermostat" />
+              <Row label="Max Unmet Hours" value={`${draft.mission.maximum_unmet_hours} h`} icon="timer" />
+            </SummaryCard>
+
+            {/* 3. Site Limits & Constraints */}
+            <SummaryCard step={3} title="Site Limits & Constraints" icon="rule" issues={count("constraints")}>
+              <Row label="Max Footprint" value={`${draft.constraints.maximum_footprint_m2} m²`} icon="crop_free" />
+              <Row label="Max Floors" value={`${draft.constraints.maximum_floors} floor(s)`} icon="layers" />
+              <Row
+                label="Budget Ceiling"
+                value={inr.format(Number(draft.constraints.maximum_capex_inr || 0))}
+                icon="currency_rupee"
+              />
+              <Row
+                label="Approved Materials"
+                value={draft.constraints.available_material_ids.map((id) => MATERIALS.find((m) => m.id === id)?.label ?? id).join(", ")}
+                icon="category"
+              />
+              <Row
+                label="Heater Fuels"
+                value={draft.constraints.heater_fuels.map((f) => HEATER_FUELS.find((x) => x.id === f)?.label ?? f).join(", ")}
+                icon="local_fire_department"
+              />
+              {draft.constraints.maximum_mass_kg && (
+                <Row label="Max Total Weight" value={`${draft.constraints.maximum_mass_kg} kg`} icon="weight" />
+              )}
+              {draft.constraints.max_assembly_time_hours && (
+                <Row label="Max Assembly Time" value={`${draft.constraints.max_assembly_time_hours} hours`} icon="timer" />
+              )}
+            </SummaryCard>
+
+            {/* 4. Physical & Envelope Overrides */}
+            <SummaryCard step={4} title="Physical & Envelope Overrides" icon="architecture" issues={count("design")}>
+              <Row
+                label="Fixed Dimensions"
+                value={`${draft.design.length_m}m (L) × ${draft.design.width_m}m (W) × ${draft.design.height_m}m (H)`}
+                icon="straighten"
+              />
+              <Row
+                label="Thicknesses"
+                value={`Wall: ${draft.design.wall_thickness_mm}mm | Roof: ${draft.design.roof_thickness_mm}mm | Floor: ${draft.design.floor_thickness_mm}mm`}
+                icon="layers"
+              />
+              <Row
+                label="Windows & Glazing"
+                value={
+                  draft.design.glazing === "none" || Number(draft.design.window_count || 0) === 0
+                    ? "None (Opaque building envelope)"
+                    : Number(draft.design.window_count) === 1
+                    ? `1 window (${draft.design.windows?.[0]?.width_m ?? draft.design.window_width_m}m × ${draft.design.windows?.[0]?.height_m ?? draft.design.window_height_m}m, ${draft.design.windows?.[0]?.orientation ?? draft.design.window_orientation}, ${draft.design.glazing})`
+                    : `${draft.design.window_count} windows configured individually (${draft.design.glazing})`
+                }
+                icon="window"
+              />
+              <Row label="Airtightness" value={`${draft.design.air_changes_per_hour} ACH`} icon="air" />
+            </SummaryCard>
+
+          </div>
+
         </div>
       </div>
 
-      <WizardFooter
-        step={5}
-        nextLabel="Launch Simulation"
-        onNext={launch}
-        nextPending={launching}
-        pendingLabel="Queuing Pareto Solver..."
-        canProceed={allValid}
-      />
+      <WizardFooter step={5} canProceed={allValid} />
     </div>
   );
 }

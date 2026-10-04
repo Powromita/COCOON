@@ -17,7 +17,10 @@ export const ROUTES = {
     step5: "/shelter-configurator/step-5",
   },
   candidateTelemetry: "/candidate-telemetry",
-  candidateDetail: (id: string) => `/candidate-telemetry/${encodeURIComponent(id)}`,
+  candidateDetail: (id: string) =>
+    id.startsWith("opt_")
+      ? `/candidate-telemetry?opt=${encodeURIComponent(id)}`
+      : `/candidate-telemetry/${encodeURIComponent(id)}`,
   benchmarkLibrary: "/benchmark-library",
   reports: "/reports",
 } as const;
@@ -44,12 +47,11 @@ export type ConfiguratorPhase = {
  * Engineering Optimization) is Engineer/Admin-only and not part of the standard flow.
  */
 export const CONFIGURATOR_PHASES: ConfiguratorPhase[] = [
-  { code: "01", label: "Location & Dates", detail: "Site, season & weather source", step: 1 },
-  { code: "02", label: "Mission & Occupancy", detail: "Mission, rooms & comfort target", step: 2 },
-  { code: "03", label: "Constraints & Materials", detail: "Footprint, budget, materials & fuel", step: 3 },
-  { code: "04", label: "Economics", detail: "Lifecycle assumption set", step: 4 },
-  { code: "05", label: "Review & Launch", detail: "Summary & solver settings", step: 5 },
-  { code: "06", label: "Advanced", detail: "Eng/Admin only", locked: true },
+  { code: "01", label: "Location & Weather", detail: "Site coordinates, elevation & dates", step: 1 },
+  { code: "02", label: "Mission & Occupancy", detail: "Mission type, troops, rooms & comfort", step: 2 },
+  { code: "03", label: "Site Limits & Constraints", detail: "Footprint, floors, budget, materials & fuels", step: 3 },
+  { code: "04", label: "Envelope & Architecture", detail: "Dimensions, thicknesses, glazing & ACH", step: 4 },
+  { code: "05", label: "Review & Solver Controls", detail: "Candidate pool, ANSYS, economics & launch", step: 5 },
 ];
 
 /** Number of steps in the standard flow (excludes the locked Advanced step). */
@@ -60,13 +62,14 @@ export type NavItem = {
   href: string;
   /** Path prefix that marks this item active (covers nested routes). */
   match: string;
+  icon: string;
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: ROUTES.dashboard, match: "/dashboard" },
-  { label: "Projects", href: ROUTES.projects, match: "/projects" },
-  { label: "Shelter Configurator", href: ROUTES.shelterConfigurator.step1, match: "/shelter-configurator" },
-  { label: "Candidate Telemetry", href: ROUTES.candidateTelemetry, match: "/candidate-telemetry" },
+  { label: "Dashboard", href: ROUTES.dashboard, match: "/dashboard", icon: "dashboard" },
+  { label: "Projects", href: ROUTES.projects, match: "/projects", icon: "folder_special" },
+  { label: "Shelter Configurator", href: ROUTES.shelterConfigurator.step1, match: "/shelter-configurator", icon: "tune" },
+  { label: "Simulation Results", href: ROUTES.candidateTelemetry, match: "/candidate-telemetry", icon: "monitoring" },
 ];
 
 export function isNavItemActive(item: NavItem, pathname: string): boolean {

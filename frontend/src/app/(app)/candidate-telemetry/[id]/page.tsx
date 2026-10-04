@@ -1,24 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, redirect } from "next/navigation";
 import { useState } from "react";
 import { getCandidate } from "@/lib/mock-data";
 import { ROUTES } from "@/lib/routes";
 import { T, useT } from "@/lib/i18n";
 import Badge from "@/components/ui/Badge";
 
-function formatSimTime(value: number) {
-  const hours = Math.floor(value);
-  const minutes = value % 1 === 0.5 ? "30" : "00";
-  return `${hours.toString().padStart(2, "0")}:${minutes} HRS`;
-}
-
 export default function CandidateDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const decodedId = decodeURIComponent(id || "");
+
+  if (decodedId.startsWith("opt_")) {
+    redirect(`/candidate-telemetry?opt=${encodeURIComponent(decodedId)}`);
+  }
+
   const t = useT();
-  const match = getCandidate(decodeURIComponent(id));
-  const [simTime, setSimTime] = useState(12.5);
+  const match = getCandidate(decodedId);
 
   if (!match) notFound();
   const candidate = match;
@@ -218,77 +217,8 @@ export default function CandidateDetailPage() {
                   <text fill="#6ee7b7" fontFamily="sans-serif" fontSize="10" fontWeight="bold" x="486" y="254">+20.8°C LIVING</text>
                 </svg>
               </div>
-
-              {/* Floating Top Right HUD */}
-              <div className="absolute top-4 right-4 z-20 bg-slate-900/90 backdrop-blur-md p-3.5 rounded-xl border border-white/10 text-white flex flex-col gap-1.5 min-w-[200px]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/70">Core Delta (ΔT)</span>
-                  <span className="font-bold text-white font-data">+59.0 K</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/70">Indoor Air Quality</span>
-                  <span className="font-bold text-equilibrium font-data">428 PPM CO₂</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/70">Condensation Risk</span>
-                  <span className="font-bold text-equilibrium font-data">0.0%</span>
-                </div>
-              </div>
-
-              {/* Isotherm Scale Bar */}
-              <div className="absolute bottom-4 left-4 z-20 bg-slate-900/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/10 flex flex-col gap-1.5 min-w-[280px]">
-                <div className="flex items-center justify-between text-[11px] text-white/80 font-semibold">
-                  <span>Isotherm Temperature (°C)</span>
-                  <span className="text-secondary font-bold">MIL-STD</span>
-                </div>
-                <div className="w-full h-2.5 rounded-full bg-gradient-to-r from-[#1E3A8A] via-[#006878] via-[#059669] via-[#D97706] to-[#BA1A1A]" />
-                <div className="flex justify-between text-[10px] text-white/60 font-data">
-                  <span>-40°C</span>
-                  <span>-20°C</span>
-                  <span>0°C</span>
-                  <span className="text-equilibrium font-bold">+18°C</span>
-                  <span className="text-thermal font-bold">+24°C</span>
-                </div>
               </div>
             </div>
-
-            {/* Diurnal Solar Time Slider (Interactive & Functional) */}
-            <div className="w-full bg-surface-container-lowest p-4 border-t border-line flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-on-surface">
-                  <span className="material-symbols-outlined text-thermal text-[20px]">sunny</span>
-                  <span className="text-xs font-bold">
-                    <T>Diurnal Sun Path &amp; Solar Absorption Time</T>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-on-surface-variant uppercase">Time of Day:</span>
-                  <span className="text-xs font-bold text-navy px-2.5 py-0.5 bg-primary-fixed rounded-full font-data">
-                    {formatSimTime(simTime)}
-                  </span>
-                </div>
-              </div>
-
-              <input
-                className="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-navy"
-                max="24"
-                min="0"
-                step="0.5"
-                type="range"
-                value={simTime}
-                onChange={(e) => setSimTime(parseFloat(e.target.value))}
-                aria-label="Simulated time of day"
-              />
-
-              <div className="flex justify-between text-[11px] text-on-surface-variant font-data">
-                <span>00:00 (Night Min -41°C)</span>
-                <span className="text-thermal font-semibold">07:45 (Dawn)</span>
-                <span className="text-navy font-bold">12:30 (Solar Peak 980 W/m²)</span>
-                <span className="text-thermal font-semibold">17:15 (Dusk)</span>
-                <span>23:59 (PCM Discharge)</span>
-              </div>
-            </div>
-          </div>
 
           {/* Dimensions & Geometric Footprint */}
           <div className="w-full bg-surface-container-lowest p-5 rounded-2xl border border-line shadow-card flex flex-col gap-3">

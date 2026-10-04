@@ -82,7 +82,8 @@ def compare_m4_with_ansys(job_dir: Path) -> dict[str, Any]:
     if not pooled:
         return {"compared": False, "reason": "no matching timestamps between the ANSYS series and the M4 run"}
     n = len(pooled)
-    return {"compared": True, "reference_engine": f"{res.engine.name} {res.engine.version}", "scenario": "48 h free-floating",
+    return {"compared": True, "reference_engine": f"{res.engine.name} {res.engine.version}",
+            "scenario": f"{len(times)} h free-floating",
             "pooled": {"n": n, "mae_c": sum(abs(e) for e in pooled) / n, "rmse_c": math.sqrt(sum(e * e for e in pooled) / n),
                        "max_abs_c": max(abs(e) for e in pooled), "bias_ansys_minus_m4_c": sum(pooled) / n},
             "zones": zones, "m4_exclusions": ["opaque solar", "long-wave", "infiltration", "door exchange", "stair exchange", "heating"],
@@ -91,7 +92,12 @@ def compare_m4_with_ansys(job_dir: Path) -> dict[str, Any]:
 
 def run_ansys_validation(building: Any, weather: Any, materials: Any, hours: int = 48, wait: bool = True,
                          jobs_dir: Path | None = None) -> dict[str, Any]:
-    """Freeze, solve (blocking when wait=True) and compare. VALIDATED_BY_ANSYS only when the job COMPLETED."""
+    """Freeze, solve (blocking when wait=True) and compare.
+
+    A completed ANSYS solve validates that exact revision. Agreement with the
+    reduced-order M4 model is reported separately and may raise a warning, but
+    it must not discard successful independent ANSYS evidence.
+    """
     sub = ansys_hook.submit(building, weather.model_copy(update={"hourly_data": weather.hourly_data[:hours]}), materials,
                             jobs_dir=jobs_dir, wait=wait)
     if not wait or sub["state"] != ansys_hook.STATE_QUEUED:
@@ -105,6 +111,23 @@ def run_ansys_validation(building: Any, weather: Any, materials: Any, hours: int
         cmp = compare_m4_with_ansys(Path(sub["job_dir"]))
     except Exception as exc:                                        # noqa: BLE001
         cmp = {"compared": False, "reason": f"{type(exc).__name__}: {exc}"}
-    return {**sub, "state": STATE_VALIDATED, "hours": hours, "comparison_m4_vs_ansys": cmp,
+    thresholds = {"mae_c_max": 2.0, "rmse_c_max": 2.5, "max_abs_c_max": 5.0}
+    pooled = cmp.get("pooled", {}) if cmp.get("compared") else {}
+    agreement_within_thresholds = bool(
+        cmp.get("compared")
+        and pooled.get("mae_c", float("inf")) <= thresholds["mae_c_max"]
+        and pooled.get("rmse_c", float("inf")) <= thresholds["rmse_c_max"]
+        and pooled.get("max_abs_c", float("inf")) <= thresholds["max_abs_c_max"]
+    )
+    if agreement_within_thresholds:
+        warning = None
+    elif cmp.get("compared"):
+        warning = "RC-to-ANSYS discrepancy exceeds the comparison thresholds; ANSYS evidence is retained"
+    else:
+        warning = f"RC-to-ANSYS comparison unavailable: {cmp.get('reason', 'unknown reason')}; ANSYS evidence is retained"
+    return {**sub, "state": STATE_VALIDATED, "hours": hours, "accepted": True,
+            "agreement_within_thresholds": agreement_within_thresholds,
+            "acceptance_thresholds": thresholds, "comparison_m4_vs_ansys": cmp,
+            "reason": None, "warning": warning,
             "meaning": "ANSYS MAPDL solved this exact revision independently; it validates conduction and window-solar behaviour "
-                       "for the 48 h free-floating scenario only, not a general accuracy claim"}
+                       f"for the {hours} h free-floating scenario only, not a general accuracy claim"}

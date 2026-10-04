@@ -15,13 +15,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <BrandMark className="h-8 w-8" />
             <span className="font-headline-sm text-headline-sm uppercase tracking-wider text-primary font-semibold"><T>COCOON</T></span>
           </div>
-          <p className="font-label-mono-xs text-label-mono-xs uppercase text-on-surface-variant tracking-wider">
-            <T>MIL-PRF-32535 THERMAL DECISION PLATFORM</T>
+          <p className="text-xs uppercase tracking-wider text-on-surface-variant font-medium">
+            <T>Thermal Shelter Design &amp; Simulation</T>
           </p>
         </Link>
       </header>
-      <main className="w-full flex-1 flex flex-col items-center justify-center px-margin-sm py-space-md">
-        <div className="w-full max-w-[440px]">{children}</div>
+      <main className="w-full flex-1 flex flex-col items-center justify-center px-margin-sm py-space-xl">
+        <div className="w-full">{children}</div>
       </main>
     </div>
   );

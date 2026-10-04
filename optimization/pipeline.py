@@ -77,6 +77,7 @@ SCHEMA = "PROPOSED cocoon.m6.optimization_result 0 (not an M0 contract)"
 # what happened to a design
 EXCLUDED_CONSTRAINTS = "excluded_by_constraints"
 DISCARDED_ML = "discarded_by_ml"
+DISCARDED_SCREENING = "screened_out_by_fast_rc"
 FAILED_VERIFICATION = "failed_verification"
 FAILED_ECONOMICS = "failed_economics"
 EXCLUDED_AFTER_PRICING = "excluded_after_pricing"
@@ -84,7 +85,7 @@ NOT_COMPARABLE = "not_comparable"
 DOMINATED = "dominated"
 ON_FRONT = "on_front"
 ON_FRONT_OVER_LIMIT = "on_front_over_unmet_limit"
-OUTCOMES = (EXCLUDED_CONSTRAINTS, DISCARDED_ML, FAILED_VERIFICATION, FAILED_ECONOMICS, EXCLUDED_AFTER_PRICING, NOT_COMPARABLE,
+OUTCOMES = (EXCLUDED_CONSTRAINTS, DISCARDED_ML, DISCARDED_SCREENING, FAILED_VERIFICATION, FAILED_ECONOMICS, EXCLUDED_AFTER_PRICING, NOT_COMPARABLE,
             DOMINATED, ON_FRONT, ON_FRONT_OVER_LIMIT)
 RUN_MODES_PER_DESIGN = 2                      # ideal-load + capacity-limited (free-floating is a third when included)
 
@@ -133,6 +134,7 @@ class OptimizationSettings:
     ranking: RankingSettings = field(default_factory=RankingSettings)
     reliability: PerturbationSpec | None = field(default_factory=PerturbationSpec)      # None switches reliability off
     reliability_max_designs: int = 8              # PLACEHOLDER: contenders assessed when more are eligible
+    strict_reliability_cap: bool = False           # staged mode keeps the selected set at or below the cap
     cost_scenario: CostScenario = CostScenario.EXPECTED
     max_runs: int | None = None                   # refuse a plan that needs more simulator runs than this
 
@@ -251,13 +253,52 @@ def _values(o: ObjectiveResult) -> dict[str, float | None]:
     return {k: v.value for k, v in o.values.items()}
 
 
-def _select_for_reliability(pool: Sequence[str], scores: Mapping[str, Mapping[str, float]], picks: Mapping[str, NamedPick], cap: int) -> list[str]:
-    """The eligible designs whose robustness is worth measuring: everyone if they fit, else the best by score plus every pick."""
+def _generation_failure_details(generated) -> dict[str, Any]:
+    reasons = dict(generated.reasons)
+    keys = set(reasons)
+    if any(key.startswith("layout:") for key in keys):
+        category, phase = "LAYOUT_SEARCH_EXHAUSTED", "layout_generation"
+        suggestions = ["Increase the footprint or allowed floor count.", "Relax fixed dimensions or room separation."]
+    elif any(key.startswith("connections:") for key in keys):
+        category, phase = "ACCESS_GRAPH_INFEASIBLE", "connection_generation"
+        suggestions = ["Increase room dimensions so doors and circulation paths can fit."]
+    elif any(key.startswith("geometry:") or key.startswith("constraints:openings") for key in keys):
+        category, phase = "GEOMETRY_INFEASIBLE", "geometry_validation"
+        suggestions = ["Increase envelope dimensions or reduce the requested window count and size."]
+    elif "constraints:envelope_mass_within_limit" in keys:
+        category, phase = "MASS_LIMIT_EXCEEDED", "candidate_validation"
+        suggestions = ["Increase the maximum mass or select lightweight structural materials."]
+    elif any(key.startswith("composition:") for key in keys):
+        category, phase = "MATERIAL_COMPOSITION_INFEASIBLE", "candidate_validation"
+        suggestions = ["Enable a compatible structural material or adjust envelope thicknesses."]
+    else:
+        category, phase = "NO_VALID_CANDIDATES", "candidate_validation"
+        suggestions = ["Review the rejection breakdown and relax the corresponding hard constraints."]
+    return {
+        "attempts": generated.attempts,
+        "reasons": reasons,
+        "failure_category": category,
+        "failure_phase": phase,
+        "proven_infeasible": False,
+        "suggestions": suggestions,
+    }
+
+
+def _select_for_reliability(pool: Sequence[str], scores: Mapping[str, Mapping[str, float]], picks: Mapping[str, NamedPick],
+                            cap: int, strict: bool = False) -> list[str]:
+    """Choose contenders for robustness; staged mode can enforce a true upper bound."""
     if len(pool) <= cap:
         return sorted(pool)
     by_score = sorted(pool, key=lambda d: (-scores[d]["overall"], d))
-    chosen = set(by_score[:cap]) | {p.design_id for p in picks.values() if p.design_id}
-    return sorted(chosen)
+    if not strict:
+        return sorted(set(by_score[:cap]) | {p.design_id for p in picks.values() if p.design_id})
+    priority = []
+    for name in ("best_overall", "best_thermal", "lowest_lcc", "lowest_capex"):
+        design_id = picks[name].design_id
+        if design_id in pool and design_id not in priority:
+            priority.append(design_id)
+    priority.extend(d for d in by_score if d not in priority)
+    return priority[:cap]
 
 
 def optimize(
@@ -315,7 +356,7 @@ def optimize(
                                    dict(generated.reasons))
     if not candidates:
         raise OptimizationError("M2 produced no valid design for these requirements", "NO_CANDIDATES",
-                                {"attempts": generated.attempts, "reasons": dict(generated.reasons)})
+                                _generation_failure_details(generated))
     if not generated.complete:
         warnings.append(f"only {len(candidates)} of the {generated.requested} requested designs could be generated")
     t = lap("generation", t)
@@ -408,7 +449,8 @@ def optimize(
     reliability: ReliabilityResult | None = None
     reliability_runs = 0
     if settings.reliability is not None and ranking.eligible:
-        chosen = _select_for_reliability(ranking.eligible, ranking.scores, ranking.picks, settings.reliability_max_designs)
+        chosen = _select_for_reliability(ranking.eligible, ranking.scores, ranking.picks, settings.reliability_max_designs,
+                                         strict=settings.strict_reliability_cap)
         budget = None if settings.max_runs is None else settings.max_runs - verification_runs
         try:
             if budget is not None and budget < 1:
@@ -457,7 +499,9 @@ def optimize(
         if rec.decision == "exclude":
             outcomes.append(DesignOutcome(status=EXCLUDED_CONSTRAINTS, stage="constraints", reason=rec.reason, failed_constraints=failed, **base))
         elif rec.decision == "discard":
-            outcomes.append(DesignOutcome(status=DISCARDED_ML, stage="screening", reason=rec.reason, recommendation_state=(
+            screened_by_fast_rc = bool(rec.model_version and rec.model_version.startswith("m4-fast-screen"))
+            outcomes.append(DesignOutcome(status=DISCARDED_SCREENING if screened_by_fast_rc else DISCARDED_ML,
+                                          stage="screening", reason=rec.reason, recommendation_state=(
                 rec.recommendation_state.value if rec.recommendation_state else None), development_only=bool(screening.development_only), **base))
         elif v is not None and v.status == "failed":
             outcomes.append(DesignOutcome(status=FAILED_VERIFICATION, stage=v.failure.stage,

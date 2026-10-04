@@ -1,7 +1,7 @@
 """
 layout_generator.py - Place rooms of a template on a footprint.
 
-Input : a TemplateMatch (Stage 1), a GenerationSpec (Stage 2) and a seed.
+Input : a template match or requirement-derived RoomPlan, a GenerationSpec and a seed.
 Output: a Layout - every zone's id, type, floor, origin and size, plus the
         stair footprint, in the building's local frame.
 
@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 from pydantic import ValidationError
@@ -200,6 +200,113 @@ def plan_rooms(match: TemplateMatch, spec: GenerationSpec) -> RoomPlan:
     )
 
 
+def plan_rooms_from_requirements(spec: GenerationSpec, floor_count: int) -> RoomPlan:
+    """Build a preliminary room plan without consulting the template catalog.
+
+    Rooms are kept separate and assigned deterministically to the least-loaded
+    floor. Connectivity is intentionally left empty here; a later pipeline
+    phase derives door and stair links from geometry that actually shares a
+    boundary.
+    """
+    if floor_count not in spec.allowed_floor_counts:
+        raise NoFeasibleLayoutError(
+            f"{floor_count} floor(s) requested; the requirements allow {list(spec.allowed_floor_counts)}",
+            {"reasons": {"floor_count_not_allowed": 1}, "attempts": 0},
+        )
+    if floor_count > len(spec.rooms):
+        raise NoFeasibleLayoutError(
+            f"cannot distribute {len(spec.rooms)} room(s) across {floor_count} non-empty floors",
+            {"reasons": {"more_floors_than_rooms": 1}, "attempts": 0},
+        )
+
+    assignments: list[list] = [[] for _ in range(floor_count)]
+    loads = [0.0] * floor_count
+    stair_reserve = [
+        spec.stair_allowance_m2 * ((1 if level > 0 else 0) + (1 if level < floor_count - 1 else 0))
+        for level in range(floor_count)
+    ]
+    capacities = [
+        math.inf if spec.footprint_cap_m2 is None else spec.footprint_cap_m2 - stair_reserve[level]
+        for level in range(floor_count)
+    ]
+    indexed_rooms = list(enumerate(spec.rooms))
+
+    airlock = next(((i, room) for i, room in indexed_rooms if room.room_type == AIRLOCK), None)
+    if airlock is not None:
+        assignments[0].append(airlock)
+        loads[0] += airlock[1].min_area_m2 * spec.circulation_factor
+        indexed_rooms.remove(airlock)
+        if loads[0] > capacities[0] + 1e-9:
+            raise NoFeasibleLayoutError(
+                "the required ground-floor entrance room exceeds the available floor capacity",
+                {"reasons": {"floor_allocation_failed": 1}, "attempts": 0, "floor": 0},
+            )
+
+    ordered = sorted(indexed_rooms, key=lambda item: (-item[1].min_area_m2, item[0]))
+
+    def allocate(index: int) -> bool:
+        if index == len(ordered):
+            return all(assignments)
+        item = ordered[index]
+        area = item[1].min_area_m2 * spec.circulation_factor
+        empty = [level for level in range(floor_count) if not assignments[level]]
+        remaining_after = len(ordered) - index - 1
+        levels = sorted(range(floor_count), key=lambda level: (loads[level], level))
+        if empty and remaining_after < len(empty):
+            levels = empty
+        for level in levels:
+            if loads[level] + area > capacities[level] + 1e-9:
+                continue
+            assignments[level].append(item)
+            loads[level] += area
+            if allocate(index + 1):
+                return True
+            loads[level] -= area
+            assignments[level].pop()
+        return False
+
+    if not allocate(0):
+        raise NoFeasibleLayoutError(
+            f"rooms cannot be allocated across {floor_count} floor(s) within the per-floor footprint limit",
+            {
+                "reasons": {"floor_allocation_failed": 1},
+                "attempts": 0,
+                "floor_count": floor_count,
+                "floor_capacity_m2": capacities,
+                "stair_reserve_m2": stair_reserve,
+            },
+        )
+
+    entrance_type = AIRLOCK if airlock is not None else assignments[0][0][1].room_type
+    occupied_types = {"living", "sleeping", "command", "medical", "multipurpose"}
+    planned: list[PlannedRoom] = []
+    for level, assigned in enumerate(assignments):
+        stair_anchor = min(assigned)[1].room_type if stair_reserve[level] else None
+        for _, room in sorted(assigned):
+            area = round(room.min_area_m2 * spec.circulation_factor, 6)
+            if room.room_type == stair_anchor:
+                area = round(area + stair_reserve[level], 6)
+            planned.append(PlannedRoom(
+                id=room.room_type,
+                type=room.room_type,
+                floor_level=level,
+                weight=area,
+                exterior_access=level == 0 and room.room_type == entrance_type,
+                is_primary_occupied=room.room_type in occupied_types,
+                min_area_m2=area,
+                min_dimension_m=room.min_dimension_m,
+                provides=(room.room_type,),
+            ))
+
+    return RoomPlan(
+        template_id="generated_from_requirements",
+        floor_count=floor_count,
+        rooms=tuple(planned),
+        links=(),
+        pruned_rooms=(),
+    )
+
+
 # ----- geometry helpers (integer 0.1 m units) ------------------------------
 Rect = tuple[int, int, int, int]  # x0, y0, x1, y1
 
@@ -273,10 +380,64 @@ def _to_m(v: int) -> float:
     return round(v / DM, 1)
 
 
+def _dynamic_links(plan: RoomPlan, rects: dict[str, Rect]) -> tuple[tuple[str, str, str], ...] | None:
+    """Build a walkable spanning topology from boundaries created by partitioning."""
+    links: list[tuple[str, str, str]] = []
+    rooms_by_floor: dict[int, list[str]] = {}
+    for room in plan.rooms:
+        rooms_by_floor.setdefault(room.floor_level, []).append(room.id)
+
+    for level, room_ids in sorted(rooms_by_floor.items()):
+        root = next((room.id for room in plan.rooms if room.floor_level == level and room.exterior_access), None)
+        root = root or next((rid for rid in room_ids if rid == "living"), room_ids[0])
+        seen = {root}
+        while len(seen) < len(room_ids):
+            candidates = []
+            for a in sorted(seen):
+                for b in sorted(set(room_ids) - seen):
+                    shared = _shared_wall(rects[a], rects[b])
+                    if shared >= MIN_SHARED_WALL_DM:
+                        preferred = 0 if "living" in (a, b) else 1
+                        candidates.append((preferred, -shared, a, b))
+            if not candidates:
+                return None
+            _, _, a, b = min(candidates)
+            links.append((a, b, "door"))
+            seen.add(b)
+
+    for lower_level in range(plan.floor_count - 1):
+        lower = rooms_by_floor[lower_level]
+        upper = rooms_by_floor[lower_level + 1]
+        candidates = []
+        for a in lower:
+            for b in upper:
+                overlap = _overlap(rects[a], rects[b])
+                if overlap is None:
+                    continue
+                ow, oh = overlap[2] - overlap[0], overlap[3] - overlap[1]
+                candidates.append((-(ow * oh), a, b))
+        if not candidates:
+            return None
+        _, a, b = min(candidates)
+        links.append((a, b, "stair"))
+    return tuple(links)
+
+
 # ----- the generator -------------------------------------------------------
-def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> Layout:
-    """One deterministic layout for ``seed``. Raises NoFeasibleLayoutError."""
-    plan = plan_rooms(match, spec)
+def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int, *, fixed_length_m: float | None = None,
+                    fixed_width_m: float | None = None, fixed_height_m: float | None = None) -> Layout:
+    """Generate a layout from a matching catalog template."""
+    return generate_layout_from_plan(
+        plan_rooms(match, spec), spec, seed,
+        fixed_length_m=fixed_length_m, fixed_width_m=fixed_width_m, fixed_height_m=fixed_height_m,
+    )
+
+
+def generate_layout_from_plan(plan: RoomPlan, spec: GenerationSpec, seed: int, *,
+                              fixed_length_m: float | None = None,
+                              fixed_width_m: float | None = None,
+                              fixed_height_m: float | None = None) -> Layout:
+    """Generate one deterministic layout from any RoomPlan."""
 
     if plan.floor_count not in spec.allowed_floor_counts:
         raise NoFeasibleLayoutError(
@@ -314,15 +475,22 @@ def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> La
         W = max(int(round(math.sqrt(area / aspect))), 1)
         W = max(W, widest_min_dm)                    # a room can never be wider than the footprint's short side
         L = max(int(round(area / W)), W, 1)
+        if fixed_length_m is not None:
+            L = int(round(fixed_length_m * DM))
+        if fixed_width_m is not None:
+            W = int(round(fixed_width_m * DM))
         while L * W < need_dm2 - 1e-6:
             L += 1
         if cap_dm2 is not None and L * W > cap_dm2 + 1e-6:
             reasons["footprint_exceeds_cap"] += 1
             continue
-        if not (FOOTPRINT_ASPECT_RANGE[0] <= L / W <= FOOTPRINT_ASPECT_RANGE[1] + 1e-9):
+        if fixed_length_m is None and fixed_width_m is None and not (FOOTPRINT_ASPECT_RANGE[0] <= L / W <= FOOTPRINT_ASPECT_RANGE[1] + 1e-9):
             reasons["footprint_aspect_out_of_range"] += 1
             continue
-        H = int(rng.integers(lo_h, hi_h + 1))
+        H = int(round(fixed_height_m * DM)) if fixed_height_m is not None else int(rng.integers(lo_h, hi_h + 1))
+        if not lo_h <= H <= hi_h:
+            reasons["height_out_of_range"] += 1
+            continue
 
         # -- rooms on every floor
         rects: dict[str, Rect] = {}
@@ -349,7 +517,15 @@ def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> La
             reasons[problem] += 1
             continue
 
-        stairs = _place_stairs(rng, plan, rects, spec)
+        attempt_plan = plan
+        if plan.template_id == "generated_from_requirements":
+            links = _dynamic_links(plan, rects)
+            if links is None:
+                reasons["rooms_cannot_be_connected"] += 1
+                continue
+            attempt_plan = replace(plan, links=links)
+
+        stairs = _place_stairs(rng, attempt_plan, rects, spec)
         if stairs is None:
             reasons["stair_does_not_fit"] += 1
             continue
@@ -367,11 +543,11 @@ def generate_layout(match: TemplateMatch, spec: GenerationSpec, seed: int) -> La
             for r in plan.rooms
         )
         layout = Layout(
-            template_id=plan.template_id, seed=seed, attempts=attempt, floor_count=plan.floor_count,
+            template_id=attempt_plan.template_id, seed=seed, attempts=attempt, floor_count=attempt_plan.floor_count,
             footprint_length_m=_to_m(L), footprint_width_m=_to_m(W), height_m=_to_m(H),
-            zones=zones, stairs=stairs, links=plan.links, pruned_rooms=plan.pruned_rooms,
+            zones=zones, stairs=stairs, links=attempt_plan.links, pruned_rooms=attempt_plan.pruned_rooms,
         )
-        problems = verify_layout(layout, plan, spec)
+        problems = verify_layout(layout, attempt_plan, spec)
         if problems:  # would indicate a sampler bug; never return an unverified layout
             reasons["verifier:" + problems[0]] += 1
             continue

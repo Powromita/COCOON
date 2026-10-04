@@ -9,12 +9,10 @@ node_modules/
 out/
 next-env.d.ts
 *.tsbuildinfo
-
 # Virtual environments
 venv/
 .venv/
 env/
-
 # IDE & OS
 .vscode/
 .idea/
@@ -22,18 +20,15 @@ env/
 Thumbs.db
 *.node
 Downloads/
-
 # Environment variables
 .env
 .env.local
 .env*.local
-
 # ML models
 *.joblib
 # M5 baseline surrogates are committed deliberately (PRD §11.5)
 !data/m5_dataset_v1/model/m5_baseline_v1/*.joblib
 !data/m5_dataset_v2/model/m5_baseline_v2/gbt_reference__*.joblib
-
 # ANSYS solver working files (large, regenerable)
 ansys-pipeline/results/**/ansys_run/
 *.rth
@@ -50,21 +45,17 @@ ansys-pipeline/results/**/ansys_run/
 *.out
 cleanup-ansys-*.bat
 .__tmp__.*
-
 # M8 ANSYS worker: runtime job queue and MAPDL scratch (evidence/ IS tracked)
 ansys-pipeline/jobs/
 ansys-pipeline/**/_mapdl_work/
 ansys-pipeline/**/.lock
-
 # M7 economics: persisted analyses, idempotency keys and override audit log (runtime data)
 data/economics_runs/
 data/pipeline_runs/
 data/simulations/
 data/weather_snapshots/
-
 # Runtime solver output - never commit (PRD §2.3)
 runs/
 results/
-
 # Large zip archives
 *.zip

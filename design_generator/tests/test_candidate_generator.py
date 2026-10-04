@@ -14,8 +14,8 @@ from cocoon_contracts.materials import MaterialSnapshot
 from design_generator.candidate_generator import (
     GenerationError,
     GenerationOptions,
-    NoTemplateError,
     generate_candidates,
+    generation_options_for_policy,
 )
 from design_generator.quantities import compute_quantities, orientation_bucket
 from design_generator.requirement_parser import UnsupportedModeError
@@ -137,6 +137,32 @@ def test_only_referenced_assemblies_are_defined(ladakh):
     for c in ladakh.candidates:
         assert set(c.building.assemblies) == {s.assembly_id for s in c.building.surfaces}
 
+
+
+def test_cost_optimized_policy_caps_expensive_layers_and_preserves_u_values(snapshot_dict):
+    options = generation_options_for_policy("cost_optimized_v2")
+    result = generate_candidates(_req(maximum_mass_kg=None), snapshot_dict, seed=42, count=8,
+                                 created_at=T0, options=options)
+    assert result.complete
+    for candidate in result.candidates:
+        assert candidate.extras["material_policy"] == "cost_optimized_v2"
+        for assembly in candidate.building.assemblies.values():
+            for layer in assembly.layers:
+                if layer.material_id == "mat_plywood":
+                    assert layer.thickness_mm <= 30
+                if layer.material_id == "mat_puf" and assembly.category.value in {"wall", "roof"}:
+                    assert layer.thickness_mm <= 120
+            limit = options.max_u_value_w_m2k.get(assembly.category.value)
+            if limit is not None:
+                assert assembly.u_value_w_m2k <= limit
+            if assembly.category.value == "partition":
+                assert all(layer.material_id != "mat_puf" for layer in assembly.layers)
+
+
+def test_material_policy_names_are_explicit():
+    assert generation_options_for_policy("legacy_v1").material_policy == "legacy_v1"
+    with pytest.raises(ValueError, match="unknown material policy"):
+        generation_options_for_policy("unknown")
 
 # ------------------------------------------------------------------ windows
 def test_every_occupied_zone_gets_a_window_and_service_rooms_do_not(ladakh):
@@ -296,12 +322,39 @@ def test_no_usable_structural_material_gives_zero_candidates_with_a_reason(snaps
 
 
 # ------------------------------------------------------------------ errors
-def test_no_template_for_the_requested_rooms(snapshot_dict):
+def test_request_without_a_matching_template_uses_requirement_layout(snapshot_dict):
     req = _req(maximum_floors=1, maximum_footprint_m2=100.0)
     req["mission"]["required_rooms"] = ["airlock", "command", "medical"]      # no template has both
-    with pytest.raises(NoTemplateError) as err:
-        generate_candidates(req, snapshot_dict, seed=1, count=1, created_at=T0)
-    assert err.value.code == "NO_TEMPLATE_FITS"
+    res = generate_candidates(req, snapshot_dict, seed=1, count=1, created_at=T0)
+    assert res.complete
+    candidate = res.candidates[0]
+    assert candidate.extras["template_id"] == "generated_from_requirements"
+    assert candidate.extras["layout_source"] == "requirements"
+    assert {zone.type for floor in candidate.building.floors for zone in floor.zones} == {
+        "airlock", "command", "medical"
+    }
+    assert candidate.report.ok
+
+
+def test_current_five_room_config_generates_separate_valid_candidates(snapshot_dict):
+    req = _req(maximum_floors=1, maximum_footprint_m2=80.0, maximum_mass_kg=40000.0)
+    req["mission"].update(
+        occupants=12,
+        required_rooms=["airlock", "living", "equipment", "sleeping", "storage"],
+    )
+    options = GenerationOptions(
+        fixed_length_m=9.0,
+        fixed_width_m=7.0,
+        require_separate_rooms=True,
+        max_attempts=30,
+    )
+    res = generate_candidates(req, snapshot_dict, seed=42, count=3, created_at=T0, options=options)
+
+    assert res.complete
+    assert {candidate.extras["layout_source"] for candidate in res.candidates} == {"requirements"}
+    assert all(candidate.layout.footprint_area_m2 == pytest.approx(63.0) for candidate in res.candidates)
+    assert all(candidate.extras["merged_rooms"] == {} for candidate in res.candidates)
+    assert all(len(candidate.building.floors[0].zones) == 5 for candidate in res.candidates)
 
 
 def test_bad_arguments(snapshot_dict):

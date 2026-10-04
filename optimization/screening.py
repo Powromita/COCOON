@@ -47,6 +47,9 @@ ML_TARGETS = ("min_occupied_temperature_c", "mean_occupied_temperature_c", "max_
 ML_SHORTLIST = "ml_shortlist"
 ML_DOMINATED = "ml_discarded_dominated"
 ML_OVER_LIMIT = "ml_discarded_over_limit"
+FAST_RC_SHORTLIST = "fast_rc_shortlist"
+FAST_RC_DOMINATED = "fast_rc_discarded_dominated"
+FAST_RC_OVER_LIMIT = "fast_rc_discarded_over_limit"
 DIRECT_UNAVAILABLE = "direct_model_unavailable"
 DIRECT_OOD = "direct_out_of_distribution"
 DIRECT_INCOMPLETE = "direct_incomplete_prediction"
@@ -345,20 +348,21 @@ def screen_candidates(
             if v and v not in model_versions:
                 model_versions.append(v)
             dev_used = dev_used or getattr(p, "label_source", "m4") == "stand_in" or bool(getattr(p, "development_only", False))
+            physics_screen = bool(v and str(v).startswith("m4-fast-screen"))
             meta = dict(ml_status=STATUS_OK, predicted={d.name: raw[did][k] for k, d in enumerate(dims_used)},
                         model_version=v, label_source=getattr(p, "label_source", None),
-                        recommendation_state=RecommendationState.SCREENED_BY_ML, ml_rank=layer[did])
+                        recommendation_state=None if physics_screen else RecommendationState.SCREENED_BY_ML, ml_rank=layer[did])
             if did in chosen_set:
                 reason = "shortlisted for RC verification" if did in safe else \
                     "kept to reach the minimum shortlist although the model ranks it lower"
-                records[did] = ScreeningRecord(did, "send_to_rc", ML_SHORTLIST, reason, **meta)
+                records[did] = ScreeningRecord(did, "send_to_rc", FAST_RC_SHORTLIST if physics_screen else ML_SHORTLIST, reason, **meta)
             elif dominators[did]:
                 records[did] = ScreeningRecord(
-                    did, "discard", ML_DOMINATED,
-                    f"predicted worse than {dominators[did][0]} by more than the safety margin on every dimension",
+                    did, "discard", FAST_RC_DOMINATED if physics_screen else ML_DOMINATED,
+                    f"screened worse than {dominators[did][0]} by more than the safety margin on every dimension",
                     dominated_by=tuple(dominators[did]), **meta)
             else:
-                records[did] = ScreeningRecord(did, "discard", ML_OVER_LIMIT,
+                records[did] = ScreeningRecord(did, "discard", FAST_RC_OVER_LIMIT if physics_screen else ML_OVER_LIMIT,
                                                f"beyond the shortlist limit of {settings.shortlist_size} (best-ranked designs were kept)", **meta)
 
     ordered = tuple(records[i] for i in ids)

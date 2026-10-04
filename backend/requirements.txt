@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+PyJWT[crypto]>=2.10,<3
+supabase>=2.0
+python-dotenv>=1.0

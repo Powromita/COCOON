@@ -19,6 +19,8 @@ EXPECTED_IDS = {
     "single_room",
     "airlock_living",
     "airlock_living_equipment",
+    "airlock_living_sleeping",
+    "airlock_living_sleeping_storage",
     "living_sleeping_storage",
     "command_post",
     "medical_post",
