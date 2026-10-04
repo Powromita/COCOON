@@ -375,10 +375,10 @@ export function useAnsysStatus(revisionId: string | undefined) {
   });
 }
 
-export function useSubmitAnsys(building: BuildingModel | undefined) {
+export function useSubmitAnsys(optimizationId: string, designId: string, building: BuildingModel | undefined) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => ansysService.submitValidation(building as BuildingModel),
+    mutationFn: () => ansysService.submitValidation(optimizationId, designId),
     onSuccess: () => {
       if (building) void queryClient.invalidateQueries({ queryKey: queryKeys.ansysLatest(building.revision_id) });
     },

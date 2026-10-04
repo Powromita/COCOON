@@ -53,7 +53,7 @@ class M5Predictor:
         from optimization.screening import STATUS_OK, STATUS_OOD, STATUS_UNAVAILABLE, Prediction
         if not self.available:
             return [Prediction(STATUS_UNAVAILABLE, None, self.reason, self.model_version) for _ in candidates]
-        import surrogate
+        from ml import surrogate
         try:
             rows = surrogate.predict(
                 [surrogate.Candidate(c.building, self.weather, self.setpoint_c,

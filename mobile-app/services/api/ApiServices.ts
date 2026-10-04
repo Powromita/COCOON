@@ -105,7 +105,7 @@ export class ApiGenerationService implements GenerationService {
       count: input.count,
       seed: input.seed,
       materials_snapshot_id: input.materialsSnapshotId ?? null,
-      validate_with_ansys: false,
+      validate_with_ansys: input.validateWithAnsys ?? false,
       baseline_economics: input.baselineEconomics ?? true,
       template_id: input.templateId ?? null,
       room_arrangement: input.roomArrangement ?? {},
@@ -262,8 +262,8 @@ export class ApiAnsysService implements AnsysService {
     return this.api.get(`${ANSYS}/revisions/${enc(revisionId)}/latest`);
   }
 
-  submitValidation(building: BuildingModel): Promise<AnsysSubmitResponse> {
-    return this.api.post(`${ANSYS}/jobs`, { building }, { timeoutMs: 60_000 });
+  submitValidation(optimizationId: string, designId: string): Promise<AnsysSubmitResponse> {
+    return this.api.post(`${ANSYS}/jobs`, { optimization_id: optimizationId, design_id: designId }, { timeoutMs: 60_000 });
   }
 
   getJob(jobId: string): Promise<AnsysValidationResult> {

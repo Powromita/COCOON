@@ -389,6 +389,7 @@ def _job(opt_id: str, body: OptimizationBody, template_ids: list[str]) -> None:
     _set_status(d, stages=stages)
     try:
         cfg = PipelineConfig(seed=body.seed, count=body.count, site=body.site, materials=_materials(body.materials_snapshot_id),
+                             weather_store=_store(),
                              baseline_economics=body.baseline_economics, persist=True, run_id=opt_id,
                              runs_dir=settings.PIPELINE_RUNS_DIR,
                              ansys="submit" if body.validate_with_ansys else "not_requested",

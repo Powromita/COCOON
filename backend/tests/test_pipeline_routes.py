@@ -113,7 +113,7 @@ def test_simulation_errors_use_the_envelope():
     assert client.get("/api/v1/simulations/../x").status_code == 404
 
 
-def test_optimization_runs_in_the_background_and_exposes_its_results():
+def test_optimization_runs_in_the_background_and_exposes_its_results(monkeypatch):
     r = client.post("/api/v1/optimizations", json={"requirements": requirements(), "count": 3, "seed": 42})
     assert r.status_code == 201
     oid = r.json()["optimization_id"]
@@ -128,6 +128,22 @@ def test_optimization_runs_in_the_background_and_exposes_its_results():
     assert par["pareto"]["front"] and "best_overall" in par["picks"]["picks"]
     b = client.get(f"/api/v1/optimizations/{oid}/designs/{s['recommended_design_id']}")
     assert b.status_code == 200 and b.json()["design_id"] == s["recommended_design_id"]
+    captured = {}
+
+    def freeze(building, weather, materials, config, **kwargs):
+        captured.update(building=building, weather=weather, materials=materials)
+        return type("Request", (), {"job_id": "ans_package_only", "design_revision_id": building.revision_id})(), Path("unused")
+
+    monkeypatch.setattr("backend.routes.ansys.create_package", freeze)
+    monkeypatch.setattr("backend.routes.ansys._run_in_background", lambda _: None)
+    submitted = client.post("/api/ansys/jobs", json={
+        "optimization_id": oid,
+        "design_id": s["recommended_design_id"],
+    })
+    assert submitted.status_code == 201, submitted.text
+    assert captured["building"].revision_id == b.json()["revision_id"]
+    assert captured["weather"].snapshot_id == s["result"]["weather_snapshot_id"]
+    assert captured["materials"].snapshot_id == "mat_snap_himalayan_v1"
     assert client.get(f"/api/v1/optimizations/{oid}/designs/des_nope").status_code == 404
     assert client.get(f"/api/v1/optimizations/{oid}/designs/..%2Fresult").status_code == 404
 

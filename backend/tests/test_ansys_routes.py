@@ -101,6 +101,13 @@ def test_submit_rejects_malformed_building():
     assert r.status_code == 422
 
 
+def test_inline_building_cannot_silently_use_default_weather_or_materials():
+    building = client.get("/api/ansys/cases/case_03_airlock_living").json()
+    r = client.post("/api/ansys/jobs", json={"building": building})
+    assert r.status_code == 422
+    assert "explicit 'weather' and 'materials'" in r.json()["detail"]
+
+
 def test_unknown_job_is_404():
     assert client.get("/api/ansys/jobs/not-a-real-job").status_code == 404
     assert client.get("/api/ansys/jobs/not-a-real-job/artifacts").status_code == 404

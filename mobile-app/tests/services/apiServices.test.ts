@@ -48,10 +48,11 @@ describe("ApiGenerationService", () => {
       requirements: fx.getSampleRequirements(),
       count: 8,
       seed: 42,
+      validateWithAnsys: true,
       idempotencyKey: "gen:prj_x:1",
     });
     expect(jobId).toBe(fx.RECORDED_OPTIMIZATION_ID);
-    expect(calls[0].body).toEqual(expect.objectContaining({ count: 8, seed: 42, requirements: fx.getSampleRequirements() }));
+    expect(calls[0].body).toEqual(expect.objectContaining({ count: 8, seed: 42, validate_with_ansys: true, requirements: fx.getSampleRequirements() }));
     expect(calls[0].headers["Idempotency-Key"]).toBe("gen:prj_x:1");
     // The submitted contract is remembered for the results screens.
     expect(await svc.getSubmittedRequirements(jobId)).toEqual(fx.getSampleRequirements());
@@ -186,8 +187,12 @@ describe("ApiAnsysService", () => {
     });
     const service = new ApiAnsysService(client);
 
-    await expect(service.submitValidation(building)).resolves.toEqual(submission);
-    expect(calls[0]).toEqual(expect.objectContaining({ method: "POST", url: "/api/ansys/jobs", body: { building } }));
+    await expect(service.submitValidation("opt_test", building.design_id)).resolves.toEqual(submission);
+    expect(calls[0]).toEqual(expect.objectContaining({
+      method: "POST",
+      url: "/api/ansys/jobs",
+      body: { optimization_id: "opt_test", design_id: building.design_id },
+    }));
     await expect(service.getJob(submission.job_id)).resolves.toEqual(
       expect.objectContaining({ status: "COMPLETED", metrics: expect.objectContaining({ mae_c: 1.2 }) })
     );

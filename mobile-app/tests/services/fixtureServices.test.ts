@@ -83,7 +83,7 @@ describe("other fixture providers", () => {
   it("does not simulate an ANSYS run", async () => {
     const svc = new FixtureAnsysService();
     expect((await svc.getLatestForRevision("rev_x")).status).toBe("NOT_REQUESTED");
-    await expect(svc.submitValidation(fx.getRecordedDesign("des_5951c6f961b7"))).rejects.toEqual(
+    await expect(svc.submitValidation("opt_test", "des_5951c6f961b7")).rejects.toEqual(
       expect.objectContaining({ kind: "unavailable" })
     );
   });

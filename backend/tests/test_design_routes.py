@@ -124,8 +124,7 @@ def test_optimization_job_reports_real_stages_and_provenance():
     assert s["template_catalog_version"] == catalog_version() and s["template_selection"] == "automatic"
     stages = {st["id"]: st["status"] for st in s["stages"]}
     assert stages["compatibility"] == stages["weather"] == stages["generation"] == "completed"
-    assert stages["simulation"] == stages["optimization"] == "completed"
-    assert stages["economics"] == "skipped"            # M7 is turned off in cocoon_pipeline.run_pipeline for now
+    assert stages["simulation"] == stages["optimization"] == stages["economics"] == "completed"
     assert stages["ansys"] == "not_requested"
     d = settings.PIPELINE_RUNS_DIR / oid
     assert json.loads((d / "compatibility.json").read_text())["ok"] is True

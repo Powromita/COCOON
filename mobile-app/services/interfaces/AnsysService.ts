@@ -1,4 +1,4 @@
-import type { AnsysValidationResult, BuildingModel } from "@cocoon/contracts";
+import type { AnsysValidationResult } from "@cocoon/contracts";
 
 import type { AnsysNotRequested, AnsysSubmitResponse } from "../../types/backend";
 
@@ -8,6 +8,6 @@ import type { AnsysNotRequested, AnsysSubmitResponse } from "../../types/backend
  */
 export interface AnsysService {
   getLatestForRevision(revisionId: string): Promise<AnsysValidationResult | AnsysNotRequested>;
-  submitValidation(building: BuildingModel): Promise<AnsysSubmitResponse>;
+  submitValidation(optimizationId: string, designId: string): Promise<AnsysSubmitResponse>;
   getJob(jobId: string): Promise<AnsysValidationResult>;
 }

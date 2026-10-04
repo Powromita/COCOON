@@ -38,7 +38,7 @@ export function ValidationTab({ ctx }: { ctx: ResultsContext }) {
   const unit = useAppStore((s) => s.temperatureUnit);
   const revision = ctx.building?.revision_id;
   const ansys = useAnsysStatus(revision);
-  const submit = useSubmitAnsys(ctx.building);
+  const submit = useSubmitAnsys(ctx.optimizationId, ctx.designId, ctx.building);
   const caps = useCapabilities();
   const ansysCapability = capabilityStatus(caps.data, "ansys");
   const sim = ctx.simulation.data?.data;

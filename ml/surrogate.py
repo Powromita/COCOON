@@ -114,6 +114,12 @@ def _assets(model_dir: Path = MODEL_DIR) -> dict:
 
 @lru_cache(maxsize=4)
 def _load_assets(model_dir: Path) -> dict:
+    if "_loss" not in sys.modules:
+        try:
+            import sklearn._loss._loss as _loss_submodule
+            sys.modules["_loss"] = _loss_submodule
+        except Exception:
+            pass
     support = json.loads((model_dir / "surrogate_support.json").read_text(encoding="utf-8"))
     meta = json.loads((model_dir / "metadata.json").read_text(encoding="utf-8"))
     family = support.get("production_model_family", PRODUCTION_FAMILY)

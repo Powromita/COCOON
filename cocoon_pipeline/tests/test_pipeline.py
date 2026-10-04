@@ -45,6 +45,10 @@ def test_end_to_end_uses_the_real_engine_and_recommends_a_design(run):
     assert res.validation["state"] == "RC_ONLY_ANSYS_NOT_REQUESTED"
     assert res.weather_snapshot_id == "wx_leh_20260101T00_168h"
     assert res.site_used["site"] == "leh" and res.site_used["chosen"] == "nearest_cached_site" and res.site_used["is_cached"] is True
+    assert opt.recommended.status == "selected"
+    assert opt.pick("lowest_lcc").status == "selected" and opt.pick("lowest_capex").status == "selected"
+    recommended = next(o for o in opt.objectives if o.design_id == res.recommended_design_id)
+    assert recommended.values["capex_inr"].value > 0 and recommended.values["lcc_inr"].value > 0
 
 
 def test_persisted_files_are_what_the_backend_reads(run):
@@ -178,6 +182,7 @@ def test_ml_on_screens_but_every_finalist_is_verified_by_m4(store):
     res = run_pipeline(requirements(), PipelineConfig(count=10, seed=3, use_ml="on", weather_store=store))
     ml = res.final_report["provenance"]["ml"]
     assert ml["used"] is True and ml["model_version"]
+    assert res.optimization.screening.ml_used is True and res.optimization.screening.model_versions
     vc = res.optimization.verified[res.recommended_design_id]
     assert vc.status == "verified" and vc.recommendation_state.value == "VERIFIED_BY_RC"
     assert res.optimization.development_only is False

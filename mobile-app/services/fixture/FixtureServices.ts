@@ -214,7 +214,7 @@ export class FixtureAnsysService implements AnsysService {
     return later(() => ({ design_revision_id: revisionId, status: "NOT_REQUESTED" as const }));
   }
 
-  async submitValidation(_building: BuildingModel): Promise<AnsysSubmitResponse> {
+  async submitValidation(_optimizationId: string, _designId: string): Promise<AnsysSubmitResponse> {
     throw new AppError({
       kind: "unavailable",
       message: "ANSYS validation cannot run in demo mode.",

@@ -108,8 +108,7 @@ def _progress(cfg: PipelineConfig, stage: str) -> None:
 
 
 def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig | None = None) -> PipelineResult:
-    # Economics disabled for now — pass None so optimize() ranks on thermal metrics only.
-    # from economics.provider import make_economics
+    from economics.provider import make_economics
     from m3_data import WeatherStore, standard_snapshot
     from m4_engine import M4Evaluator
     from optimization import OptimizationSettings, ScreeningSettings, optimize
@@ -129,8 +128,7 @@ def run_pipeline(requirements: RequirementsContract | dict, cfg: PipelineConfig 
     _progress(cfg, "weather")
 
     evaluator = M4Evaluator(materials, store)
-    economics = None  # economics disabled — no assumption sets needed
-    _progress(cfg, "economics_disabled")       # so a status display shows M7 as not run, not as completed
+    economics = make_economics(materials, requirements)
     settings = cfg.optimization if cfg.optimization is not None else OptimizationSettings()
 
     predictor, ml_info = _ml_predictor(cfg, requirements, weather)

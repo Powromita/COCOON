@@ -67,6 +67,8 @@ DEFAULT_MATERIALS = settings.ANSYS_CASES_DIR / "materials_m0_standard.json"
 
 class SubmitBody(BaseModel):
     building: dict | None = Field(default=None, description="M0 BuildingModel, inline")
+    optimization_id: str | None = Field(default=None, description="completed integrated optimization owning the design")
+    design_id: str | None = Field(default=None, description="design selected from the integrated optimization")
     case: str | None = Field(default=None, description="name from GET /api/ansys/cases, "
                              "instead of an inline 'building'")
     weather: dict | None = Field(default=None, description="M0 WeatherSnapshot; default is "
@@ -113,6 +115,38 @@ def _load_contract(model_cls, inline, default_path, what):
     raise HTTPException(422, f"provide '{what}' (no default snapshot bundled)")
 
 
+def _optimization_inputs(optimization_id: str, design_id: str):
+    from .pipeline import _materials, _store
+
+    run_dir = (settings.PIPELINE_RUNS_DIR / optimization_id).resolve()
+    try:
+        run_dir.relative_to(settings.PIPELINE_RUNS_DIR.resolve())
+    except ValueError:
+        raise HTTPException(404, "unknown optimization or design")
+    result_path = run_dir / "result.json"
+    request_path = run_dir / "request.json"
+    building_path = (run_dir / "candidates" / f"{design_id}.building.json").resolve()
+    try:
+        building_path.relative_to(run_dir)
+    except ValueError:
+        raise HTTPException(404, "unknown optimization or design")
+    if not result_path.is_file() or not request_path.is_file() or not building_path.is_file():
+        raise HTTPException(404, "unknown completed optimization or design")
+
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    request = json.loads(request_path.read_text(encoding="utf-8"))
+    building = BuildingModel.model_validate_json(building_path.read_text(encoding="utf-8"))
+    if building.design_id != design_id:
+        raise HTTPException(409, "stored design identity does not match the requested design")
+    try:
+        weather = _store().get(result["weather_snapshot_id"])
+    except KeyError:
+        from m3_data import WeatherStore
+        weather = WeatherStore().get(result["weather_snapshot_id"])
+    materials = _materials(request.get("materials_snapshot_id"))
+    return building, weather, materials
+
+
 @router.get("/cases")
 def list_cases():
     """Demo/dev BuildingModels (the M8 evidence fixtures) usable in POST
@@ -134,22 +168,33 @@ def get_case(name: str):
 @router.post("/jobs", status_code=201)
 def submit_job(body: SubmitBody):
     _require_available()
-    if body.case:
+    authoritative = body.optimization_id is not None or body.design_id is not None
+    if authoritative:
+        if not body.optimization_id or not body.design_id:
+            raise HTTPException(422, "provide both 'optimization_id' and 'design_id'")
+        if body.case or body.building is not None or body.weather is not None or body.materials is not None:
+            raise HTTPException(422, "optimization design submission cannot override building, weather, or materials")
+        building, weather, materials = _optimization_inputs(body.optimization_id, body.design_id)
+    elif body.case:
         if ".." in body.case or "/" in body.case or "\\" in body.case:
             raise HTTPException(422, f"invalid case name '{body.case}'")
         case_path = settings.ANSYS_CASES_DIR / f"{body.case}.json"
         if not case_path.is_file():
             raise HTTPException(422, f"unknown case '{body.case}'; see GET /api/ansys/cases")
         building = BuildingModel.model_validate_json(case_path.read_text(encoding="utf-8"))
+        weather = _load_contract(WeatherSnapshot, body.weather, DEFAULT_WEATHER, "weather")
+        materials = _load_contract(MaterialSnapshot, body.materials, DEFAULT_MATERIALS, "materials")
     elif body.building is not None:
         building = _load_contract(BuildingModel, body.building, None, "building")
+        if body.weather is None or body.materials is None:
+            raise HTTPException(422, "inline building submissions require explicit 'weather' and 'materials'")
+        weather = _load_contract(WeatherSnapshot, body.weather, None, "weather")
+        materials = _load_contract(MaterialSnapshot, body.materials, None, "materials")
     else:
-        raise HTTPException(422, "provide either 'case' or 'building'")
+        raise HTTPException(422, "provide an optimization design, a case, or an inline building")
 
-    weather = _load_contract(WeatherSnapshot, body.weather, DEFAULT_WEATHER, "weather")
     if body.hours:
         weather = weather.model_copy(update={"hourly_data": weather.hourly_data[:body.hours]})
-    materials = _load_contract(MaterialSnapshot, body.materials, DEFAULT_MATERIALS, "materials")
 
     cfg = AnsysSolverConfig(element_size_m=body.element_size_m, element_type="SOLID70",
                             substeps_min=body.substeps_per_hour,
